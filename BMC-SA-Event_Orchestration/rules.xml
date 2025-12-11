@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process>
+   <process-def name=":BMC-SA-Event_Orchestration:rules">
+      <sequence>
+         <switch>
+            <meta>
+               <peer-location>
+                  <location>any</location>
+               </peer-location>
+            </meta>
+            <execute-all-applicable-cases>true</execute-all-applicable-cases>
+            <case name="Process Common Event" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[boolean(//event/metaData) = 'true' and boolean(//event/sourceData) = 'true' and boolean(//event/reporterData) and boolean(//event/extendedData) and boolean(//nameValue[name = 'eo-event-type'])='true']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[boolean(//event/metaData) = 'true' and boolean(//event/sourceData) = 'true' and boolean(//event/reporterData) and boolean(//event/extendedData) and boolean(//nameValue[name = 'eo-event-type'])]]></from>
+                     <fromKey><![CDATA[4034]]></fromKey>
+                     <to><![CDATA['true']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>BMC-SA-Event_Orchestration</group>
+                     <name-prefix>Process Common Event</name-prefix>
+                     <process-name>:BMC-SA-Event_Orchestration:Process Event</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+         </switch>
+      </sequence>
+      <meta>
+         <peer-location>
+            <location>any</location>
+         </peer-location>
+      </meta>
+      <parameters>
+         <input>
+            <from>inputevent</from>
+            <to>inputevent</to>
+         </input>
+      </parameters>
+   </process-def>
+</process>
+

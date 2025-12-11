@@ -1,0 +1,226 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Convert Output to XML">
+    <parameters>
+      <input global="false" required="true">
+        <description>Sample: 
+&lt;XML&gt;
+  &lt;json&gt;
+    &lt;rest-adapter-response&gt;
+      &lt;header-lines&gt;
+        &lt;Transfer-Encoding&gt;chunked&lt;/Transfer-Encoding&gt;
+        &lt;Keep-Alive&gt;timeout=60&lt;/Keep-Alive&gt;
+        &lt;Server&gt;platform-web-server&lt;/Server&gt;
+        &lt;X-Content-Type-Options&gt;nosniff&lt;/X-Content-Type-Options&gt;
+        &lt;Connection&gt;keep-alive&lt;/Connection&gt;
+        &lt;Pragma&gt;no-cache&lt;/Pragma&gt;
+        &lt;Date&gt;Fri, 19 Jun 2020 18:05:41 GMT&lt;/Date&gt;
+        &lt;X-Frame-Options&gt;DENY&lt;/X-Frame-Options&gt;
+        &lt;Strict-Transport-Security&gt;max-age=31536000; includeSubDomains&lt;/Strict-Transport-Security&gt;
+        &lt;Cache-Control&gt;no-store&lt;/Cache-Control&gt;
+        &lt;Content-Security-Policy&gt;script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*&lt;/Content-Security-Policy&gt;
+        &lt;X-XSS-Protection&gt;1; mode=block&lt;/X-XSS-Protection&gt;
+        &lt;Content-Type&gt;application/json;charset=UTF-8&lt;/Content-Type&gt;
+      &lt;/header-lines&gt;
+      &lt;metadata&gt;
+        &lt;status&gt;success&lt;/status&gt;
+      &lt;/metadata&gt;
+      &lt;status-line&gt;
+        &lt;code&gt;200&lt;/code&gt;
+      &lt;/status-line&gt;
+      &lt;message-body&gt;
+        &lt;name&gt;error message&lt;/name&gt;
+        &lt;value /&gt;
+      &lt;/message-body&gt;
+      &lt;message-body&gt;
+        &lt;name&gt;triage output&lt;/name&gt;
+        &lt;value&gt;&amp;lt;triage-output&amp;gt;&amp;lt;pod-status&amp;gt;&amp;lt;waiting&amp;gt;&amp;lt;reason&amp;gt;CrashLoopBackOff&amp;lt;/reason&amp;gt;&amp;lt;message&amp;gt;Back-off 5m0s restarting failed container=calico-node pod=calico-node-hk7x8_kube-system(adc017cc-94ca-11ea-91f1-005056857b5d)&amp;lt;/message&amp;gt;&amp;lt;/waiting&amp;gt;&amp;lt;conditions&amp;gt;&amp;lt;reason&amp;gt;ContainersNotReady&amp;lt;/reason&amp;gt;&amp;lt;lastTransitionTime&amp;gt;2020-05-13T03:34:40Z&amp;lt;/lastTransitionTime&amp;gt;&amp;lt;message&amp;gt;containers with unready status: [calico-node]&amp;lt;/message&amp;gt;&amp;lt;type&amp;gt;Ready&amp;lt;/type&amp;gt;&amp;lt;lastProbeTime&amp;gt;null&amp;lt;/lastProbeTime&amp;gt;&amp;lt;status&amp;gt;False&amp;lt;/status&amp;gt;&amp;lt;/conditions&amp;gt;&amp;lt;conditions&amp;gt;&amp;lt;reason&amp;gt;ContainersNotReady&amp;lt;/reason&amp;gt;&amp;lt;lastTransitionTime&amp;gt;2020-05-13T03:34:40Z&amp;lt;/lastTransitionTime&amp;gt;&amp;lt;message&amp;gt;containers with unready status: [calico-node]&amp;lt;/message&amp;gt;&amp;lt;type&amp;gt;ContainersReady&amp;lt;/type&amp;gt;&amp;lt;lastProbeTime&amp;gt;null&amp;lt;/lastProbeTime&amp;gt;&amp;lt;status&amp;gt;False&amp;lt;/status&amp;gt;&amp;lt;/conditions&amp;gt;&amp;lt;container-log&amp;gt;2020-06-19 18:02:44.386 [INFO][7] startup.go 256: Early log level set to info2020-06-19 18:02:44.387 [INFO][7] startup.go 274: Using stored node name from /var/lib/calico/nodename2020-06-19 18:02:44.387 [INFO][7] startup.go 284: Determined node name: clm-aus-tcqi31Calico node failed to startERROR: Error accessing the Calico datastore: context deadline exceeded&amp;lt;/container-log&amp;gt;&amp;lt;/pod-status&amp;gt;&amp;lt;remediation-required&amp;gt;true&amp;lt;/remediation-required&amp;gt;&amp;lt;status&amp;gt;success&amp;lt;/status&amp;gt;&amp;lt;error-message /&amp;gt;&amp;lt;/triage-output&amp;gt;&lt;/value&gt;
+      &lt;/message-body&gt;
+      &lt;message-body&gt;
+        &lt;name&gt;status&lt;/name&gt;
+        &lt;value&gt;success&lt;/value&gt;
+      &lt;/message-body&gt;
+    &lt;/rest-adapter-response&gt;
+  &lt;/json&gt;
+&lt;/XML&gt;</description>
+        <from>detailed process output</from>
+        <to>detailed process output</to>
+      </input>
+      <output global="false" required="false">
+        <to>output xml</to>
+        <from>output xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>detailed process output</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>output xml</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <process-output>
+      <xsl:apply-templates select="//message-body" />
+    </process-output>
+  </xsl:template>
+  <xsl:template match="message-body">
+    <xsl:choose>
+      <xsl:when test="./*[name() = 'name']/text() = 'status'">
+        <status>
+          <xsl:value-of select="./*[name() = 'value']/text()" disable-output-escaping="no" />
+        </status>
+      </xsl:when>
+      <xsl:when test="./*[name() = 'name']/text() = 'error message'">
+        <error-message>
+          <xsl:value-of select="./*[name() = 'value']/text()" disable-output-escaping="no" />
+        </error-message>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>detailed process output</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>xml string</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="//message-body[name/text() != 'status' and name/text() != 'error-message']/value/text()" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:XML String to XML</process-name>
+        <parameters>
+          <input>
+            <from>xml string</from>
+            <to>XML String</to>
+          </input>
+          <output>
+            <from>XML</from>
+            <to>xml data</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>xml data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>xml data</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="./*/*" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML Preserve Namespace</process-name>
+        <parameters>
+          <input>
+            <from>output xml</from>
+            <to>parent xml</to>
+          </input>
+          <input>
+            <from>xml data</from>
+            <to>child xml</to>
+          </input>
+          <output>
+            <from>result xml</from>
+            <to>output xml</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Convert message body of Execute Process with Auth Token  into XML. Note - this is not always applicable if the message is not inherently an XML.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b33760cc-5549-423a-abb1-774d2b1206a9</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1592596099541</last-modified>
+    </meta>
+  </process-def>
+</process>

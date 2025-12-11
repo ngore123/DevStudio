@@ -1,0 +1,174 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Network_Utilities:Get Multicast Router Information">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The multicast router to query.</description>
+        <from>multicast router</from>
+        <to>mrouter</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the IP address of the interface from which you want to send the mrinfo query. By default</description>
+        <from>interface address</from>
+        <to>iaddress</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the neighbor query retry limit. The default value is 3.</description>
+        <from>neighbor query limit</from>
+        <to>querylimit</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies how long in seconds mrinfo waits for a neighbor query reply. The default value is 4.</description>
+        <from>query interval</from>
+        <to>interval</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="iaddress">
+                  <input global="false">
+                    <from>iaddress</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="querylimit">
+                  <input global="false">
+                    <from>querylimit</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="interval">
+                  <input global="false">
+                    <from>interval</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="mrouter">
+                  <input global="false">
+                    <from>mrouter</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">mrinfo -n</xsl:text>
+        <xsl:if test="string-length('${interval}')!=0  and string(number(${interval}))!='NaN'">
+          <xsl:text disable-output-escaping="no"> -t ${interval}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${querylimit}')!=0 and string(number(${querylimit})) ">
+          <xsl:text disable-output-escaping="no"> -r ${querylimit}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${iaddress}')!=0">
+          <xsl:text disable-output-escaping="no"> -i ${iaddress}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> ${mrouter}</xsl:text>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported"</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported"</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Displays the configuration of a multicast router.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>c37965d6-d29b-3ef0-a353-b5031e36ebd1</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288093248338</last-modified>
+    </meta>
+  </process-def>
+</process>

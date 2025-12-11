@@ -1,0 +1,208 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AutoPilot-OA-IP-Address-Management:Get Used IP Address">
+    <parameters>
+      <input global="false" required="true">
+        <description>Subnet Address to get Profile for.</description>
+        <from>Subnet Address</from>
+        <to>subnet address</to>
+      </input>
+      <input global="false" required="true">
+        <description>Configuration name from module configuration.
+Valid values: VitalQIP.</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Scope can have twos possible values
+1. Any string : It is a organization name same as pod name. 
+2. null : in this case we will use default organization.</description>
+        <from>scope</from>
+        <to>scope</to>
+      </input>
+      <output global="false" required="false">
+        <description>operation status.
+valid values: true, false.</description>
+        <to>success status</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="false">
+        <description>incase of any error, error message goes here.  </description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>List of ipaddresses which are used in the subnet. i.e. those all address which are not in unused state.
+
+Valid value:
+&lt;addresses&gt;
+   &lt;host-address&gt;
+         &lt;address&gt;a.b.c.d&lt;/address&gt;
+   &lt;host-address&gt;
+&lt;/addresses&gt;
+
+</description>
+        <to>used-addresses</to>
+        <from>used-addresses</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-IP-Address-Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>user name</from>
+            <to>user name</to>
+          </output>
+          <output>
+            <from>password</from>
+            <to>password</to>
+          </output>
+          <output>
+            <from>organization</from>
+            <to>organization</to>
+          </output>
+          <output>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value>This IPAM solution s not supported</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>success</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="VitalQIP"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-VitalQIP:Get Object List</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>user name</from>
+                  <to>user name</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>password</to>
+                </input>
+                <input>
+                  <from>organization</from>
+                  <to>organization</to>
+                </input>
+                <input>
+                  <from>subnet address</from>
+                  <to>subnet-address</to>
+                </input>
+                <input>
+                  <from>scope</from>
+                  <to>scope</to>
+                </input>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>success</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>used-addresses</from>
+                  <to>used-addresses</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>49c806cd-f453-4428-96d6-9d244abcc1a1</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1298868966779</last-modified>
+    </meta>
+  </process-def>
+</process>

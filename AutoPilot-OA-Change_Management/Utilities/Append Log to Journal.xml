@@ -1,0 +1,483 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Change_Management:Utilities:Append Log to Journal">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration entry defined in a configuration module. 
+
+Example: HP_ServiceCenter
+
+Note:
+
+This is not supported by BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The change id number 
+
+HP_ServiceCenter Example: C26</description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="true">
+        <description>XML or String Value - Free text field. 
+
+Example: This is a sample log entry</description>
+        <from>log</from>
+        <to>log</to>
+      </input>
+      <input global="false" required="true">
+        <description>XML or String Value - Free text field. 
+
+Example: This is a sample summary log entry</description>
+        <from>summary</from>
+        <to>summary</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document providing the data template for single or multiple Concept elements.The change concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.</description>
+        <to>changes</to>
+        <from>changes</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success,failure
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Verbose success status message 
+
+BMC_AR_System
+
+Example:
+ 
+The retrieval of Change data has completed successfully for CRQ000000000135
+
+HP_ServiceCenter
+
+Example:
+ 
+The retrieval of Change data has completed successfully for C26</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Change_Management:Searches:Get Change by Change ID</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>change id</from>
+            <to>change id</to>
+          </input>
+          <output>
+            <from>changes</from>
+            <to>changes</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>log</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>log</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[concat("||||| ", .," ||||| " )]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>changes</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(//misc-array1-line1) > '0']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>changes</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>existing log</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//misc-array1-line1]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>existing log</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>log</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens>
+                          <replacement-token name="log">
+                            <input global="false">
+                              <from>log</from>
+                            </input>
+                          </replacement-token>
+                        </xpath-replacement-tokens>
+                        <xpath><![CDATA[concat( ., " $[log] ||||| ")]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+            <assign>
+              <assignment>
+                <input>
+                  <from>change id</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>change-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>log</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>misc-array1-line1</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>summary</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>misc-array1-line2</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>change</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>changes</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="change">
+                      <input global="false">
+                        <from>change</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Changes>
+      <xsl:choose>
+        <xsl:when test="string-length(//change) &gt; 0">
+          <xsl:copy-of select="//change" />
+        </xsl:when>
+        <xsl:otherwise>${change}</xsl:otherwise>
+      </xsl:choose>
+    </Changes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Show contents of changes</value>
+                    </input>
+                    <input>
+                      <from>changes</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Change_Management:Update Changes</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>changes</from>
+                  <to>changes</to>
+                </input>
+                <output>
+                  <from>changes</from>
+                  <to>changes</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>success</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[2]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'failure']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>change id</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[concat("Update failed for Change ID: ", .)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[2]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[2]</location>
+            </switch>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() != 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>change id</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown Change ID: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow updates the log (notes) for an existing change.
+
+This is not supported by BMC_AR_Systems
+This is not supported by BMC_AR_System. ServiceCenter</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>3c7952db-5dab-3896-9f7c-3d007510edbb</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283249282156</last-modified>
+    </meta>
+  </process-def>
+</process>

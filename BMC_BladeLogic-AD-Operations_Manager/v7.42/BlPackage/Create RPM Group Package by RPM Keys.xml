@@ -1,0 +1,543 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:BlPackage:Create RPM Group Package by RPM Keys">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Comma separated list of the DBKeys for the RPM depot objects you want to package.</description>
+        <from>dbKeyList</from>
+        <to>dbKeyList</to>
+      </input>
+      <input global="false" required="true">
+        <description>ID of the group under which you want to create the new package.</description>
+        <from>parentGroupID</from>
+        <to>parentGroupID</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the package.</description>
+        <from>pkgName</from>
+        <to>pkgName</to>
+      </input>
+      <input global="false" required="true">
+        <description>RPM Group install command.</description>
+        <from>installCmd</from>
+        <to>installCmd</to>
+      </input>
+      <input global="false" required="true">
+        <description>RPM Group uninstall command.</description>
+        <from>uninstallCmd</from>
+        <to>uninstallCmd</to>
+      </input>
+      <input global="false" required="true">
+        <description>The single-user mode.
+You can set the singleUserMode argument to one of the following strings:
+- NotRequired: Not Required
+- RevertTo: Use single-user mode without reboot
+- RebootAs: Reboot into single-user mode </description>
+        <from>singleUserMode</from>
+        <to>singleUserMode</to>
+      </input>
+      <input global="false" required="true">
+        <description>The reboot mode.
+You can set the rebootMode argument to one of the following strings:
+- NotRequired: Not required
+- AfterDeploy: After item deployment
+- OutOfBand: Out-of-band
+- AtJobEnd: By end of job </description>
+        <from>rebootMode</from>
+        <to>rebootMode</to>
+      </input>
+      <input global="false" required="false">
+        <description>The comma-separated list of return codes that should be interpreted as an error from the command. A blank string indicates that there are no overrides for this category.</description>
+        <from>installErrorRCO</from>
+        <to>installErrorRCO</to>
+      </input>
+      <input global="false" required="false">
+        <description>The comma-separated list of return codes that should be interpreted as a warning from the command. A blank string indicates that there are no overrides for this category.</description>
+        <from>installWarningRCO</from>
+        <to>installWarningRCO</to>
+      </input>
+      <input global="false" required="false">
+        <description>The comma-separated list of return codes that should be interpreted as a reboot request from the command. A blank string indicates that there are no overrides for this category.</description>
+        <from>installRebootRCO</from>
+        <to>installRebootRCO</to>
+      </input>
+      <input global="false" required="false">
+        <description>The comma-separated list of return codes that should be interpreted as success from the command. A blank string indicates that there are no overrides for this category.</description>
+        <from>installSuccessRCO</from>
+        <to>installSuccessRCO</to>
+      </input>
+      <input global="false" required="false">
+        <description>The comma-separated list of return codes that should be interpreted as an error from the undo command. A blank string indicates that there are no overrides for this category.</description>
+        <from>uninstallErrorRCO</from>
+        <to>uninstallErrorRCO</to>
+      </input>
+      <input global="false" required="false">
+        <description>The comma-separated list of return codes that should be interpreted as a warning from the undo command. A blank string indicates that there are no overrides for this category.</description>
+        <from>uninstallWarningRCO</from>
+        <to>uninstallWarningRCO</to>
+      </input>
+      <input global="false" required="false">
+        <description>The comma-separated list of return codes that should be interpreted as a reboot request from the undo command. A blank string indicates that there are no overrides for this category.</description>
+        <from>uninstallRebootRCO</from>
+        <to>uninstallRebootRCO</to>
+      </input>
+      <input global="false" required="false">
+        <description>The comma-separated list of return codes that should be interpreted as success from the undo command. A blank string indicates that there are no overrides for this category.</description>
+        <from>uninstallSuccessRCO</from>
+        <to>uninstallSuccessRCO</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the DB Key for the external command created in this process.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the Adapter response for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>dbKeyList</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>parentGroupID</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>pkgName</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>installCmd</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>uninstallCmd</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>singleUserMode</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>rebootMode</from>
+            <to>argument 7</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>installErrorRCO</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>singleUserMode</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>rebootMode</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>cmdErrorRCO</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[3]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>cmdWarningRCO</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[4]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>cmdRebootRCO</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[5]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>cmdSuccessRCO</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[6]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>undoCmdErrorRCO</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[7]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>undoCmdWarningRCO</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[8]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>undoCmdRebootRCO</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[9]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+              <parameters>
+                <input>
+                  <from>undoCmdSuccessRCO</from>
+                  <to>argument</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[10]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>BlPackage</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>createRPMGroupPackageByRPMKeys</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command adds an external command to the end of a BLPackage.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>53252bc0-cdb7-3e98-8ef5-85aab4bbdc4d</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179768524</last-modified>
+    </meta>
+  </process-def>
+</process>

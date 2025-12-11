@@ -1,0 +1,155 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct CPU Allocation Parameters">
+    <parameters>
+      <input global="false" required="false">
+        <description>CPU allocation reservation [optional]
+        Amount of resource that is guaranteed available to the virtual machine or resource pool. Reserved resources are not wasted if they are not used. If the utilization is less than the reservation, the resources can be utilized by other running virtual machines. Unit is MHz.</description>
+        <from>CPU allocation reservation</from>
+        <to>CPU allocation reservation</to>
+      </input>
+      <input global="false" required="false">
+        <description>CPU allocation limit [optional]
+       The utilization of a virtual machine/resource pool will not exceed this limit, even if there are available resources. This is typically used to ensure a consistent performance of virtual machines / resource pools independent of available resources. If set to -1, then there is no fixed limit on resource usage (only bounded by available resources and shares). Unit is MHz. </description>
+        <from>CPU allocation limit</from>
+        <to>CPU allocation limit</to>
+      </input>
+      <input global="false" required="false">
+        <description>CPU allocation shares [optional]
+       The number of shares allocated. Used to determine resource allocation in case of resource contention. This value is only set if level is set to custom. If level is not set to custom, this value is ignored. Therefore, only shares with custom values can be compared. 
+There is no unit for this value. It is a relative measure based on the settings for other resource pools.</description>
+        <from>CPU allocation shares</from>
+        <to>CPU allocation shares</to>
+      </input>
+      <input global="false" required="false">
+        <description>CPU allocation level [optional]
+          The allocation level. The level is a simplified view of shares. Levels map to a pre-determined set of numeric values for shares. If the shares value does not map to a predefined size, then the level is set as custom.
+
+valid values: 
+custom - Shares are specified in the "shares" column.  
+high - Shares = 2000 * number of virtual CPUs
+low - Shares = 500 * number of virtual CPUs
+normal - Shares = 1000 * number of virtual CPUs</description>
+        <from>CPU allocation level</from>
+        <to>CPU allocation level</to>
+      </input>
+      <output global="false" required="false">
+        <to>cpu allocation</to>
+        <from>cpu allocation</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Shares Parameters</process-name>
+        <parameters>
+          <input>
+            <from>CPU allocation shares</from>
+            <to>shares</to>
+          </input>
+          <input>
+            <from>CPU allocation level</from>
+            <to>level</to>
+          </input>
+          <output>
+            <from>shares info</from>
+            <to>shares info</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>cpu allocation</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="reservation">
+                <input global="false">
+                  <from>CPU allocation reservation</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="limit">
+                <input global="false">
+                  <from>CPU allocation limit</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="shares">
+                <input global="false">
+                  <from>shares info</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <cpu-allocation>
+      <reservation>${reservation}</reservation>
+      <limit>${limit}</limit>
+      ${shares}
+    </cpu-allocation>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs complex &lt;cpu-allocation&gt; parameter.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>863728f2-3e6f-3ada-89b0-27afc12965ec</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288251428711</last-modified>
+    </meta>
+  </process-def>
+</process>

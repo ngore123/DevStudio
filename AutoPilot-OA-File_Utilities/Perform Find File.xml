@@ -1,0 +1,184 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:Perform Find File">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The specific file for which you wish to search.</description>
+        <from>file</from>
+        <to>file</to>
+      </input>
+      <input global="false" required="false">
+        <description>The directory from which you wish to start the search. 
+If no directory is entered then the value of / will be used for Linux and SunOS. 
+For Windows: if no directory is entered</description>
+        <from>directory</from>
+        <to>directory</to>
+      </input>
+      <input global="false" required="false">
+        <description>Recursive search (include all sub directories) is only valid for Windows O/S.
+Valid value: true</description>
+        <from>recursive</from>
+        <to>recursive</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>file</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="file">
+                  <input global="false">
+                    <from>file</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="directory">
+                  <input global="false">
+                    <from>directory</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="recursive">
+                  <input global="false">
+                    <from>recursive</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">find</xsl:text>
+        <xsl:if test="string-length('${directory}') = 0">
+          <xsl:text disable-output-escaping="no"> .</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${directory}') != 0">
+          <xsl:text disable-output-escaping="no"> $[directory]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no"> -name $[file]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no"> -print</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">find</xsl:text>
+        <xsl:if test="string-length('${directory}') = 0">
+          <xsl:text disable-output-escaping="no"> .</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${directory}') != 0">
+          <xsl:text disable-output-escaping="no"> $[directory]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no"> -name $[file]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no"> -print</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">dir </xsl:text>
+        <xsl:if test="string-length('${recursive}') != 0 and '${recursive}' = 'true'">
+          <xsl:text disable-output-escaping="no"> /s </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${directory}') != 0">
+          <xsl:text disable-output-escaping="no"> $[directory]\</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">${file}</xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Find File
+    Find a file and its location.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>9e4ef927-f615-3289-b20f-05ec29fb5dfa</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902422142</last-modified>
+    </meta>
+  </process-def>
+</process>

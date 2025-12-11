@@ -1,0 +1,200 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-NetAPP_Storage:v4.0:Aggregate:Find Aggregate">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter. Default Name: NetAppActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Finds the list of all the aggregrates contained inside a Resource Group,Resource Pool,Data Set,Storage Set,Host,Aggregate,Volume,Qtree
+
+Sample Items XML:
+
+&lt;items&gt;
+&lt;item&gt;
+		&lt;targets&gt;
+			&lt;target&gt;
+				&lt;host&gt;10.10.10.10&lt;/host&gt;
+				&lt;user-name&gt;userName&lt;/user-name&gt;
+				&lt;password&gt;password&lt;/password&gt;
+				&lt;protocol&gt;http&lt;/protocol&gt;
+				&lt;port&gt;8088&lt;/port&gt;                                
+			&lt;/target&gt;
+		&lt;/targets&gt;		
+	&lt;target&gt;server1&lt;/target&gt;
+	&lt;aggregate-type&gt;aggregate&lt;/aggregate-type&gt;
+	&lt;include-is-available&gt;true&lt;/include-is-available&gt;
+	&lt;is-dp-ignored&gt;false&lt;/is-dp-ignored&gt;
+	&lt;is-in-dataset&gt;false&lt;/is-in-dataset&gt;
+	&lt;resourcepool-filter&gt;all&lt;/resourcepool-filter&gt;
+	&lt;object-name-or-id&gt;Gold_Resource_Pool&lt;/object-name-or-id&gt;
+&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+targets [Conditional] 
+
+        It is parent XML element for &lt;target&gt; XML element. 
+        The &lt;target&gt; XML element is used to specify dynamic targets at request level. 
+        Note: The &lt;targets&gt; XML element is required if the adapter configuration is empty in Grid Manager. 
+
+target [Conditional] 
+        It is child XML element of &lt;targets&gt; XML element. This element is used to specify dynamic targets at request level. 
+
+        Using dynamic targets you can define connection information for a remote host within an adapter request. This allows you to configure an adapter in Grid Manager, by specifying configuration information in an adapter request. 
+
+        Note: (1) Adapter configuration specified using request level dynamic targets takes precedence over Grid Manager level configuration information. (2) If request level dynamic target is specified using &lt;targets&gt; XML element, then the &lt;target&gt; element which is child of &lt;item&gt; element is ignored. (3) This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+host [Conditional] 
+Host name or IP address of server on which NetApp DataFabric Manager is running. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+user-name [Conditional] 
+NetApp DataFabric Manager login username. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+password [Conditional] 
+NetApp DataFabric Manager login password. 
+
+You can encrypt the password by specifying the encryption type attribute. 
+For example: &lt;password encryption-type = "Base64"&gt;cGFzc3dvcmQ=&lt;/password&gt;. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+protocol [Optional] 
+Communication protocol used by adapter. Valid value is http or https. Default value is http. 
+
+port [Optional] 
+Port on which NetApp DataFabric Manager is enabled. Default value is 8088 for http protocol and 8488 for https protocol. 
+
+target [Optional] 
+It is child XML element of &lt;item&gt; XML element. 
+You can use this element to specify the connection information for a DFM Server. For this a comma separated list of configuration names can be specified. This executes the request simultaneously on all DFM servers identified by the configuration names. 
+Valid values: 
+1. The values specified for &lt;target&gt; XML element must be same as the values that have been specified for the name attribute of &lt;config&gt; element in Grid Manager adapter configuration. 
+2. You can provide "ALL" as the value. In this case the request will get executed on all the DFM servers defined in Grid Manager adapter configuration. 
+3. You can specify multiple comma separated names to allow simultaneous execution of requests across multiple DFM servers. 
+4. You can skip this element. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+You can leave this element empty. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+
+Note: This element is ignored if request level dynamic target is specified using &lt;targets&gt; XML element.
+
+
+aggregate-type[Optional]
+	Filter by type of aggregate. Possible values are: traditional,aggregate
+	If no aggregate-type input is supplied, all types of aggregates will be listed.
+
+include-is-available[Optional]
+	This is a boolean field. If true, the is-available status is calculated for each aggregate. Default is false.
+
+is-dp-ignored[Optional]
+	This is a boolean field. If true, only list aggregates that have been set to be ignored for purposes of data protection. If false, only list aggregates that have not been set to be ignored for purposes of data protection. If not specified, list all aggregates without taking into account whether they have been ignored or not.
+
+is-in-dataset[Optional]
+	This is a boolean field. If true, only list aggregates which only contain data which is protected by a dataset. If false, only list aggregates containing data which is not protected by a dataset. If not specified, list all aggregates whether they are in a dataset or not.
+
+object-name-or-id[Optional]
+	Name or identifier of an object to list aggregates for. The allowed object types for this argument are: 
+Resource Group,Resource Pool,Data Set,Storage Set,Host,Aggregate,Volume,Qtree
+	If object-name-or-id identifies an aggregate, that single aggregate will be returned. If object-name-or-id resolves to more than one aggregate, all of them will be returned. If no object-name-or-id is provided, all aggregates will be listed.
+  
+resourcepool-filter[Optional]
+	Possible Value: 'in_rpool', 'not_in_rpool', 'all'. If set to 'in_rpool', only list aggregates that are in a resource pool. If set to 'not_in_rpool', only list aggregates that are not in a resource pool. If set to 'all', then list all aggregates. If a value is not specified, then 'all' will be the default. An aggregate is said to be in a resource pool if either the aggregate or the storage system containing the aggregate is a member of a resource pool.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>find-aggregate</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-NetAPP_Storage:Utilities:Invoke Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Finds the list of all the aggregrates contained inside a Resource Group,Resource Pool,Data Set,Storage Set,Host,Aggregate,Volume,Qtree</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>11dad0fa-c4e1-3aba-937b-af99b737f0e8</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598189454</last-modified>
+    </meta>
+  </process-def>
+</process>

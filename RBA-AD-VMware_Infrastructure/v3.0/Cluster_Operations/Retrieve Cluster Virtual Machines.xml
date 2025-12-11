@@ -1,0 +1,198 @@
+<process draft="false" dev-studio-version="7.7.02">
+  <process-def name=":RBA-AD-VMware_Infrastructure:v3.0:Cluster_Operations:Retrieve Cluster Virtual Machines">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter to use to handle the request.
+
+Default value: VMwareInfrastructure</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>items
+       The items XML used to perform "Retrieve Cluster Virtual Machines" operation.
+
+Value takes the form:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;retrieve-all-vm-properties&gt;false&lt;/retrieve-all-vm-properties&gt;
+		&lt;parameters&gt;
+				&lt;cluster-compute-resource&gt;&lt;/cluster-compute-resource&gt;
+			&lt;/parameters&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Description of 'retrieve-all-vm-properties'
+
+This flag boolean decides whether the all the VM properties are fetched or only VM name and type, if set to true all the properties of each vm is returned, otherwise only VM name and type is returned. 
+
+Default Value is false. 
+
+For description of each parameter tags, please refer Construct Item for Retrieve Cluster Virtual Machines Configuration process.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="false">
+        <description>connection parameters [optional]
+           The XML containing the metadata needed by the adapter to connect to the target.
+
+Value takes the form:
+
+&lt;connection-parameters&gt;
+	&lt;soap-url&gt;&lt;/soap-url&gt;
+	&lt;transport&gt;&lt;/transport&gt;	
+	&lt;user-name&gt;&lt;/user-name&gt;
+	&lt;password&gt;&lt;/password&gt;
+&lt;/connection-parameters&gt;</description>
+        <from>connection parameters</from>
+        <to>connection parameters</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>operation name</to>
+                  <value>Retrieve_Cluster_Virtual_Machines</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//items/item/retrieve-all-vm-properties/text()  = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>operation name</to>
+                  <value>Retrieve_Cluster_Virtual_Machines_All_Properties</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:RBA-AD-VMware_Infrastructure:Utilities:Invoke VMware Infrastructure Adapter</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>Cluster</value>
+            <to>operation type</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>connection parameters</from>
+            <to>connection parameters</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Retrieve Cluster Virtual Machines
+	This operation retrieves virtual machines in a cluster.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>40c69e5a-be6c-4df1-a731-bcef15778a4d</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1439394930706</last-modified>
+    </meta>
+  </process-def>
+</process>

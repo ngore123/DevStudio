@@ -1,0 +1,829 @@
+<process draft="false" dev-studio-version="7.8.01">
+  <process-def name=":BMC-SA-MyIT_Service_Broker_Integration:Get Service Details">
+    <parameters>
+      <input global="false" required="true">
+        <description>String [Required]
+
+The name of the Service for which the details have to be fetched. The name should match the one defined in the module configuration while declaring the service mappings. </description>
+        <from>service name</from>
+        <to>service name</to>
+      </input>
+      <output global="false" required="false">
+        <to>response</to>
+        <from>response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-MyIT_Service_Broker_Integration:Utilities:Generate Response</process-name>
+              <parameters>
+                <input>
+                  <value>failure</value>
+                  <to>status</to>
+                </input>
+                <input>
+                  <value>Service Not Found.</value>
+                  <to>error message</to>
+                </input>
+                <input>
+                  <value>Get Service Details</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>service name</from>
+                  <to>service name</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Invalid Service. Generating the Error Response.</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input global="true">
+                <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ServiceBrokerIntegration:ServiceMapping</configuration>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="service name">
+                  <input global="false">
+                    <from>service name</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[string-length(string(//service[service-name='${service name}']))>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:URL</configuration>
+                </input>
+                <output>
+                  <to>soap url</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:UserName</configuration>
+                </input>
+                <output>
+                  <to>user name</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:Password</configuration>
+                </input>
+                <output>
+                  <to>password</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:AdapterName</configuration>
+                </input>
+                <output>
+                  <to>http adapter name</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:UseSSLCertificate</configuration>
+                </input>
+                <output>
+                  <to>use ssl certificate</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:InstallSSLCertificate</configuration>
+                </input>
+                <output>
+                  <to>install certificate</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:AllowUnsignedCertificate</configuration>
+                </input>
+                <output>
+                  <to>allow unsigned certificate</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:Passphrase</configuration>
+                </input>
+                <output>
+                  <to>passphrase</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input global="true">
+                    <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ServiceBrokerIntegration:ServiceMapping</configuration>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>service path</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="name">
+                      <input global="false">
+                        <from>service name</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//service[service-name='${name}']/path/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:WebServiceAdapterName</configuration>
+                </input>
+                <output>
+                  <to>ws adapter name</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:Transport</configuration>
+                </input>
+                <output>
+                  <to>transport</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ConnectionProperties:GridName</configuration>
+                </input>
+                <output>
+                  <to>grid name</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Reading the grid details from the module configuration...</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>***url</value>
+                    </input>
+                    <input>
+                      <from>url</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-SA-MyIT_Service_Broker_Integration:Utilities:Generate Response</process-name>
+                    <parameters>
+                      <input>
+                        <value>failure</value>
+                        <to>status</to>
+                      </input>
+                      <input>
+                        <value>Service Mapping not found.</value>
+                        <to>error message</to>
+                      </input>
+                      <input>
+                        <value>Get Service Details</value>
+                        <to>request type</to>
+                      </input>
+                      <input>
+                        <from>service name</from>
+                        <to>service name</to>
+                      </input>
+                      <output>
+                        <from>json response</from>
+                        <to>response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>The Service Mapping not found for the specified service. Generating the Error Response.</value>
+                          </input>
+                          <input>
+                            <value></value>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>service path</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(.)>0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>soap url</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>soap message</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="user name">
+                            <input global="false">
+                              <from>user name</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="password">
+                            <input global="false">
+                              <from>password</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="service">
+                            <input global="false">
+                              <from>service path</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="grid name">
+                            <input global="false">
+                              <from>grid name</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+      <xsl:element name="soap:Header">
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+          <xsl:attribute name="soap:mustUnderstand">
+            <xsl:text>1</xsl:text>
+          </xsl:attribute>
+          <xsl:element name="wsse:UsernameToken">
+            <xsl:element name="wsse:Username">${user name}</xsl:element>
+            <xsl:element name="wsse:Password">
+              <xsl:attribute name="Type">
+                <xsl:text>http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText</xsl:text>
+              </xsl:attribute>
+              ${password}
+            </xsl:element>
+          </xsl:element>
+        </wsse:Security>
+      </xsl:element>
+      <xsl:element name="soap:Body">
+        <soa:getProcessDescription xmlns:soa="http://bmc.com/ao/xsd/2008/09/soa">
+          <xsl:element name="soa:gridName">${grid name}</xsl:element>
+          <xsl:element name="soa:processName">${service}</xsl:element>
+        </soa:getProcessDescription>
+      </xsl:element>
+    </soap:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>Building the SOAP Message..</value>
+                          </input>
+                          <input>
+                            <value></value>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <from>soap message</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+                    <parameters>
+                      <input>
+                        <from>ws adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>transport</from>
+                        <to>transport</to>
+                      </input>
+                      <input>
+                        <from>soap url</from>
+                        <to>soap url</to>
+                      </input>
+                      <input>
+                        <from>soap message</from>
+                        <to>soap message</to>
+                      </input>
+                      <input>
+                        <from>use ssl certificate</from>
+                        <to>use ssl certificate</to>
+                      </input>
+                      <input>
+                        <from>install certificate</from>
+                        <to>install certificate</to>
+                      </input>
+                      <input>
+                        <from>allow unsigned certificate</from>
+                        <to>allow unsigned certificate</to>
+                      </input>
+                      <input>
+                        <from>passphrase</from>
+                        <to>pass phrase</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>Invoking the SOAP adapter...</value>
+                          </input>
+                          <input>
+                            <value></value>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>SOAP Adapter Response </value>
+                          </input>
+                          <input>
+                            <from>adapter response</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <call-process>
+                          <process-name>:BMC-SA-MyIT_Service_Broker_Integration:Utilities:Generate Response</process-name>
+                          <parameters>
+                            <input>
+                              <value>failure</value>
+                              <to>status</to>
+                            </input>
+                            <input>
+                              <value>Failed to get the service details.</value>
+                              <to>error message</to>
+                            </input>
+                            <input>
+                              <value>Get Service Details</value>
+                              <to>request type</to>
+                            </input>
+                            <input>
+                              <from>service name</from>
+                              <to>service name</to>
+                            </input>
+                            <output>
+                              <from>json response</from>
+                              <to>response</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>Failed in calling the SOAP adapter. Generating the Error Response.</value>
+                                </input>
+                                <input>
+                                  <value></value>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                        </call-process>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[.='success']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Strip Namespaces</process-name>
+                          <parameters>
+                            <input>
+                              <from>adapter response</from>
+                              <to>XML</to>
+                            </input>
+                            <output>
+                              <from>XML</from>
+                              <to>XML response</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>Stripping namespaces...</value>
+                                </input>
+                                <input>
+                                  <value></value>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>Stripped namespaces:</value>
+                                </input>
+                                <input>
+                                  <from>XML response</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence>
+                              <call-process>
+                                <process-name>:BMC-SA-MyIT_Service_Broker_Integration:Utilities:Generate Response</process-name>
+                                <parameters>
+                                  <input>
+                                    <value>failure</value>
+                                    <to>status</to>
+                                  </input>
+                                  <input>
+                                    <value>Failed to get the service details.</value>
+                                    <to>error message</to>
+                                  </input>
+                                  <input>
+                                    <value>Get Service Details</value>
+                                    <to>request type</to>
+                                  </input>
+                                  <input>
+                                    <from>service name</from>
+                                    <to>service name</to>
+                                  </input>
+                                  <output>
+                                    <from>json response</from>
+                                    <to>response</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <before-execution>
+                                  <log>
+                                    <level>debug</level>
+                                    <parameters>
+                                      <input>
+                                        <value>Error in striping namespaces. Generating the Error Response.</value>
+                                      </input>
+                                      <input>
+                                        <value></value>
+                                      </input>
+                                    </parameters>
+                                  </log>
+                                </before-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>XML response</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string-length(string(/soap-response/Envelope/Body/getProcessDescriptionResponse))!=0]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>XML response</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>service params</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens />
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <service-details>
+      <description>
+        <xsl:value-of select="/soap-response/Envelope/Body/getProcessDescriptionResponse/Description/Description" disable-output-escaping="no" />
+      </description>
+      <xsl:for-each select="/soap-response/Envelope/Body/getProcessDescriptionResponse/Description/Parameters">
+        <xsl:copy-of select="./*" />
+      </xsl:for-each>
+    </service-details>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <before-execution>
+                                  <log>
+                                    <level>debug</level>
+                                    <parameters>
+                                      <input>
+                                        <value>Extracting Ouput from the response SOAP Envelope.</value>
+                                      </input>
+                                      <input>
+                                        <value></value>
+                                      </input>
+                                    </parameters>
+                                  </log>
+                                </before-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                              </assign>
+                              <call-process>
+                                <process-name>:BMC-SA-MyIT_Service_Broker_Integration:Utilities:Generate Response</process-name>
+                                <parameters>
+                                  <input>
+                                    <value>success</value>
+                                    <to>status</to>
+                                  </input>
+                                  <input>
+                                    <value>Get Service Details</value>
+                                    <to>request type</to>
+                                  </input>
+                                  <input>
+                                    <from>service name</from>
+                                    <to>service name</to>
+                                  </input>
+                                  <input>
+                                    <from>service params</from>
+                                    <to>data</to>
+                                  </input>
+                                  <output>
+                                    <from>json response</from>
+                                    <to>response</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <before-execution>
+                                  <log>
+                                    <level>debug</level>
+                                    <parameters>
+                                      <input>
+                                        <value>Successfully got the service details. Generating success response.</value>
+                                      </input>
+                                      <input>
+                                        <value></value>
+                                      </input>
+                                    </parameters>
+                                  </log>
+                                </before-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>f6d2fbba-aa75-400f-b8a5-733265939c5b</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1463474777705</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,123 @@
+<process draft="false" dev-studio-version="7.6.02.05">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Item for Remove Hard Disk">
+    <parameters>
+      <input global="false" required="true">
+        <description>The name of the virtual machine from which the virtual disks need to be removed.  
+
+Valid value:  String
+</description>
+        <from>virtual machine</from>
+        <to>virtual machine</to>
+      </input>
+      <input global="false" required="false">
+        <description>disk name: Name of the Virtual Disk to be removed.
+
+You can also supply 'disk-key' instead of 'disk-name'. Either of 'disk-key' and 'disk-name' is mandatory. If both 'disk-name' and 'disk-key' are supplied, 'disk-key' will take priority and 'disk-name' will be ignored.
+
+value: String</description>
+        <from>disk name</from>
+        <to>disk name</to>
+      </input>
+      <input global="false" required="false">
+        <description>disk key: Unique key of the Virtual Disk to be removed. This can be obtained by calling the 'Retrieve VM Configuration' method on the VM.
+
+You can also supply 'disk-name' instead of 'disk-key'. Either of 'disk-key' and 'disk-name' is mandatory. If both 'disk-name' and 'disk-key' are supplied, 'disk-key' will take priority and 'disk-name' will be ignored.
+
+value: String</description>
+        <from>disk key</from>
+        <to>disk key</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="vm">
+                <input global="false">
+                  <from>virtual machine</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="disk name">
+                <input global="false">
+                  <from>disk name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="disk key">
+                <input global="false">
+                  <from>disk key</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <parameters>
+          <virtual-machine>${vm}</virtual-machine>
+          <spec>
+            <device-change-list>
+              <device-change>
+                <device type="VirtualDisk">
+                  <xsl:choose>
+                    <xsl:when test="string-length('${disk key}')&gt;0">
+                      <disk-key>${disk key}</disk-key>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <disk-name>${disk name}</disk-name>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </device>
+              </device-change>
+            </device-change-list>
+          </spec>
+        </parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs &lt;items&gt; for Remove Hard Disk operation</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>063a6689-20db-33f8-989f-1c6f351801ed</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1363157529686</last-modified>
+    </meta>
+  </process-def>
+</process>

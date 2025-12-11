@@ -1,0 +1,187 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Change_Management:Utilities:Apply Mappings">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - This attribute may be any concept element that has a query mapping.</description>
+        <from>concept key</from>
+        <to>key</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - One of the mappings defined in the module configuration for translating between concept elements and system fields.</description>
+        <from>mappings</from>
+        <to>mappings</to>
+      </input>
+      <output global="false" required="true">
+        <description>String Value - This is the input concept key translated into a system defined field.</description>
+        <to>translated key</to>
+        <from>translated key</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>key</from>
+                </input>
+                <output>
+                  <to>translated key</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>key</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>mappings</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>translated key</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="key">
+                      <input global="false">
+                        <from>key</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//*[@name='${key}']/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>key</from>
+                    </input>
+                    <input>
+                      <from>mappings</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>translated key</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(.)=0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>key</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>translated key</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[concat("NO CONCEPT-TO-SYSTEM-MAPPING FOUND FOR ", .)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process will translate the input key/value pairs from concept element names to the system defined fields.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5dc83e8d-a257-33ec-a4b6-7a60db057b8d</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283249283104</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,275 @@
+<process draft="false" dev-studio-version="8.1.00">
+  <process-def name=":BMC-SA-Event_Orchestration_Host_Down:Utilities:Ping from Router">
+    <parameters>
+      <input global="false" required="true">
+        <description>The host name or ip address of the router</description>
+        <from>router address</from>
+        <to>router address</to>
+      </input>
+      <input global="false" required="true">
+        <description>host to be pinged</description>
+        <from>destination</from>
+        <to>destination</to>
+      </input>
+      <input global="false" required="true">
+        <description>ping command to be executed on router</description>
+        <from>router ping command</from>
+        <to>router ping command</to>
+      </input>
+      <output global="false" required="true">
+        <to>success</to>
+        <from>ping success</from>
+      </output>
+      <output global="false" required="false">
+        <to>ping message</to>
+        <from>router ping message</from>
+      </output>
+      <output global="false" required="false">
+        <to>command ping output</to>
+        <from>command ping output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>router address</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>destination</from>
+            <to>command</to>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="ping command">
+                  <input global="false">
+                    <from>router ping command</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[concat("${ping command}", ' ', .)]]></xpath>
+            </xpath-expression>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command ping output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>router ping exit code</to>
+          </output>
+          <output>
+            <from>adapter response</from>
+            <to>ping output</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+          </console-output>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>$$$$</value>
+              </input>
+              <input>
+                <from>command ping output</from>
+              </input>
+              <input>
+                <from>router ping exit code</from>
+              </input>
+              <input>
+                <from>ping output</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>command ping output</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>ping success</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[contains(string(//output), " 0% packet loss")  or contains(string(//output), "is alive")  or (contains(string(//output), "Success rate is ") and number(substring-before(substring-after(string(//output), 'Success rate is '), ' percent'))>80)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>ping success</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>router ping message</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <pingStatus>
+      <xsl:if test="contains(., &quot;false&quot;)">
+        <xsl:text disable-output-escaping="no">Ping from Closest router failed.</xsl:text>
+      </xsl:if>
+      <xsl:if test="contains(., &quot;true&quot;)">
+        <xsl:text disable-output-escaping="no">Ping from Closest router succeeded.</xsl:text>
+      </xsl:if>
+    </pingStatus>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>$$$$ ping output (from router)</value>
+                    </input>
+                    <input>
+                      <from>ping output</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>ping success</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>ping output</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//target-output/metadata/status/text() = 'error']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+            </console-output>
+            <assign>
+              <assignment>
+                <output>
+                  <to>ping success</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>ping output</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>router ping message</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <pingStatus>
+      <xsl:if test="string-length(//target-output/metadata/error/text() ) &gt; 0 ">
+        <xsl:value-of select="//target-output/metadata/error/text()" disable-output-escaping="no" />
+      </xsl:if>
+    </pingStatus>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow will retrieve the information associated with the router,
+connect to the router, initiate the ping and return the results. </description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>85ae5612-bd39-4e8d-bc2b-876528ad75e6</process-id>
+      <author>rsamudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1543899252915</last-modified>
+    </meta>
+  </process-def>
+</process>

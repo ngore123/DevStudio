@@ -1,0 +1,195 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AutoPilot-OA-Directory_Services_Utilities:Groups:Update Group Policy">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>Refresh target, If no value is specified then both the computer settings and the user settings are processed.
+Valid Values: computer, user
+
+</description>
+        <from>refresh target</from>
+        <to>refresh target</to>
+      </input>
+      <input global="false" required="false">
+        <description>Ignores all processing optimizations and reapplies all settings.
+Valid Values: true</description>
+        <from>force</from>
+        <to>force</to>
+      </input>
+      <input global="false" required="false">
+        <description>Number of seconds that policy processing waits to finish. If no input is specified a default of 600 seconds is applied.
+0 equals no wait</description>
+        <from>wait</from>
+        <to>wait</to>
+      </input>
+      <input global="false" required="false">
+        <description>Logs off after the refresh has completed.
+Valid values: true</description>
+        <from>logoff</from>
+        <to>logoff</to>
+      </input>
+      <input global="false" required="false">
+        <description>Restarts the computer after the refresh has completed.
+Valid values: true</description>
+        <from>reboot</from>
+        <to>reboot</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>refresh target</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="refresh target">
+                  <input global="false">
+                    <from>refresh target</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="force">
+                  <input global="false">
+                    <from>force</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="wait">
+                  <input global="false">
+                    <from>wait</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="logoff">
+                  <input global="false">
+                    <from>logoff</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="reboot">
+                  <input global="false">
+                    <from>reboot</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">gpupdate</xsl:text>
+        <xsl:if test="string-length('${refresh target}') != 0 and '${refresh target}' = 'computer'">
+          <xsl:text disable-output-escaping="no"> /target:computer</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${refresh target}') != 0 and '${refresh target}' = 'user'">
+          <xsl:text disable-output-escaping="no"> /target:user</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${force}') != 0 and '${force}' = 'true'">
+          <xsl:text disable-output-escaping="no"> /force</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${wait}') != 0">
+          <xsl:text disable-output-escaping="no"> /wait:${wait}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${logoff}') != 0 and '${logoff}' = 'true'">
+          <xsl:text disable-output-escaping="no"> /logoff</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${reboot}') != 0 and '${reboot}' = 'true'">
+          <xsl:text disable-output-escaping="no"> /boot</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update Group Policy
+    Updates local Group Policy settings and Group Policy settings that are stored in Active Directory, including security settings.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>861f818c-c543-396a-85bb-e992a35cb51f</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290416894646</last-modified>
+    </meta>
+  </process-def>
+</process>

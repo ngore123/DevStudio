@@ -1,0 +1,374 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Create AO specific worklog message">
+    <parameters>
+      <input global="false" required="true">
+        <from>connectivityIssueFlag</from>
+        <to>connectivityIssueFlag</to>
+      </input>
+      <input global="false" required="true">
+        <from>status_row</from>
+        <to>status_row</to>
+      </input>
+      <input global="false" required="true">
+        <from>retryLimitExceeded</from>
+        <to>retryLimitExceeded</to>
+      </input>
+      <input global="false" required="true">
+        <from>jobID</from>
+        <to>jobID</to>
+      </input>
+      <input global="false" required="false">
+        <from>changeID</from>
+        <to>changeID</to>
+      </input>
+      <input global="false" required="true">
+        <from>jobInstanceID</from>
+        <to>jobInstanceID</to>
+      </input>
+      <input global="false" required="false">
+        <from>taskID</from>
+        <to>taskID</to>
+      </input>
+      <input global="false" required="true">
+        <from>errorMessage</from>
+        <to>errorMessage</to>
+      </input>
+      <input global="false" required="true">
+        <from>jobVersion</from>
+        <to>jobVersion</to>
+      </input>
+      <output global="false" required="true">
+        <to>commandArguments</to>
+        <from>commandArguments</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>activityLog</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Request sent to Remedy failed at Remedy with error: </value>
+                    </input>
+                    <input required="false">
+                      <from>errorMessage</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>activityLog</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>connectivityIssueFlag</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>retryLimitExceeded</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Request sent to Remedy has repetedly failed. Retry limit  has exceeded, this request will not be retried by AO again. Error:</value>
+                    </input>
+                    <input required="false">
+                      <from>errorMessage</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>activityLog</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>connectivityIssueFlag</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>retryLimitExceeded</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "false"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>status_row</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "Ready"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Request sent to Remedy failed with error. AO has received this message and would retry sending it again to Remedy. Error:</value>
+                    </input>
+                    <input required="false">
+                      <from>errorMessage</from>
+                    </input>
+                    <input>
+                      <value>. </value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>activityLog</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <utility>
+        <date>
+          <now />
+        </date>
+        <output global="false">
+          <to>currentTime</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[1]</location>
+      </utility>
+      <utility>
+        <number>
+          <divide>
+            <input>
+              <from>currentTime</from>
+            </input>
+            <input>
+              <value>1000</value>
+            </input>
+          </divide>
+        </number>
+        <output global="false">
+          <to>currentTime</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[2]</location>
+      </utility>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Utility:DateConverter</process-name>
+        <parameters>
+          <input>
+            <from>currentTime</from>
+            <to>inputdate</to>
+          </input>
+          <input>
+            <value>utc</value>
+            <to>convertTo</to>
+          </input>
+          <output>
+            <from>datePostConversion</from>
+            <to>datePostConversion</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:HandleErrorInResponse=&gt;</value>
+              </input>
+              <input>
+                <from>currentTime</from>
+              </input>
+              <input>
+                <from>datePostConversion</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Form worklog update request</process-name>
+        <parameters>
+          <input>
+            <from>jobID</from>
+            <to>JobID</to>
+          </input>
+          <input>
+            <from>jobInstanceID</from>
+            <to>JobInstanceID</to>
+          </input>
+          <input>
+            <from>changeID</from>
+            <to>InfrastructureChangeID</to>
+          </input>
+          <input>
+            <from>taskID</from>
+            <to>TaskID</to>
+          </input>
+          <input>
+            <from>activityLog</from>
+            <to>FieldValue</to>
+          </input>
+          <input>
+            <value>AO</value>
+            <to>LastModifiedBy</to>
+          </input>
+          <input>
+            <from>datePostConversion</from>
+            <to>LastModifiedDate</to>
+          </input>
+          <input>
+            <from>jobVersion</from>
+            <to>JobVersion</to>
+          </input>
+          <output>
+            <from>commandArguments</from>
+            <to>commandArguments</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:Create AO specific worklog message=&gt;</value>
+              </input>
+              <input>
+                <from>commandArguments</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a145b549-c5ab-4ace-aec4-37bcf8fa7c0e</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1476693188728</last-modified>
+    </meta>
+  </process-def>
+</process>

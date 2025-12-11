@@ -1,0 +1,230 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:Provision:Get Provision Job Status">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>DBKey of the provision job.
+If you are using PXE, status can be:
+    - Pre-discovered
+    - Discovered
+    - Bios Info
+    - Queued
+    - Check State
+    - Disk Cleanup
+    - Hardware Config
+    - Disk Array Config
+    - Pre Disk Partition
+    - Disk Partition
+    - Post Disk Partition
+    - Format
+    - Make Run Once
+    - Phase 1 OS Install
+    - Phase 2 OS Install
+    - Provisioned
+
+If you are using JumpStart, status can be:
+    - Make Jumpstart files
+    - Added Rule Entry
+    - Check Rules Succeeded
+    - Add Install Client
+    - Reboot Script Finished
+    - OS Install Finished
+
+If you are using NIM, status can be:
+    - Make NIM files
+    - Defined NIM Resources
+    - Pre-MachineDef script finished
+    - Defined NIM Machine
+    - Pre-Bosinst script finished
+    - Bosinst Initiated
+    - Post-Bosinst script finished
+    - Bosinst finished
+    - OS Install Finished</description>
+        <from>jobKey</from>
+        <to>jobKey</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the textual description of the job status of the identified provisioning job.</description>
+        <to>jobStatus</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add Argument to List</process-name>
+        <parameters>
+          <input>
+            <from>jobKey</from>
+            <to>argument</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <value>Provision</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>getProvisionJobStatus</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command returns a textual description of the job status of the identified provisioning job.
+
+If you are using PXE, status can be:
+
+    * Pre-discovered
+    * Discovered
+    * Bios Info
+    * Queued
+    * Check State
+    * Disk Cleanup
+    * Hardware Config
+    * Disk Array Config
+    * Pre Disk Partition
+    * Disk Partition
+    * Post Disk Partition
+    * Format
+    * Make Run Once
+    * Phase 1 OS Install
+    * Phase 2 OS Install
+    * Provisioned
+
+If you are using JumpStart, status can be:
+
+    * Make Jumpstart files
+    * Added Rule Entry
+    * Check Rules Succeeded
+    * Add Install Client
+    * Reboot Script Finished
+    * OS Install Finished
+
+If you are using NIM, status can be:
+
+    * Make NIM files
+    * Defined NIM Resources
+    * Pre-MachineDef script finished
+    * Defined NIM Machine
+    * Pre-Bosinst script finished
+    * Bosinst Initiated
+    * Post-Bosinst script finished
+    * Bosinst finished
+    * OS Install Finished</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8a43e81c-128d-3862-a64b-367437c11e9e</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179846597</last-modified>
+    </meta>
+  </process-def>
+</process>

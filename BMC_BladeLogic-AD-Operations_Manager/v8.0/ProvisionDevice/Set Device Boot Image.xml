@@ -1,0 +1,214 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v8.0:ProvisionDevice:Set Device Boot Image">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>MAC address of the device whose boot image you want to set.</description>
+        <from>mac address</from>
+        <to>mac address</to>
+      </input>
+      <input global="false" required="true">
+        <description>ID of the boot image you want to set.</description>
+        <from>bootImageId</from>
+        <to>bootImageId</to>
+      </input>
+      <output global="false" required="false">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>returns void</description>
+        <to>void</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>mac address</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>bootImageId</from>
+            <to>argument 2</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>ProvisionDevice</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>setDeviceBootImage</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command sets the boot image for a given device.
+You use the BootImageId variable to indicate which image you want to use for the device. You can use the following ID numbers for BootImageId:
+• DOS image for x86 devices: 1
+• Gentoo image for x86 devices: 100
+• Gentoo image for x64 devices: 101
+• Windows PE 2.0 image for x86 devices: 200
+• Windows PE 2.0 image for x64 devices: 201
+• Windows PE 1.6 image for x86 devices: 300
+• Windows PE 1.6 image for x64 devices: 301
+• Windows PE 2.x ISO image for x86 devices: 400
+• Windows PE 2.x ISO image for x64 devices: 401
+• Gentoo, Skip Linux Pre-Install image: 500
+• VMware Server ESXi 4.0 image for x64 devices: 501 </description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a81005d7-70cc-340b-9bac-8ec19e80dbe8</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283180046705</last-modified>
+    </meta>
+  </process-def>
+</process>

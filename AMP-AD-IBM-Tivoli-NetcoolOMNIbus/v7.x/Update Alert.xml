@@ -1,0 +1,348 @@
+<process draft="false" dev-studio-version="7.6.02.05">
+  <process-def name=":AMP-AD-IBM-Tivoli-NetcoolOMNIbus:v7.x:Update Alert">
+    <parameters>
+      <input global="false" required="false">
+        <description>Specifies the adapter to be used for the process 
+Default value: OMNIbusAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Identifies the alert to be updated</description>
+        <from>serial</from>
+        <to>serial</to>
+      </input>
+      <input global="false" required="false">
+        <description>Identifies the alert field to be updated</description>
+        <from>field</from>
+        <to>field</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the value for the the given &lt;field&gt;</description>
+        <from>value</from>
+        <to>value</to>
+      </input>
+      <input global="false" required="false">
+        <description>Indicates if the specified &lt;value&gt; is a character string 
+Valid values: true, false (default)</description>
+        <from>is char</from>
+        <to>is char</to>
+      </input>
+      <input global="false" required="false">
+        <description>Contains one or more &lt;entry&gt; elements, Used when need to update multiple column at a time. 
+
+----Sample &lt;field-value-map&gt; XML-----
+
+&lt;field-value-map&gt;
+&lt;entry&gt;
+	&lt;field&gt;Node&lt;/field&gt;
+	&lt;value&gt;Node_Update_Demo&lt;/value&gt;
+	&lt;is-char&gt;true&lt;/is-char&gt;
+&lt;/entry&gt;
+&lt;entry&gt;
+	&lt;field&gt;Summary&lt;/field&gt;
+	&lt;value&gt;Summary_Demo&lt;/value&gt;
+	&lt;is-char&gt;true&lt;/is-char&gt;
+&lt;/entry&gt;
+&lt;entry&gt;
+	&lt;field&gt;Severity&lt;/field&gt;
+	&lt;value&gt;5&lt;/value&gt;
+	&lt;is-char&gt;&lt;/is-char&gt;
+&lt;/entry&gt;
+&lt;/field-value-map&gt;
+
+-------------------------------------------------</description>
+        <from>field-value-map</from>
+        <to>field-value-map</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>adapter name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>adapter name</to>
+                  <value>OMNIbusAdapter</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>is char</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>is char</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>field-value-map</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>field-value-map-text</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//field-value-map/entry/field/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>field-value-map</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="serial">
+                <input global="false">
+                  <from>serial</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="field">
+                <input global="false">
+                  <from>field</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="value">
+                <input global="false">
+                  <from>value</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="is char">
+                <input global="false">
+                  <from>is char</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="field-value-map">
+                <input global="false">
+                  <from>field-value-map</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="field-value-map-text">
+                <input global="false">
+                  <from>field-value-map-text</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="action" />
+  <xsl:template match="/">
+    <request-data>
+      <OmnibusAdapterRequest>
+        <action>
+          <xsl:choose>
+            <xsl:when test="string-length('${field-value-map-text}')!=0">
+              <xsl:text disable-output-escaping="no">update alerts.status set </xsl:text>
+              <xsl:for-each select="//field-value-map/entry">
+                <xsl:value-of select="field" disable-output-escaping="no" />
+                <xsl:text disable-output-escaping="no">=</xsl:text>
+                <xsl:if test="is-char = 'true'">
+                  <xsl:text disable-output-escaping="no">'</xsl:text>
+                </xsl:if>
+                <xsl:value-of select="value" disable-output-escaping="no" />
+                <xsl:if test="is-char = 'true'">
+                  <xsl:text disable-output-escaping="no">'</xsl:text>
+                </xsl:if>
+                <xsl:if test="position()!=last()">
+                  <xsl:text disable-output-escaping="no">,</xsl:text>
+                </xsl:if>
+              </xsl:for-each>
+              <xsl:text disable-output-escaping="no"> where Serial = ${serial}</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no">update alerts.status set ${field} =</xsl:text>
+              <xsl:if test="${is char}()">
+                <xsl:text disable-output-escaping="no">'</xsl:text>
+              </xsl:if>
+              <xsl:text disable-output-escaping="no">${value}</xsl:text>
+              <xsl:if test="${is char}()">
+                <xsl:text disable-output-escaping="no">'</xsl:text>
+              </xsl:if>
+              <xsl:text disable-output-escaping="no"> where Serial = ${serial}</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </action>
+      </OmnibusAdapterRequest>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Adapter request</value>
+              </input>
+              <input>
+                <from>adapter request</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update Alert
+    Updates an OMNIbus alert.
+
+    Inputs
+        adapter name    [Optional]
+            The adapter to be used to handle the request. If not provided, "EMSAdapter" will be used.
+        serial
+            Identifies the alert.
+        field
+            Identifies the alert field to be updated.
+        value
+            The new value to be placed in the field.
+        is char    [Optional]
+            Whether or not the value is a character string.
+            Valid Values
+                false    [Default]
+                true            
+
+</description>
+        <version>1.0</version>
+      </documentation>
+      <time-to-live>60000</time-to-live>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>54e6925e-600a-4abd-af24-362895440105</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1346237648771</last-modified>
+    </meta>
+  </process-def>
+</process>

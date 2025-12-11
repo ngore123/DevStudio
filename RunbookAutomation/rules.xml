@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process>
+   <process-def name=":RunbookAutomation:rules">
+      <sequence>
+         <switch>
+            <meta>
+               <peer-location>
+                  <location>any</location>
+               </peer-location>
+            </meta>
+            <execute-all-applicable-cases>true</execute-all-applicable-cases>
+            <case name="GetTaskIDfromEvent" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[contains(//text/text(), "Operator Initiated Change")='true']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[contains(//text/text(), "Operator Initiated Change")]]></from>
+                     <fromKey><![CDATA[3304]]></fromKey>
+                     <to><![CDATA['true']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>RunbookAutomation</group>
+                     <name-prefix>GetTaskIDfromEvent</name-prefix>
+                     <process-name>:RunbookAutomation:OperatorInitiatedChange:getApprovalStatus</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+            <case name="getChangeIdfromEvent(tsna)" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[contains(., "BMC Network Automation Change")='true']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[contains(., "BMC Network Automation Change")]]></from>
+                     <fromKey><![CDATA[9328]]></fromKey>
+                     <to><![CDATA['true']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>RunbookAutomation</group>
+                     <name-prefix>getChangeIdfromEvent(tsna)</name-prefix>
+                     <process-name>:RunbookAutomation:TSNA:getChangeIdTSNAUsecase</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+         </switch>
+      </sequence>
+      <meta>
+         <peer-location>
+            <location>any</location>
+         </peer-location>
+      </meta>
+      <parameters>
+         <input>
+            <from>inputevent</from>
+            <to>inputevent</to>
+         </input>
+      </parameters>
+   </process-def>
+</process>
+

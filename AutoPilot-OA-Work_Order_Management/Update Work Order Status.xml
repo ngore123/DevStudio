@@ -1,0 +1,369 @@
+<process draft="false" dev-studio-version="7.8.00">
+  <process-def name=":AutoPilot-OA-Work_Order_Management:Update Work Order Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module. 
+
+Example: BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The Work Order ID  
+
+Example: WO0000000000243</description>
+        <from>work order id</from>
+        <to>work order id</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The new status 
+
+BMC_AR_System
+
+Valid Values:
+
+Assigned
+Pending
+Waiting Approval
+Planning
+In Progress
+Completed
+Rejected
+Cancelled
+Closed
+</description>
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - Status reason 
+
+BMC_AR_System
+
+Valid Values: 
+
+   No Longer Required 
+   Funding Not Available 
+   To Be Re-Scheduled 
+   Resources Not Available 
+   Successful 
+   Successful with Issues 
+   Unsuccessful 
+   Backed Out 
+   Final Review Complete 
+   Final Review Required 
+   Additional Coding Required 
+   Insufficient Task Data 
+   In Verification 
+   In Rollout 
+   Insufficient Change Data 
+   Schedule Conflicts 
+   In Development 
+   In Test 
+   In Build 
+   In Rollback 
+   In Documentation 
+   Vendor Purchase 
+   Support Group Communication 
+   Task Review 
+   Miscellaneous 
+   Future Enhancement 
+   Manager Intervention 
+   Accepted 
+   Assigned 
+   Built 
+   On Hold 
+   Automatically Closed
+   Client Hold
+   Client Additional Information Requested
+   Client Action Required
+   Support Contact Hold
+   Local Site Action Required
+   Purchase Order Approval
+   Supplier Delivery
+   Third Party Vendor Action Required
+    Infrastructure Change
+    Initial Status
+    Awaiting Request Assignee
+    Work Not Started
+    Cancelled By Requester
+    Cancelled By Support
+    Customer Close
+     System Close
+     System Close with Issues</description>
+        <from>status reason</from>
+        <to>status reason</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - actual start date
+
+Remedy Example: 1262304060  (epoch) 
+
+Note : This input is valid for ITSM version 7.7 onward.</description>
+        <from>actual start date</from>
+        <to>actual start date</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - actual end date
+
+Remedy Example: 1262304060  (epoch) 
+
+Note : This input is valid for ITSM version 7.7 onward.</description>
+        <from>actual end date</from>
+        <to>actual end date</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - scheduled start date
+
+Remedy Example: 1262304060  (epoch) 
+
+Note : This input is valid for ITSM version 7.7 onward.</description>
+        <from>scheduled start date</from>
+        <to>scheduled start date</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - scheduled end date
+
+Remedy Example: 1262304060  (epoch) 
+
+Note : This input is valid for ITSM version 7.7 onward.</description>
+        <from>scheduled end date</from>
+        <to>scheduled end date</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document - consolidated success status from each output.
+
+Sample:
+&lt;work-orders&gt;
+  &lt;work-order&gt;
+    &lt;success-status&gt;success&lt;/success-status&gt;
+    &lt;work-order-id&gt;WO0000000000233&lt;/work-order-id&gt;
+  &lt;/work-order&gt;
+&lt;/work-orders&gt;</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>An XML document - consolidated status message from each output.
+
+Sample:
+&lt;work-orders&gt;
+  &lt;work-order&gt;
+    &lt;status-message&gt;Work order status updated successfully&lt;/status-message&gt;
+    &lt;work-order-id&gt;WO0000000000233&lt;/work-order-id&gt;
+  &lt;/work-order&gt;
+&lt;/work-orders&gt;</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Unknown system </value>
+                    </input>
+                    <input required="false">
+                      <from>configuration name</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>status message</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "BMC_AR_System"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>work orders</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="status">
+                      <input global="false">
+                        <from>status</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="status reason">
+                      <input global="false">
+                        <from>status reason</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="scheduled end date">
+                      <input global="false">
+                        <from>scheduled end date</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="scheduled start date">
+                      <input global="false">
+                        <from>scheduled start date</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="actual end date">
+                      <input global="false">
+                        <from>actual end date</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="actual start date">
+                      <input global="false">
+                        <from>actual start date</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>work order id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <WorkOrders>
+      <WorkOrder>
+        <work-order-id>${id}</work-order-id>
+        <status>${status}</status>
+        <status-reason>${status reason}</status-reason>
+        <scheduled-start-date>${scheduled start date}</scheduled-start-date>
+        <scheduled-end-date>${scheduled end date}</scheduled-end-date>
+        <actual-end-date>${actual end date}</actual-end-date>
+        <actual-start-date>${actual start date}</actual-start-date>
+      </WorkOrder>
+    </WorkOrders>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Work_Order_Management:Update Work Orders</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>work orders</from>
+                  <to>work orders</to>
+                </input>
+                <output>
+                  <from>successful work orders</from>
+                  <to>successful work orders</to>
+                </output>
+                <output>
+                  <from>failed work orders</from>
+                  <to>failed work orders</to>
+                </output>
+                <output>
+                  <from>success count</from>
+                  <to>success count</to>
+                </output>
+                <output>
+                  <from>failure count</from>
+                  <to>failure count</to>
+                </output>
+                <output>
+                  <from>consolidated status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>consolidated success status</from>
+                  <to>success status</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This action updates the work order status</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5dbaafe5-ba1c-4d5e-8cc5-98a9a39a46b3</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1440063243388</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,178 @@
+<process draft="false" dev-studio-version="8.0.01">
+  <process-def name=":AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML Preserve Namespace">
+    <parameters>
+      <input global="false" required="true">
+        <description>An XML structure, at the minimum it should be something like this:
+
+&lt;root-element /&gt;
+
+Note - element name  need not have to the root-element.</description>
+        <from>parent xml</from>
+        <to>parent xml</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML structure, at the minimum it should be something like:
+
+&lt;child-element /&gt;
+
+NOTE: The element name need not have to be child-element. It can be anything.</description>
+        <from>child xml</from>
+        <to>child xml</to>
+      </input>
+      <output global="false" required="false">
+        <description>Result of adding child xml to parent xml.
+
+For example:
+say, parent xml is:
+&lt;parent&gt;
+    &lt;child-1&gt;a&lt;/child-1&gt;
+&lt;/parent&gt;
+
+and child xml is:
+&lt;child-2&gt;b&lt;/child-2&gt;
+
+The result xml will be:
+
+&lt;parent&gt;
+    &lt;child-1&gt;a&lt;/child-1&gt;
+    &lt;child-2&gt;b&lt;/child-2&gt;
+&lt;/parent&gt;
+</description>
+        <to>result xml</to>
+        <from>result xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>child xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>modified child xml</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootElem" select="name(/*)" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="count(/*/*) &gt; 0">
+        <xsl:copy-of select="." />
+      </xsl:when>
+      <xsl:otherwise>
+        <placeholder>
+          <xsl:copy-of select="." />
+        </placeholder>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>parent xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>result xml</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="child xml">
+                <input global="false">
+                  <from>modified child xml</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootElementName" select="name(/*)" />
+  <xsl:variable name="childXml">${child xml}</xsl:variable>
+  <xsl:template match="@* | node()">
+    <xsl:element name="{$rootElementName}">
+      <xsl:copy>
+        <xsl:apply-templates select="@* | node()" />
+      </xsl:copy>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@* | node()" />
+      <xsl:if test="name(.) = $rootElementName">
+        <xsl:choose>
+          <xsl:when test="name(xalan:nodeset($childXml)/*) = 'placeholder'">
+            <xsl:copy-of select="xalan:nodeset($childXml)/*/*" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:copy-of select="xalan:nodeset($childXml)" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </xsl:copy>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== intermediate===</value>
+              </input>
+              <input>
+                <from>modified child xml</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Given two XMLs, add the second XML into the first XML.
+
+Note the workflow does not check for validity of the XML. It is the caller's responsibility. Invalid XMLs will cause compensation.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>67cc9ff9-7add-4a0b-a1aa-9c4541f3ebea</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Common Utilities</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1539493764313</last-modified>
+    </meta>
+  </process-def>
+</process>

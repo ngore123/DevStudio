@@ -1,0 +1,414 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.43:Delete:Cleanup Historic Data">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>The name of the object to clean up.</description>
+        <from>objectName</from>
+        <to>objectName</to>
+      </input>
+      <input global="false" required="false">
+        <description>Retention time in days, if applicable. The minimum retention time is 3 days.</description>
+        <from>retentionTime</from>
+        <to>retentionTime</to>
+      </input>
+      <input global="false" required="false">
+        <description>Maximum duration for the operation in seconds, if applicable.</description>
+        <from>duration</from>
+        <to>duration</to>
+      </input>
+      <input global="false" required="false">
+        <description>Delete objects limited to a specific role, if applicable.</description>
+        <from>roleName</from>
+        <to>roleName</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the object returned by the command.</description>
+        <to>Object</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the Adapter response for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+              <parameters>
+                <input>
+                  <from>objectName</from>
+                  <to>argument 1</to>
+                </input>
+                <input>
+                  <from>retentionTime</from>
+                  <to>argument 2</to>
+                </input>
+                <input>
+                  <from>duration</from>
+                  <to>argument 3</to>
+                </input>
+                <input>
+                  <from>roleName</from>
+                  <to>argument 4</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>objectName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>retentionTime</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) < 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>duration</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) < 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>roleName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) < 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+              <parameters>
+                <input>
+                  <from>objectName</from>
+                  <to>argument 1</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>objectName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) < 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>retentionTime</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>duration</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>roleName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+              <parameters>
+                <input>
+                  <from>retentionTime</from>
+                  <to>argument 1</to>
+                </input>
+                <input>
+                  <from>duration</from>
+                  <to>argument 2</to>
+                </input>
+                <input>
+                  <from>roleName</from>
+                  <to>argument 3</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>objectName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) < 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>retentionTime</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) < 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>duration</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) < 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>roleName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) < 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>argument list</to>
+                  <value>
+                    <arguments />
+                  </value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>Delete</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>cleanupHistoricalData</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <compensation name=":BMC_BladeLogic-AD-Operations_Manager:v7.43:Delete:Cleanup Historic Data:999999999" />
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command adds a new association to a custom command. An association indicates what type of server object(s) the command can run against - servers, directories, files, or any combination.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b712cb66-c27d-342b-b019-62931d144729</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179968371</last-modified>
+    </meta>
+  </process-def>
+  <compensation-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.43:Delete:Cleanup Historic Data:999999999">
+    <meta>
+      <peer-location>
+        <location>this</location>
+      </peer-location>
+    </meta>
+    <parameters />
+    <sequence />
+  </compensation-def>
+</process>

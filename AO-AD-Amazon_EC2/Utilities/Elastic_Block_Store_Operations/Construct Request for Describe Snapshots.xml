@@ -1,0 +1,206 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AO-AD-Amazon_EC2:Utilities:Elastic_Block_Store_Operations:Construct Request for Describe Snapshots">
+    <parameters>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon EC2. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - 
+http://ec2.amazonaws.com/doc/2009-11-30/AmazonEC2.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon EC2 instances across different regions. Respective values for different regions are as below:
+
+    * http://us-east-1.ec2.amazonaws.com/ — Endpoint located in the US-East (Northern Virginia) Region
+    * http://us-west-1.ec2.amazonaws.com/ — Endpoint located in the US-West (Northern California) Region
+    * http://eu-west-1.ec2.amazonaws.com/ ---Endpoint located in the EU (Ireland) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>signature properties [Optional]
+
+Specify this element for including authentication credentials at request level. 
+
+Sample values that can be specified are:
+
+&lt;signature-properties mode = "key-files"&gt;
+    &lt;private-key-file&gt;&lt;/private-key-file&gt;
+    &lt;certificate-file&gt;&lt;/certificate-file&gt;
+&lt;/signature-properties&gt;
+
+OR
+
+&lt;signature-properties mode = "key-data"&gt;
+    &lt;private-key-data&gt;&lt;/private-key-data&gt;
+    &lt;certificate-data&gt;&lt;/certificate-data&gt;
+&lt;/signature-properties&gt;
+</description>
+        <from>signature properties</from>
+        <to>signature properties</to>
+      </input>
+      <input global="false" required="false">
+        <description>snapshot set [Optional]
+
+Set of snapshots.
+
+&lt;snapshot-set&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;snapshot-id&gt;&lt;/snapshot-id&gt;
+    &lt;/item&gt;
+&lt;/snapshot-set&gt;
+
+</description>
+        <from>snapshot set</from>
+        <to>snapshot set</to>
+      </input>
+      <input global="false" required="false">
+        <description>owners set [Optional]
+
+Set of owners that can create volumes from the instance. Returns snapshots owned by the specified owner.
+
+Valid Values: self, amazon, AWS Account ID
+
+&lt;owners-set&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;owner&gt;&lt;/owner&gt;
+    &lt;/item&gt;
+&lt;/owners-set&gt;
+</description>
+        <from>owners set</from>
+        <to>owners set</to>
+      </input>
+      <input global="false" required="false">
+        <description>restorable by set [Optional]
+
+Set of users that can create volumes from the snapshot. Specify Account ID of a user that can create volumes from the snapshot.
+
+&lt;restorable-by-set&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;user&gt;&lt;/user&gt;
+    &lt;/item&gt;
+&lt;/restorable-by-set&gt;
+</description>
+        <from>restorable by set</from>
+        <to>restorable by set</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>adapter request</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="wsdl location">
+                <input global="false">
+                  <from>wsdl location</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="endpoint address">
+                <input global="false">
+                  <from>endpoint address</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="snapshot set">
+                <input global="false">
+                  <from>snapshot set</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="owners set">
+                <input global="false">
+                  <from>owners set</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="restorable by set">
+                <input global="false">
+                  <from>restorable by set</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="signature properties">
+                <input global="false">
+                  <from>signature properties</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request-data>
+      <amazon-ec2-request>
+        <xsl:if test="string-length('${wsdl location}')&gt;0">
+          <wsdl-location>${wsdl location}</wsdl-location>
+        </xsl:if>
+        <xsl:if test="string-length('${endpoint address}')&gt;0">
+          <endpoint-address>${endpoint address}</endpoint-address>
+        </xsl:if>
+        ${signature properties}
+        <operation-name>
+          <xsl:text disable-output-escaping="no">describe-snapshots</xsl:text>
+        </operation-name>
+        <parameters>${snapshot set}${owners set}${restorable by set}</parameters>
+      </amazon-ec2-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Returns information about Amazon EBS snapshots available to the user.
+The list of snapshots returned can be modified by specifying snapshot IDs, snapshot owners, or users
+with create volume permissions. If no options are specified, Amazon EC2 returns all snapshots for
+which the user has create volume permissions.
+If you specify one or more snapshot IDs, only snapshots that have the specified IDs are returned. If
+you specify an invalid snapshot ID, a fault is returned. If you specify a snapshot ID for which you do not
+have access, it will not be included in the returned results.
+If you specify one or more snapshot owners, only snapshots from the specified owners and for which
+you have access are returned. The results can include the AWS Account IDs of the specified owners,
+amazon for snapshots owned by Amazon or self for snapshots that you own.
+If you specify a list of restorable users, only users that have create snapshot permissions for the
+snapshots are returned. You can specify AWS Account IDs (if you own the snapshot(s)), self for
+snapshots for which you own or have explicit permissions, or all for public snapshots.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d3705446-e3d4-3193-9e8e-6c25996906bc</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1296730155406</last-modified>
+    </meta>
+  </process-def>
+</process>

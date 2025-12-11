@@ -1,0 +1,910 @@
+<process draft="false" dev-studio-version="7.6.02.04">
+  <process-def name=":AO-AD-Infoblox-NIOS:Update Items">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+Default adapter name: InfobloxNIOS.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>item type :
+Defines the type of operation to be performed.
+
+Supported 'item type'-
+1. update-dns-record
+2. update-fixed-address
+</description>
+        <from>item type</from>
+        <to>item type</to>
+      </input>
+      <input global="false" required="true">
+        <description>The 'items' xml of the entity to be updated.
+
+Below is an example 'items' xml to update DNS A record.
+
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;target&gt;
+			&lt;host&gt;localhost&lt;/host&gt;
+			&lt;user-name&gt;admin&lt;/user-name&gt;
+			&lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+			&lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+		&lt;/target&gt;			
+		    &lt;parameters&gt;
+		    &lt;record-type&gt;A&lt;/record-type&gt;
+					&lt;query&gt;											
+							&lt;a-name&gt;admin.demo.com&lt;/a-name&gt;
+							&lt;ip-address&gt;10.0.0.12&lt;/ip-address&gt;
+							&lt;dns-view&gt;default&lt;/dns-view&gt;
+					&lt;/query&gt;
+					&lt;update&gt;
+							&lt;scheduled-at&gt;2012-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+							&lt;a-name&gt;admin.demo.com&lt;/a-name&gt;
+							&lt;ip-address&gt;10.0.0.43&lt;/ip-address&gt;
+							&lt;dns-view&gt;default&lt;/dns-view&gt;							
+							&lt;comment&gt;updated comment&lt;/comment&gt;									
+							&lt;disable&gt;true&lt;/disable&gt;
+							&lt;ttl&gt;120&lt;/ttl&gt;
+							&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;sample site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+		&lt;/item&gt;
+&lt;/items&gt;
+
+-------------------------------------------------------------------------------------------------------------------
+sample for update-fixed-address
+
+Sample items Xml: 
+
+1&gt; For IPV4
+ 
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network&gt;10.0.0.0&lt;/network&gt;	
+						&lt;mask&gt;24&lt;/mask&gt;
+						&lt;network-view&gt;default&lt;/network-view&gt;
+						&lt;network-type&gt;ipv4&lt;/network-type&gt;
+						&lt;ip-address&gt;10.0.0.1&lt;/ip-address&gt;
+						&lt;mac-address&gt;00:00:00:11:11:11&lt;/mac-address&gt;
+						&lt;dhcp-client-identifier&gt;Value of dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Building&lt;/key&gt;
+								&lt;value&gt;sample&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;true&lt;/disable&gt;
+						&lt;name&gt;Name Of Fixed Address&lt;/name&gt;
+						&lt;ip-address&gt;10.0.0.2&lt;/ip-address&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;dhcp-client-identifier&gt;dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+						&lt;lease-settings&gt;
+							&lt;lease-time&gt;121&lt;/lease-time&gt;
+							&lt;routers&gt;10.0.0.3&lt;/routers&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;10.0.0.5&lt;/dns-servers&gt;
+							&lt;broadcast-address&gt;127.0.0.1&lt;/broadcast-address&gt;
+						&lt;/lease-settings&gt;       
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Sample_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+ 
+ The Query Criteria that can be follow are as below, to update fixed address.
+ -&gt; network,mask will get all the fixed address in the network.
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network&gt;10.0.0.0&lt;/network&gt;	
+						&lt;mask&gt;24&lt;/mask&gt;
+						&lt;network-type&gt;ipv4&lt;/network-type&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;true&lt;/disable&gt;
+						&lt;name&gt;Name Of Fixed Address&lt;/name&gt;
+						&lt;ip-address&gt;10.0.0.2&lt;/ip-address&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;dhcp-client-identifier&gt;dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+						&lt;lease-settings&gt;
+							&lt;lease-time&gt;121&lt;/lease-time&gt;
+							&lt;routers&gt;10.0.0.3&lt;/routers&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;10.0.0.5&lt;/dns-servers&gt;
+							&lt;broadcast-address&gt;127.0.0.1&lt;/broadcast-address&gt;
+						&lt;/lease-settings&gt;       
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Sample_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; network,mask and network-view.
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network&gt;10.0.0.0&lt;/network&gt;	
+						&lt;mask&gt;24&lt;/mask&gt;
+						&lt;network-view&gt;default&lt;/network-view&gt;
+						&lt;network-type&gt;ipv4&lt;/network-type&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;true&lt;/disable&gt;
+						&lt;name&gt;Name Of Fixed Address&lt;/name&gt;
+						&lt;ip-address&gt;10.0.0.2&lt;/ip-address&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;dhcp-client-identifier&gt;dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+						&lt;lease-settings&gt;
+							&lt;lease-time&gt;121&lt;/lease-time&gt;
+							&lt;routers&gt;10.0.0.3&lt;/routers&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;10.0.0.5&lt;/dns-servers&gt;
+							&lt;broadcast-address&gt;127.0.0.1&lt;/broadcast-address&gt;
+						&lt;/lease-settings&gt;       
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Sample_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; ip-address
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network-type&gt;ipv4&lt;/network-type&gt;
+						&lt;ip-address&gt;10.0.0.1&lt;/ip-address&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;true&lt;/disable&gt;
+						&lt;name&gt;Name Of Fixed Address&lt;/name&gt;
+						&lt;ip-address&gt;10.0.0.2&lt;/ip-address&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;dhcp-client-identifier&gt;dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+						&lt;lease-settings&gt;
+							&lt;lease-time&gt;121&lt;/lease-time&gt;
+							&lt;routers&gt;10.0.0.3&lt;/routers&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;10.0.0.5&lt;/dns-servers&gt;
+							&lt;broadcast-address&gt;127.0.0.1&lt;/broadcast-address&gt;
+						&lt;/lease-settings&gt;       
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Sample_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; mac-address
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network-type&gt;ipv4&lt;/network-type&gt;
+						&lt;mac-address&gt;00:00:00:11:11:11&lt;/mac-address&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;true&lt;/disable&gt;
+						&lt;name&gt;Name Of Fixed Address&lt;/name&gt;
+						&lt;ip-address&gt;10.0.0.2&lt;/ip-address&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;dhcp-client-identifier&gt;dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+						&lt;lease-settings&gt;
+							&lt;lease-time&gt;121&lt;/lease-time&gt;
+							&lt;routers&gt;10.0.0.3&lt;/routers&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;10.0.0.5&lt;/dns-servers&gt;
+							&lt;broadcast-address&gt;127.0.0.1&lt;/broadcast-address&gt;
+						&lt;/lease-settings&gt;       
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Sample_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; dhcp-client-identifier
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network-type&gt;ipv4&lt;/network-type&gt;
+						&lt;dhcp-client-identifier&gt;Value of dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;true&lt;/disable&gt;
+						&lt;name&gt;Name Of Fixed Address&lt;/name&gt;
+						&lt;ip-address&gt;10.0.0.2&lt;/ip-address&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;dhcp-client-identifier&gt;dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+						&lt;lease-settings&gt;
+							&lt;lease-time&gt;121&lt;/lease-time&gt;
+							&lt;routers&gt;10.0.0.3&lt;/routers&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;10.0.0.5&lt;/dns-servers&gt;
+							&lt;broadcast-address&gt;127.0.0.1&lt;/broadcast-address&gt;
+						&lt;/lease-settings&gt;       
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Sample_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; extensible-attributes
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network-type&gt;ipv4&lt;/network-type&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Building&lt;/key&gt;
+								&lt;value&gt;sample&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;true&lt;/disable&gt;
+						&lt;name&gt;Name Of Fixed Address&lt;/name&gt;
+						&lt;ip-address&gt;10.0.0.2&lt;/ip-address&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;dhcp-client-identifier&gt;dhcp-client-identifier&lt;/dhcp-client-identifier&gt;
+						&lt;lease-settings&gt;
+							&lt;lease-time&gt;121&lt;/lease-time&gt;
+							&lt;routers&gt;10.0.0.3&lt;/routers&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;10.0.0.5&lt;/dns-servers&gt;
+							&lt;broadcast-address&gt;127.0.0.1&lt;/broadcast-address&gt;
+						&lt;/lease-settings&gt;       
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Sample_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+ 
+ 
+2&gt; For IPV6
+ 
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network&gt;10.0.0.0&lt;/network&gt;	
+						&lt;mask&gt;24&lt;/mask&gt;
+						&lt;network-view&gt;default&lt;/network-view&gt;
+						&lt;network-type&gt;ipv6&lt;/network-type&gt;
+						&lt;ip-address&gt;2002::6&lt;/ip-address&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+						&lt;comment&gt;Value Of Comment&lt;/comment&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Building&lt;/key&gt;
+								&lt;value&gt;sample&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;false&lt;/disable&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+						&lt;name&gt;&lt;/name&gt;
+						&lt;ip-address&gt;2002::16&lt;/ip-address&gt;
+						&lt;ipv6-prefix&gt;2012::&lt;/ipv6-prefix&gt;
+						&lt;ipv6-prefix-bits&gt;32&lt;/ipv6-prefix-bits&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;lease-settings&gt;
+							&lt;valid-lifetime&gt;123456&lt;/valid-lifetime&gt;
+							&lt;preferred-lifetime&gt;1234&lt;/preferred-lifetime&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;2002::11&lt;/dns-servers&gt;
+						&lt;/lease-settings&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Demo_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+ 
+The Query Criteria that can be follow are as below, to update fixed address.
+
+-&gt; network,mask will get all the fixed address in the network.
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network&gt;10.0.0.0&lt;/network&gt;	
+						&lt;mask&gt;24&lt;/mask&gt;
+						&lt;network-type&gt;ipv6&lt;/network-type&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;false&lt;/disable&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+						&lt;name&gt;&lt;/name&gt;
+						&lt;ip-address&gt;2002::16&lt;/ip-address&gt;
+						&lt;ipv6-prefix&gt;2012::&lt;/ipv6-prefix&gt;
+						&lt;ipv6-prefix-bits&gt;32&lt;/ipv6-prefix-bits&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;lease-settings&gt;
+							&lt;valid-lifetime&gt;123456&lt;/valid-lifetime&gt;
+							&lt;preferred-lifetime&gt;1234&lt;/preferred-lifetime&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;2002::11&lt;/dns-servers&gt;
+						&lt;/lease-settings&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Demo_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+
+-&gt; network,mask and network-view.
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network&gt;10.0.0.0&lt;/network&gt;	
+						&lt;mask&gt;24&lt;/mask&gt;
+						&lt;network-view&gt;default&lt;/network-view&gt;
+						&lt;network-type&gt;ipv6&lt;/network-type&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;false&lt;/disable&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+						&lt;name&gt;&lt;/name&gt;
+						&lt;ip-address&gt;2002::16&lt;/ip-address&gt;
+						&lt;ipv6-prefix&gt;2012::&lt;/ipv6-prefix&gt;
+						&lt;ipv6-prefix-bits&gt;32&lt;/ipv6-prefix-bits&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;lease-settings&gt;
+							&lt;valid-lifetime&gt;123456&lt;/valid-lifetime&gt;
+							&lt;preferred-lifetime&gt;1234&lt;/preferred-lifetime&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;2002::11&lt;/dns-servers&gt;
+						&lt;/lease-settings&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Demo_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; ip-address
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network-type&gt;ipv6&lt;/network-type&gt;
+						&lt;ip-address&gt;2002::6&lt;/ip-address&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;false&lt;/disable&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+						&lt;name&gt;&lt;/name&gt;
+						&lt;ip-address&gt;2002::16&lt;/ip-address&gt;
+						&lt;ipv6-prefix&gt;2012::&lt;/ipv6-prefix&gt;
+						&lt;ipv6-prefix-bits&gt;32&lt;/ipv6-prefix-bits&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;lease-settings&gt;
+							&lt;valid-lifetime&gt;123456&lt;/valid-lifetime&gt;
+							&lt;preferred-lifetime&gt;1234&lt;/preferred-lifetime&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;2002::11&lt;/dns-servers&gt;
+						&lt;/lease-settings&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Demo_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; duid
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network-type&gt;ipv6&lt;/network-type&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;false&lt;/disable&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+						&lt;name&gt;&lt;/name&gt;
+						&lt;ip-address&gt;2002::16&lt;/ip-address&gt;
+						&lt;ipv6-prefix&gt;2012::&lt;/ipv6-prefix&gt;
+						&lt;ipv6-prefix-bits&gt;32&lt;/ipv6-prefix-bits&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;lease-settings&gt;
+							&lt;valid-lifetime&gt;123456&lt;/valid-lifetime&gt;
+							&lt;preferred-lifetime&gt;1234&lt;/preferred-lifetime&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;2002::11&lt;/dns-servers&gt;
+						&lt;/lease-settings&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Demo_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; comment
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network-type&gt;ipv6&lt;/network-type&gt;
+						&lt;comment&gt;Value Of Comment&lt;/comment&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;false&lt;/disable&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+						&lt;name&gt;&lt;/name&gt;
+						&lt;ip-address&gt;2002::16&lt;/ip-address&gt;
+						&lt;ipv6-prefix&gt;2012::&lt;/ipv6-prefix&gt;
+						&lt;ipv6-prefix-bits&gt;32&lt;/ipv6-prefix-bits&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;lease-settings&gt;
+							&lt;valid-lifetime&gt;123456&lt;/valid-lifetime&gt;
+							&lt;preferred-lifetime&gt;1234&lt;/preferred-lifetime&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;2002::11&lt;/dns-servers&gt;
+						&lt;/lease-settings&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Demo_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+
+-&gt; extensible-attributes
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;target&gt;
+            &lt;host&gt;localhost&lt;/host&gt;
+            &lt;user-name&gt;admin&lt;/user-name&gt;
+            &lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+            &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+        &lt;/target&gt;
+            &lt;parameters&gt;
+                    &lt;query&gt;
+						&lt;network-type&gt;ipv6&lt;/network-type&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Building&lt;/key&gt;
+								&lt;value&gt;sample&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/query&gt;
+                    &lt;update&gt;
+						&lt;scheduled-at&gt;2015-12-07T16:30:19+05:30&lt;/scheduled-at&gt;
+						&lt;disable&gt;false&lt;/disable&gt;
+						&lt;duid&gt;55:55&lt;/duid&gt;
+						&lt;name&gt;&lt;/name&gt;
+						&lt;ip-address&gt;2002::16&lt;/ip-address&gt;
+						&lt;ipv6-prefix&gt;2012::&lt;/ipv6-prefix&gt;
+						&lt;ipv6-prefix-bits&gt;32&lt;/ipv6-prefix-bits&gt;
+						&lt;comment&gt;Comment&lt;/comment&gt;
+						&lt;lease-settings&gt;
+							&lt;valid-lifetime&gt;123456&lt;/valid-lifetime&gt;
+							&lt;preferred-lifetime&gt;1234&lt;/preferred-lifetime&gt;
+							&lt;domain-name&gt;demo.com&lt;/domain-name&gt;
+							&lt;dns-servers&gt;2002::11&lt;/dns-servers&gt;
+						&lt;/lease-settings&gt;
+						&lt;extensible-attributes&gt;
+							&lt;attribute&gt;
+								&lt;key&gt;Site&lt;/key&gt;
+								&lt;value&gt;Demo_Site&lt;/value&gt;
+							&lt;/attribute&gt;
+						&lt;/extensible-attributes&gt;
+					&lt;/update&gt;
+           &lt;/parameters&gt;
+        &lt;/item&gt;
+&lt;/items&gt;
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="true">
+        <description>version 
+The version of 'InfoBlox NIOS Appliance' which is supported by adapter. 
+
+Valid value: v6.3</description>
+        <from>version</from>
+        <to>version</to>
+      </input>
+      <output global="false" required="false">
+        <description>Returned adapter response is captured in this context parameter.</description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Infoblox-NIOS:Utilities:Version Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <from>version</from>
+                  <to>version</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>version</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='v6.3']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Infoblox-NIOS:Utilities:Item Type Error Reporting</process-name>
+                    <parameters>
+                      <input>
+                        <from>item type</from>
+                        <to>provided item type</to>
+                      </input>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'update-dns-record']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-Infoblox-NIOS:v6.3:DNS:Update DNS Record</process-name>
+                    <unique-id>c31376a8-718f-4090-ab37-6f958d63a6b2</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'update-fixed-address']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Infoblox-NIOS:v6.3:DHCP:Update Fixed Address</process-name>
+                    <unique-id>85b2af75-0f2e-495d-8b28-f617852408d5</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[3]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update Items:
+
+It is a generic wrapper to update different type of entries.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ef238e69-eea1-4629-b4c4-d62e37f52a29</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1369656225640</last-modified>
+    </meta>
+  </process-def>
+</process>

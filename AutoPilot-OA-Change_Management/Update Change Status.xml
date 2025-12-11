@@ -1,0 +1,690 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":AutoPilot-OA-Change_Management:Update Change Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module. 
+
+Example: BMC_ARS_System, HP_ServiceCenter,BMC_Remedyforce, ServiceNow</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The change ID
+
+Remedy Example: CRQ000000000201
+
+HP ServiceCenter Example: C23
+
+BMC_Remedyforce Example:CR00000055
+
+ServiceNow : CHG0030109</description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The new status 
+
+BMC_AR_System
+
+Valid Values:
+ 
+Draft 
+Request For Authorization 
+Request For Change 
+Planning In Progress 
+Scheduled For Review 
+Scheduled For Approval 
+Scheduled 
+Implementation In Progress 
+Pending 
+Rejected 
+Completed 
+Cancelled
+
+HP_ServiceCenter
+
+Valid Values:
+
+Initial
+Pending
+Closed
+
+BMC_Remedyforce
+Valid Values:
+
+Accepted
+Active
+Analyzed
+Approved
+Archived
+Assigned
+Broken Down
+Closed /No contact
+Completed
+Closed
+Cancelled
+Development
+Disabled
+Discontinued
+Draft
+failed
+In Progress
+In Stock
+Installed
+Known Error
+Lost or Stolen
+Maintenance
+No Resolution
+Off Line
+On Loan
+Waiting for
+
+ServiceNow
+Valid Values:
+
+New
+Assess
+Authorize
+Scheduled
+Implement
+Review
+Closed
+Canceled</description>
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - Status reason 
+
+BMC_AR_System
+
+Valid Values: 
+
+No Longer Required 
+Funding Not Available 
+To Be Re-Scheduled 
+Resources Not Available 
+Successful 
+Successful with Issuesl 
+Unsuccessful 
+Backed Out 
+Final Review Complete 
+Final Review Required 
+Additional Coding Required 
+Insufficient Task Data 
+In Verification 
+In Rollout 
+In Sufficient Charge Data 
+Scheddule Conflicts 
+In Development 
+In Test 
+In Build 
+In Rollbaack 
+In Documentation 
+Vendor Purchase 
+Support Group Commmunication 
+Task Review 
+Miscellaneous 
+Future Enhancement 
+Manager Intervention 
+Accepted 
+Assigned 
+Built 
+On Hold 
+Automatically Closed
+
+HP_ServiceCenter
+
+Valid Values:
+
+This is a free form text field to record comments on the closure of this change.
+
+BMC_Remedyforce : Not supported
+
+ServiceNow : Not supported</description>
+        <from>status reason</from>
+        <to>status reason</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - actual start date
+
+Remedy Example: 1262304060  (epoch) 
+
+HP_ServiceCenter Example: 2009.11.01 08:00:00
+
+BMC_Remedyforce Example : 2012-08-05T13:15:30Z (utc)
+
+ServiceNow : 2020-04-21 11:13:18
+
+
+
+
+
+
+
+</description>
+        <from>actual start date</from>
+        <to>actual start date</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - actual end date
+
+Remedy Example: 1262304060  (epoch) 
+
+HP_ServiceCenter Example: 2009.11.01 08:00:00
+
+BMC_Remedyforce Example : 2012-08-05T13:15:30Z (utc)
+
+ServiceNow : 2020-04-21 11:13:18</description>
+        <from>actual end date</from>
+        <to>actual end date</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - scheduled start date
+
+Remedy Example: 1262304060  (epoch) 
+
+HP_ServiceCenter Example: 2009.11.01 08:00:00
+
+BMC_Remedyforce Example : 2012-08-05T13:15:30Z (utc)
+
+ServiceNow : 2020-04-21 11:13:18</description>
+        <from>scheduled start date</from>
+        <to>scheduled start date</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - scheduled end date
+
+Remedy Example: 1262304060  (epoch) 
+
+HP_ServiceCenter Example: 2009.11.01 08:00:00
+
+BMC_Remedyforce Example : 2012-08-05T13:15:30Z (utc)
+
+ServiceNow : 2020-04-21 11:13:18</description>
+        <from>scheduled end date</from>
+        <to>scheduled end date</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document providing the data template for single or multiple Concept elements.The change concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <to>changes</to>
+        <from>changes</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure 
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - A process specific string that explains the value of success status.
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>change id</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>change-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>status reason</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>status-reason</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>status</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>status</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>actual start date</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>actual-start-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>actual end date</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>actual-end-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>scheduled start date</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>scheduled-start-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>scheduled end date</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>scheduled-end-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>change</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>changes</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="change">
+                      <input global="false">
+                        <from>change</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Changes>
+      <xsl:choose>
+        <xsl:when test="string-length(//change) &gt; 0">
+          <xsl:copy-of select="//change" />
+        </xsl:when>
+        <xsl:otherwise>${change}</xsl:otherwise>
+      </xsl:choose>
+    </Changes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Show contents of change</value>
+                    </input>
+                    <input>
+                      <from>change</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Change_Management:Update Changes</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>changes</from>
+                  <to>changes</to>
+                </input>
+                <output>
+                  <from>changes</from>
+                  <to>changes</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'ServiceNow']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Change_Management:Utilities:ServiceNow:Translate Status Reason</process-name>
+              <unique-id>b829e88f-1875-40f2-a74d-ba86130962c0</unique-id>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>status</from>
+                  <to>status</to>
+                </input>
+                <input>
+                  <from>status reason</from>
+                  <to>status reason</to>
+                </input>
+                <output>
+                  <from>closing notes</from>
+                  <to>closing notes</to>
+                </output>
+                <output>
+                  <from>working notes</from>
+                  <to>working notes</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>change id</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>change-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>closing notes</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>closing-comment-line1</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>working notes</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>worklog-details</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>status</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>status</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>actual start date</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>actual-start-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>actual end date</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>actual-end-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>scheduled start date</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>scheduled-start-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>scheduled end date</from>
+                </input>
+                <output>
+                  <to>change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>scheduled-end-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>change</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>changes</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="change">
+                      <input global="false">
+                        <from>change</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Changes>
+      <xsl:choose>
+        <xsl:when test="string-length(//change) &gt; 0">
+          <xsl:copy-of select="//change" />
+        </xsl:when>
+        <xsl:otherwise>${change}</xsl:otherwise>
+      </xsl:choose>
+    </Changes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Show contents of change</value>
+                    </input>
+                    <input>
+                      <from>change</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Change_Management:Update Changes</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>changes</from>
+                  <to>changes</to>
+                </input>
+                <output>
+                  <from>changes</from>
+                  <to>changes</to>
+                </output>
+                <output>
+                  <from>failed changes</from>
+                  <to>failed changes</to>
+                </output>
+                <output>
+                  <from>success count</from>
+                  <to>success count</to>
+                </output>
+                <output>
+                  <from>failure count</from>
+                  <to>failure count</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>consolidated status</from>
+                  <to>consolidated status</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow updates the status for an existing change record. To close a change see the "Close Change" workflow.</description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d092765f-9531-3004-939a-185be515f9a7</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1587958057395</last-modified>
+    </meta>
+  </process-def>
+</process>

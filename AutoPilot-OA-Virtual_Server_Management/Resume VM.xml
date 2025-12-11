@@ -1,0 +1,242 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AutoPilot-OA-Virtual_Server_Management:Resume VM">
+    <parameters>
+      <input global="false" required="true">
+        <description>Name of the virtual server</description>
+        <from>vm name</from>
+        <to>vm name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String value - The name of a configuration item defined in a configuration module.
+
+Example: BladeLogic, VMware, Amazon</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Name/IP Address of the virtual center on which the given virtual machine is hosted</description>
+        <from>virtual center</from>
+        <to>virtual center</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Number of seconds to wait before polling for the virtual center task status</description>
+        <from>delay</from>
+        <to>delay</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the url for the remote soap service running on the vmware virtual center.
+</description>
+        <from>soap url</from>
+        <to>soap url</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the user name that will be used for http basic authentication on the vmware virtual center.
+</description>
+        <from>username</from>
+        <to>username</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the password corresponding to the specified user name.
+</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the transport protocol for the message.
+</description>
+        <from>transport</from>
+        <to>transport</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. 	
+Valid values: success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Power state of the virtual machine.
+
+Valid values: Started, Stopped, Suspended</description>
+        <to>power status</to>
+        <from>power status</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>Given system is not supported</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'VMware']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:VMware:Resume VM</process-name>
+              <parameters>
+                <input>
+                  <from>vm name</from>
+                  <to>vm name</to>
+                </input>
+                <input>
+                  <from>virtual center</from>
+                  <to>virtual center</to>
+                </input>
+                <input>
+                  <from>delay</from>
+                  <to>delay</to>
+                </input>
+                <input>
+                  <from>soap url</from>
+                  <to>soap url</to>
+                </input>
+                <input>
+                  <from>username</from>
+                  <to>username</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>password</to>
+                </input>
+                <input>
+                  <from>transport</from>
+                  <to>transport</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>power status</from>
+                  <to>power status</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Allows VM activity to continue when the VM is in suspended state.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1303207502278</last-modified>
+    </meta>
+  </process-def>
+</process>

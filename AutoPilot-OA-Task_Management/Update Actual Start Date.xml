@@ -1,0 +1,316 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Task_Management:Update Actual Start Date">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module.
+
+Example: BMC_AR_System, BMC_Remedyforce, ServiceNow</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - Task ID</description>
+        <from>task id</from>
+        <to>task id</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - Actual Start Date (Epoch Format) 
+
+Example: 1262304000</description>
+        <from>actual start date</from>
+        <to>actual start date</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document providing detail for one or more tasks.</description>
+        <to>tasks</to>
+        <from>tasks</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - A process specific string that explains the value of success status.</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>success count</to>
+        <from>success count</from>
+      </output>
+      <output global="false" required="false">
+        <to>failed tasks</to>
+        <from>failed tasks</from>
+      </output>
+      <output global="false" required="false">
+        <to>failure count</to>
+        <from>failure count</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>task id</from>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>task-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>actual start date</from>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>actual-start-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>tasks</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="task">
+                      <input global="false">
+                        <from>task</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//task) &gt; 0">
+          <xsl:copy-of select="//task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Task_Management:Update Tasks</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>tasks</from>
+                  <to>tasks</to>
+                </input>
+                <output>
+                  <from>tasks</from>
+                  <to>tasks</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'ServiceNow']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>task id</from>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>task-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>actual start date</from>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>actual-start-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>tasks</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="task">
+                      <input global="false">
+                        <from>task</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//task) &gt; 0">
+          <xsl:copy-of select="//task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Task_Management:Update Tasks</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>tasks</from>
+                  <to>tasks</to>
+                </input>
+                <output>
+                  <from>tasks</from>
+                  <to>tasks</to>
+                </output>
+                <output>
+                  <from>failed tasks</from>
+                  <to>failed tasks</to>
+                </output>
+                <output>
+                  <from>success count</from>
+                  <to>success count</to>
+                </output>
+                <output>
+                  <from>failure count</from>
+                  <to>failure count</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow updates the actual start date  for a task.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5d5374a1-e0a8-3e2d-8d21-dd565f10d0fd</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1422528149154</last-modified>
+    </meta>
+  </process-def>
+</process>

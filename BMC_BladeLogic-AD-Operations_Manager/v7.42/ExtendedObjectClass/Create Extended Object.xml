@@ -1,0 +1,207 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:ExtendedObjectClass:Create Extended Object">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the added extended object.</description>
+        <from>extendedObjectName</from>
+        <to>extendedObjectName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Short description for the extended object.</description>
+        <from>description</from>
+        <to>description</to>
+      </input>
+      <input global="false" required="true">
+        <description>Script to be executed.</description>
+        <from>execScript</from>
+        <to>execScript</to>
+      </input>
+      <input global="false" required="true">
+        <description>Associated grammar file.</description>
+        <from>grammarName</from>
+        <to>grammarName</to>
+      </input>
+      <input global="false" required="true">
+        <description>NSH name of the associated operating system.</description>
+        <from>osNshName</from>
+        <to>osNshName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Execute remotely (true) or centrally(false).</description>
+        <from>remoteExecute</from>
+        <to>remoteExecute</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the DBKey of object.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="true">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>extendedObjectName</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>description</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>execScript</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>grammarName</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>osNshName</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>remoteExecute</from>
+            <to>argument 6</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>ExtendedObjectClass</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>createExtendedObject</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <compensation name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:ExtendedObjectClass:Create Extended Object:999999999" />
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command creates an extended object class.
+For parsing purposes, each extended object class is associated with a grammar file. The grammarName parameter specifies the associated grammar, for example, hosts.gm.
+Each extended object class is associated with several operating systems to which the class is relevant. When you create a new extended object class, you associate a single operating system with the new class. The parameter osNshName is the NSH name of the operating system (for example, WindowsNT, Unix, HP-UX, and so on).
+The command only associates the extended object class with a single OS. To associate the class with other operating systems, use the command addOSAssociation .</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>42957115-7c30-3a61-bcf2-116589d4619b</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179810210</last-modified>
+    </meta>
+  </process-def>
+  <compensation-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:ExtendedObjectClass:Create Extended Object:999999999">
+    <meta>
+      <peer-location>
+        <location>this</location>
+      </peer-location>
+    </meta>
+    <parameters />
+    <sequence />
+  </compensation-def>
+</process>

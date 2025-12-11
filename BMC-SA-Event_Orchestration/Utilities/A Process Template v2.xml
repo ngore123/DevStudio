@@ -1,0 +1,224 @@
+<process draft="false" dev-studio-version="8.0.00">
+  <process-def name=":BMC-SA-Event_Orchestration:Utilities:A Process Template v2">
+    <parameters>
+      <input global="false" required="true">
+        <description>true or false. If false, the workflow skips the main logic.</description>
+        <from>continue processing</from>
+        <to>continue processing</to>
+      </input>
+      <input global="false" required="true">
+        <description>true or false. If true, an error is logged in the target system, if any.</description>
+        <from>log error</from>
+        <to>log error</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>========Input=======</value>
+              </input>
+              <input>
+                <from>continue processing</from>
+              </input>
+              <input>
+                <from>log error</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>log error</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[. = 'true']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>===========Log Error===========</value>
+                          </input>
+                          <input>
+                            <value></value>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>continue processing</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==========Continue Processing=======</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==========Output========</value>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[3]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This a process template. It has a few basic things.
+1. Log Input
+2. Log Output
+3. Atleast 2 basic output parameters - status and error message.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>2d50ebcc-8440-4850-9041-c931a4b38308</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration.</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1521466432598</last-modified>
+    </meta>
+  </process-def>
+</process>

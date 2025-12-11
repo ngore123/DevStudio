@@ -1,0 +1,133 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-Microsoft_System_Center_Operations_Manager:Utilities:Constructor_Utilities:Create Criteria Expression">
+    <parameters>
+      <input global="false" required="true">
+        <description>operator[Required]
+	The 'operator' tag specifies the operand for key and value specified.
+	Valid values - equals, not equals, like, in</description>
+        <from>operator</from>
+        <to>operator</to>
+      </input>
+      <input global="false" required="true">
+        <description>key[Required]
+	This tag contains the alert attribute by which the alerts are filtered. Valid values for this tag can be any of the alert attributes such as: name, description, id etc. You can use Find Alert By ID to get the list of all the alert attributes.</description>
+        <from>key</from>
+        <to>key</to>
+      </input>
+      <input global="false" required="true">
+        <description>value[Required]
+	This tag contains the valid search expression for the attribute specified in the key. Please refer to Criteria guide for valid search criteria expression format.
+NOTE: For help on writing regular expressions refer to 'Regular Expressions Guide.doc'
+
+Note: XML escapse characters (i.e., ", &lt;, &gt;, &amp;) must be replaced as below- 
+
+" by &amp;quot; 
+&lt; by &amp;lt; 
+&gt; by &amp;gt;
+&amp; by &amp;amp; </description>
+        <from>value</from>
+        <to>value</to>
+      </input>
+      <output global="false" required="false">
+        <to>criteria expressions</to>
+        <from>criteria expressions</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>criteria expressions</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="key">
+                <input global="false">
+                  <from>key</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="operator">
+                <input global="false">
+                  <from>operator</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="value">
+                <input global="false">
+                  <from>value</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <criteria-expressions>
+      <xsl:if test="string('${key}') != ''">
+        <criteria-expression>
+          <key>
+            <xsl:value-of select="string('${key}')" disable-output-escaping="no" />
+          </key>
+          <value>
+            <xsl:if test="string('${value}') != ''">
+              <xsl:value-of select="string('${value}')" disable-output-escaping="no" />
+            </xsl:if>
+          </value>
+          <operator>
+            <xsl:if test="string('${operator}') != ''">
+              <xsl:value-of select="string('${operator}')" disable-output-escaping="no" />
+            </xsl:if>
+          </operator>
+        </criteria-expression>
+      </xsl:if>
+    </criteria-expressions>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Criteria Expression XML: </value>
+              </input>
+              <input>
+                <from>criteria expressions</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>bc34799c-f0e4-3ef6-9100-43624ddf68e6</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598714032</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,226 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AO-AD-Amazon_EC2:Utilities:Amazon_Machine_Image_Operations:Construct Request for Describe Images">
+    <parameters>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon EC2. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - 
+http://ec2.amazonaws.com/doc/2009-11-30/AmazonEC2.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon EC2 instances across different regions. Respective values for different regions are as below:
+
+    * http://us-east-1.ec2.amazonaws.com/ — Endpoint located in the US-East (Northern Virginia) Region
+    * http://us-west-1.ec2.amazonaws.com/ — Endpoint located in the US-West (Northern California) Region
+    * http://eu-west-1.ec2.amazonaws.com/ ---Endpoint located in the EU (Ireland) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>signature properties [Optional]
+
+Specify this element for including authentication credentials at request level. 
+
+Sample values that can be specified are:
+
+&lt;signature-properties mode = "key-files"&gt;
+    &lt;private-key-file&gt;&lt;/private-key-file&gt;
+    &lt;certificate-file&gt;&lt;/certificate-file&gt;
+&lt;/signature-properties&gt;
+
+OR
+
+&lt;signature-properties mode = "key-data"&gt;
+    &lt;private-key-data&gt;&lt;/private-key-data&gt;
+    &lt;certificate-data&gt;&lt;/certificate-data&gt;
+&lt;/signature-properties&gt;
+</description>
+        <from>signature properties</from>
+        <to>signature properties</to>
+      </input>
+      <input global="false" required="false">
+        <description>executable by set [optional]
+
+Executable set. Returns AMIs for which the specified user has explicit launch permissions. The user ID can be a user's account ID, self to return AMIs for which the sender of the request has explicit launch permissions, or all to return AMIs with public launch permissions.
+
+&lt;executable-by-set&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;user&gt;&lt;/user&gt;
+    &lt;/item&gt;
+&lt;/executable-by-set&gt;
+</description>
+        <from>executable by set</from>
+        <to>executable by set</to>
+      </input>
+      <input global="false" required="false">
+        <description>images set [Optional]
+
+Image set.AMI IDs to describe.
+
+&lt;images-set&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;image-id&gt;&lt;/image-id&gt;
+    &lt;/item&gt;
+&lt;/images-set&gt;
+</description>
+        <from>images set</from>
+        <to>images set</to>
+      </input>
+      <input global="false" required="false">
+        <description>owners set [Optional]
+
+Information about an owner.Returns AMIs owned by the specified owner. Multiple owners can be specified. The IDs amazon, self, and explicit can be used to include AMIs owned by Amazon, AMIs owned by the user, and AMIs for which the user has explicit launch permissions, respectively.
+
+&lt;owners-set&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;owner&gt;&lt;/owner&gt;
+    &lt;/item&gt;
+&lt;/owners-set&gt;
+</description>
+        <from>owners set</from>
+        <to>owners set</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>inputs</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="executable by set">
+                <input global="false">
+                  <from>executable by set</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="images set">
+                <input global="false">
+                  <from>images set</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="owners set">
+                <input global="false">
+                  <from>owners set</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <inputs>${executable by set}${owners set}${images set}</inputs>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputs</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="wsdl location">
+                <input global="false">
+                  <from>wsdl location</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="endpoint address">
+                <input global="false">
+                  <from>endpoint address</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="signature properties">
+                <input global="false">
+                  <from>signature properties</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request-data>
+      <amazon-ec2-request>
+        <xsl:if test="string-length('${wsdl location}')&gt;0">
+          <wsdl-location>${wsdl location}</wsdl-location>
+        </xsl:if>
+        <xsl:if test="string-length('${endpoint address}')&gt;0">
+          <endpoint-address>${endpoint address}</endpoint-address>
+        </xsl:if>
+        ${signature properties}
+        <operation-name>
+          <xsl:text disable-output-escaping="no">describe-images</xsl:text>
+        </operation-name>
+        <parameters>
+          <executable-by-set>
+            <xsl:copy-of select="//executable-by-set/*" />
+          </executable-by-set>
+          <images-set>
+            <xsl:copy-of select="//images-set/*" />
+          </images-set>
+          <owners-set>
+            <xsl:copy-of select="//owners-set/*" />
+          </owners-set>
+        </parameters>
+      </amazon-ec2-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Returns information about AMIs, AKIs, and ARIs. This includes image type, product codes,
+architecture, and kernel and RAM disk IDs. Images available to you include public images, private
+images that you own, and private images owned by other users for which you have explicit launch
+permissions.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>68ee3876-0865-38d6-9490-f28d4b55bbbf</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1296727592798</last-modified>
+    </meta>
+  </process-def>
+</process>

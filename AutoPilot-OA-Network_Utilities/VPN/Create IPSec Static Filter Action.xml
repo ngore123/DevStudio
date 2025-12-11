@@ -1,0 +1,214 @@
+<process draft="false" dev-studio-version="7.5.02.08">
+  <process-def name=":AutoPilot-OA-Network_Utilities:VPN:Create IPSec Static Filter Action">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the name of the filter action to be created.</description>
+        <from>name</from>
+        <to>name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Provides information about the filter action.</description>
+        <from>description</from>
+        <to>description</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ yes or no}
+Specifies whether to enable session key perfect forward secrecy (PFS). If yes is specified, new master key material is renegotiated each time a new session key is required. The default value is no.</description>
+        <from>qmpfs</from>
+        <to>qmpfs</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ yes or no}]
+Specifies whether to allow an incoming packet that matches the configured filter list to be unsecured, but require IPSec-secured communication when replying. The default value is no.</description>
+        <from>inpass</from>
+        <to>inpass</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ yes or no}
+Specifies whether to fall back to unsecured communication with other computers that do not support IPSec, or when IPSec negotiations with an IPSec-capable computer fail. The default value is no.</description>
+        <from>soft</from>
+        <to>soft</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ permit or block or negotiate}]
+Specifies whether to permit traffic without negotiating IP security. If permit is specified, traffic is transmitted or received without negotiating or applying IP security. If block is specified, traffic is blocked. If negotiate is specified, IP security is used with the specified list of security methods. The default value is negotiate.</description>
+        <from>action</from>
+        <to>action</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies one or more security methods, separated by spaces and defined by the following format: {ESP [ConfAlg,AuthAlg]:k/s  or AH [HashAlg]:k/s  or AH [HashAlg+ESPConfAlg,AuthAlg]:k/s} Where:ConfAlgSpecifies the encryption algorithm. ConfigAlg can be DES (Data Encryption Standard), 3DES, or none. AuthAlgSpecifies the integrity algorithm. AuthAlg can be MD5 (Message Digest 5), SHA1 (Secure Hash Algorithm 1), or none.HashAlgSpecifies the hash function. HashAlg can be MD5 (Message Digest 5) or SHA1.kSpecifies the session key lifetime in kilobytes. After the specified number of kilobytes of data is transferred, a new session key for the quick mode SA is generated. The default value is 100000 kilobytes.sSpecifies the session key lifetime in seconds. The default value is 3600 seconds.</description>
+        <from>qmsecmethods</from>
+        <to>qmsecmethods</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="name">
+                  <input global="false">
+                    <from>name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="description">
+                  <input global="false">
+                    <from>description</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="qmpfs">
+                  <input global="false">
+                    <from>qmpfs</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="inpass">
+                  <input global="false">
+                    <from>inpass</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="soft">
+                  <input global="false">
+                    <from>soft</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="action">
+                  <input global="false">
+                    <from>action</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="qmsecmethods">
+                  <input global="false">
+                    <from>qmsecmethods</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:param name="mirrored">
+    <xsl:text disable-output-escaping="no">${mirrored}</xsl:text>
+  </xsl:param>
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows XP">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Windows XP.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">netsh ipsec static add filteraction name=$[name]</xsl:text>
+        <xsl:if test="string-length('${description}')!=0">
+          <xsl:text disable-output-escaping="yes"> description=$[description]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${qmpfs}')!=0">
+          <xsl:text disable-output-escaping="no"> qmpfs=${qmpfs}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${inpass}')!=0">
+          <xsl:text disable-output-escaping="no"> inpass=$[inpass]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${soft}')!=0">
+          <xsl:text disable-output-escaping="no"> soft=${soft}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${action}')!=0">
+          <xsl:text disable-output-escaping="no"> action=${action}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${qmsecmethods}')!=0">
+          <xsl:text disable-output-escaping="no"> qmsecmethods=${qmsecmethods}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported"</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported"</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Creates a filter action with the specified quick mode security methods.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+    </meta>
+  </process-def>
+</process>

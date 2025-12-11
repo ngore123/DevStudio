@@ -1,0 +1,164 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Operating_System_Utilities:Security:Perform System Security Analyze with Overwrite">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the database used to perform the analysis.</description>
+        <from>database</from>
+        <to>db</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies a security template to import into the database prior to performing the analysis. Security templates are created using the Security Templates snap-in.</description>
+        <from>security template</from>
+        <to>cfg</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies a file in which to log the status of the configuration process. If not specified, configuration data is logged in the scesrv.log file which is located in the %windir%\security\logs directory.</description>
+        <from>log file</from>
+        <to>log</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="db">
+                  <input global="false">
+                    <from>db</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="cfg">
+                  <input global="false">
+                    <from>cfg</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="log">
+                  <input global="false">
+                    <from>log</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">secedit /analyze /db ${db}</xsl:text>
+        <xsl:if test="string-length('${cfg}')!=0">
+          <xsl:text disable-output-escaping="no"> /cfg ${cfg}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> /overwrite</xsl:text>
+        <xsl:if test="string-length('${log}')!=0">
+          <xsl:text disable-output-escaping="no"> /log ${log}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported."</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported."</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Analyzes the security settings on a computer by comparing them against the baseline settings in a database.
+
+(with overwrite)
+Specifies that the database should be emptied prior to importing the security template. If this parameter is not specified, the settings in the security template are accumulated into the database. If this parameter is not specified and there are conflicting settings in the database and the template being imported, the template settings win.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>744ffd00-5ee2-3dcd-8c15-6b1254c06dfd</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1291031878332</last-modified>
+    </meta>
+  </process-def>
+</process>

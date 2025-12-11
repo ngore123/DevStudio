@@ -1,0 +1,933 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Process Response">
+    <parameters>
+      <input global="false" required="true">
+        <description>REST Adapter response in XML format as below:
+&lt;rest-adapter-response&gt;
+  &lt;metadata&gt;
+    &lt;status&gt;success&lt;/status&gt;
+  &lt;/metadata&gt;
+  &lt;status-line&gt;
+    &lt;code&gt;401&lt;/code&gt;
+    &lt;reason&gt;Unauthorized&lt;/reason&gt;
+  &lt;/status-line&gt;
+  &lt;header-lines&gt;
+    &lt;Date&gt;Fri, 11 Oct 2019 05:31:22 GMT&lt;/Date&gt;
+    &lt;X-Frame-Options&gt;SAMEORIGIN&lt;/X-Frame-Options&gt;
+    &lt;Content-Security-Policy&gt;frame-ancestors 'self'&lt;/Content-Security-Policy&gt;
+    &lt;Content-Type&gt;application/json&lt;/Content-Type&gt;
+    &lt;WWW-Authenticate&gt;AR-JWT&lt;/WWW-Authenticate&gt;
+    &lt;Content-Length&gt;113&lt;/Content-Length&gt;
+  &lt;/header-lines&gt;
+  &lt;message-body&gt;
+    &lt;e&gt;
+      &lt;messageAppendedText&gt;Allen&lt;/messageAppendedText&gt;
+      &lt;messageNumber&gt;623&lt;/messageNumber&gt;
+      &lt;messageText&gt;Authentication failed&lt;/messageText&gt;
+      &lt;messageType&gt;ERROR&lt;/messageType&gt;
+    &lt;/e&gt;
+  &lt;/message-body&gt;
+&lt;/rest-adapter-response&gt;
+
+</description>
+        <from>adapter response</from>
+        <to>adapter response</to>
+      </input>
+      <input global="false" required="false">
+        <description>XML or JSON. If no input is provided, it is assumed to JSON.</description>
+        <from>return data format</from>
+        <to>return data format</to>
+      </input>
+      <output global="false" required="false">
+        <to>response headers</to>
+        <from>response headers</from>
+      </output>
+      <output global="false" required="false">
+        <to>response body</to>
+        <from>response body</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status code</to>
+        <from>status code</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:AutoPilot-OA-Common_Utilities:REST:VALID_SUCCESS_CODES</configuration>
+          </input>
+          <output>
+            <to>success codes</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="success codes">
+                <input global="false">
+                  <from>success codes</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="(contains(//metadata/status/text(), &quot;success&quot;)  and contains('${success codes}', //status-line/code/text()))">
+          <xsl:text disable-output-escaping="no">success</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status code</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//status-line/code/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error message</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="status">
+                <input global="false">
+                  <from>status</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="statusError">
+    <xsl:value-of select="//metadata/error/text()" disable-output-escaping="no" />
+  </xsl:variable>
+  <xsl:variable name="statusLineReason">
+    <xsl:value-of select=" //status-line/reason/text()" disable-output-escaping="no" />
+  </xsl:variable>
+  <xsl:variable name="LF">
+    <xsl:text disable-output-escaping="no">
+</xsl:text>
+  </xsl:variable>
+  <xsl:variable name="messagebodyError">
+    <xsl:value-of select="//message-body/errors" disable-output-escaping="no" />
+  </xsl:variable>
+  <xsl:variable name="messagebodyErrorMessages">
+    <xsl:value-of select="//message-body/errorMessages" disable-output-escaping="no" />
+  </xsl:variable>
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="'${status}' = 'failure'">
+        <xsl:choose>
+          <xsl:when test="string-length(normalize-space($messagebodyError))&gt;0">
+            <xsl:value-of select="$messagebodyError" disable-output-escaping="no" />
+          </xsl:when>
+          <xsl:when test="string-length(normalize-space($statusError)) &gt; 0 and string-length(normalize-space($statusLineReason)) &gt; 0 and string-length(normalize-space($messagebodyError))= 0 and string-length(normalize-space($messagebodyErrorMessages))= 0">
+            <xsl:value-of select="concat($statusError, $LF, $statusLineReason)" disable-output-escaping="no" />
+          </xsl:when>
+          <xsl:when test="string-length(normalize-space($messagebodyErrorMessages))">
+            <xsl:value-of select="$messagebodyErrorMessages" disable-output-escaping="no" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="concat($statusError, $statusLineReason)" disable-output-escaping="no" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>json message body</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <!--Some rouge implementations return JSON body  without having non-xml-response-data element.-->
+    <value>
+      <xsl:choose>
+        <xsl:when test="boolean(//message-body/non-xml-data-response) = false">
+          <xsl:value-of select="//message-body/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:when test="boolean(//message-body/non-xml-data-response)">
+          <xsl:value-of select="//message-body/non-xml-data-response/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text></xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>xml message body</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//message-body/*)">
+        <xsl:choose>
+          <xsl:when test="count(//message-body/*) &gt; 1">
+            <xsl:copy-of select="//message-body" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:copy-of select="//message-body/*" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <message-body />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error xml</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="status">
+                <input global="false">
+                  <from>status</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="'${status}' = 'failure'">
+        <xsl:choose>
+          <xsl:when test="boolean(//message-body/*) and count(//message-body/*) = 1">
+            <xsl:copy-of select="//message-body/*" />
+          </xsl:when>
+          <xsl:when test="boolean(//message-body/*) and count(//message-body/*) &gt; 1">
+            <xsl:copy-of select="//message-body" />
+          </xsl:when>
+          <xsl:otherwise>
+            <message-body>
+              <xsl:text></xsl:text>
+            </message-body>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <message-body>
+          <xsl:text></xsl:text>
+        </message-body>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error json</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="status">
+                <input global="false">
+                  <from>status</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="'${status}' = 'failure'">
+        <xsl:choose>
+          <xsl:when test="boolean(//message-body/non-xml-data-response) = false">
+            <xsl:value-of select="//message-body/text()" disable-output-escaping="no" />
+          </xsl:when>
+          <xsl:when test="boolean(//message-body/non-xml-data-response)">
+            <xsl:value-of select="//message-body/non-xml-data-response/text()" disable-output-escaping="no" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text></xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'failure']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[ translate(., 'JSON', 'json') = 'json']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>error xml</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="error xml">
+                  <input global="false">
+                    <from>error xml</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[string-length(normalize-space('$[error xml]')) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+              <parameters>
+                <input>
+                  <from>error xml</from>
+                  <to>XML</to>
+                </input>
+                <output>
+                  <from>JSON</from>
+                  <to>error json</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'failure']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[translate(., 'XML', 'xml') = 'xml']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>error json</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert JSON to XML</process-name>
+              <parameters>
+                <input>
+                  <from>error json</from>
+                  <to>JSON</to>
+                </input>
+                <output>
+                  <from>XML</from>
+                  <to>error xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>xml message body</from>
+                </input>
+                <output>
+                  <to>message body xml</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[ translate(., 'XML', 'xml') = 'xml']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>json message body</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert JSON to XML</process-name>
+              <parameters>
+                <input>
+                  <from>json message body</from>
+                  <to>JSON</to>
+                </input>
+                <output>
+                  <from>XML</from>
+                  <to>message body xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) = 0 or translate(., 'JSON', 'json') = 'json']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>xml message body</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(//message-body/*) = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+              <parameters>
+                <input>
+                  <from>xml message body</from>
+                  <to>XML</to>
+                </input>
+                <output>
+                  <from>JSON</from>
+                  <to>json message body</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[3]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>response headers</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//header-lines)">
+        <xsl:copy-of select="//header-lines" />
+      </xsl:when>
+      <xsl:otherwise>
+        <header-lines />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[3]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[translate(., 'XML', 'xml') != 'xml']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+              <parameters>
+                <input>
+                  <from>response headers</from>
+                  <to>XML</to>
+                </input>
+                <output>
+                  <from>JSON</from>
+                  <to>response headers</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[3]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[3]</location>
+      </switch>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[3]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>json message body</from>
+                </input>
+                <output>
+                  <to>response body</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[4]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[translate(., 'XML', 'xml') = 'xml']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>message body xml</from>
+                </input>
+                <output>
+                  <to>response body</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[4]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'failure']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[translate(., 'XML', 'xml') != 'xml']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>error json</from>
+                </input>
+                <output>
+                  <to>response body</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[4]:sequence[3]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'failure']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[translate(., 'XML', 'xml') = 'xml']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>error xml</from>
+                </input>
+                <output>
+                  <to>response body</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[4]:sequence[4]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[4]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Given an adapter response and return data format, return status, error message and response body.
+
+Based on return data format and status of response (success or failure), response body may contain XML or JSON data.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>99346b4a-8d25-4e8e-905e-001c9304eb6b</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Remedy REST</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1574842305549</last-modified>
+    </meta>
+  </process-def>
+</process>

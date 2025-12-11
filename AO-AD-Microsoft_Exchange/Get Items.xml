@@ -1,0 +1,688 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AO-AD-Microsoft_Exchange:Get Items">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter used to handle the request.
+
+Default value: MicrosoftExchangeActorAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Command [Required]
+              The name of the command to execute. 
+
+Valid Values:
+
+- Commands supported on Exchange versions 2007, 2010, 2013 and 2016
+
+	Get-MailboxDatabase
+	Get-TransportRule
+	Get-MailboxStatistics
+	Get-Mailbox
+	Get-Message
+	Get-DistributionGroupMember
+
+- Commands supported on Exchange versions 2010, 2013 and 2016 
+
+	Get-MailboxDatabaseCopyStatus
+	Get-MailboxMoveRequest
+	Get-MailboxImportRequest (supported on 2010 SP1 and later, 2013 and 2016)
+	Get-MailboxExportRequest (supported on 2010 SP1 and later, 2013 and 2016)
+	Get-DatabaseAvailabilityGroup</description>
+        <from>command</from>
+        <to>command</to>
+      </input>
+      <input global="false" required="true">
+        <description>parameters [Required]   
+  
+          The Input parameters XML for the command execution. To be provided under the 'parameters' tag with individual parameter as a combination of 'name' and 'value' pair in the following format:
+
+&lt;parameters&gt;
+    &lt;parameter&gt;
+        &lt;name&gt;Name1&lt;/name&gt;
+        &lt;value&gt;Value1&lt;/value&gt;
+    &lt;/parameter&gt;
+    &lt;parameter&gt;
+        &lt;name&gt;Name2&lt;/name&gt;
+        &lt;value&gt;Value2&lt;/value&gt;
+    &lt;/parameter&gt;
+&lt;/parameters&gt;
+
+The parameters may differ according to the Exchange Server version. Please refer to the Microsoft documentation for the list of all supported parameters specific to your version.
+
+</description>
+        <from>input parameters</from>
+        <to>input parameters</to>
+      </input>
+      <input global="false" required="false">
+        <description>format option [Optional]
+           This controls the output format of the command being executed. Valid values for this are - format-list, format-custom, format-table &amp; format-wide</description>
+        <from>format option</from>
+        <to>format option</to>
+      </input>
+      <input global="false" required="false">
+        <description>verbose logging [Optional]
+           In order to get detailed logging statements for the operation being executed in the response, this parameter is needed. Valid values - true, false.</description>
+        <from>verbose logging</from>
+        <to>verbose logging</to>
+      </input>
+      <output global="false" required="false">
+        <description>The adapter response containing the results. </description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:Utilities:Invalid Command Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <from>command</from>
+                  <to>command</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-MailboxDatabase']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:DB_Management:Get Mailbox Database</process-name>
+              <unique-id>f2c97d53-a422-3d85-acd1-4e5105f1dfb0</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-TransportRule']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:Hub_Transport_Rules:Get Transport Rule</process-name>
+              <unique-id>b195a451-0e88-3de2-861d-db138d89c8e1</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-MailboxStatistics']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:Mailbox_Management:Get Mailbox Statistics</process-name>
+              <unique-id>5b9aefdc-74d0-3276-93b8-3df9fa1eb4f1</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-Mailbox']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:Mailbox_Management:Get Mailbox</process-name>
+              <unique-id>c7216501-9bce-3709-9214-ac767ec880a6</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[5]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-Message']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:Queue_Management:Get Message</process-name>
+              <unique-id>9e7be3c7-9d42-3037-b6c1-7a994bb02fce</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[6]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-DistributionGroupMember']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:Recipients_Group_Management:Get Distribution Group Member</process-name>
+              <unique-id>78a62f82-0598-3925-812b-4a1ba5d203a0</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[7]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-DatabaseAvailabilityGroup']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2010:Database_Availability_Group_Management:Get Database Availability Group</process-name>
+              <unique-id>634208fa-1f29-4fa2-a10d-b7264b26aaf7</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[8]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-MailboxDatabaseCopyStatus']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2010:Mailbox_Management:Get Mailbox Database Copy Status</process-name>
+              <unique-id>49c08733-842a-4bb2-8e77-08e6bc5d103c</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[9]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-MailboxExportRequest']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2010:Mailbox_Management:Get Mailbox Export Request</process-name>
+              <unique-id>cfb2c72b-4d5e-4890-aca1-e13518c7d2ea</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[10]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-MailboxImportRequest']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2010:Mailbox_Management:Get Mailbox Import Request</process-name>
+              <unique-id>ea57a205-7687-4a55-8814-6324b02e3c36</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[11]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Get-MailboxMoveRequest']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2010:Mailbox_Management:Get Move Mailbox Request</process-name>
+              <unique-id>3d8e9783-d6f4-47eb-870c-675072c65ec6</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[12]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Create Items
+      Creates items within Amazon EC2.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0bbecb28-6d93-4914-947e-6531d2cfcbe9</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1455173615030</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,390 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AutoPilot-OA-Virtual_Server_Management:Utilities:VMware:Poll VM Power Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>Name of the virtual machine whose power status is to be polled</description>
+        <from>vm name</from>
+        <to>vm name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Required virtual machine power status.  When there is a transition of power status after power on, power off etc operations, the expected value of power status should be mentioned as "check status".
+
+Valid values: Started, Stopped, Suspended</description>
+        <from>check status</from>
+        <to>check status</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] Name/IP Address of the virtual center on which the given virtual machine is hosted</description>
+        <from>virtual center</from>
+        <to>virtual center</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the url for the remote soap service running on the vmware virtual center.
+</description>
+        <from>soap url</from>
+        <to>soap url</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the user name that will be used for http basic authentication on the vmware virtual center.
+</description>
+        <from>username</from>
+        <to>username</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the password corresponding to the specified user name.
+</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the transport protocol for the message.
+</description>
+        <from>transport</from>
+        <to>transport</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure </description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status.</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Power status of the virtual machine</description>
+        <to>powerStatus</to>
+        <from>powerStatus</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>task closed</to>
+            <value>false</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>count</to>
+            <value>5</value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>count</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>iterator</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:variable name="elements">
+      <root />
+    </xsl:variable>
+    <xsl:call-template name="create-xml">
+      <xsl:with-param name="count" select="." />
+      <xsl:with-param name="xml" select="$elements" />
+    </xsl:call-template>
+  </xsl:template>
+  <xsl:template name="create-xml">
+    <xsl:param name="count" />
+    <xsl:param name="xml" />
+    <xsl:choose>
+      <xsl:when test="count(xalan:nodeset($xml)/root/element)&lt;$count">
+        <xsl:variable name="new-xml">
+          <root>
+            <xsl:copy-of select="xalan:nodeset($xml)/root/element" />
+            <element />
+          </root>
+        </xsl:variable>
+        <xsl:call-template name="create-xml">
+          <xsl:with-param name="count" select="$count" />
+          <xsl:with-param name="xml" select="$new-xml" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="$xml" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>iterator</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>element</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//element]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>task closed</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.)='false']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+                <pause>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <duration>5000</duration>
+                  <location>:switch[1]:sequence[2]:pause[1]</location>
+                </pause>
+                <call-process>
+                  <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:VMware:Get VM Power Status</process-name>
+                  <parameters>
+                    <input>
+                      <from>vm name</from>
+                      <to>vm name</to>
+                    </input>
+                    <input>
+                      <from>virtual center</from>
+                      <to>virtual center</to>
+                    </input>
+                    <input>
+                      <from>soap url</from>
+                      <to>soap url</to>
+                    </input>
+                    <input>
+                      <from>username</from>
+                      <to>username</to>
+                    </input>
+                    <input>
+                      <from>password</from>
+                      <to>password</to>
+                    </input>
+                    <input>
+                      <from>transport</from>
+                      <to>transport</to>
+                    </input>
+                    <output>
+                      <from>success status</from>
+                      <to>success status</to>
+                    </output>
+                    <output>
+                      <from>status message</from>
+                      <to>status message</to>
+                    </output>
+                    <output>
+                      <from>powerStatus</from>
+                      <to>powerStatus</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <console-output>
+                      <type>INFO</type>
+                      <summary>
+                        <concat>
+                          <input>
+                            <value></value>
+                          </input>
+                        </concat>
+                      </summary>
+                      <detail>
+                        <concat>
+                          <input>
+                            <value></value>
+                          </input>
+                        </concat>
+                      </detail>
+                    </console-output>
+                  </after-execution>
+                  <location>:switch[1]:sequence[2]:call-process[1]</location>
+                </call-process>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>powerStatus</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>task closed</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="check status">
+                          <input global="false">
+                            <from>check status</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(.) = '${check status}'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <assignment>
+                    <input>
+                      <from>status message</from>
+                    </input>
+                    <output>
+                      <to>status message</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                    <output>
+                      <to>success status</to>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1302776527463</last-modified>
+    </meta>
+  </process-def>
+</process>

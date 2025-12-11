@@ -1,0 +1,261 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_ServiceManager:Utilities:Entity type Error Reporting">
+    <parameters>
+      <input global="false" required="false">
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="false">
+        <from>entity type</from>
+        <to>entity type</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value> Bad entity-type. For selected logical group the entity type can be: </value>
+                      </input>
+                    </concat>
+                  </input>
+                  <input>
+                    <from>entity type</from>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>errorstring</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>errorstring</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:utility[1]</location>
+            </utility>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[concat(//entity-type/text(), "#") = '#']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value> entity-type missing.</value>
+                      </input>
+                    </concat>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>errorstring</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>errorstring</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:utility[1]</location>
+            </utility>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[concat(//operation-name/text(), "#") = '#']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value> operation-name missing.</value>
+                      </input>
+                    </concat>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>errorstring</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>errorstring</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[3]:utility[1]</location>
+            </utility>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(contains(//operation-name/text(), //entity-type/text()) or (//entity-type/text() = 'handheld-device' and contains(//operation-name/text(), 'hand-held-device' )))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>The 'operation-name' is performing operation on some 'entity-type' which is not the same 'entity-type' which was provided in item xml. The 'entity-type' and 'operation-name' provided in item xml (items) are respectively as follows: </value>
+                      </input>
+                    </concat>
+                  </input>
+                  <input>
+                    <from>items</from>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//entity-type/text()]]></xpath>
+                    </xpath-expression>
+                  </input>
+                  <input>
+                    <concat>
+                      <input>
+                        <value> &amp; </value>
+                      </input>
+                    </concat>
+                  </input>
+                  <input>
+                    <from>items</from>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//operation-name/text()]]></xpath>
+                    </xpath-expression>
+                  </input>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>.</value>
+                      </input>
+                    </concat>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>errorstring</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>errorstring</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[4]:utility[1]</location>
+            </utility>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This report error for following cases:
+
+ 1-Missing 'entity-type' element or 'operation-name'  element or both.
+
+ 2-Invalid value of 'entity-type' element or invalid value of 'operation-name' element. 
+
+3-The 'operation-name' is performing operation on some 'entity-type' which is not the same 'entity-type' which was provided in item xml.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>fb0f07dd-266a-3ca1-b35d-23a411cd1db9</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290594305190</last-modified>
+    </meta>
+  </process-def>
+</process>

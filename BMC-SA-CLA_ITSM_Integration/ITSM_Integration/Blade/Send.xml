@@ -1,0 +1,560 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Send">
+    <parameters>
+      <input global="false" required="true">
+        <from>commandArgs</from>
+        <to>commandArgs</to>
+      </input>
+      <input global="false" required="false">
+        <from>connectivityIssueFoundWithBlade</from>
+        <to>connectivityIssueFoundWithBlade</to>
+      </input>
+      <input global="false" required="false">
+        <from>errorMessage</from>
+        <to>errorMessage</to>
+      </input>
+      <input global="false" required="true">
+        <from>hostInfo</from>
+        <to>hostInfo</to>
+      </input>
+      <input global="false" required="true">
+        <from>connectionDetails</from>
+        <to>connectionDetails</to>
+      </input>
+      <input global="false" required="false">
+        <from>sessionID</from>
+        <to>sessionID</to>
+      </input>
+      <output global="false" required="true">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="true">
+        <to>connectivityIssueFoundWithBlade</to>
+        <from>connectivityIssueFoundWithBlade</from>
+      </output>
+      <output global="false" required="true">
+        <to>errorMessage</to>
+        <from>errorMessage</from>
+      </output>
+      <output global="false" required="true">
+        <to>sessionID</to>
+        <from>sessionID</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>connectionDetails</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>username</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(., "username=")]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(.)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>connectionDetails</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>password</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(., "password=")]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(.)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>connectionDetails</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>protocol</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(., "protocol=")]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(.)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input required="false">
+                <from>protocol</from>
+              </input>
+              <input>
+                <value>://</value>
+              </input>
+              <input required="false">
+                <from>hostInfo</from>
+              </input>
+              <input>
+                <value>/services/LoginService</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>loginUrl</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input required="false">
+                <from>protocol</from>
+              </input>
+              <input>
+                <value>://</value>
+              </input>
+              <input required="false">
+                <from>hostInfo</from>
+              </input>
+              <input>
+                <value>/services/CLITunnelService</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>CLITunnelServiceUrl</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>sessionID</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(string(.))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Update Job</process-name>
+              <parameters>
+                <input>
+                  <from>status</from>
+                  <to>status</to>
+                </input>
+                <input>
+                  <from>sessionID</from>
+                  <to>sessionId</to>
+                </input>
+                <input>
+                  <from>commandArgs</from>
+                  <to>commandArgs</to>
+                </input>
+                <input>
+                  <from>connectivityIssueFoundWithBlade</from>
+                  <to>connectivityIssueFoundWithBlade</to>
+                </input>
+                <input>
+                  <from>errorMessage</from>
+                  <to>errorMessage</to>
+                </input>
+                <input>
+                  <from>CLITunnelServiceUrl</from>
+                  <to>url</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>connectivityIssueFoundWithBlade</from>
+                  <to>connectivityIssueFoundWithBlade</to>
+                </output>
+                <output>
+                  <from>errorMessage</from>
+                  <to>errorMessage</to>
+                </output>
+                <output>
+                  <from>sessionExpired</from>
+                  <to>sessionExpired</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Send:UpdateJob=&gt;</value>
+                    </input>
+                    <input>
+                      <from>sessionID</from>
+                    </input>
+                    <input>
+                      <from>sessionExpired</from>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>errorMessage</from>
+                    </input>
+                    <input>
+                      <from>connectivityIssueFoundWithBlade</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case applies-if-any-condition-true="true">
+          <condition>
+            <document>
+              <input>
+                <from>sessionID</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(boolean(string(.)))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>sessionExpired</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Login to BSA</process-name>
+              <parameters>
+                <input>
+                  <from>status</from>
+                  <to>status</to>
+                </input>
+                <input>
+                  <from>connectivityIssueFoundWithBlade</from>
+                  <to>connectivityIssueFoundWithBlade</to>
+                </input>
+                <input>
+                  <from>errorMessage</from>
+                  <to>errorMessage</to>
+                </input>
+                <input>
+                  <from>loginUrl</from>
+                  <to>url</to>
+                </input>
+                <input>
+                  <from>username</from>
+                  <to>username</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>password</to>
+                </input>
+                <output>
+                  <from>sessionId</from>
+                  <to>sessionID</to>
+                </output>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>connectivityIssueFoundWithBlade</from>
+                  <to>connectivityIssueFoundWithBlade</to>
+                </output>
+                <output>
+                  <from>errorMessage</from>
+                  <to>errorMessage</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Send:LoginService=&gt;</value>
+                    </input>
+                    <input>
+                      <from>sessionID</from>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>errorMessage</from>
+                    </input>
+                    <input>
+                      <from>connectivityIssueFoundWithBlade</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case applies-if-any-condition-true="false">
+                <condition>
+                  <document>
+                    <input>
+                      <from>status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.) = "success"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>sessionID</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[boolean(string(.))]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>connectivityIssueFoundWithBlade</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.) = "false"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>errorMessage</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[not(boolean(string(.)))]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Update Job</process-name>
+                    <parameters>
+                      <input>
+                        <from>status</from>
+                        <to>status</to>
+                      </input>
+                      <input>
+                        <from>sessionID</from>
+                        <to>sessionId</to>
+                      </input>
+                      <input>
+                        <from>commandArgs</from>
+                        <to>commandArgs</to>
+                      </input>
+                      <input>
+                        <from>connectivityIssueFoundWithBlade</from>
+                        <to>connectivityIssueFoundWithBlade</to>
+                      </input>
+                      <input>
+                        <from>errorMessage</from>
+                        <to>errorMessage</to>
+                      </input>
+                      <input>
+                        <from>CLITunnelServiceUrl</from>
+                        <to>url</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>connectivityIssueFoundWithBlade</from>
+                        <to>connectivityIssueFoundWithBlade</to>
+                      </output>
+                      <output>
+                        <from>errorMessage</from>
+                        <to>errorMessage</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Send:UpdateJob2=&gt;</value>
+                          </input>
+                          <input>
+                            <from>status</from>
+                          </input>
+                          <input>
+                            <from>errorMessage</from>
+                          </input>
+                          <input>
+                            <from>connectivityIssueFoundWithBlade</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[2]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Obtain session and send job updates to BSA.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>9857c348-d618-4614-9f17-d182f99d23de</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1474447176864</last-modified>
+    </meta>
+  </process-def>
+</process>

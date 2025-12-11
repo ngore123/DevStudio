@@ -1,0 +1,433 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:Job_Management:Add Schedule to Job">
+    <parameters>
+      <input global="false" required="false">
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <from>schedule type</from>
+        <to>schedule type</to>
+      </input>
+      <input global="false" required="false">
+        <from>notification type</from>
+        <to>notification type</to>
+      </input>
+      <input global="false" required="true">
+        <from>job type</from>
+        <to>job type</to>
+      </input>
+      <input global="false" required="true">
+        <from>groupName</from>
+        <to>groupName</to>
+      </input>
+      <input global="false" required="true">
+        <from>jobName</from>
+        <to>jobName</to>
+      </input>
+      <input global="false" required="false">
+        <from>dateString</from>
+        <to>dateString</to>
+      </input>
+      <input global="false" required="false">
+        <from>recipient</from>
+        <to>recipient</to>
+      </input>
+      <input global="false" required="false">
+        <from>dayOfMonth</from>
+        <to>dayOfMonth</to>
+      </input>
+      <input global="false" required="false">
+        <from>statusType</from>
+        <to>statusType</to>
+      </input>
+      <input global="false" required="false">
+        <from>days</from>
+        <to>days</to>
+      </input>
+      <input global="false" required="false">
+        <from>hours</from>
+        <to>hours</to>
+      </input>
+      <input global="false" required="false">
+        <from>mins</from>
+        <to>mins</to>
+      </input>
+      <input global="false" required="false">
+        <from>daysOfWeek</from>
+        <to>daysOfWeek</to>
+      </input>
+      <input global="false" required="false">
+        <from>frequency</from>
+        <to>frequency</to>
+      </input>
+      <output global="false" required="false">
+        <to>success</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="false">
+        <to>success message</to>
+        <from>success message</from>
+      </output>
+      <output global="false" required="false">
+        <to>Object</to>
+        <from>Object</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value>Invalid Inputs</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>job type</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="AclPushJob" or "AuditJob" or "BatchJob" or "ComplianceJob" or "ComponentDiscoveryJob" or "DeployJob" or "FileDeployJob" or "NSHScriptJob" or "PatchAnalysisJob" or "SnapshotJob"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>schedule type</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="daily" or "interval" or "monthly" or "onetime" or "weekly"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>notification type</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='email' or 'snmp' or '']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+              <parameters>
+                <input>
+                  <from>groupName</from>
+                  <to>argument 1</to>
+                </input>
+                <input>
+                  <from>jobName</from>
+                  <to>argument 2</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>job type</from>
+                  <to>namespace</to>
+                </input>
+                <input>
+                  <value>getDBKeyByGroupAndName</value>
+                  <to>command name</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>argument list</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>return values</from>
+                  <to>jobKey</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//value/text()]]></xpath>
+                  </xpath-expression>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>*** SUCCESS BEFORE ***</value>
+                    </input>
+                    <input>
+                      <from>success</from>
+                    </input>
+                    <input>
+                      <from>notification type</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="true"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Job Schedule</process-name>
+                    <parameters>
+                      <input>
+                        <from>connection details</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>schedule type</from>
+                        <to>schedule type</to>
+                      </input>
+                      <input>
+                        <from>notification type</from>
+                        <to>notification type</to>
+                      </input>
+                      <input>
+                        <from>jobKey</from>
+                        <to>jobKey</to>
+                      </input>
+                      <input>
+                        <from>dateString</from>
+                        <to>dateString</to>
+                      </input>
+                      <input>
+                        <from>recipient</from>
+                        <to>recipient</to>
+                      </input>
+                      <input>
+                        <from>statusType</from>
+                        <to>statusType</to>
+                      </input>
+                      <input>
+                        <from>days</from>
+                        <to>days</to>
+                      </input>
+                      <input>
+                        <from>hours</from>
+                        <to>hours</to>
+                      </input>
+                      <input>
+                        <from>mins</from>
+                        <to>mins</to>
+                      </input>
+                      <input>
+                        <from>daysOfWeek</from>
+                        <to>daysOfWeek</to>
+                      </input>
+                      <input>
+                        <from>frequency</from>
+                        <to>frequency</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>success</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>Object</from>
+                        <to>Object</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Format Error message</process-name>
+        <parameters>
+          <input>
+            <from>error message</from>
+            <to>error message</to>
+          </input>
+          <input>
+            <from>success</from>
+            <to>success</to>
+          </input>
+          <input global="true">
+            <configuration>:BMC_BladeLogic-AD-Operations_Manager:CommonStrings:DefaultError</configuration>
+            <to>message text</to>
+          </input>
+          <output>
+            <from>error message</from>
+            <to>success message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process adds a schedule to a job. The job type can be AclPushJob, AuditJob, BatchJob, ComplianceJob, ComplianceDiscoveryJob, DeployJob, FileDeployJob, NSHScriptJob, PatchAnalysis, or SnapShotJob. The schedule type can be daily, interval, monthly, onetime, or weekly.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>bf1e4c0d-362c-3ecc-a66f-0a8703125c18</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179724497</last-modified>
+    </meta>
+  </process-def>
+</process>

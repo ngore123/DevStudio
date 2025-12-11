@@ -1,0 +1,172 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":RBA-AD-Active_Directory:Active_Directory:Group_Management:Set Group Scope">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter to handle the request. 
+
+Default value: ActiveDirectory</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <description>This element is required if a target will be referenced or defined in the request.
+In the absence of this element, the default target in the Adapter configuration will be used. 
+
+Value takes the form:
+
+&lt;target&gt;
+		&lt;host&gt;&lt;/host&gt;
+		&lt;user-name&gt;&lt;/user-name&gt;
+		&lt;password&gt;&lt;/password&gt;
+&lt;/target&gt;</description>
+        <from>target</from>
+        <to>target</to>
+      </input>
+      <input global="false" required="true">
+        <description>The distinguished name of the group whose scope need to be modified.
+
+e.g. CN=MyGroup,OU=MyOU,DC=punbnadv21,DC=local
+</description>
+        <from>object distinguished name</from>
+        <to>object distinguished name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Contains the parameter list for the command.
+
+Parameters for the command are:
+
+&lt;parameters&gt;
+		&lt;scope&gt;&lt;scope&gt;
+		&lt;server&gt;&lt;/server&gt;
+          &lt;domain&gt;&lt;/domain&gt;
+          &lt;user-name&gt;&lt;/user-name&gt;
+          &lt;password&gt;&lt;/password&gt;
+&lt;/parameters&gt;
+
+* Valid Values for scope : l|g|u 
+
+l=local, g=global, u=universal</description>
+        <from>parameters</from>
+        <to>parameters</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>active directory command</to>
+            <value>Set Group Scope</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>object class</to>
+            <value>Group</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:RBA-AD-Active_Directory:Utilities:Create Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>target</from>
+            <to>target</to>
+          </input>
+          <input>
+            <from>active directory command</from>
+            <to>active directory command</to>
+          </input>
+          <input>
+            <from>object class</from>
+            <to>object class</to>
+          </input>
+          <input>
+            <from>object distinguished name</from>
+            <to>object distinguished name</to>
+          </input>
+          <input>
+            <from>parameters</from>
+            <to>parameters</to>
+          </input>
+          <output>
+            <from>adapter request</from>
+            <to>adapter request</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:RBA-AD-Active_Directory:Utilities:Invoke ActiveDirectory Adapter</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>adapter request</from>
+            <to>adapter request</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Sets the scope of a group - Domain Local, Universal, Global
+           </description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>9ac87a85-5835-4c90-ac55-150ca39143e8</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1489484464268</last-modified>
+    </meta>
+  </process-def>
+</process>

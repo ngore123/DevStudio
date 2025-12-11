@@ -1,0 +1,170 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:UpdateHostDetailsInUrlFormat">
+    <parameters>
+      <input global="false" required="true">
+        <from>ARMidTierHost</from>
+        <to>ARMidTierHost</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARMidTierPort</from>
+        <to>ARMidTierPort</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARProtocol</from>
+        <to>ARProtocol</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARServerHost</from>
+        <to>ARServerHost</to>
+      </input>
+      <input global="false" required="true">
+        <from>urlFormat</from>
+        <to>urlFormat</to>
+      </input>
+      <output global="false" required="true">
+        <to>outputUrl</to>
+        <from>outputUrl</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>urlFormat</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>outputUrl</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="protocol">
+                <input global="false">
+                  <from>ARProtocol</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="midtierHost">
+                <input global="false">
+                  <from>ARMidTierHost</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="midtierPort">
+                <input global="false">
+                  <from>ARMidTierPort</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="serverHost">
+                <input global="false">
+                  <from>ARServerHost</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:variable name="vartemp1">
+        <xsl:call-template name="replaceAll">
+          <xsl:with-param name="text" select="." />
+          <xsl:with-param name="specialCharacter" select="&quot;{ARProtocol}&quot;" />
+          <xsl:with-param name="escapeCharacter" select="'${protocol}'" />
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="vartemp2">
+        <xsl:call-template name="replaceAll">
+          <xsl:with-param name="text" select="$vartemp1" />
+          <xsl:with-param name="specialCharacter" select="&quot;{ARMidTierHost}&quot;" />
+          <xsl:with-param name="escapeCharacter" select="'${midtierHost}'" />
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:variable name="vartemp3">
+        <xsl:call-template name="replaceAll">
+          <xsl:with-param name="text" select="$vartemp2" />
+          <xsl:with-param name="specialCharacter" select="&quot;{ARMidTierPort}&quot;" />
+          <xsl:with-param name="escapeCharacter" select="'${midtierPort}'" />
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:call-template name="replaceAll">
+        <xsl:with-param name="text" select="$vartemp3" />
+        <xsl:with-param name="specialCharacter" select="&quot;{ARServerHost}&quot;" />
+        <xsl:with-param name="escapeCharacter" select="'${serverHost}'" />
+      </xsl:call-template>
+    </value>
+  </xsl:template>
+  <xsl:template name="replaceAll">
+    <xsl:param name="text" />
+    <xsl:param name="specialCharacter" />
+    <xsl:param name="escapeCharacter" />
+    <xsl:choose>
+      <xsl:when test="contains($text,$specialCharacter)">
+        <xsl:value-of select="substring-before($text,$specialCharacter)" disable-output-escaping="no" />
+        <xsl:value-of select="$escapeCharacter" disable-output-escaping="no" />
+        <xsl:call-template name="replaceAll">
+          <xsl:with-param name="text" select="substring-after($text,$specialCharacter)" />
+          <xsl:with-param name="specialCharacter" select="$specialCharacter" />
+          <xsl:with-param name="escapeCharacter" select="$escapeCharacter" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text" disable-output-escaping="no" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:UpdateARUrl=&gt;</value>
+              </input>
+              <input>
+                <from>urlFormat</from>
+              </input>
+              <input>
+                <from>outputUrl</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description />
+        <version />
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name />
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>f7e20127-aaca-4190-b3ee-fdc0aa6d211a</process-id>
+      <author>AoAdmin</author>
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1474017223521</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,204 @@
+<process draft="false" dev-studio-version="22.2.01">
+  <process-def name=":ESA_ITSM:HPD_INC_Status:Inc_Closure_Procedure">
+    <parameters>
+      <input global="false" required="false">
+        <from>Support_Group</from>
+        <to>Support_Group</to>
+      </input>
+      <input global="false" required="false">
+        <from>Inc_Number</from>
+        <to>Inc_Number</to>
+      </input>
+      <input global="false" required="false">
+        <from>Inc_Resolution</from>
+        <to>Inc_Resolution</to>
+      </input>
+      <output global="false" required="false">
+        <to>Status_update</to>
+        <from>Status_update</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:ESA_ITSM:HPD_INC_Status:Inc_Set_InProgress</process-name>
+        <parameters>
+          <input>
+            <from>Support_Group</from>
+            <to>Support_Group</to>
+          </input>
+          <input>
+            <from>Inc_Number</from>
+            <to>Incident_Number</to>
+          </input>
+          <output>
+            <from>success</from>
+            <to>success</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>Status_update</to>
+                  <value>Inc_Set_InProgress Failed</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:ESA_ITSM:HPD_INC_Status:Inc_Set_Resolved</process-name>
+              <parameters>
+                <input>
+                  <from>Inc_Number</from>
+                  <to>Incident_Number</to>
+                </input>
+                <input>
+                  <from>Inc_Resolution</from>
+                  <to>Resolution</to>
+                </input>
+                <output>
+                  <from>success</from>
+                  <to>success</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>Status_update</to>
+                        <value>Resolved</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.) = "failed"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>Status_update</to>
+                        <value>Inc_Set_Resolved Failed</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>6bc37f30-717f-40f6-b865-e1ee3f4fe252</process-id>
+      <author>C. Lenz</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1712050429508</last-modified>
+    </meta>
+  </process-def>
+</process>

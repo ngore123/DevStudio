@@ -1,0 +1,162 @@
+<process draft="false" dev-studio-version="22.2.01">
+  <process-def name=":ESA_ITSM:HPD_Fetch_Data_BackupStatus:TSSA_Commands:Get_TSA_Job_LogItems">
+    <parameters>
+      <input global="false" required="false">
+        <from>Job_Key</from>
+        <to>Job_Key</to>
+      </input>
+      <input global="false" required="false">
+        <from>Job_RunID</from>
+        <to>Job_RunID</to>
+      </input>
+      <input global="false" required="false">
+        <from>TSA_Connection</from>
+        <to>TSA_Connection</to>
+      </input>
+      <output global="false" required="false">
+        <to>JobLogItems</to>
+        <from>JobLogItems</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>Job_Key</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>Job_RunID</from>
+            <to>argument 2</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument_list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>TSA_Connection</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>JobRun</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>getLogItemsByJobRunId</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument_list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>output</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>JobLogItems</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//output]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>232272f6-da6e-4b49-9795-70a0a1bb00d0</process-id>
+      <author>Yannic Legermann</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1711377186927</last-modified>
+    </meta>
+  </process-def>
+</process>

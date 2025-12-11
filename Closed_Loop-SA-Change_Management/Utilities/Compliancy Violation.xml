@@ -1,0 +1,1189 @@
+<process draft="false" dev-studio-version="7.6.02.03">
+  <process-def name=":Closed_Loop-SA-Change_Management:Utilities:Compliancy Violation">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration entry defined in a configuration module. 
+
+Example: BCAN</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>xml document - contains an alert.
+
+Example alert:
+
+&lt;Notification xmlns="Closed_Loop-SA-Change_Management"&gt;
+  &lt;host xmlns=""&gt;172.21.127.10&lt;/host&gt;
+  &lt;sysuptime xmlns=""&gt;198988874&lt;/sysuptime&gt;
+  &lt;enterprise xmlns=""&gt;BCAN&lt;/enterprise&gt;
+  &lt;generic-trap xmlns=""&gt;0&lt;/generic-trap&gt;
+  &lt;specific-trap xmlns=""&gt;0&lt;/specific-trap&gt;
+  &lt;notification-type xmlns=""&gt;Compliancy Violation Found&lt;/notification-type&gt;
+  &lt;change-id xmlns=""&gt;CRQ000000000119&lt;/change-id&gt;
+  &lt;condition-trace xmlns=""&gt;[_Modified Device 1760-01=True]&lt;/condition-trace&gt;
+  &lt;annotation xmlns=""&gt;Comlpiancy vialoation notification from bcan-test-01&lt;/annotation&gt;
+  &lt;trigger-device xmlns=""&gt;bcan-cisco1760-01&lt;/trigger-device&gt;
+  &lt;trigger-event-description xmlns="" /&gt;
+  &lt;server-url xmlns=""&gt;https://bcan-test-01.bmc.com&lt;/server-url&gt;
+  &lt;task-id xmlns=""&gt;TAS000000000223&lt;/task-id&gt;
+  &lt;trigger-device-instance-id xmlns=""&gt;AS0050560C63F2L0K0RAX1htAQc5YA&lt;/trigger-device-instance-id&gt;
+&lt;/Notification&gt;</description>
+        <from>alert</from>
+        <to>alert</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document providing the data template for single or multiple Concept elements.The incident concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <to>incidents</to>
+        <from>incidents</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: 0-success,1-failure
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value – A verbose message indicating the success or failure of the process</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value – A value showing the exception type.
+
+Example: Descrepancy, Device, Compliancy</description>
+        <to>exception type</to>
+        <from>exception type</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:Closed_Loop-SA-Change_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+          <output>
+            <from>incident platform</from>
+            <to>incident platform</to>
+          </output>
+          <output>
+            <from>incident template</from>
+            <to>incident template</to>
+          </output>
+          <output>
+            <from>default user name</from>
+            <to>user name</to>
+          </output>
+          <output>
+            <from>incident default impact</from>
+            <to>incident default impact</to>
+          </output>
+          <output>
+            <from>incident default reported source</from>
+            <to>incident default reported source</to>
+          </output>
+          <output>
+            <from>incident default status</from>
+            <to>incident default status</to>
+          </output>
+          <output>
+            <from>incident default status reason</from>
+            <to>incident default status reason</to>
+          </output>
+          <output>
+            <from>incident default service type</from>
+            <to>incident default service type</to>
+          </output>
+          <output>
+            <from>incident default urgency</from>
+            <to>incident default urgency</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() = "BCAN"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Incident_Management:Utilities:Extract Incident Template ID</process-name>
+              <parameters>
+                <input>
+                  <from>incident platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <value>incident-template-name</value>
+                  <to>key 1</to>
+                </input>
+                <input>
+                  <from>incident template</from>
+                  <to>value 1</to>
+                </input>
+                <output>
+                  <from>incident instance id</from>
+                  <to>incident instance id</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:Closed_Loop-SA-Change_Management:Utilities:Query User Information</process-name>
+                    <parameters>
+                      <input>
+                        <from>configuration name</from>
+                        <to>configuration name</to>
+                      </input>
+                      <input>
+                        <from>user name</from>
+                        <to>user name</to>
+                      </input>
+                      <output>
+                        <from>login id</from>
+                        <to>login id</to>
+                      </output>
+                      <output>
+                        <from>first name</from>
+                        <to>first name</to>
+                      </output>
+                      <output>
+                        <from>last name</from>
+                        <to>last name</to>
+                      </output>
+                      <output>
+                        <from>company</from>
+                        <to>company</to>
+                      </output>
+                      <output>
+                        <from>company location</from>
+                        <to>company location</to>
+                      </output>
+                      <output>
+                        <from>success status</from>
+                        <to>success status</to>
+                      </output>
+                      <output>
+                        <from>status message</from>
+                        <to>status message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>incident instance id</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(.) = '0']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>1</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status message</to>
+                        <value>Unable to extract Incident Template data</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>annotation</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//annotation/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:Closed_Loop-SA-Change_Management:Utilities:Truncate Input</process-name>
+                    <parameters>
+                      <input>
+                        <from>annotation</from>
+                        <to>input</to>
+                      </input>
+                      <output>
+                        <from>output</from>
+                        <to>annotation</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>summary</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="annotation">
+                            <input global="false">
+                              <from>annotation</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length('$[annotation]') = 0">
+          <xsl:text disable-output-escaping="no">No annotation provided.</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test=" string-length('$[annotation]') != 0">
+            <xsl:text disable-output-escaping="no">$[annotation]</xsl:text>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>exception type</to>
+                        <value>Compliancy</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:assign[2]</location>
+                  </assign>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>device</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//trigger-device/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>device instance id</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//trigger-device-instance-id/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>server url</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//server-url/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>event description</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[translate(//trigger-event-description/text(),'"',"")]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>description</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//trigger-event-description/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>notes</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="device">
+                            <input global="false">
+                              <from>device</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="device instance id">
+                            <input global="false">
+                              <from>device instance id</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="server url">
+                            <input global="false">
+                              <from>server url</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="event description">
+                            <input global="false">
+                              <from>event description</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="Event Description">
+                            <input global="false">
+                              <from>description</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length('$[device]') != 0 and string-length('$[device instance id]') = 0 and string-length('$[server url]') != 0 and string-length('$[event description]') != 0">
+          <xsl:text disable-output-escaping="no">Event Description: $[Event Description], CI Name: $[device], Server URL: $[server url]</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:if test="string-length('$[event description]') != 0">
+            <xsl:text disable-output-escaping="no">Event Description:$[Event Description]</xsl:text>
+          </xsl:if>
+          <xsl:if test="string-length('$[server url]') != 0">
+            <xsl:text disable-output-escaping="no">Server URL: $[server url]</xsl:text>
+          </xsl:if>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:assign[3]</location>
+                  </assign>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>notification value</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//notification-type/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>alert</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>incident urgency value</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="notification value">
+                            <input global="false">
+                              <from>notification value</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="incident default urgency">
+                            <input global="false">
+                              <from>incident default urgency</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length('${notification value}') &gt; '0'">
+          <xsl:choose>
+            <xsl:when test="string('${notification value}') = '4-Low' or string('${notification value}') = '3-Medium' or string('${notification value}') = '2-High'">
+              <xsl:text disable-output-escaping="no">${notification value}</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:if test="string('${notification value}') = 'Discrepancy Found'">
+                <xsl:text disable-output-escaping="no">2-High</xsl:text>
+              </xsl:if>
+              <xsl:if test="string('${notification value}') = 'Compliancy Violation Found'">
+                <xsl:text disable-output-escaping="no">2-High</xsl:text>
+              </xsl:if>
+              <xsl:if test="string('${notification value}') = 'All Discrepancies Cleared'">
+                <xsl:text disable-output-escaping="no">4-Low</xsl:text>
+              </xsl:if>
+              <xsl:if test="string('${notification value}') = 'All Compliancy Violations Cleared'">
+                <xsl:text disable-output-escaping="no">4-Low</xsl:text>
+              </xsl:if>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">${incident default urgency}</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:assign[4]</location>
+                  </assign>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>notes</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>incident</to>
+                                <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                  <attribute>long-description</attribute>
+                                </concept>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//value/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>summary</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>incident</to>
+                                <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                  <attribute>short-description</attribute>
+                                </concept>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//value/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>first name</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>first-name</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>last name</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>last-name</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default status</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>status</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default service type</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>service-type</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default impact</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>impact</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident urgency value</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>urgency</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default reported source</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>reported-source</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>incident</to>
+                              <value>CREATE</value>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>action</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default status reason</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>status-reason</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident instance id</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>template-id</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>device</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>ci-name</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>incident</to>
+                              <value>BMC.ASSET</value>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>dataset-id</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>incident</to>
+                              <value>BMC_COMPUTERSYSTEM</value>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>lookup-keyword</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>incident</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>incidents</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="incident">
+                                  <input global="false">
+                                    <from>incident</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Incidents>
+      <xsl:choose>
+        <xsl:when test="string-length(//incident) &gt; 0">
+          <xsl:copy-of select="//incident" />
+        </xsl:when>
+        <xsl:otherwise>${incident}</xsl:otherwise>
+      </xsl:choose>
+    </Incidents>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>Show contents of incident</value>
+                                </input>
+                                <input>
+                                  <from>incidents</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>alert</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string-length(//trigger-device-instance-id/text()) = '0']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>notes</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>incident</to>
+                                <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                  <attribute>long-description</attribute>
+                                </concept>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//value/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>summary</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>incident</to>
+                                <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                  <attribute>short-description</attribute>
+                                </concept>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//value/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>first name</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>first-name</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>last name</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>last-name</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default status</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>status</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default service type</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>service-type</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default impact</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>impact</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident urgency value</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>urgency</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default reported source</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>reported-source</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>incident</to>
+                              <value>CREATE</value>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>action</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident default status reason</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>status-reason</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>incident instance id</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>template-id</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>device</from>
+                            </input>
+                            <output>
+                              <to>incident</to>
+                              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                                <attribute>ci-name</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>incident</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>incidents</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="incident">
+                                  <input global="false">
+                                    <from>incident</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Incidents>
+      <xsl:choose>
+        <xsl:when test="string-length(//incident) &gt; 0">
+          <xsl:copy-of select="//incident" />
+        </xsl:when>
+        <xsl:otherwise>${incident}</xsl:otherwise>
+      </xsl:choose>
+    </Incidents>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>Show contents of incident</value>
+                                </input>
+                                <input>
+                                  <from>incidents</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = '1']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>1</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <from>status message</from>
+                      </input>
+                      <output>
+                        <to>status message</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[2]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[2]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow creates an incident concept based upon the values defined for a compliancy violation.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>86ca34df-1306-370b-9067-d75ffab59a0e</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1328529119613</last-modified>
+    </meta>
+  </process-def>
+</process>

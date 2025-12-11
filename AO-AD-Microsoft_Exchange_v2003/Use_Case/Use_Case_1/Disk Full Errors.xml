@@ -1,0 +1,1338 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AO-AD-Microsoft_Exchange_v2003:Use_Case:Use_Case_1:Disk Full Errors">
+    <parameters>
+      <input global="false" required="true">
+        <from>inputevent</from>
+        <to>inputevent</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Set Default Adapter Name</process-name>
+        <parameters>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:Exchange2003AdapterName</configuration>
+            <to>adapter name</to>
+          </input>
+          <output>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>connection detail concept</to>
+            <value>windows-command</value>
+            <concept type="AutoPilot-OA-Common_Utilities:ConnectionDetails">
+              <attribute>invocation-mechanism</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:WindowsCommandAdapterName</configuration>
+          </input>
+          <output>
+            <to>connection detail concept</to>
+            <concept type="AutoPilot-OA-Common_Utilities:ConnectionDetails">
+              <attribute>adapter-name</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:ExchangeServerInstallationDirectory</configuration>
+          </input>
+          <output>
+            <to>ExchangeServerInstallationDirectory</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:DiskSpaceThresholdValue</configuration>
+          </input>
+          <output>
+            <to>DiskSpaceThresholdValue</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>ExchangeServerInstallationDirectory</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>LimitsInput</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="installdir">
+                <input global="false">
+                  <from>ExchangeServerInstallationDirectory</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="threshold">
+                <input global="false">
+                  <from>DiskSpaceThresholdValue</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <limits>
+      <limit>
+        <xsl:attribute name="directory">${installdir}</xsl:attribute>
+        ${threshold}
+      </limit>
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:SMTPVirtualServerName</configuration>
+          </input>
+          <output>
+            <to>SMTP Virtual Server Name</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:ExchangeServerName</configuration>
+          </input>
+          <output>
+            <to>Exchange Server Name</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:WindowsCommandHostName</configuration>
+          </input>
+          <output>
+            <to>connection detail concept</to>
+            <concept type="AutoPilot-OA-Common_Utilities:ConnectionDetails">
+              <attribute>hostname</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:WindowsCommandUserName</configuration>
+          </input>
+          <output>
+            <to>connection detail concept</to>
+            <concept type="AutoPilot-OA-Common_Utilities:ConnectionDetails">
+              <attribute>username</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AO-AD-Microsoft_Exchange_v2003:Exchange_Use_Case:WindowsCommandPassword</configuration>
+          </input>
+          <output>
+            <to>connection detail concept</to>
+            <concept type="AutoPilot-OA-Common_Utilities:ConnectionDetails">
+              <attribute>password</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>@@@@@@@</value>
+              </input>
+              <input>
+                <from>LimitsInput</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Physical_Device_Utilities:Disk:Volume:Perform Disk Usage Statistics Evaluation</process-name>
+        <parameters>
+          <input>
+            <from>connection detail concept</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>LimitsInput</from>
+            <to>acceptable thresholds</to>
+          </input>
+          <output>
+            <from>limits</from>
+            <to>DiskUsageBefore</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>!!!!</value>
+              </input>
+              <input>
+                <from>DiskUsageBefore</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Use_Case_Utilities:Annotate BEM Event</process-name>
+              <parameters>
+                <input>
+                  <from>inputevent</from>
+                  <to>inputevent</to>
+                </input>
+                <input>
+                  <value>AO did not find the disk usage to breach the threshold.</value>
+                  <to>annotation message</to>
+                </input>
+                <output>
+                  <from>AnnotateResponse</from>
+                  <to>AnnotateResponse</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>DiskUsageBefore</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//limits/directory/status/text()='error']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Use_Case_Utilities:Annotate BEM Event</process-name>
+              <parameters>
+                <input>
+                  <from>inputevent</from>
+                  <to>inputevent</to>
+                </input>
+                <input>
+                  <value>Unable to determine disk space usage. Please check AO workflow input parameters.</value>
+                  <to>annotation message</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>DiskUsageBefore</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//within-limit/text()='false']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange_v2003:v2003:Disk_Space_Management:Delete BadMail</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>SMTP Virtual Server Name</from>
+                  <to>input parameters</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens>
+                      <replacement-token name="smtpvirtualservername">
+                        <input global="false">
+                          <from>SMTP Virtual Server Name</from>
+                        </input>
+                      </replacement-token>
+                    </stylesheet-replacement-tokens>
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <parameters>
+      <parameter>
+        <name>
+          <xsl:text disable-output-escaping="no">SMTPVirtualServerName</xsl:text>
+        </name>
+        <value>
+          <xsl:text disable-output-escaping="no">${smtpvirtualservername}</xsl:text>
+        </value>
+      </parameter>
+    </parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>BadMailAdapterResponse</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>BadMailAdapterResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>BadMailSuccess</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <matching-values>
+      <xsl:for-each select="//line">
+        <xsl:if test="text()=&quot;Deleting BadMail directory files...&quot;">
+          <matching-value>
+            <xsl:copy-of select="&quot;Found a match&quot;" />
+          </matching-value>
+        </xsl:if>
+      </xsl:for-each>
+    </matching-values>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>BadMailSuccess</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>BadMailSuccessCount</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[count(//matching-value)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Use_Case_Utilities:Annotate BEM Event</process-name>
+                    <parameters>
+                      <input>
+                        <from>inputevent</from>
+                        <to>inputevent</to>
+                      </input>
+                      <input>
+                        <value>BadMail directory cleanup failed. Please use operator assisted remediation process to reclaim disk.</value>
+                        <to>annotation message</to>
+                      </input>
+                      <output>
+                        <from>AnnotateResponse</from>
+                        <to>AnnotateResponse</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>BadMailSuccessCount</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//result > 0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-Microsoft_Exchange_v2003:v2003:Disk_Space_Management:Delete SMTP Protocol Logs</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>SMTP Virtual Server Name</from>
+                        <to>input parameters</to>
+                        <xslt-stylesheet>
+                          <stylesheet-replacement-tokens>
+                            <replacement-token name="smtpvirtualservername">
+                              <input global="false">
+                                <from>SMTP Virtual Server Name</from>
+                              </input>
+                            </replacement-token>
+                          </stylesheet-replacement-tokens>
+                          <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <parameters>
+      <parameter>
+        <name>
+          <xsl:text disable-output-escaping="no">SMTPVirtualServerName</xsl:text>
+        </name>
+        <value>
+          <xsl:text disable-output-escaping="no">${smtpvirtualservername}</xsl:text>
+        </value>
+      </parameter>
+    </parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                        </xslt-stylesheet>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>SMTPProtocolLogsAdapterResponse</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>SMTPProtocolLogsAdapterResponse</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>SMTPProtocolSuccess</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens />
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <matching-values>
+      <xsl:for-each select="//line">
+        <xsl:if test="text()=&quot;Deleting SMTP protocol log files...&quot;">
+          <matching-value>
+            <xsl:copy-of select="&quot;Found a match&quot;" />
+          </matching-value>
+        </xsl:if>
+      </xsl:for-each>
+    </matching-values>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>SMTPProtocolSuccess</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>SMTPProtocolSuccessCount</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[count(//matching-value)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <call-process>
+                          <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Use_Case_Utilities:Annotate BEM Event</process-name>
+                          <parameters>
+                            <input>
+                              <from>inputevent</from>
+                              <to>inputevent</to>
+                            </input>
+                            <input>
+                              <value>SMTP Protocol logs cleanup failed. Please use operator assisted remediation process to reclaim disk.</value>
+                              <to>annotation message</to>
+                            </input>
+                            <output>
+                              <from>AnnotateResponse</from>
+                              <to>AnnotateResponse</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                          </after-execution>
+                          <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                        </call-process>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>SMTPProtocolSuccessCount</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//result > 0]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <call-process>
+                          <process-name>:AO-AD-Microsoft_Exchange_v2003:v2003:Disk_Space_Management:Delete Message Tracking Logs</process-name>
+                          <parameters>
+                            <input>
+                              <from>adapter name</from>
+                              <to>adapter name</to>
+                            </input>
+                            <input>
+                              <from>Exchange Server Name</from>
+                              <to>input parameters</to>
+                              <xslt-stylesheet>
+                                <stylesheet-replacement-tokens>
+                                  <replacement-token name="exchangeservername">
+                                    <input global="false">
+                                      <from>Exchange Server Name</from>
+                                    </input>
+                                  </replacement-token>
+                                </stylesheet-replacement-tokens>
+                                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <parameters>
+      <parameter>
+        <name>
+          <xsl:text disable-output-escaping="no">ExchangeServerName</xsl:text>
+        </name>
+        <value>
+          <xsl:text disable-output-escaping="no">${exchangeservername}</xsl:text>
+        </value>
+      </parameter>
+    </parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                              </xslt-stylesheet>
+                            </input>
+                            <output>
+                              <from>adapter response</from>
+                              <to>MessageTrackingLogsAdapterResponse</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                          </after-execution>
+                          <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>MessageTrackingLogsAdapterResponse</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>MessageTrackingDelSuccess</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens />
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <matching-values>
+      <xsl:for-each select="//line">
+        <xsl:if test="text()=&quot;Deleting message tracking log files...&quot;">
+          <matching-value>
+            <xsl:copy-of select="&quot;Found a match&quot;" />
+          </matching-value>
+        </xsl:if>
+      </xsl:for-each>
+    </matching-values>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>MessageTrackingDelSuccess</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>MessageTrackingDelSuccessCount</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[count(//matching-value)]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence>
+                              <call-process>
+                                <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Use_Case_Utilities:Annotate BEM Event</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>inputevent</from>
+                                    <to>inputevent</to>
+                                  </input>
+                                  <input>
+                                    <value>Message Tracking logs cleanup failed. Please use operator assisted remediation process to reclaim disk.</value>
+                                    <to>annotation message</to>
+                                  </input>
+                                  <output>
+                                    <from>AnnotateResponse</from>
+                                    <to>AnnotateResponse</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>MessageTrackingDelSuccessCount</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[//result > 0]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <call-process>
+                                <process-name>:AutoPilot-OA-Physical_Device_Utilities:Disk:Volume:Perform Disk Usage Statistics Evaluation</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>connection detail concept</from>
+                                    <to>connection details</to>
+                                  </input>
+                                  <input>
+                                    <from>LimitsInput</from>
+                                    <to>acceptable thresholds</to>
+                                  </input>
+                                  <output>
+                                    <from>limits</from>
+                                    <to>DiskUsageAfter</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                              <switch>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>true</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                                <default>
+                                  <sequence>
+                                    <call-process>
+                                      <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Use_Case_Utilities:Annotate BEM Event</process-name>
+                                      <parameters>
+                                        <input>
+                                          <from>inputevent</from>
+                                          <to>inputevent</to>
+                                        </input>
+                                        <input>
+                                          <value>Disk usage issue could not be remediated despite Exchange Server logs cleanup. Please use operator assisted remediation process to reclaim disk.</value>
+                                          <to>annotation message</to>
+                                        </input>
+                                        <output>
+                                          <from>AnnotateResponse</from>
+                                          <to>AnnotateResponse</to>
+                                        </output>
+                                      </parameters>
+                                      <meta>
+                                        <documentation />
+                                        <run-mode-handling>
+                                          <run-mode>OCP</run-mode>
+                                          <allow-step-into>false</allow-step-into>
+                                        </run-mode-handling>
+                                        <checkpoint>false</checkpoint>
+                                      </meta>
+                                      <after-execution>
+                                        <console-output>
+                                          <type>INFO</type>
+                                          <summary>
+                                            <concat>
+                                              <input>
+                                                <value></value>
+                                              </input>
+                                            </concat>
+                                          </summary>
+                                          <detail>
+                                            <concat>
+                                              <input>
+                                                <value></value>
+                                              </input>
+                                            </concat>
+                                          </detail>
+                                        </console-output>
+                                      </after-execution>
+                                      <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                                    </call-process>
+                                  </sequence>
+                                </default>
+                                <case>
+                                  <condition>
+                                    <document>
+                                      <input>
+                                        <from>DiskUsageAfter</from>
+                                      </input>
+                                    </document>
+                                    <xpath-expression>
+                                      <xpath-replacement-tokens />
+                                      <xpath><![CDATA[//limits/directory/status/text()='error']]></xpath>
+                                    </xpath-expression>
+                                  </condition>
+                                  <sequence>
+                                    <console-output>
+                                      <type>INFO</type>
+                                      <summary>
+                                        <concat>
+                                          <input>
+                                            <value></value>
+                                          </input>
+                                        </concat>
+                                      </summary>
+                                      <detail>
+                                        <concat>
+                                          <input>
+                                            <value></value>
+                                          </input>
+                                        </concat>
+                                      </detail>
+                                    </console-output>
+                                    <call-process>
+                                      <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Use_Case_Utilities:Annotate BEM Event</process-name>
+                                      <parameters>
+                                        <input>
+                                          <from>inputevent</from>
+                                          <to>inputevent</to>
+                                        </input>
+                                        <input>
+                                          <value>Unable to determine disk space usage after cleanup action. Please check AO workflow input parameters.</value>
+                                          <to>annotation message</to>
+                                        </input>
+                                        <output>
+                                          <from>AnnotateResponse</from>
+                                          <to>AnnotateResponse</to>
+                                        </output>
+                                      </parameters>
+                                      <meta>
+                                        <documentation />
+                                        <run-mode-handling>
+                                          <run-mode>OCP</run-mode>
+                                          <allow-step-into>false</allow-step-into>
+                                        </run-mode-handling>
+                                        <checkpoint>false</checkpoint>
+                                      </meta>
+                                      <after-execution>
+                                        <console-output>
+                                          <type>INFO</type>
+                                          <summary>
+                                            <concat>
+                                              <input>
+                                                <value></value>
+                                              </input>
+                                            </concat>
+                                          </summary>
+                                          <detail>
+                                            <concat>
+                                              <input>
+                                                <value></value>
+                                              </input>
+                                            </concat>
+                                          </detail>
+                                        </console-output>
+                                      </after-execution>
+                                      <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                                    </call-process>
+                                  </sequence>
+                                </case>
+                                <case>
+                                  <condition>
+                                    <document>
+                                      <input>
+                                        <from>DiskUsageAfter</from>
+                                      </input>
+                                    </document>
+                                    <xpath-expression>
+                                      <xpath-replacement-tokens />
+                                      <xpath><![CDATA[//within-limit/text()='true']]></xpath>
+                                    </xpath-expression>
+                                  </condition>
+                                  <sequence>
+                                    <console-output>
+                                      <type>INFO</type>
+                                      <summary>
+                                        <concat>
+                                          <input>
+                                            <value></value>
+                                          </input>
+                                        </concat>
+                                      </summary>
+                                      <detail>
+                                        <concat>
+                                          <input>
+                                            <value></value>
+                                          </input>
+                                        </concat>
+                                      </detail>
+                                    </console-output>
+                                    <call-process>
+                                      <process-name>:AO-AD-Microsoft_Exchange_v2003:Utilities:Use_Case_Utilities:Annotate And Close BEM Event</process-name>
+                                      <parameters>
+                                        <input>
+                                          <from>inputevent</from>
+                                          <to>inputevent</to>
+                                        </input>
+                                        <output>
+                                          <from>AnnotateResponse</from>
+                                          <to>AnnotateResponse</to>
+                                        </output>
+                                        <output>
+                                          <from>CloseEventResponse</from>
+                                          <to>CloseEventResponse</to>
+                                        </output>
+                                      </parameters>
+                                      <meta>
+                                        <documentation />
+                                        <run-mode-handling>
+                                          <run-mode>OCP</run-mode>
+                                          <allow-step-into>false</allow-step-into>
+                                        </run-mode-handling>
+                                        <checkpoint>false</checkpoint>
+                                      </meta>
+                                      <after-execution>
+                                        <console-output>
+                                          <type>INFO</type>
+                                          <summary>
+                                            <concat>
+                                              <input>
+                                                <value></value>
+                                              </input>
+                                            </concat>
+                                          </summary>
+                                          <detail>
+                                            <concat>
+                                              <input>
+                                                <value></value>
+                                              </input>
+                                            </concat>
+                                          </detail>
+                                        </console-output>
+                                      </after-execution>
+                                      <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[3]:call-process[1]</location>
+                                    </call-process>
+                                  </sequence>
+                                </case>
+                                <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                              </switch>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[3]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Use Case Description
+--------------------------------
+1. Disk Full Event is generated in Event Management for 
+the Exchange Server (for example BEM). 
+The corresponding event should have the message
+ text as "Low Disk Space on Exchange Server"
+
+ 2. AO verifies  the condition that disk space
+ threshold has been breached
+
+ 3. If  disk space threshold breached - AO executes 
+remediation actions on the Exchange directory
+
+ 4. AO validates the remediation disk clean up action
+
+ 5. If remediated suppress event</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>313679d3-a34b-3b84-9d66-6a196a3a02c0</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1282204729901</last-modified>
+    </meta>
+  </process-def>
+</process>

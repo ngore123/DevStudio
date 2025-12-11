@@ -1,0 +1,264 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-NetAPP_Storage:v4.0:Provisioning_Policy:Update Provisioning Policy">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter. Default Name: NetAppActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Modifies the provisioning policy settings of an existing policy in the database with the new values specified in the input. Note: type of provisioning policy cannot be modified after creation.
+
+Sample Items XML:
+
+&lt;items&gt;
+&lt;item&gt;
+		&lt;targets&gt;
+			&lt;target&gt;
+				&lt;host&gt;10.10.10.10&lt;/host&gt;
+				&lt;user-name&gt;userName&lt;/user-name&gt;
+				&lt;password&gt;password&lt;/password&gt;
+				&lt;protocol&gt;http&lt;/protocol&gt;
+				&lt;port&gt;8088&lt;/port&gt;                                
+			&lt;/target&gt;
+		&lt;/targets&gt;
+	&lt;target&gt;server1&lt;/target&gt;
+	&lt;provisioning-policy-name-or-id&gt;testpolicy1&lt;/provisioning-policy-name-or-id&gt;
+	&lt;provisioning-policy-description&gt;test policy desc1111&lt;/provisioning-policy-description&gt;
+	&lt;resource-tag&gt;test1&lt;/resource-tag&gt;
+	&lt;full-threshold&gt;90&lt;/full-threshold&gt;
+	&lt;nearly-full-threshold&gt;80&lt;/nearly-full-threshold&gt;
+	&lt;script-path&gt;C:\test.txt&lt;/script-path&gt;
+	&lt;default-group-quota&gt;1024&lt;/default-group-quota&gt;
+	&lt;default-user-quota&gt;2048&lt;/default-user-quota&gt;
+	&lt;snapshot-reserve&gt;false&lt;/snapshot-reserve&gt;
+	&lt;thin-provision&gt;true&lt;/thin-provision&gt;
+	&lt;controller-failure&gt;true&lt;/controller-failure&gt;
+	&lt;disk-failure&gt;single&lt;/disk-failure&gt;
+	&lt;sub-system-failure&gt;true&lt;/sub-system-failure&gt;
+	&lt;dedupe-enabled&gt;true&lt;/dedupe-enabled&gt;
+	&lt;dedupe-schedule&gt;auto&lt;/dedupe-schedule&gt;
+&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+targets [Conditional] 
+
+        It is parent XML element for &lt;target&gt; XML element. 
+        The &lt;target&gt; XML element is used to specify dynamic targets at request level. 
+        Note: The &lt;targets&gt; XML element is required if the adapter configuration is empty in Grid Manager. 
+
+target [Conditional] 
+        It is child XML element of &lt;targets&gt; XML element. This element is used to specify dynamic targets at request level. 
+
+        Using dynamic targets you can define connection information for a remote host within an adapter request. This allows you to configure an adapter in Grid Manager, by specifying configuration information in an adapter request. 
+
+        Note: (1) Adapter configuration specified using request level dynamic targets takes precedence over Grid Manager level configuration information. (2) If request level dynamic target is specified using &lt;targets&gt; XML element, then the &lt;target&gt; element which is child of &lt;item&gt; element is ignored. (3) This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+host [Conditional] 
+Host name or IP address of server on which NetApp DataFabric Manager is running. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+user-name [Conditional] 
+NetApp DataFabric Manager login username. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+password [Conditional] 
+NetApp DataFabric Manager login password. 
+
+You can encrypt the password by specifying the encryption type attribute. 
+For example: &lt;password encryption-type = "Base64"&gt;cGFzc3dvcmQ=&lt;/password&gt;. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+protocol [Optional] 
+Communication protocol used by adapter. Valid value is http or https. Default value is http. 
+
+port [Optional] 
+Port on which NetApp DataFabric Manager is enabled. Default value is 8088 for http protocol and 8488 for https protocol. 
+
+target [Optional] 
+It is child XML element of &lt;item&gt; XML element. 
+You can use this element to specify the connection information for a DFM Server. For this a comma separated list of configuration names can be specified. This executes the request simultaneously on all DFM servers identified by the configuration names. 
+Valid values: 
+1. The values specified for &lt;target&gt; XML element must be same as the values that have been specified for the name attribute of &lt;config&gt; element in Grid Manager adapter configuration. 
+2. You can provide "ALL" as the value. In this case the request will get executed on all the DFM servers defined in Grid Manager adapter configuration. 
+3. You can specify multiple comma separated names to allow simultaneous execution of requests across multiple DFM servers. 
+4. You can skip this element. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+You can leave this element empty. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+
+Note: This element is ignored if request level dynamic target is specified using &lt;targets&gt; XML element.
+
+
+
+script-path[Optional]
+	Full path of a script on the management station to perform certain custom steps. The script will be run as the final step in the the provisioning process.  
+
+full-threshold[Optional]
+	Specified as percentage value, if used space of any data set member crosses this value, a critical event is generated. Range: [1..100]
+
+nearly-full-threshold[Optional]
+	Specified as percentage value, if the used space of any data set member crosses this value, a warning event is generated. Range: [1..100]  
+
+default-group-quota[Optional]
+	Default group quota setting on the data set members. The value is expressed in kilobytes. Range: [1..2^44-1]  
+
+default-user-quota[Optional]
+	Default user quota setting on the data set members. The value is expressed in kilobytes. Range: [1..2^44-1] 
+
+snapshot-reserve[Optional]
+	If True, 20% of requested space is reserved for Snapshot copies of data.
+
+thin-provision[Optional]
+	If True, the requested space is not pre-allocated (or reserved) from aggregates. The space from aggregates is actually consumed when users write data to CIFS shares or NFS exports of data set members. 
+
+provisioning-policy-description[Optional]
+	Description of the policy. It may contain from 0 to 255 characters. The default value is the empty string "". 
+	
+provisioning-policy-name-or-id[Required]
+	Name of the policy. Each provisioning policy has a name that is unique among provisioning and data protection policies. Should be provided while creating a new policy. 
+
+resource-tag[Optional]
+	A label associated with a resource pool or its elements (filer/aggregates). A label serves as a filter when selecting resources, during provisioning,i.e only those resources that have a macthing tag are considered for provisioning. 
+For example: An adminitrator can label resource pools as "low-cost" and create a provisioning policy with resource-tag set to "low-cost" to place data sets on cheap storage. It may contain from 0 to 255 characters.
+
+guarantee-writes[Optional]
+	This is a boolean field. This should be specified as 'true' when over committing storage space. i.e thin-provision is set to "true". Default is false.
+
+If set to "true", Provisioning Manager creates Volume/LUN configuration such that space for writes to LUNs is always guaranteed but Snapshot copies may or may not be possible depending on space availability, the choice of configuration can be specified in thin-provisioning-configuration input element.
+
+If set to "false", Provisioning Manager creates Volumes/LUNs with no space guarantees at all. As a result the writes to Volumes/LUNs provisioned using such policies can fail at given time. 
+
+Ignored when policy type is not "san".
+
+storage-container-type[Optional]
+	Container type to provision. Possible values: "volume","lun". Provisioning Manager can provision LUNs and map them to server to provide access to the LUNs or provision FlexVols and delegate the task of provisioning LUNs to server administrators using server side tools liks SnapDrive. Default value is "lun". Ignored when policy type is not "san".
+	
+san-thin-provision[Optional]
+	This is a boolean field. If 'true', will enable over-commitment of storage space. Ignored when policy type is not "san". Valid values - boolean
+
+thin-provisioning-configuration[Optional]
+	Specifies the configuration to use when thin-provision and guarantee-writes are set to "true". Each configuration has advantages and space saving objectives. Ignored when policy type is not "san".
+
+Possible values are snapshots, data_and_snapshots. 
+
+snapshots: This configurations allows thin provisioning of snapshot space, i.e space is allocated for Snapshot copies as needed but space for data and overwrites (after the first Snapshot copy) is preallocated. When the aggregate runs out of space further Snapshot copies may fail, but existing Snapshot copies are preserved. 
+
+data_and_snapshots: This configurations allows thin provisioning of space for data overwrites and snapshot space, The space requested initially is allocated upfront but space for data overwrites(after first Snapshot copy) and Snapshot copies is allocated as needed. In situations when aggregate on which volume is placed runs out of space, Snapshot copies in oldest first order will be automatically deleted to allocate space for user writes. 
+
+The value is set to "none" when either thin-provision or gurantee-writes is "false".
+
+controller-failure[Optional]
+	Resiliency against single controller failure, i.e the data set can be accessed even after a controller fails. Maps to active/active pair. Default value is "false". 
+	
+disk-failure[Optional]
+	Resiliency against disk failures, possible values are "single" (Maps to RAID-4 aggregates), "double" (Maps to RAID-DP aggregates) or "any"(either RAID-4 or RAID-DP). Default value is "double".  
+
+sub-system-failure[Optional]
+	This is a boolean field. If 'true' would mean resiliency against storage sub system failures (or back end failures) like disk shelf, disk shelf adapters, failure of FCAL loops. Maps to "SyncMirror" aggregates. Default value is "false".
+
+dedupe-enabled[Optional]
+	This is a boolean field. If specified as 'true' then dedupe will be enabled on all the volumes of the dataset with which the provisioning policy is associated. Default value is false.
+
+dedupe-schedule[Optional]
+	Specifies the schedule for deduplication that has to be set on the volumes of the dataset with which the provisioning policy is associated. Valid values are "none", "auto" and the format hour_list@day_list. 
+The 'hour_list' specifies which hours of the day the dedupe operation should run on each scheduled day. Hour ranges such as 8-17 are allowed. Step values can be used in conjunction with ranges. For example, 0-23/2 means "every two hours". 
+The 'day_list' specifies which days of the week the dedupe operation should run. It is a comma-separated list of the first three letters of the day: sun, mon, tue, wed, thu, fri, sat. The names are not case sensitive. Day ranges such as mon-fri can also be given. 
+Default value is "none".</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>update-provisioning-policy</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-NetAPP_Storage:Utilities:Invoke Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Modifies the provisioning policy settings of an existing policy in the database with the new values specified in the input. Note: type of provisioning policy cannot be modified after creation.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ae0a15d7-3fcf-3964-9ac8-8bc14e3bab6a</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598214172</last-modified>
+    </meta>
+  </process-def>
+</process>

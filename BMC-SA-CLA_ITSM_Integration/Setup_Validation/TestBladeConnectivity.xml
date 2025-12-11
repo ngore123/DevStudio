@@ -1,0 +1,1008 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:Setup_Validation:TestBladeConnectivity">
+    <parameters>
+      <input global="false" required="true">
+        <from>automationHostDetails</from>
+        <to>automationHostDetails</to>
+      </input>
+      <output global="false" required="true">
+        <to>bladeConnectivityScenario</to>
+        <from>bladeConnectivityScenario</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>bladeOperationStatus</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>bladeOperationReason</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>bladeConnectivityScenario</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Persistence:QueryConnectionDetails</process-name>
+        <parameters>
+          <input>
+            <from>automationHostDetails</from>
+            <to>hostinfo</to>
+          </input>
+          <output>
+            <from>connectionDetailsValue</from>
+            <to>connectionDetailsValue</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectionDetailsValue</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>username</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "username=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[normalize-space(.)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectionDetailsValue</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>password</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "password=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[normalize-space(.)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectionDetailsValue</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>protocol</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "protocol=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[normalize-space(.)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input required="false">
+                      <from>protocol</from>
+                    </input>
+                    <input>
+                      <value>://</value>
+                    </input>
+                    <input required="false">
+                      <from>automationHostDetails</from>
+                    </input>
+                    <input>
+                      <value>/services/LoginService</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>loginUrl</to>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input required="false">
+                      <from>protocol</from>
+                    </input>
+                    <input>
+                      <value>://</value>
+                    </input>
+                    <input required="false">
+                      <from>automationHostDetails</from>
+                    </input>
+                    <input>
+                      <value>/services/CLITunnelService</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>cliTunnelServiceUrl</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>OneClickValidation:Blade connectivity:loginUrl=&gt;</value>
+                    </input>
+                    <input>
+                      <from>loginUrl</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Login to BSA</process-name>
+              <parameters>
+                <input>
+                  <from>status</from>
+                  <to>status</to>
+                </input>
+                <input>
+                  <from>loginUrl</from>
+                  <to>url</to>
+                </input>
+                <input>
+                  <from>username</from>
+                  <to>username</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>password</to>
+                </input>
+                <output>
+                  <from>sessionId</from>
+                  <to>sessionId</to>
+                </output>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>connectivityIssueFoundWithBlade</from>
+                  <to>connectivityIssueFoundWithBlade</to>
+                </output>
+                <output>
+                  <from>errorMessage</from>
+                  <to>errorMessage</to>
+                </output>
+                <output>
+                  <from>bladeResponse</from>
+                  <to>bladeResponse</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>OneClickValidation:Blade integration=&gt;</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>sessionId</from>
+                    </input>
+                    <input>
+                      <from>errorMessage</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>bladeResponse</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>errorText</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//error/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>scenario1</to>
+                        <value>
+                          <output />
+                        </value>
+                      </output>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="errorText">
+                            <input global="false">
+                              <from>errorText</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <scenario>
+      <name>
+        <xsl:text disable-output-escaping="no">BMC Server Automation connectivity via AO</xsl:text>
+      </name>
+      <result>
+        <xsl:text disable-output-escaping="no">failure</xsl:text>
+      </result>
+      <reason>
+        <xsl:value-of select="'${errorText}'" disable-output-escaping="no" />
+      </reason>
+    </scenario>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>bladeConnectivityScenario</to>
+                        <value>
+                          <output />
+                        </value>
+                      </output>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="scenario1">
+                            <input global="false">
+                              <from>scenario1</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <usecase name="BMC Server Automation Connection">${scenario1}</usecase>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>OneClickValidation:Blade connectivity=&gt;</value>
+                          </input>
+                          <input>
+                            <from>scenario1</from>
+                          </input>
+                          <input>
+                            <from>bladeConnectivityScenario</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.) = "success"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>scenario1</to>
+                        <value>
+                          <output />
+                        </value>
+                      </output>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens />
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <scenario>
+      <name>
+        <xsl:text disable-output-escaping="no">BMC Server Automation connectivity via AO</xsl:text>
+      </name>
+      <result>
+        <xsl:text disable-output-escaping="no">success</xsl:text>
+      </result>
+      <reason />
+    </scenario>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>sessionId</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>req2</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="sessionid">
+                            <input global="false">
+                              <from>sessionId</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:clit="http://bladelogic.com/webservices/skeleton/clitunnel" xmlns:xsd="http://bladelogic.com/webservices/framework/xsd" version="1.0">
+  <xsl:output indent="yes" encoding="XML" />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <xsl:element name="soapenv:Header">
+        <xsl:element name="xsd:sessionId">
+          <xsl:text disable-output-escaping="no">${sessionid}</xsl:text>
+        </xsl:element>
+      </xsl:element>
+      <soapenv:Body>
+        <xsl:element name="clit:executeCommandByParamList">
+          <xsl:element name="clit:nameSpace">
+            <xsl:text disable-output-escaping="no">AO</xsl:text>
+          </xsl:element>
+          <xsl:element name="clit:commandName">
+            <xsl:text disable-output-escaping="no">isValidJson-api</xsl:text>
+          </xsl:element>
+          <xsl:element name="clit:commandArguments">
+            <xsl:text disable-output-escaping="no">{"version":"1.0"}</xsl:text>
+          </xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <input global="true">
+                        <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Default_WebService_Adapter</configuration>
+                      </input>
+                      <output>
+                        <to>WSAdapter</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>scenario2</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>OneClickValidation:Blade connectivity=&gt;</value>
+                          </input>
+                          <input>
+                            <from>bladeOperationStatus</from>
+                          </input>
+                          <input>
+                            <from>bladeOperationReason</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+                    <parameters>
+                      <input>
+                        <from>WSAdapter</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <value>http-rpc</value>
+                        <to>transport</to>
+                      </input>
+                      <input>
+                        <from>cliTunnelServiceUrl</from>
+                        <to>soap url</to>
+                      </input>
+                      <input>
+                        <from>req2</from>
+                        <to>soap message</to>
+                      </input>
+                      <input>
+                        <value>bladelogicNamespace:executeCommandByParamList</value>
+                        <to>soap action</to>
+                      </input>
+                      <input>
+                        <value>true</value>
+                        <to>use ssl certificate</to>
+                      </input>
+                      <input>
+                        <value>true</value>
+                        <to>install certificate</to>
+                      </input>
+                      <input>
+                        <value>true</value>
+                        <to>allow unsigned certificate</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>bladeResponse</to>
+                      </output>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>info</level>
+                        <parameters>
+                          <input>
+                            <value>BMC-SA-CLA_ITSM_Integration:OneClickValidation:TestBladeConnectivity=&gt;</value>
+                          </input>
+                          <input>
+                            <from>bladeResponse</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <input>
+                              <concat>
+                                <input>
+                                  <value>The BSA user ( </value>
+                                </input>
+                                <input required="false">
+                                  <from>username</from>
+                                </input>
+                                <input>
+                                  <value>)  that is configured has multiple roles associated with it.</value>
+                                </input>
+                              </concat>
+                            </input>
+                            <output>
+                              <to>reason</to>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>scenario2</to>
+                              <value>
+                                <output />
+                              </value>
+                            </output>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="reason">
+                                  <input global="false">
+                                    <from>reason</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <scenario>
+      <name>
+        <xsl:text disable-output-escaping="no">BMC Server Automation user role verification via AO</xsl:text>
+      </name>
+      <result>
+        <xsl:text disable-output-escaping="no">failure</xsl:text>
+      </result>
+      <reason>
+        <xsl:value-of select="'${reason}'" disable-output-escaping="no" />
+      </reason>
+    </scenario>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>OneClickValidation:Blade connectivity=&gt;</value>
+                                </input>
+                                <input>
+                                  <from>bladeOperationStatus</from>
+                                </input>
+                                <input>
+                                  <from>bladeOperationReason</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>bladeResponse</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[not(//faultstring) and not(//error)]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>scenario2</to>
+                              <value>
+                                <output />
+                              </value>
+                            </output>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens />
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <scenario>
+      <name>
+        <xsl:text disable-output-escaping="no">BMC Server Automation user role verification via AO</xsl:text>
+      </name>
+      <result>
+        <xsl:text disable-output-escaping="no">success</xsl:text>
+      </result>
+      <reason />
+    </scenario>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>OneClickValidation:Blade connectivity=&gt;</value>
+                                </input>
+                                <input>
+                                  <from>bladeOperationStatus</from>
+                                </input>
+                                <input>
+                                  <from>bladeOperationReason</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>scenario2</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>bladeConnectivityScenario</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="scenario1">
+                            <input global="false">
+                              <from>scenario1</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="scenario2">
+                            <input global="false">
+                              <from>scenario2</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <usecase name="BMC Server Automation Connection">${scenario1}${scenario2}</usecase>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>OneClickValidation:Blade connectivity=&gt;</value>
+                          </input>
+                          <input>
+                            <from>bladeOperationStatus</from>
+                          </input>
+                          <input>
+                            <from>bladeOperationReason</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[2]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>bladeResponse</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[boolean(//faultstring)]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>bladeResponse</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>faultstring</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//faultstring/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>bladeConnectivityScenario</to>
+                        <value>
+                          <output />
+                        </value>
+                      </output>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="faultstring">
+                            <input global="false">
+                              <from>faultstring</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <usecase name="BMC Server Automation Connection">
+      <scenario>
+        <name>
+          <xsl:text disable-output-escaping="no">BMC Server Automation connectivity via AO</xsl:text>
+        </name>
+        <result>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </result>
+        <reason>
+          <xsl:value-of select="'${faultstring}'" disable-output-escaping="no" />
+        </reason>
+      </scenario>
+    </usecase>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>OneClickValidation:Blade connectivity=&gt;</value>
+                          </input>
+                          <input>
+                            <from>bladeOperationStatus</from>
+                          </input>
+                          <input>
+                            <from>bladeOperationReason</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>connectionDetailsValue</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(boolean(string(.)))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Connection details of </value>
+                    </input>
+                    <input required="false">
+                      <from>automationHostDetails</from>
+                    </input>
+                    <input>
+                      <value> not present in AO.</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>bladeOperationReason</to>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>bladeConnectivityScenario</to>
+                  <value>
+                    <output />
+                  </value>
+                </output>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="reason">
+                      <input global="false">
+                        <from>bladeOperationReason</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <usecase name="BMC Server Automation Connection">
+      <scenario>
+        <name>
+          <xsl:text disable-output-escaping="no">BMC Server Automation connectivity via AO</xsl:text>
+        </name>
+        <result>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </result>
+        <reason>
+          <xsl:value-of select="'${reason}'" disable-output-escaping="no" />
+        </reason>
+      </scenario>
+    </usecase>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>OneClickValidation:Blade connectivity=&gt;</value>
+                    </input>
+                    <input>
+                      <from>bladeOperationStatus</from>
+                    </input>
+                    <input>
+                      <from>bladeOperationReason</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ffd89a46-f384-4668-9958-b19f26bba57c</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1473144317769</last-modified>
+    </meta>
+  </process-def>
+</process>

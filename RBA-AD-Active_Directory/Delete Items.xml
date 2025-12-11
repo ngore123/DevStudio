@@ -1,0 +1,742 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":RBA-AD-Active_Directory:Delete Items">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter use to handle the request.
+
+Default value: ActiveDirectory</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>item type
+              The item type that makes the judgement on what wrapper must be executed.
+
+Valid values: 
+				DeleteAccount, 
+				DeleteAccounts, 
+				ADAMContainer. 
+				ADAMGroup, 
+				ADAMInetOrgPerson, 
+				ADAMOU, 
+				ADAMUser, 
+				ADAMContact,
+				DeleteComputerAccount,
+				DeleteComputerAccounts,
+				DeleteQuota</description>
+        <from>item type</from>
+        <to>item type</to>
+      </input>
+      <input global="false" required="false">
+        <description>This element is required if a target will be referenced or defined in the request.
+In the absence of this element, the default target in the Adapter configuration will be used. 
+
+Value takes the form:
+
+&lt;target&gt;
+		&lt;host&gt;&lt;/host&gt;
+		&lt;user-name&gt;&lt;/user-name&gt;
+		&lt;password&gt;&lt;/password&gt;
+&lt;/target&gt;</description>
+        <from>target</from>
+        <to>target</to>
+      </input>
+      <input global="false" required="false">
+        <description>The distinguished name of the object. </description>
+        <from>object distinguished name</from>
+        <to>object distinguished name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Contains the required/optional parameter list for the command. 
+
+Value takes the form:
+
+&lt;parameters&gt;
+		........
+&lt;/parameters&gt;</description>
+        <from>parameters</from>
+        <to>parameters</to>
+      </input>
+      <input global="false" required="true">
+        <description>version
+         The Active Directory Application version. The current supported version is v2003.</description>
+        <from>version</from>
+        <to>version</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:RBA-AD-Active_Directory:Utilities:Version Error Reporting</process-name>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>version</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='v2003' or .='v2008' or .='v2012']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Utilities:Item Type Error Reporting</process-name>
+                    <parameters>
+                      <input>
+                        <from>item type</from>
+                        <to>item type</to>
+                      </input>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='DeleteAccount']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory:v2003:User_Account_Management:Delete Account</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='DeleteAccounts']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory:v2003:User_Account_Management:Delete Accounts</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[3]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='ADAMContainer']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory_Application_Mode:v2003:Container:Delete Container</process-name>
+                    <unique-id>66f55ec4-879c-31aa-8fa1-c7ff1cc1e747</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[4]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='ADAMGroup']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory_Application_Mode:v2003:Group:Delete Group</process-name>
+                    <unique-id>b05cafe4-03ba-3d63-98e8-2a919c1b6b70</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[5]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='ADAMInetOrgPerson']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory_Application_Mode:v2003:inetOrgPerson:Delete inetOrgPerson</process-name>
+                    <unique-id>fb8308ce-a12a-374e-8eec-80039dacfc28</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[6]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='ADAMOU']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory_Application_Mode:v2003:Organizational_Unit:Delete OU</process-name>
+                    <unique-id>f8d23d7b-9702-3821-b90e-daa52939614f</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[7]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='ADAMUser']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory_Application_Mode:v2003:User:Delete User</process-name>
+                    <unique-id>21e4307d-0f3a-3f1a-b5ed-de168a0c4777</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[8]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='ADAMContact']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory_Application_Mode:v2003:Contact:Delete Contact</process-name>
+                    <unique-id>b5bae38d-b51c-3e27-ad34-b34e4f417411</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[9]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='DeleteComputerAccount']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory:v2003:Computer_Account_Management:Delete Computer Account</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[10]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='DeleteComputerAccounts']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory:v2003:Computer_Account_Management:Delete Computer Accounts</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>parameters</from>
+                        <to>parameters</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[11]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[.='DeleteQuota']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:RBA-AD-Active_Directory:Active_Directory:Quota_Management:Delete Quota</process-name>
+                    <unique-id>53d6335d-6700-497c-affe-eb9710b241c2</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target</from>
+                        <to>target</to>
+                      </input>
+                      <input>
+                        <from>object distinguished name</from>
+                        <to>object distinguished name</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[12]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Delete Items
+    Delete one or more items within Active Directory and ADAM.
+
+Delete Items support following operations:
+Delete Account, 
+Delete Accounts, 
+Delete ADAM Container, 
+Delete ADAM Group, 
+Delete ADAM InetOrgPerson, 
+Delete ADAM OU, 
+Delete ADAM User, 
+Delete ADAM Contact,
+Delete Computer Account,
+Delete Computer Accounts</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2eb3a7af-6f98-357a-b0fe-7eaac9012539</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1503656369559</last-modified>
+    </meta>
+  </process-def>
+</process>

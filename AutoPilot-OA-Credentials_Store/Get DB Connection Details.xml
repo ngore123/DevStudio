@@ -1,0 +1,635 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Credentials_Store:Get DB Connection Details">
+    <parameters>
+      <input global="false" required="true">
+        <description>host name who's  connection details need to be extracted.</description>
+        <from>host</from>
+        <to>host</to>
+      </input>
+      <input global="false" required="true">
+        <description>Database name</description>
+        <from>db name</from>
+        <to>db name</to>
+      </input>
+      <output global="false" required="false">
+        <description>Connection details based on the connection details concept.
+
+Sample:
+&lt;connection-details&gt;
+  &lt;adapter-name/&gt;
+  &lt;hostname/&gt;
+  &lt;username/&gt;
+  &lt;password/&gt;
+  &lt;invocation-mechanism/&gt;
+&lt;/connection-details&gt;</description>
+        <to>host connection details</to>
+        <from>host connection details</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <utility>
+        <string>
+          <lowercase>
+            <input>
+              <from>host</from>
+            </input>
+          </lowercase>
+        </string>
+        <output global="false">
+          <to>host</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[1]</location>
+      </utility>
+      <assign>
+        <assignment>
+          <output>
+            <to>isIP</to>
+            <value>true</value>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AutoPilot-OA-Credentials_Store:Triage_Remediation:Secure_Credentials:Databases</configuration>
+          </input>
+          <output>
+            <to>test db connection detail</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Tokenize String</process-name>
+        <parameters>
+          <input>
+            <from>host</from>
+            <to>string</to>
+          </input>
+          <input>
+            <value>.</value>
+            <to>delimiter</to>
+          </input>
+          <output>
+            <from>tokens</from>
+            <to>tokens</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <for-each>
+        <document>
+          <input>
+            <from>tokens</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>token</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//tokens/*]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>isIP</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = 'true']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>token</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>result</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[string(number(.)) != 'NaN']]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>result</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>isIP</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="isIP">
+                          <input global="false">
+                            <from>isIP</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(.) = 'true' and string('${isIP}') = 'true'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>host</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>domain</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="isIP">
+                <input global="false">
+                  <from>isIP</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string('${isIP}') = 'true'" />
+        <xsl:otherwise>
+          <xsl:value-of select="substring-after(., '.')" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>host</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>host name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="isIP">
+                <input global="false">
+                  <from>isIP</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string('${isIP}') = 'true'">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="string-length(substring-before(., &quot;.&quot;)) &gt; 0">
+              <xsl:value-of select="substring-before(., &quot;.&quot;)" disable-output-escaping="no" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="." disable-output-escaping="no" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:AutoPilot-OA-Credentials_Store:Triage_Remediation:Secure_Credentials:Databases</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="host name">
+                <input global="false">
+                  <from>host name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="domain">
+                <input global="false">
+                  <from>domain</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="db name">
+                <input global="false">
+                  <from>db name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-details>
+      <xsl:choose>
+        <xsl:when test="string-length('$[domain]')&gt;0">
+          <xsl:choose>
+            <xsl:when test="//*[starts-with(local-name(), 'Domain') and Domain_Name/text()='$[domain]']">
+              <xsl:apply-templates select="//*[starts-with(local-name(), 'Domain') and Domain_Name/text()='$[domain]']" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:apply-templates select="//*[starts-with(local-name(), 'Domain') and Domain_Name/text()='default']" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates select="//*[starts-with(local-name(), 'Domain') and Domain_Name/text()='default']" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </connection-details>
+  </xsl:template>
+  <xsl:template match="//*[starts-with(local-name(), 'Domain')]">
+    <xsl:choose>
+      <xsl:when test="*[starts-with(local-name(), 'Host') and Hostname/text()='$[host name]']">
+        <xsl:apply-templates select="*[starts-with(local-name(), 'Host') and Hostname/text()='$[host name]']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="*[starts-with(local-name(), 'Host') and Hostname/text()='*']" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template match="*[starts-with(local-name(), 'Host')]">
+    <xsl:choose>
+      <xsl:when test="*[starts-with(local-name(), 'Database') and DB_Name/text()='$[db name]']">
+        <xsl:apply-templates select="*[starts-with(local-name(), 'Database') and DB_Name/text()='$[db name]']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="*[starts-with(local-name(), 'Database') and DB_Name/text()='*']" />
+      </xsl:otherwise>
+    </xsl:choose>
+    <hostname>
+      <xsl:choose>
+        <xsl:when test="Hostname/text() = '*' and ../Domain_Name/text()!='default'">
+          <xsl:value-of select="concat('$[host name].', '$[domain]')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:when test="Hostname/text() = '*' and ../Domain_Name/text()='default'">
+          <xsl:text disable-output-escaping="no">$[host name]</xsl:text>
+          <xsl:if test="string-length('$[domain]')&gt;0">
+            <xsl:text disable-output-escaping="no">.$[domain]</xsl:text>
+          </xsl:if>
+        </xsl:when>
+        <xsl:when test="Hostname/text()='$[host name]' and ../Domain_Name/text()!='default'">
+          <xsl:value-of select="concat(Hostname/text(), '.$[domain]') " disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:when test="Hostname/text()='$[host name]' and ../Domain_Name/text()='default'">
+          <xsl:choose>
+            <xsl:when test="string-length(IP_Address/text())&gt;0">
+              <xsl:value-of select="IP_Address/text()" disable-output-escaping="no" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="string-length('$[domain]')&gt;0">
+                  <xsl:value-of select="concat(Hostname/text(), '.$[domain]') " disable-output-escaping="no" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="Hostname/text()" disable-output-escaping="no" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </hostname>
+    <invocation-mechanism>
+      <xsl:value-of select="Invocation_Mechanism/text()" disable-output-escaping="no" />
+    </invocation-mechanism>
+    <subprotocol>
+      <xsl:value-of select="Subprotocol/text()" disable-output-escaping="no" />
+    </subprotocol>
+    <port>
+      <xsl:value-of select="Port/text()" disable-output-escaping="no" />
+    </port>
+    <driver>
+      <xsl:value-of select="Driver/text()" disable-output-escaping="no" />
+    </driver>
+  </xsl:template>
+  <xsl:template match="*[starts-with(local-name(), 'Database')]">
+    <username>
+      <xsl:choose>
+        <xsl:when test="Username/*">
+          <xsl:copy-of select="Username/*" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="Username/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </username>
+    <password>
+      <xsl:choose>
+        <xsl:when test="Password/*">
+          <xsl:copy-of select="Password/*" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="Password/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </password>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>connection details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>invocation mechanism</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//invocation-mechanism/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:AutoPilot-OA-Credentials_Store:Triage_Remediation:Adapter_Invocation_Mechanism_Mappings</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="invocation mechanism">
+                <input global="false">
+                  <from>invocation mechanism</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="//adapter-name[@invocation-mechanism='$[invocation mechanism]']" disable-output-escaping="yes" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>connection details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>host connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="adapter name">
+                <input global="false">
+                  <from>adapter name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-details>
+      <xsl:if test="//connection-details/*[local-name() = 'password']">
+        <xsl:choose>
+          <xsl:when test="//connection-details/password/*">
+            <xsl:copy-of select="//connection-details/password/." />
+          </xsl:when>
+          <xsl:otherwise>
+            <password>
+              <xsl:value-of select="//connection-details/password/." disable-output-escaping="no" />
+            </password>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+      <xsl:if test="//connection-details/*[local-name() = 'username']">
+        <xsl:choose>
+          <xsl:when test="//connection-details/*[local-name()='username']">
+            <xsl:choose>
+              <xsl:when test="//connection-details/username/*">
+                <xsl:copy-of select="//connection-details/username/." />
+              </xsl:when>
+              <xsl:otherwise>
+                <username>
+                  <xsl:value-of select="//connection-details/username/." disable-output-escaping="no" />
+                </username>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:if>
+      <xsl:copy-of select="//connection-details/*[local-name() != 'username' and local-name() != 'password']" />
+      <xsl:if test="string-length('${adapter name}') &gt; 0">
+        <adapter-name>
+          <xsl:text disable-output-escaping="no">${adapter name}</xsl:text>
+        </adapter-name>
+      </xsl:if>
+    </connection-details>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>##AdapterName## Connection details</value>
+              </input>
+              <input>
+                <from>adapter name</from>
+              </input>
+              <input>
+                <from>connection details</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflows extracts the connection details of a given host based on the module configuration.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e0902fd5-b23c-4519-892a-fa8aaf3d749c</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1283173262714</last-modified>
+    </meta>
+  </process-def>
+</process>

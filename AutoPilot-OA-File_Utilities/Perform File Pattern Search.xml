@@ -1,0 +1,203 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:Perform File Pattern Search">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The pattern to match.</description>
+        <from>pattern</from>
+        <to>pattern</to>
+      </input>
+      <input global="false" required="true">
+        <description>The path and file name of the file to be searched.</description>
+        <from>file</from>
+        <to>file</to>
+      </input>
+      <input global="false" required="false">
+        <description>Print all lines except those that contain the pattern? 
+Valid value:  true</description>
+        <from>invert pattern</from>
+        <to>invert pattern</to>
+      </input>
+      <input global="false" required="false">
+        <description>Precede each line by the block number on which it was found? 
+Valid value:  true</description>
+        <from>print byte offset</from>
+        <to>print byte offset</to>
+      </input>
+      <input global="false" required="false">
+        <description>Ignore upper/lower case distinctions during comparisons? 
+Valid value:  true</description>
+        <from>case insensitive</from>
+        <to>case insensitive</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>file</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="pattern">
+                  <input global="false">
+                    <from>pattern</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="file">
+                  <input global="false">
+                    <from>file</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="invert pattern">
+                  <input global="false">
+                    <from>invert pattern</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="print byte offset">
+                  <input global="false">
+                    <from>print byte offset</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="case insensitive">
+                  <input global="false">
+                    <from>case insensitive</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">grep </xsl:text>
+        <xsl:if test="string-length('${invert pattern}') !=0 and '${invert pattern}' = 'true'">
+          <xsl:text>-v </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${print byte offset}') !=0 and '${print byte offset}' = 'true'">
+          <xsl:text>-b </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${case insensitive}') !=0 and '${case insensitive}' = 'true'">
+          <xsl:text>-i </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">$[pattern] $[file]</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/xpg4/bin/grep </xsl:text>
+        <xsl:if test="string-length('${invert pattern}') !=0 and '${invert pattern}' = 'true'">
+          <xsl:text>-v </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${print byte offset}') !=0 and '${print byte offset}' = 'true'">
+          <xsl:text>-b </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${case insensitive}') !=0 and '${case insensitive}' = 'true'">
+          <xsl:text>-i </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">$[pattern] $[file]</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">findstr </xsl:text>
+        <xsl:if test="string-length('${invert pattern}') !=0 and '${invert pattern}' = 'true'">
+          <xsl:text disable-output-escaping="no">/v </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${print byte offset}') !=0 and '${print byte offset}' = 'true'">
+          <xsl:text disable-output-escaping="no">/o </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${case insensitive}') !=0 and '${case insensitive}' = 'true'">
+          <xsl:text disable-output-escaping="no">/i </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">$[pattern] $[file]</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform File Pattern Search
+    Searches the contents of a file for a pattern and displays any matching lines.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8d70cd76-6990-331c-98be-ead398eeee23</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902421206</last-modified>
+    </meta>
+  </process-def>
+</process>

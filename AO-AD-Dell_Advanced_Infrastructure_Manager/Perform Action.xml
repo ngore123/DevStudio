@@ -1,0 +1,693 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AO-AD-Dell_Advanced_Infrastructure_Manager:Perform Action">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+Default adapter name: DellAIMActor.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>item type :
+Defines the type of operation to be performed.
+
+Supported 'item type'-
+1. start-persona
+2. stop-persona
+3. start-persona-on-server
+4. assign-persona-to-server-pool
+5. unassign-persona-from-server-pool
+6. start-vmrack
+7. stop-vmrack
+8. start-vmrack-on-server
+9. assign-vmrack-to-server-pool
+10. unassign-vmrack-from-server-pool
+</description>
+        <from>item type</from>
+        <to>item type</to>
+      </input>
+      <input global="false" required="true">
+        <description>The 'items' xml of the action to be performed.
+
+Below is an example 'items' xml to start/stop a persona
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;targets&gt;
+			&lt;target&gt;
+				&lt;host&gt;localhost&lt;/host&gt;
+				&lt;user-name&gt;admin&lt;/user-name&gt;
+				&lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;	
+				&lt;protocol&gt;https&lt;/protocol&gt;
+				&lt;port&gt;443&lt;/port&gt;
+				&lt;use-ssl-certificate&gt;true&lt;/use-ssl-certificate&gt;
+				&lt;allow-unsigned-certificate&gt;true&lt;/allow-unsigned-certificate&gt;
+				&lt;install-certificate&gt;true&lt;/install-certificate&gt;
+				&lt;passphrase&gt;changeit&lt;/passphrase&gt;
+			&lt;/target&gt;
+		&lt;/targets&gt;
+		&lt;target&gt;config1&lt;/target&gt;
+		&lt;persona-id&gt;PERSONA_ID_1&lt;/persona-id&gt;
+	&lt;/item&gt;
+	&lt;item&gt;
+		&lt;target&gt;config2&lt;/target&gt;
+		&lt;persona-id&gt;PERSONA_ID_2&lt;/persona-id&gt;
+	&lt;/item&gt;
+&lt;/items&gt;</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="true">
+        <description>version
+The version of 'Dell AIM' which is supported by adapter. 
+
+Valid value: v3.4</description>
+        <from>version</from>
+        <to>version</to>
+      </input>
+      <output global="false" required="false">
+        <description>Returned adapter response is captured in this context parameter.</description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:Utilities:Version Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <from>version</from>
+                  <to>version</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>version</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='v3.4']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:Utilities:Item Type Error Reporting</process-name>
+                    <parameters>
+                      <input>
+                        <from>item type</from>
+                        <to>provided item type</to>
+                      </input>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'start-persona']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:Persona:Start Persona</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='stop-persona']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:Persona:Stop Persona</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[3]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='start-persona-on-server']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:Persona:Start Persona On Server</process-name>
+                    <unique-id>6a6ad70f-3314-410a-8b1e-e67a46d2d1d7</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[4]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="assign-persona-to-server-pool"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:Persona:Assign Persona To Server Pool</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[5]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="unassign-persona-from-server-pool"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:Persona:Unassign Persona From Server Pool</process-name>
+                    <unique-id>b3fd8718-eb86-42a5-8a15-731e0ce5a18f</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[6]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='start-vmrack']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:VMRack:Start VMRack</process-name>
+                    <unique-id>8db5fe2a-61df-47be-9a6a-f820927efb38</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[7]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='stop-vmrack']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:VMRack:Stop VMRack</process-name>
+                    <unique-id>0b9ffba4-2b26-4cb5-8010-137678246a8a</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[8]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='start-vmrack-on-server']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:VMRack:Start VMRack On Server</process-name>
+                    <unique-id>040ae21a-770a-4b1d-b0ec-e56699fb06f2</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[9]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='assign-vmrack-to-server-pool']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:VMRack:Assign VMRack To Server Pool</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[10]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='unassign-vmrack-from-server-pool']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:VMRack:Unassign VMRack From Server Pool</process-name>
+                    <unique-id>4d43671f-72bd-4c3a-bf65-f3414e35c3f4</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[11]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Action: 
+
+It is a generic wrapper to perform different type of actions.
+</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a5f997da-745b-3691-8920-d3a04daa86e8</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1306741232113</last-modified>
+    </meta>
+  </process-def>
+</process>

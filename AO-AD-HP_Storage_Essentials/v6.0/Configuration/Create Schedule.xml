@@ -1,0 +1,179 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:v6.0:Configuration:Create Schedule">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is HPSEActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Create Schedule
+
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;add&lt;/command&gt;
+	    &lt;category&gt;configuration&lt;/category&gt;
+		&lt;process-id&gt;create-schedule&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;schedule-name&gt;"Schedule Name"&lt;/schedule-name&gt;
+	      &lt;schedule-description&gt;"Schedule Description"&lt;/schedule-description&gt;
+	      &lt;nextrun-date&gt;2010-07-22&lt;/nextrun-date&gt;
+	      &lt;nextrun-time&gt;10:00&lt;/nextrun-time&gt;
+	      &lt;interval-frequency&gt;2&lt;/interval-frequency&gt;
+	      &lt;interval-duration&gt;day&lt;/interval-duration&gt;
+	      &lt;discoverygroup-ids&gt;1001 1758&lt;/discoverygroup-ids&gt;
+	      &lt;infrastructure /&gt;
+	      &lt;backup /&gt;
+	      &lt;refresh /&gt;
+	      &lt;enable /&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+schedule-name[Optional]
+	Name of schedule
+schedule-description[Optional]
+	Schedule Description
+nextrun-date[Required]
+	Date on which the schedule will run. Valid Date Format: yyyy-mm-dd
+nextrun-time[Required]
+	Time at which the schedule will run. Valid Time Format(24-hour): hh:mm
+interval-frequency[Required]
+	Interval duration between succesive runs of schedule. Although interval-frequency can be as minimum as 1 second, it is recommended that the minimum frequency should be provided as one hour. The reason being that a discovery schedule invariably takes at least 15-20 mins to run completely. Therefore, if the interval is provided less than 1 hour the exact behavior of the schedule is not guranteed.
+
+interval-duration[Required]
+	Unit that identifies the interval duration.  Valid values: second, minute, hour, day, week.
+discoverygroup-ids[Required]
+	Discovery groups that should be included in discovery. Atleast one discovery-group should be specified. ids should be separated by spaces
+infrastructure[Required, if "backup" is not provided]
+	Indicates if infrastructure details are included as part of discovery.
+backup[Required, if "infrastructure" is not provided]
+	Indicates if backup details are included as part of discovery.
+refresh[Optional]
+	Indicates if HP Storage Essentials should force the device manager refresh for an element.
+enable[Optional]
+	Indicates whether the new created shedule is to be enabled or not after its creation. If this element is present, then the created schedule will be enabled, else the created shedules will not be enabled.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Process ID Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <value>create-schedule</value>
+                  <to>process id</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//items/item/process-id)='create-schedule']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Invoke Adapter Request</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper supports the following requirements:-
+
+1. Adds a new schedule for discovery</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>6cf84059-e36c-39e0-8375-df50c38411cd</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588085086</last-modified>
+    </meta>
+  </process-def>
+</process>

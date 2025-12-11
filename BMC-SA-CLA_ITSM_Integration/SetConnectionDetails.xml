@@ -1,0 +1,727 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:SetConnectionDetails">
+    <parameters>
+      <input global="false" required="true">
+        <from>ARMidTierHost</from>
+        <to>ARMidTierHost</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARMidTierPort</from>
+        <to>ARMidTierPort</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARServerHost</from>
+        <to>ARServerHost</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARProtocol</from>
+        <to>ARProtocol</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARUsername</from>
+        <to>ARUsername</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARPassword</from>
+        <to>ARPassword</to>
+      </input>
+      <input global="false" required="true">
+        <description>host:port</description>
+        <from>AutomationHostnameNew</from>
+        <to>AutomationHostname_New</to>
+      </input>
+      <input global="false" required="true">
+        <from>AutomationProtocol</from>
+        <to>AutomationProtocol</to>
+      </input>
+      <input global="false" required="true">
+        <from>AutomationUsername</from>
+        <to>AutomationUsername</to>
+      </input>
+      <input global="false" required="true">
+        <from>AutomationPassword</from>
+        <to>AutomationPassword</to>
+      </input>
+      <input global="false" required="true">
+        <from>AutomationProductCode</from>
+        <to>AutomationProductCode</to>
+      </input>
+      <input global="false" required="false">
+        <description>host:port</description>
+        <from>AutomationHostnameOld</from>
+        <to>AutomationHostname_Old</to>
+      </input>
+      <output global="false" required="true">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="true">
+        <to>reason</to>
+        <from>reason</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>reason</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:In SetConnectionDetails=&gt;</value>
+              </input>
+              <input>
+                <from>ARMidTierHost</from>
+              </input>
+              <input>
+                <from>ARMidTierPort</from>
+              </input>
+              <input>
+                <from>ARServerHost</from>
+              </input>
+              <input>
+                <from>AutomationHostname_New</from>
+              </input>
+              <input>
+                <from>AutomationHostname_Old</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Persistence:StoreARConnectionDetails</process-name>
+        <parameters>
+          <input>
+            <from>ARMidTierHost</from>
+            <to>ARMidTierHost</to>
+          </input>
+          <input>
+            <from>ARMidTierPort</from>
+            <to>ARMidTierPort</to>
+          </input>
+          <input>
+            <from>ARServerHost</from>
+            <to>ARServerHost</to>
+          </input>
+          <input>
+            <from>ARProtocol</from>
+            <to>ARProtocol</to>
+          </input>
+          <input>
+            <from>ARUsername</from>
+            <to>ARUsername</to>
+          </input>
+          <input>
+            <from>ARPassword</from>
+            <to>ARPassword</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>reason</from>
+            <to>reason</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case applies-if-any-condition-true="true">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(boolean(string(.)))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "success"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-CLA_ITSM_Integration:Persistence:StoreBladeConnectionDetails</process-name>
+              <parameters>
+                <input>
+                  <from>AutomationHostname_New</from>
+                  <to>AutomationHostname_New</to>
+                </input>
+                <input>
+                  <from>AutomationProtocol</from>
+                  <to>AutomationProtocol</to>
+                </input>
+                <input>
+                  <from>AutomationUsername</from>
+                  <to>AutomationUsername</to>
+                </input>
+                <input>
+                  <from>AutomationPassword</from>
+                  <to>AutomationPassword</to>
+                </input>
+                <input>
+                  <from>AutomationProductCode</from>
+                  <to>AutomationProductCode</to>
+                </input>
+                <input>
+                  <from>AutomationHostname_Old</from>
+                  <to>AutomationHostname_Old</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>reason</from>
+                  <to>reason</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case applies-if-any-condition-true="false">
+                <condition>
+                  <document>
+                    <input>
+                      <from>status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.)=""  or string(.)='success']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>AutomationHostname_Old</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[boolean(string(.))]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>AutomationHostname_Old</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="AutomationHostname_New">
+                        <input global="false">
+                          <from>AutomationHostname_New</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string(.)  !=  '${AutomationHostname_New}']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <input global="true">
+                        <from>ARInboundUrl</from>
+                      </input>
+                      <output>
+                        <to>soapurl</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input global="true">
+                        <from>ARUsername</from>
+                      </input>
+                      <output>
+                        <to>remedyUsername</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input global="true">
+                        <from>ARPassword</from>
+                      </input>
+                      <output>
+                        <to>remedyPassword</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input global="true">
+                        <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Connection_Details:transport</configuration>
+                      </input>
+                      <output>
+                        <to>transport</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>soapurl</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>req</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="username">
+                            <input global="false">
+                              <from>remedyUsername</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="password">
+                            <input global="false">
+                              <from>remedyPassword</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="newSourceID">
+                            <input global="false">
+                              <from>AutomationHostname_New</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="oldSourceID">
+                            <input global="false">
+                              <from>AutomationHostname_Old</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tem="http://tempuri.org" xmlns:urn="CHG_ChangeServiceInterface" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" version="1.0">
+  <xsl:output indent="yes" encoding="XML" cdata-section-elements="Change_ProcessInterfaceData " />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Header>
+        <xsl:element name="urn:AuthenticationInfo">
+          <xsl:element name="urn:userName">$[username]</xsl:element>
+          <xsl:element name="urn:password">$[password]</xsl:element>
+        </xsl:element>
+      </soapenv:Header>
+      <soapenv:Body>
+        <xsl:element name="urn:Update_SourceInformation">
+          <xsl:element name="urn:OldSourceID">
+            <xsl:text disable-output-escaping="no">${oldSourceID}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:NewSourceID">
+            <xsl:text disable-output-escaping="no">${newSourceID}</xsl:text>
+          </xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <input global="true">
+                        <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Default_WebService_Adapter</configuration>
+                      </input>
+                      <output>
+                        <to>wsAdapter</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>BMC-SA-CLA_ITSM_Integration:SendMessageToRemedy:remedyRequest=&gt;</value>
+                          </input>
+                          <input>
+                            <from>req</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+                    <parameters>
+                      <input>
+                        <from>wsAdapter</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>transport</from>
+                        <to>transport</to>
+                      </input>
+                      <input>
+                        <from>soapurl</from>
+                        <to>soap url</to>
+                      </input>
+                      <input>
+                        <from>req</from>
+                        <to>soap message</to>
+                      </input>
+                      <input>
+                        <value>urn:CHG_ChangeServiceInterface/Update_SourceInformation</value>
+                        <to>soap action</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>remedyResponse</to>
+                      </output>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>BMC-SA-CLA_ITSM_Integration:SendMessageToRemedy:remedyResponse=&gt;</value>
+                          </input>
+                          <input>
+                            <from>remedyResponse</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <call-process>
+                    <process-name>:BMC-SA-CLA_ITSM_Integration:Utility:Strip Namespaces</process-name>
+                    <parameters>
+                      <input>
+                        <from>remedyResponse</from>
+                        <to>XML</to>
+                      </input>
+                      <output>
+                        <from>XML</from>
+                        <to>remedyResponse</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>remedyResponse</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>statusXML</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens />
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <output>
+      <xsl:choose>
+        <xsl:when test="//ReturnValue/text()='SUCCESS'">
+          <status>
+            <xsl:text disable-output-escaping="no">success</xsl:text>
+          </status>
+          <reason />
+        </xsl:when>
+        <xsl:when test="((//ReturnValue/text()!='SUCCESS') and (not(//faultstring)))">
+          <status>
+            <xsl:text disable-output-escaping="no">failed</xsl:text>
+          </status>
+          <reason>
+            <xsl:value-of select="//ReturnMessage/text()" disable-output-escaping="no" />
+          </reason>
+        </xsl:when>
+        <xsl:when test="//faultstring">
+          <status>
+            <xsl:text disable-output-escaping="no">failed</xsl:text>
+          </status>
+          <reason>
+            <xsl:value-of select="//faultstring/text()" disable-output-escaping="no" />
+          </reason>
+        </xsl:when>
+        <xsl:otherwise>
+          <status>
+            <xsl:text disable-output-escaping="no">failed</xsl:text>
+          </status>
+          <reason>
+            <xsl:value-of select="//error/text()" disable-output-escaping="no" />
+          </reason>
+        </xsl:otherwise>
+      </xsl:choose>
+    </output>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>statusXML</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//status/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>statusXML</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>reason</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//reason/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[2]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:Out SetConnectionDetails=&gt;</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>reason</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="true">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "success"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(boolean(string(.)))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>0</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>reason</to>
+                  <value>Connection details successfully configured in AO</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:Out SetConnectionDetails=&gt;</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>reason</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Set connection details of Blade and Remedy.It also handles updating BSA hostname feature. It gets invoked by BSA UI and CLA installer.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>57beda3e-b51e-4fd6-9e98-1e38b65ef591</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1472116506614</last-modified>
+    </meta>
+  </process-def>
+</process>

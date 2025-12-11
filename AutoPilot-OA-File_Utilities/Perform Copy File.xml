@@ -1,0 +1,197 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:Perform Copy File">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The source file to copy.</description>
+        <from>source</from>
+        <to>source</to>
+      </input>
+      <input global="false" required="true">
+        <description>The destination file.</description>
+        <from>destination</from>
+        <to>destination</to>
+      </input>
+      <input global="false" required="false">
+        <description>Copy directories recursively? 
+Valid values:  true
+Not supported with a Windows O/S</description>
+        <from>recursive</from>
+        <to>recursive</to>
+      </input>
+      <input global="false" required="false">
+        <description>If an existing destination file cannot be opened.
+
+Not supported with a Windows O/S</description>
+        <from>force</from>
+        <to>force</to>
+      </input>
+      <input global="false" required="false">
+        <description>Preserve the specified attributes (mode)
+
+Not supported with a Windows O/S</description>
+        <from>preserve attributes</from>
+        <to>preserve attributes</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>source</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="destination">
+                  <input global="false">
+                    <from>destination</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="force">
+                  <input global="false">
+                    <from>force</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="preserve attributes">
+                  <input global="false">
+                    <from>preserve attributes</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="recursive">
+                  <input global="false">
+                    <from>recursive</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="source">
+                  <input global="false">
+                    <from>source</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">cp </xsl:text>
+        <xsl:if test="string-length('${recursive}') and '${recursive}' = 'true'">
+          <xsl:text>-r </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${preserve attributes}') and '${preserve attributes}' = 'true'">
+          <xsl:text>-p </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${force}') and '${force}' = 'true'">
+          <xsl:text>-f </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">${source} ${destination}</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/xpg4/bin/cp </xsl:text>
+        <xsl:if test="string-length('${recursive}') and '${recursive}' = 'true'">
+          <xsl:text>-r </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${preserve attributes}') and '${preserve attributes}' = 'true'">
+          <xsl:text>-p </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${force}') and '${force}' = 'true'">
+          <xsl:text>-f </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">${source} ${destination}</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">copy </xsl:text>
+        <xsl:text disable-output-escaping="no">${source} ${destination}</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Copy File
+    Copy a file or directory to another location.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a9a32bd4-d91f-3153-a0b5-9c5d75e5bec3</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902418871</last-modified>
+    </meta>
+  </process-def>
+</process>

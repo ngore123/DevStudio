@@ -1,0 +1,111 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-Common_Utilities:XML_Utilities:Strip NonAscii Characters">
+    <parameters>
+      <input global="false" required="true">
+        <from>input</from>
+        <to>input</to>
+      </input>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>input</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>output</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="line" />
+  <xsl:template match="/">
+    <xsl:apply-templates select="@*|node()" />
+  </xsl:template>
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="line">
+    <xsl:copy>
+      <xsl:call-template name="replace-non-ascii">
+        <xsl:with-param name="text" select="." />
+      </xsl:call-template>
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template name="replace-non-ascii">
+    <xsl:param name="text" />
+    <xsl:variable name="ascii">
+      <xsl:text disable-output-escaping="no"> !"#$%&amp;amp;'()*+,-./0123456789:;=&lt;&gt;?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[]^_`abcdefghijklmnopqrstuvwxyz{|}~</xsl:text>
+    </xsl:variable>
+    <xsl:variable name="non-ascii" select="translate($text, $ascii, '')" />
+    <xsl:choose>
+      <xsl:when test="$non-ascii">
+        <xsl:variable name="char" select="substring($non-ascii, 1, 1)" />
+        <xsl:call-template name="replace-non-ascii">
+          <xsl:with-param name="text" select="translate($text, $char, ' ')" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$text" disable-output-escaping="no" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Remove non-ascii characters like â&lt;80&gt;&lt;98&gt; which is non-ascii representation of single-quote.
+
+Note the content is coming from an adapter where each line is in a "line" element like:
+&lt;response&gt;
+   &lt;line&gt;kjhdsd&lt;/line&gt;
+   &lt;line&gt;pojklj&lt;/line&gt;
+&lt;/response&gt;
+   
+</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>c3d22244-4ec2-4dbe-a0ff-dc7df27ed738</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Common Utiltiies</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1551528306854</last-modified>
+    </meta>
+  </process-def>
+</process>

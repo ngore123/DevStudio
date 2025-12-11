@@ -1,0 +1,1201 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration_Host_Down:Utilities:Perform 360 Service Verification">
+    <parameters>
+      <input global="false" required="true">
+        <description>The host name or ip address of the target device.</description>
+        <from>host</from>
+        <to>host</to>
+      </input>
+      <input global="false" required="true">
+        <description>Router host name and component type to ping target host. Format is as below:
+
+&lt;router-host component-type="unix"&gt;clm-aus-021690.bmc.com&lt;/router-host&gt;
+</description>
+        <from>router host details</from>
+        <to>router host details</to>
+      </input>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails  that contains the information required to connect to a given host or device.
+</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <output global="false" required="true">
+        <to>investigation message</to>
+        <from>investigation message</from>
+      </output>
+      <output global="false" required="true">
+        <to>investigation status</to>
+        <from>investigation status</from>
+      </output>
+      <output global="false" required="true">
+        <to>triagedata</to>
+        <from>triagedata</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>router host details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>routerhost</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>router host details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>router host type</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[@component-type]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>connection details with ping</to>
+            <value>
+              <connection-details>
+</connection-details>
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>host ping success</to>
+            <value>true</value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>host ping success</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>host ping success</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[.="true"]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>triagedata</to>
+            <value>
+              <enrichment-data>
+</enrichment-data>
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>traceroute host details</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>connection details</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>connection detail</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//connection-detail]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>-------------for loop connection detail---------------</value>
+              </input>
+              <input>
+                <from>connection detail</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <sequence>
+          <call-process>
+            <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Convert Target Connection Data to Connection Details</process-name>
+            <parameters>
+              <input>
+                <from>connection detail</from>
+                <to>target connection data</to>
+              </input>
+              <output>
+                <from>connection details</from>
+                <to>connection details</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:call-process[1]</location>
+          </call-process>
+          <call-process>
+            <process-name>:AutoPilot-OA-Network_Utilities:Perform Host Accessibility Check</process-name>
+            <parameters>
+              <input>
+                <from>connection details</from>
+                <to>connection details</to>
+              </input>
+              <input>
+                <from>host</from>
+                <to>destination</to>
+              </input>
+              <output>
+                <from>output</from>
+                <to>local ping output</to>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output cdata-section-elements="action" indent="yes" />
+  <xsl:template match="/">
+    <annotation-data>
+      <xsl:for-each select="//line[.!='bash-2.03$']">
+        <xsl:if test="string(.)!=&quot;&quot;">
+          <xsl:value-of select="." />
+          <xsl:text disable-output-escaping="no">
+</xsl:text>
+        </xsl:if>
+      </xsl:for-each>
+    </annotation-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </output>
+              <output>
+                <from>success</from>
+                <to>local ping success</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <after-execution>
+              <console-output>
+                <type>INFO</type>
+              </console-output>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>--------------ping output-------------------</value>
+                  </input>
+                  <input>
+                    <from>local ping output</from>
+                  </input>
+                  <input>
+                    <from>local ping success</from>
+                  </input>
+                </parameters>
+              </log>
+            </after-execution>
+            <location>:call-process[2]</location>
+          </call-process>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>local ping success</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[not(string(.) = 'true')]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>local ping output</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[not(contains(., "contains(text(), ' 0% packet loss') or (contains(text(), 'Success rate is ') and number((substring-before(substring-after(text(), 'Success rate is '), ' percent'))&gt; 80)) or (contains(text(), &quot;% loss)&quot;) and number(substring-before(substring-after(text(), &quot; (&quot;),&quot;% loss)&quot;)) &lt; 20)"))]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>local ping output</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[not(contains(., "error"))]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <console-output>
+                  <type>INFO</type>
+                </console-output>
+                <assign>
+                  <assignment>
+                    <input>
+                      <from>connection detail</from>
+                    </input>
+                    <output>
+                      <to>traceroute host details</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>connection detail</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>traceroute hostname</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[concat(" Host1 : ", //hostname/text())]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>connection detail</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>connection detail</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="ping output">
+                    <input global="false">
+                      <from>local ping output</from>
+                    </input>
+                  </replacement-token>
+                  <replacement-token name="ping success">
+                    <input global="false">
+                      <from>local ping success</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@* | node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="connection-detail">
+    <xsl:copy>
+      <xsl:apply-templates select="@* | node()" />
+      <ping-output>
+        <xsl:text disable-output-escaping="no">${ping output}</xsl:text>
+      </ping-output>
+      <ping-success>
+        <xsl:text disable-output-escaping="no">${ping success}</xsl:text>
+      </ping-success>
+    </xsl:copy>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <before-execution>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>------------ping success or not-----------------</value>
+                  </input>
+                  <input>
+                    <from>host ping success</from>
+                  </input>
+                  <input>
+                    <from>local ping success</from>
+                  </input>
+                </parameters>
+              </log>
+            </before-execution>
+            <location>:assign[2]</location>
+          </assign>
+          <call-process>
+            <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML</process-name>
+            <parameters>
+              <input>
+                <from>connection details with ping</from>
+                <to>parent xml</to>
+              </input>
+              <input>
+                <from>connection detail</from>
+                <to>child xml</to>
+              </input>
+              <output>
+                <from>result xml</from>
+                <to>connection details with ping</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <before-execution>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>---------------before connection detail update-----------------</value>
+                  </input>
+                  <input>
+                    <from>connection details with ping</from>
+                  </input>
+                  <input>
+                    <from>host ping success</from>
+                  </input>
+                </parameters>
+              </log>
+            </before-execution>
+            <after-execution>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>-------------------Consolidated connection details------------------</value>
+                  </input>
+                  <input>
+                    <from>connection details with ping</from>
+                  </input>
+                </parameters>
+              </log>
+            </after-execution>
+            <location>:call-process[3]</location>
+          </call-process>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>host ping success</to>
+                      <value>false</value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <before-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>-----------------In host ping failed----------------------------</value>
+                        </input>
+                        <input>
+                          <from>host ping success</from>
+                        </input>
+                        <input>
+                          <from>local ping success</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </before-execution>
+                  <location>:switch[2]:sequence[1]:assign[1]</location>
+                </assign>
+              </sequence>
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>host ping success</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. = "true"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>local ping success</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. = "true"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>host ping success</to>
+                      <value>true</value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <before-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>-------------------host ping detail</value>
+                        </input>
+                        <input>
+                          <from>host ping success</from>
+                        </input>
+                        <input>
+                          <from>local ping success</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </before-execution>
+                  <location>:switch[2]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[2]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Traceroute</process-name>
+              <parameters>
+                <input>
+                  <from>connection details with ping</from>
+                  <to>connectiondetails</to>
+                </input>
+                <input>
+                  <value>success</value>
+                  <to>investigation status</to>
+                </input>
+                <input>
+                  <from>host</from>
+                  <to>destinationhost</to>
+                </input>
+                <output>
+                  <from>investigation message</from>
+                  <to>investigation message</to>
+                </output>
+                <output>
+                  <from>investigation status</from>
+                  <to>investigation status</to>
+                </output>
+                <output>
+                  <from>triagedata</from>
+                  <to>triagedata</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[3]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>host ping success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. != "true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>host</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>investigation message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[concat("Ping test to ", ., " faced few error conditions.")]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>investigation status</to>
+                        <value>error</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>connection details with ping</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>Triage Data</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="hostname">
+                            <input global="false">
+                              <from>host</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="enrichment-data " />
+  <xsl:template match="/">
+    <enrichment-data>
+      <xsl:text disable-output-escaping="no">Triage Data for Host ${hostname}
+</xsl:text>
+      <xsl:text disable-output-escaping="no">#
+#
+</xsl:text>
+      <xsl:apply-templates select="//connection-detail" />
+    </enrichment-data>
+  </xsl:template>
+  <xsl:template match="connection-detail">
+    <xsl:text disable-output-escaping="no"></xsl:text>
+    <xsl:value-of select="concat('Ping Host: ' , component/@name)" disable-output-escaping="no" />
+    <xsl:text disable-output-escaping="no">
+</xsl:text>
+    <xsl:value-of select="concat('Ping Output: ', ping-output/text())" disable-output-escaping="no" />
+    <xsl:text disable-output-escaping="no">#
+#
+</xsl:text>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[3]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>router host details</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(.)>0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AutoPilot-OA-Credentials_Store:EventOrchestration:Get Ping Host Details</process-name>
+                    <parameters>
+                      <input>
+                        <from>routerhost</from>
+                        <to>host name</to>
+                      </input>
+                      <input>
+                        <from>router host type</from>
+                        <to>component type</to>
+                      </input>
+                      <output>
+                        <from>connection details</from>
+                        <to>router connection details</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <call-process>
+                    <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Convert Target Connection Data to Connection Details</process-name>
+                    <parameters>
+                      <input>
+                        <from>router connection details</from>
+                        <to>target connection data</to>
+                      </input>
+                      <output>
+                        <from>connection details</from>
+                        <to>router connection details</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                  </call-process>
+                  <call-process>
+                    <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Perform Accessibility Check from Closest Device</process-name>
+                    <parameters>
+                      <input>
+                        <from>router connection details</from>
+                        <to>traceroute details</to>
+                      </input>
+                      <input>
+                        <concat>
+                          <input required="false">
+                            <from>host</from>
+                          </input>
+                        </concat>
+                        <to>destination</to>
+                      </input>
+                      <input>
+                        <from>routerhost</from>
+                        <to>default router</to>
+                      </input>
+                      <output>
+                        <from>success</from>
+                        <to>closest device ping success</to>
+                      </output>
+                      <output>
+                        <from>closest device triage data</from>
+                        <to>closest triage data</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>Closest triage data *************</value>
+                          </input>
+                          <input>
+                            <from>closest triage data</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:call-process[3]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <call-process>
+                          <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Traceroute</process-name>
+                          <parameters>
+                            <input>
+                              <from>connection details with ping</from>
+                              <to>connectiondetails</to>
+                            </input>
+                            <input>
+                              <value>failure</value>
+                              <to>investigation status</to>
+                            </input>
+                            <input>
+                              <from>host</from>
+                              <to>destinationhost</to>
+                            </input>
+                            <output>
+                              <from>investigation message</from>
+                              <to>investigation message</to>
+                            </output>
+                            <output>
+                              <from>investigation status</from>
+                              <to>investigation status</to>
+                            </output>
+                            <output>
+                              <from>triagedata</from>
+                              <to>triagedata</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                        </call-process>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triagedata</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>oldtext</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//enrichment-data/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triagedata</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>triagedata</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="pingoutput">
+                                  <input global="false">
+                                    <from>pingoutput</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="routerhost">
+                                  <input global="false">
+                                    <from>routerhost</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="host">
+                                  <input global="false">
+                                    <from>host</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="olddata">
+                                  <input global="false">
+                                    <from>oldtext</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="router triage data">
+                                  <input global="false">
+                                    <from>closest triage data</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <enrichment-data>
+      <xsl:text disable-output-escaping="no">${olddata}</xsl:text>
+      <xsl:text disable-output-escaping="no"></xsl:text>
+      <xsl:text disable-output-escaping="no">----------------------------------------------</xsl:text>
+      <xsl:text disable-output-escaping="no">Ping Triage was UN-successful. 
+So, performing traceroute from ${routerhost} host and trying to ping ${host} from closest router.</xsl:text>
+      <xsl:text disable-output-escaping="no">${router triage data}</xsl:text>
+      <xsl:text disable-output-escaping="no">Host accessible from closest router</xsl:text>
+      <xsl:text disable-output-escaping="no">------------------------------</xsl:text>
+    </enrichment-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>destinationhost</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>investigation message</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[concat("Ping test to ", ., " succeeded after performing multiple Host Accessibility checks.")]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>---------------triage data------------------------</value>
+                                </input>
+                                <input>
+                                  <from>triagedata</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>closest device ping success</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[. = "false"]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <call-process>
+                          <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Traceroute</process-name>
+                          <parameters>
+                            <input>
+                              <from>connection details with ping</from>
+                              <to>connectiondetails</to>
+                            </input>
+                            <input>
+                              <value>failure</value>
+                              <to>investigation status</to>
+                            </input>
+                            <input>
+                              <from>host</from>
+                              <to>destinationhost</to>
+                            </input>
+                            <output>
+                              <from>investigation message</from>
+                              <to>investigation message</to>
+                            </output>
+                            <output>
+                              <from>investigation status</from>
+                              <to>investigation status</to>
+                            </output>
+                            <output>
+                              <from>triagedata</from>
+                              <to>triagedata</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triagedata</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>oldtext</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//enrichment-data/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triagedata</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>triagedata</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="routerhost">
+                                  <input global="false">
+                                    <from>routerhost</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="olddata">
+                                  <input global="false">
+                                    <from>oldtext</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="routertriagedata">
+                                  <input global="false">
+                                    <from>closest triage data</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <enrichment-data>
+      <xsl:text disable-output-escaping="no">${olddata}</xsl:text>
+      <xsl:text disable-output-escaping="no">&amp;#10;</xsl:text>
+      <xsl:text disable-output-escaping="no">----------------------------------------------</xsl:text>
+      <xsl:text disable-output-escaping="no">&amp;#10;</xsl:text>
+      <xsl:text disable-output-escaping="no">Ping Triage was UN-successful.
+So, performing traceroute from ${routerhost} host..</xsl:text>
+      <xsl:text disable-output-escaping="no">&amp;#10;</xsl:text>
+      <xsl:text disable-output-escaping="no">${routertriagedata}</xsl:text>
+      <xsl:text disable-output-escaping="no">------------------------------</xsl:text>
+    </enrichment-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>host</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>investigation message</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[concat("Ping test to ", ., " succeeded after performing multiple Host Accessibility checks.")]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>----------------------before triage data-------------------------------</value>
+                                </input>
+                                <input>
+                                  <from>triagedata</from>
+                                </input>
+                                <input>
+                                  <from>routerhost</from>
+                                </input>
+                                <input>
+                                  <from>closest triage data</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>---------------After triage data------------------------</value>
+                                </input>
+                                <input>
+                                  <from>triagedata</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[3]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[3]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow will ping a given device from three different locations.  If all three pings are unsuccessful a traceroute will be performed and the original target will be pinged again from the closest device.
+
+</description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>da983442-36b1-4d50-bec9-924e42bb6dcc</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1552867356250</last-modified>
+    </meta>
+  </process-def>
+</process>

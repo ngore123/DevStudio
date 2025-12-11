@@ -1,0 +1,278 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:ImportExport:Import Object">
+    <parameters>
+      <input global="false" required="false">
+        <description>The Connection details for the Adatpater.
+Ezample:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the directory where the object you want to import is located.</description>
+        <from>sourcePath</from>
+        <to>sourcePath</to>
+      </input>
+      <input global="false" required="false">
+        <description>Location of a mapping file used to resolve any conflicts that occur when importing. You can name this file whatever you want.</description>
+        <from>mappingFile</from>
+        <to>mappingFile</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>void</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>sourcePath</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>mappingFile</from>
+            <to>argument 2</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>updated list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>ImportExport</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>importObject</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>updated list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>The command imports an object into the BladeLogic system.
+This command uses an XML-based mapping file. The DTD for this mapping file is shown below
+
+&lt;!ELEMENT source_server (#PCDATA)&gt;
+
+&lt;!ELEMENT target_server (#PCDATA)&gt;
+
+&lt;!ELEMENT server_mapping (source_server, target_server)&gt;
+
+&lt;!-- source_server_group is the simple group name target_server_group is the fully qualified group name --&gt;
+
+&lt;!ELEMENT source_server_group (#PCDATA)&gt;
+
+&lt;!ELEMENT target_server_group (#PCDATA)&gt;
+
+&lt;!ELEMENT server_group_mapping (source_server_group, target_server_group)&gt;
+
+&lt;!ELEMENT property_set_class (#PCDATA)&gt;
+
+&lt;!ELEMENT source_property (#PCDATA)&gt;
+
+&lt;!ELEMENT target_property (#PCDATA)&gt;
+
+&lt;!ELEMENT property_mapping (property_set_class, source_property, target_property)&gt;
+
+&lt;!ELEMENT source_system_package_type (#PCDATA)&gt;
+
+&lt;!ELEMENT target_system_package_type (#PCDATA)&gt;
+
+&lt;!ELEMENT system_package_type_mapping (source_system_package_type, target_system_package_type)&gt;
+
+&lt;!-- object_type is the name of the model type of the object (e.g SNAPSHOT_JOB, BLPACKAGE etc) containing_group is a fully qualified group name --&gt;
+
+&lt;!ELEMENT object_type (#PCDATA)&gt;
+
+&lt;!ELEMENT object_name (#PCDATA)&gt;
+
+&lt;!ELEMENT group_id (#PCDATA)&gt;
+
+&lt;!ELEMENT source_object (object_type, object_name, group_id)&gt;
+
+&lt;!ELEMENT containing_group (#PCDATA)&gt;
+
+&lt;!ELEMENT grouped_object_mapping (source_object, containing_group)&gt;
+
+&lt;!ELEMENT remediation_depot_group (#PCDATA)&gt;
+
+&lt;!ELEMENT remediation_job_group (#PCDATA)&gt;
+
+&lt;!ELEMENT remediation_group_mapping (source_object, remediation_depot_group, remediation_job_group)&gt;
+
+&lt;!ELEMENT job_name (#PCDATA)&gt;
+
+&lt;!ELEMENT job_group (#PCDATA)&gt;
+
+&lt;!ELEMENT job_group_id (#PCDATA)&gt;
+
+&lt;!ELEMENT source_discovery_job (job_name, job_group_id)&gt;
+
+&lt;!ELEMENT target_discovery_job (job_name, job_group)&gt;
+
+&lt;!ELEMENT discovery_job_mapping (source_discovery_job, target_discovery_job)&gt;
+
+&lt;!ELEMENT source_compliance_job (job_name, job_group_id)&gt;
+
+&lt;!ELEMENT target_compliance_job (job_name, job_group)&gt;
+
+&lt;!ELEMENT compliance_job_mapping (source_compliance_job, target_compliance_job)&gt;
+
+&lt;!ELEMENT source_deploy_job (job_name, job_group_id)&gt;
+
+&lt;!ELEMENT target_deploy_job (job_name, job_group)&gt;
+
+&lt;!ELEMENT deploy_job_mapping (source_deploy_job, target_deploy_job)&gt;
+
+&lt;!ELEMENT template_name (#PCDATA)&gt;
+
+&lt;!ELEMENT template_group (#PCDATA)&gt;
+
+&lt;!ELEMENT template_group_id (#PCDATA)&gt;
+
+&lt;!ELEMENT source_template (template_name, template_group_id)&gt;
+
+&lt;!ELEMENT target_template (template_name, template_group)&gt;
+
+&lt;!ELEMENT template_mapping (source_template, target_template)&gt;
+
+&lt;!ELEMENT depot_software_name (#PCDATA)&gt;
+
+&lt;!ELEMENT depot_software_group (#PCDATA)&gt;
+
+&lt;!ELEMENT depot_software_location (#PCDATA)&gt;
+
+&lt;!ELEMENT depot_software_type (#PCDATA)&gt;
+
+&lt;!ELEMENT source_depot_software (depot_software_location, depot_software_type)&gt;
+
+&lt;!ELEMENT target_depot_software (depot_software_name, depot_software_group)&gt;
+
+&lt;!ELEMENT depot_software_mapping (source_depot_software, target_depot_software)&gt;
+
+&lt;!ELEMENT blpackage_name (#PCDATA)&gt;
+
+&lt;!ELEMENT blpackage_group (#PCDATA)&gt;
+
+&lt;!ELEMENT source_blpackage_location (#PCDATA)&gt;
+
+&lt;!ELEMENT target_blpackage (blpackage_name, blpackage_group)&gt;
+
+&lt;!ELEMENT blpackage_mapping (source_blpackage_location, target_blpackage)&gt;
+
+&lt;!ELEMENT source_grammar (#PCDATA)&gt;
+
+&lt;!ELEMENT target_grammar (#PCDATA)&gt;
+
+&lt;!ELEMENT grammar_mapping (source_grammar, target_grammar)&gt;
+
+&lt;!ELEMENT required_value (property_set_class, target_property, value)&gt;
+
+&lt;!ELEMENT value (#PCDATA | property_set_instance)*&gt;
+
+&lt;!ELEMENT property_set_instance (required_value)*&gt;
+
+&lt;!ELEMENT mapping (( server_mapping | server_group_mapping | property_mapping | system_package_type_mapping | grouped_object_mapping | discovery_job_mapping | compliance_job_mapping | deploy_job_mapping | template_mapping | depot_software_mapping | blpackage_mapping | grammar_mapping | required_value | remediation_group_mapping )* )&gt;
+</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2be91461-30c0-3716-9c58-9027e7dea0f5</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179817190</last-modified>
+    </meta>
+  </process-def>
+</process>

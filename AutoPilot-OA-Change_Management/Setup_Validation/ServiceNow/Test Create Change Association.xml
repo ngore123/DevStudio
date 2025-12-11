@@ -1,0 +1,173 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Change_Management:Setup_Validation:ServiceNow:Test Create Change Association">
+    <parameters>
+      <output global="false" required="false">
+        <description>An XML document that contains detail for one or more incidents </description>
+        <to>changes</to>
+        <from>changes</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - A process specific explanation for the value of success status.</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Change_Management:Setup_Validation:ServiceNow:Get Service Now Configuration Name</process-name>
+        <unique-id>7e75ca13-a384-432e-82c6-a434a0bc3732</unique-id>
+        <parameters>
+          <output>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>change</to>
+            <value>lnux100</value>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>configuration-item</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>change</to>
+            <value>CHG0030013</value>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>change-id</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>change</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>changes</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="change">
+                <input global="false">
+                  <from>change</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Changes>
+      <xsl:choose>
+        <xsl:when test="string-length(//change) &gt; 0">
+          <xsl:copy-of select="//change" />
+        </xsl:when>
+        <xsl:otherwise>${change}</xsl:otherwise>
+      </xsl:choose>
+    </Changes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Show contents of changes</value>
+              </input>
+              <input>
+                <from>changes</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Change_Management:Create Change Association</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>changes</from>
+            <to>changes</to>
+          </input>
+          <output>
+            <from>changes</from>
+            <to>changes</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow tests creating a change record. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2911ddfc-4edc-4c62-b590-8889ea4758e3</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1417661021427</last-modified>
+    </meta>
+  </process-def>
+</process>

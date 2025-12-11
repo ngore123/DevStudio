@@ -1,0 +1,298 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Item for Add Hard Disk">
+    <parameters>
+      <input global="false" required="true">
+        <description>virtual machine
+        Virtual machine used to make the method call</description>
+        <from>virtual machine</from>
+        <to>virtual machine</to>
+      </input>
+      <input global="false" required="false">
+        <description>Backing type of the virtual disk.
+
+For Raw Device Mapping valid value is: VirtualDiskRawDiskMappingVer1BackingInfo
+
+Default value: VirtualDiskFlatVer2BackingInfo</description>
+        <from>backing type</from>
+        <to>backing type</to>
+      </input>
+      <input global="false" required="true">
+        <description>backing file name [optional]
+              Filename for the host file used in this backing.</description>
+        <from>backing file name</from>
+        <to>backing file name</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Conditional]
+
+The host-specific device the LUN is being accessed through. If the target LUN is not available on the host then it is empty. For example, this could happen if it has accidentally been masked out.
+
+Note: This parameter is only valid when adding a RDM virtual disk.
+Note: This parameter is required when adding a RDM virtual disk.
+
+Valid format: /vmfs/devices/disks/&lt;Unique device id&gt;</description>
+        <from>backing device name</from>
+        <to>backing device name</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Conditional]
+
+The compatibility mode of the raw disk mapping (RDM). This must be specified when a new virtual disk with an RDM backing is created.
+
+Valid values:
+
+physicalMode - A disk device backed by a physical compatibility mode raw disk mapping cannot use disk modes, and commands are passed straight through to the LUN indicated by the raw disk mapping. 
+
+virtualMode - A disk device backed by a virtual compatibility mode raw disk mapping can use disk modes.
+
+Note: This parameter is only valid while adding a RDM virtual disk
+Note: This parameter is required valid while adding a RDM virtual disk</description>
+        <from>backing comptability mode</from>
+        <to>backing comptability mode</to>
+      </input>
+      <input global="false" required="true">
+        <description>backing persistence mode [optional]
+                The disk persistence mode. 
+
+Valid values are: 
+persistent 
+independent_persistent 
+independent_nonpersistent 
+nonpersistent 
+undoable 
+append </description>
+        <from>backing persistence mode</from>
+        <to>backing persistence mode</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing file type split flag [true]
+           Flag to indicate the type of virtual disk file: split or monolithic. If true, the virtual disk is stored in multiple files, each 2GB.
+
+valid values: true, false </description>
+        <from>backing file type split flag</from>
+        <to>backing file type split flag</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing file thin provisioned flag [optional]
+              Flag to indicate to the underlying filesystem, whether the virtual disk backing file should be allocated lazily (using thin provisioning). This flag is only used for file systems that support configuring the provisioning policy on a per file basis, such as VMFS3.
+
+
+Valid values: true, false</description>
+        <from>backing file thin provisioned flag</from>
+        <to>backing file thin provisioned flag</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing write through flag [optional]
+         Flag to indicate whether writes should go directly to the file system or should be buffered.
+
+Valid values: true, false</description>
+        <from>backing write through flag</from>
+        <to>backing write through flag</to>
+      </input>
+      <input global="false" required="false">
+        <description>capacity in KB
+       Capacity of this virtual disk.</description>
+        <from>capacity in KB</from>
+        <to>capacity in KB</to>
+      </input>
+      <input global="false" required="false">
+        <description>The number of shares allocated. Used to determine resource allocation in case of resource contention. This value is only set if level is set to custom. If level is not set to custom, this value is ignored. Therefore, only shares with custom values can be compared.
+
+There is no unit for this value. It is a relative measure based on the settings for other resource pools. 
+
+Valid Values: Integer</description>
+        <from>shares</from>
+        <to>shares</to>
+      </input>
+      <input global="false" required="false">
+        <description>The allocation level. The level is a simplified view of shares. Levels map to a pre-determined set of numeric values for shares. If the shares value does not map to a predefined size, then the level is set as custom. 
+
+Valid values:
+
+custom	 Shares are specified in the "shares" column.
+
+high	For CPU: Shares = 2000 * number of virtual CPUs
+		For Memory: Shares = 20 * virtual machine memory size in megabytes
+		For Disk: Shares = 2000
+		
+low		For CPU: Shares = 500 * number of virtual CPUs
+		For Memory: Shares = 5 * virtual machine memory size in megabytes
+		For Disk: Shares = 500
+		
+normal	For CPU: Shares = 1000 * number of virtual CPUs
+		For Memory: Shares = 10 * virtual machine memory size in megabytes
+		For Disk: Shares = 1000 </description>
+        <from>shares level</from>
+        <to>shares level</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] 
+
+Valid values for device controller type are:
+
+    VirtualBusLogicController, VirtualLsiLogicController 
+
+If device type is not specified and the vm does not have any device controller attached to it then it takes default value as "VirtualBusLogicController"</description>
+        <from>device controller type</from>
+        <to>device controller type</to>
+      </input>
+      <input global="false" required="false">
+        <description>bus number
+	To add hard disk with given controller type and on given controller index.</description>
+        <from>bus number</from>
+        <to>bus number</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="backing file name">
+                <input global="false">
+                  <from>backing file name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="backing file thin provisioned flag">
+                <input global="false">
+                  <from>backing file thin provisioned flag</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="backing file type split flag">
+                <input global="false">
+                  <from>backing file type split flag</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="backing persistence mode">
+                <input global="false">
+                  <from>backing persistence mode</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="backing write through flag">
+                <input global="false">
+                  <from>backing write through flag</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="capacity in KB">
+                <input global="false">
+                  <from>capacity in KB</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="virtual machine">
+                <input global="false">
+                  <from>virtual machine</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="shares">
+                <input global="false">
+                  <from>shares</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="level">
+                <input global="false">
+                  <from>shares level</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="device controller type">
+                <input global="false">
+                  <from>device controller type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="device name">
+                <input global="false">
+                  <from>backing device name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="compatibility mode">
+                <input global="false">
+                  <from>backing comptability mode</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="backing type">
+                <input global="false">
+                  <from>backing type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="bus number">
+                <input global="false">
+                  <from>bus number</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <parameters>
+          <virtual-machine>${virtual machine}</virtual-machine>
+          <spec>
+            <device-change>
+              <device controller-type="${device controller type}">
+                <bus-number>${bus number}</bus-number>
+                <backing type="${backing type}">
+                  <file-name>${backing file name}</file-name>
+                  <device-name>${device name}</device-name>
+                  <compatibility-mode>${compatibility mode}</compatibility-mode>
+                  <disk-mode>${backing persistence mode}</disk-mode>
+                  <split>${backing file type split flag}</split>
+                  <write-through>${backing write through flag}</write-through>
+                  <thin-provisioned>${backing file thin provisioned flag}</thin-provisioned>
+                </backing>
+                <capacity-inKB>${capacity in KB}</capacity-inKB>
+                <shares>
+                  <shares>${shares}</shares>
+                  <level>${level}</level>
+                </shares>
+              </device>
+            </device-change>
+          </spec>
+        </parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs &lt;items&gt; for Add Hard Disk operation</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4d1a2567-b754-311a-a00d-7698b68434ec</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1321879335875</last-modified>
+    </meta>
+  </process-def>
+</process>

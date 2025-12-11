@@ -1,0 +1,220 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:DeployJob:Set Advance Deploy Job Phase Schedule by DBKey">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The handle to the Deploy Job.</description>
+        <from>jobKey</from>
+        <to>jobKey</to>
+      </input>
+      <input global="false" required="true">
+        <description>Simulate phase schedule type. You can set this string to one of the following values:
+
+   - NotScheduled - Indicates the simulate phase should not occur. If you set simulateType to NotScheduled, you should set simulateDateString to a blank string.
+   - AtTime - Indicates the simulate phase should start at the time you specify in simulateDateString.</description>
+        <from>simulateType</from>
+        <to>simulateType</to>
+      </input>
+      <input global="false" required="true">
+        <description>One-time schedule for simulate phase. The date string must be in the format YYYY-MM-DD HH:MM:SS.</description>
+        <from>simulateDateString</from>
+        <to>simulateDateString</to>
+      </input>
+      <input global="false" required="true">
+        <description>Stage phase schedule type. You can set this string to one of the following values:
+    - NotScheduled - Indicates the stage phase should not occur. If you set stageType to NotScheduled, you should set stageDateString to a blank string.
+    - AfterPreviousPhase - Indicates that the stage phase should start after the previous phase has successfully completed.
+    - AtTime - Indicates the stage phase should start at the time you specify in stageDateString.</description>
+        <from>stageType</from>
+        <to>stageType</to>
+      </input>
+      <input global="false" required="true">
+        <description>One-time schedule for stage phase. The date string must be in the format YYYY-MM-DD HH:MM:SS.</description>
+        <from>stageDateString</from>
+        <to>stageDateString</to>
+      </input>
+      <input global="false" required="true">
+        <description>Commit phase schedule type. You can set this string to one of the following values:
+    - NotScheduled - Indicates the commit phase should not occur. If you set commitType to NotScheduled, you should set commitDateString to a blank string.
+    - AfterPreviousPhase - Indicates that the commit phase should start after the previous phase has successfully completed.
+    - AtTime - Indicates the commit phase should start at the time you specify in commitDateString.</description>
+        <from>commitType</from>
+        <to>commitType</to>
+      </input>
+      <input global="false" required="true">
+        <description>One-time schedule for commit phase. The date string must be in the format YYYY-MM-DD HH:MM:SS.</description>
+        <from>commitDateString</from>
+        <to>commitDateString</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the handle for updated job.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the Adapter response for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>jobKey</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>simulateType</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>simulateDateString</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>stageType</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>stageDateString</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>commitType</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>commitDateString</from>
+            <to>argument 7</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>DeployJob</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>setAdvanceDeployJobPhaseScheduleByDBKey</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command works only with advanced Deploy Jobs. This command first clears all schedules set for this Deploy Job, then lets you set a schedule for each phase of the Deploy Job. You can also specify that specific phases not be scheduled, or indicate that the schedule should start after the previous phase.
+
+The following rules apply to the use of this command:
+   1. Used for advanced Deploy Jobs only.
+   2. All time strings must be formatted as follows: YYYY-MM-DD HH:MM:SS
+   3. All provided schedule times must occur after the previous phase scheduled time.
+   4. You cannot set simulateType to AfterPreviousPhase.
+   5. If you specify the AtTime type option for a phase, then you must provide a valid time string for this phase. If you specify any other type option, the time string is ignored -- we recommend that you use a blank string ("") for the time string in this case.
+   6. If the simulate phase is not enabled for the Deploy Job, then you must set simulateType to NotScheduled. Other settings will generate an error.
+   7. No phase can be set to AfterPreviousPhase if the previous phase is not scheduled, or will not occur.
+
+Failures for rules 1-4 have no effect on the Deploy Job. However failures for rules 5-7 reset the Deploy Job to be in a "Do not execute" state, because by this point all existing schedules have already been removed.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2cf5126e-0ac8-3722-9359-7d441f5b8193</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179797464</last-modified>
+    </meta>
+  </process-def>
+</process>

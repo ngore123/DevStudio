@@ -1,0 +1,421 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-ITSM_Automation:Utilities:Generate Response">
+    <parameters>
+      <input global="false" required="true">
+        <description>Possible values are success or failure</description>
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <input global="false" required="false">
+        <description>Conditional optional: Required when status is failure. Error message text from target system</description>
+        <from>error message</from>
+        <to>error message</to>
+      </input>
+      <input global="false" required="true">
+        <description>Possible values are:
+Create Change
+Update Change
+Get Change Status
+Get ITSM Configuration
+</description>
+        <from>request type</from>
+        <to>request type</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional: Any input data related to the request.</description>
+        <from>data</from>
+        <to>data</to>
+      </input>
+      <input global="false" required="false">
+        <description>The number of records returned in case of a get request.</description>
+        <from>result count</from>
+        <to>result count</to>
+      </input>
+      <output global="false" required="false">
+        <to>json response</to>
+        <from>json response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==== Generate response input====</value>
+              </input>
+              <input>
+                <from>data</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+              <input>
+                <from>request type</from>
+              </input>
+              <input>
+                <from>result count</from>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <utility>
+              <string>
+                <regex>
+                  <input>
+                    <from>error message</from>
+                  </input>
+                  <expression>
+                    <search case-sensitive="false">(['"])</search>
+                    <replace replace-all="true" />
+                  </expression>
+                </regex>
+              </string>
+              <output global="false">
+                <to>error message</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:utility[1]</location>
+            </utility>
+            <utility>
+              <string>
+                <regex>
+                  <input>
+                    <from>data</from>
+                  </input>
+                  <expression>
+                    <search case-sensitive="false">([&lt;&gt;])</search>
+                    <replace replace-all="true" />
+                  </expression>
+                </regex>
+              </string>
+              <output global="false">
+                <to>data</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:utility[2]</location>
+            </utility>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>error message</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>bao response</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="request type">
+                      <input global="false">
+                        <from>request type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="status">
+                      <input global="false">
+                        <from>status</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="error message">
+                      <input global="false">
+                        <from>error message</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="data">
+                      <input global="false">
+                        <from>data</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <bao-response>
+      <metadata>
+        <request-type>${request type}</request-type>
+        <status>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </status>
+      </metadata>
+      <xsl:choose>
+        <xsl:when test="string-length(//response-data)&gt;0">${data}</xsl:when>
+        <xsl:otherwise>
+          <response-data>
+            <error-message>${data}</error-message>
+          </response-data>
+        </xsl:otherwise>
+      </xsl:choose>
+    </bao-response>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>bao response</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="request type">
+                      <input global="false">
+                        <from>request type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="status">
+                      <input global="false">
+                        <from>status</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="count">
+                      <input global="false">
+                        <from>result count</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="data">
+                      <input global="false">
+                        <from>data</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <bao-response>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(//response-data-list))&gt;0">
+          <xsl:copy-of select="//response-data-list/*" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="string-length(//response-data)&gt;0">${data}</xsl:when>
+            <xsl:otherwise>
+              <response-data>${data}</response-data>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+      <metadata>
+        <status>
+          <xsl:choose>
+            <xsl:when test="string('$[status]')='success'">
+              <xsl:text disable-output-escaping="no">success</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no">Error</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </status>
+        <request-type>${request type}</request-type>
+        <xsl:choose>
+          <xsl:when test="string-length('$[count]') &gt;0">
+            <result-count>${count}</result-count>
+          </xsl:when>
+        </xsl:choose>
+      </metadata>
+    </bao-response>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>-----BAO Response-----</value>
+                    </input>
+                    <input>
+                      <from>bao response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML Attributes to Elements</process-name>
+        <parameters>
+          <input>
+            <from>bao response</from>
+            <to>xml</to>
+          </input>
+          <output>
+            <from>XMLNoAttribute</from>
+            <to>XMLNoAttribute</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+        <parameters>
+          <input>
+            <from>XMLNoAttribute</from>
+            <to>XML</to>
+          </input>
+          <output>
+            <from>JSON</from>
+            <to>json response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== JSON Response===</value>
+              </input>
+              <input>
+                <from>json response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Encapsulate input with BAO's standard response template.
+In the case of success:
+
+&lt;bao-response&gt;
+ &lt;metadata&gt;
+    &lt;status&gt;success&lt;/status&gt;
+    &lt;request-type&gt;get service list&lt;/request-type&gt;
+ &lt;/metadata&gt;
+ &lt;response-data&gt;
+{data}
+ &lt;/response-data&gt;
+&lt;/bao-response&gt;
+
+Tags in metadata section are:
+1. status - success/failure
+2. error-message (if any)
+3. request-type 
+4. Data (passed in as input and appended as is)
+
+In case of failure:
+
+&lt;bao-response&gt;
+ &lt;metadata&gt;
+    &lt;status&gt;failure&lt;/status&gt;
+    
+    &lt;request-type&gt;invoke&lt;/request-type&gt;
+ &lt;/metadata&gt;
+&lt;response-data&gt;
+&lt;error-message&gt;WE INCLUDE SPECIFIC ERROR MESSAGE RETURNED BY THE TARGET APPLICATION&lt;/error-message&gt;
+&lt;/response-data&gt;
+&lt;/bao-response&gt;
+</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>075b947d-4cef-42fe-95e7-19439aba8809</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1549416896625</last-modified>
+    </meta>
+  </process-def>
+</process>

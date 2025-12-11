@@ -1,0 +1,220 @@
+<process draft="false" dev-studio-version="8.0.00">
+  <process-def name=":AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Convert XML to String">
+    <parameters>
+      <input global="false" required="true">
+        <description>Input XML of the format below. Note presence of double-quotes (") in the value of the input. These double-quotes are escaped in the output:
+
+&lt;inputParameters&gt;
+  &lt;inputParameter&gt;
+    &lt;name&gt;adapter name&lt;/name&gt;
+    &lt;value&gt;text with double-quotes - "&lt;/value&gt;
+  &lt;/inputParameter&gt;
+  &lt;inputParameter&gt;
+    &lt;name&gt;target connection data&lt;/name&gt;
+    &lt;value&gt;
+      &lt;connection-details&gt;
+       &lt;hostname&gt;blah.doodle.com&lt;/hostname&gt;
+        &lt;username&gt;somename&lt;/username&gt;
+         &lt;password&gt;
+          &lt;EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
+            &lt;CipherData&gt;
+              &lt;CipherValue&gt;some-enrypted-data&lt;/CipherValue&gt;
+            &lt;/CipherData&gt;
+          &lt;/EncryptedData&gt;
+        &lt;/password&gt;
+        &lt;invocation-mechanism&gt;ssh&lt;/invocation-mechanism&gt;
+        &lt;timeout&gt;120&lt;/timeout&gt;
+        &lt;adapter-name&gt;SSHAdapter&lt;/adapter-name&gt;
+      &lt;/connection-details&gt;
+    &lt;/value&gt;
+  &lt;/inputParameter&gt;
+&lt;/inputParameters&gt;</description>
+        <from>input xml</from>
+        <to>input xml</to>
+      </input>
+      <output global="false" required="false">
+        <to>string output</to>
+        <from>string output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>input xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>string output</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="java.lang.String" xmlns:json="org.json" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="q" select="'&quot;'" />
+  <xsl:variable name="eq" select="'\\&quot;'" />
+  <xsl:variable name="empty">
+    <xsl:text></xsl:text>
+  </xsl:variable>
+  <xsl:variable name="rootElemName" select="name(/*)" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(/*/*)">
+        <xsl:variable name="xmlStr">
+          <xsl:apply-templates select="@*|node()" mode="nodetostring" />
+        </xsl:variable>
+        <xsl:variable name="escapedXmlStr" select="java:replaceAll(java:new($xmlStr), $q, $eq)" />
+        <value>
+          <xsl:value-of select="$escapedXmlStr" disable-output-escaping="no" />
+        </value>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:element name="{$rootElemName}">
+          <xsl:value-of select=" java:replaceAll(java:new(.), $q, $eq)" disable-output-escaping="no" />
+        </xsl:element>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template mode="selfclosetag" match="*">
+    <xsl:text disable-output-escaping="no">&lt;</xsl:text>
+    <xsl:value-of select="name()" disable-output-escaping="no" />
+    <xsl:apply-templates select="@*" mode="attribs" />
+    <xsl:text disable-output-escaping="no">/&gt;</xsl:text>
+  </xsl:template>
+  <xsl:template mode="opentag" match="*">
+    <xsl:text disable-output-escaping="no">&lt;</xsl:text>
+    <xsl:value-of select="name()" disable-output-escaping="no" />
+    <xsl:apply-templates select="." mode="namespace" />
+    <xsl:apply-templates select="@*" mode="attribs" />
+    <xsl:text disable-output-escaping="no">&gt;</xsl:text>
+  </xsl:template>
+  <xsl:template mode="closetag" match="*">
+    <xsl:text disable-output-escaping="no">&lt;/</xsl:text>
+    <xsl:value-of select="name()" disable-output-escaping="no" />
+    <xsl:text disable-output-escaping="no">&gt;</xsl:text>
+  </xsl:template>
+  <xsl:template match="* | text()" mode="nodetostring">
+    <xsl:choose>
+      <xsl:when test="boolean(name())">
+        <xsl:choose>
+          <!--if element is not empty-->
+          <xsl:when test="normalize-space(.) != $empty or *">
+            <xsl:apply-templates select="." mode="opentag" />
+            <xsl:apply-templates select="* | text()" mode="nodetostring" />
+            <xsl:apply-templates select="." mode="closetag" />
+          </xsl:when>
+          <!-- assuming emty tags are self closing, e.g. <img/>, <source/>, <input/>-->
+          <xsl:otherwise>
+            <xsl:apply-templates select="." mode="selfclosetag" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <!--Just text-->
+      <xsl:otherwise>
+        <xsl:value-of select="java:replaceAll(java:new(.), $q, $eq)" disable-output-escaping="no" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template match="@*" mode="attribs">
+    <xsl:if test="position() = 1">
+      <xsl:text disable-output-escaping="no"> </xsl:text>
+    </xsl:if>
+    <xsl:value-of select="concat(name(), '=', $q,  java:replaceAll(java:new(.), $q, $eq) , $q)" disable-output-escaping="no" />
+    <xsl:if test="position() != last()">
+      <xsl:text disable-output-escaping="no"> </xsl:text>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template match="*" mode="namespace">
+    <xsl:if test="name(.) = 'EncryptedData'">
+      <xsl:if test="position() = 1">
+        <xsl:text disable-output-escaping="no"> </xsl:text>
+      </xsl:if>
+      <xsl:value-of select="concat('xmlns', '=', $q,  java:replaceAll(java:new(namespace-uri(.)), $q, $eq) , $q)" disable-output-escaping="no" />
+      <xsl:if test="position() != last()">
+        <xsl:text disable-output-escaping="no"> </xsl:text>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>===input xml====</value>
+              </input>
+              <input>
+                <from>input xml</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=============== String Output =================</value>
+              </input>
+              <input>
+                <from>string output</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Given an input XML as below, the process will output  string suitable to be used as value in a JSON data.
+
+Note: double quotes are escaped and XML values are converted into XML strings.
+
+          &lt;EncryptedData xmlns="http://www.w3.org/2001/04/xmlenc" Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
+            &lt;CipherData&gt;
+              &lt;CipherValue&gt;some-enrypted-data&lt;/CipherValue&gt;
+            &lt;/CipherData&gt;
+          &lt;/EncryptedData&gt;
+
+
+OUTPUT:
+
+&lt;EncryptedData xmlns=\"http://www.w3.org/2001/04/xmlenc\" Type=\"http://www.w3.org/2001/04/xmlenc#Content\"&gt;&lt;CipherData&gt;&lt;CipherValue&gt;&lt;/CipherValue&gt;&lt;/CipherData&gt;&lt;/EncryptedData&gt;&lt;/password&gt;&lt;invocation-mechanism&gt;&lt;/invocation-mechanism&gt;&lt;timeout&gt;120&lt;/timeout&gt;&lt;adapter-name&gt;SSHAdapter&lt;/adapter-name&gt;&lt;/connection-details&gt;</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4cbf0e2a-6317-45bc-a22f-74d46508e85a</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Common Utilties</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1524067111373</last-modified>
+    </meta>
+  </process-def>
+</process>

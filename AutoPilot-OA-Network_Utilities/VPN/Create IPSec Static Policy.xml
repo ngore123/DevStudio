@@ -1,0 +1,244 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AutoPilot-OA-Network_Utilities:VPN:Create IPSec Static Policy">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the name of the IPSec policy to be created.</description>
+        <from>name</from>
+        <to>name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Provides information about the IPSec policy.</description>
+        <from>description</from>
+        <to>description</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ ye</description>
+        <from>mmpfs</from>
+        <to>mmpfs</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the number of times that master keying material can be used to derive the session key. The default value is 0, meaning an unlimited number of quick mode SAs can be derived from the main mode SA.</description>
+        <from>qmpermm</from>
+        <to>qmpermm</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the number of minutes after which a new master key will be generated. The default value is 480 minutes.</description>
+        <from>mmlifetime</from>
+        <to>mmlifetime</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ye</description>
+        <from>activatedefaultrule</from>
+        <to>activatedefaultrule</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies how often IPSec polls for changes to this policy. The default value is 180 minutes.
+</description>
+        <from>pollinginterval</from>
+        <to>pollinginterval</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ ye</description>
+        <from>assign</from>
+        <to>assign</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies one or more key exchange security methods, separated by spaces and defined by the following format: ConfAlg-HashAlg-GroupNumb, where:ConfAlgSpecifies the encryption algorithm. ConfAlg can be DES (Data Encryption Standard) or 3DES.HashAlgSpecifies the hash function. HashAlg can be MD5 (Message Digest 5) or SHA1 (Secure Hash Algorithm 1).GroupNumSpecifies the Diffie-Hellman group to be used for the base keying material. GroupNumb can be: 1 (low, protects with 768 bits of keying material), 2 (medium, protects with 1024 bits), and 3 (high, protects with 2048 bits).</description>
+        <from>mmsecmethods</from>
+        <to>mmsecmethods</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="name">
+                  <input global="false">
+                    <from>name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="description">
+                  <input global="false">
+                    <from>description</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="mmpfs">
+                  <input global="false">
+                    <from>mmpfs</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="qmpermm">
+                  <input global="false">
+                    <from>qmpermm</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="mmlifetime">
+                  <input global="false">
+                    <from>mmlifetime</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="activatedefaultrule">
+                  <input global="false">
+                    <from>activatedefaultrule</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="pollinginterval">
+                  <input global="false">
+                    <from>pollinginterval</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="assign">
+                  <input global="false">
+                    <from>assign</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="mmsecmethods">
+                  <input global="false">
+                    <from>mmsecmethods</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:param name="mirrored">
+    <xsl:text disable-output-escaping="no">${mirrored}</xsl:text>
+  </xsl:param>
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows XP">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Windows XP.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">netsh ipsec static add policy name=$[name]</xsl:text>
+        <xsl:if test="string-length('${description}')!=0">
+          <xsl:text disable-output-escaping="no"> description=$[description]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${mmpfs}')!=0">
+          <xsl:text disable-output-escaping="no"> mmpfs=${mmpfs}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${qmpermm}')!=0">
+          <xsl:text disable-output-escaping="no"> qmpermm=$[qmpermm]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${mmlifetime}')!=0">
+          <xsl:text disable-output-escaping="no"> mmlifetime=${mmlifetime}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${activatedefaultrule}')!=0">
+          <xsl:text disable-output-escaping="no"> activatedefaultrule=${activatedefaultrule}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${pollinginterval}')!=0">
+          <xsl:text disable-output-escaping="no"> pollinginterval=${pollinginterval}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${assign}')!=0">
+          <xsl:text disable-output-escaping="no"> assign=${assign}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${mmsecmethods}')!=0">
+          <xsl:text disable-output-escaping="no"> mmsecmethods=${mmsecmethods}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported"</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported"</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Creates an IPSec policy with the specified name.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1306245593703</last-modified>
+    </meta>
+  </process-def>
+</process>

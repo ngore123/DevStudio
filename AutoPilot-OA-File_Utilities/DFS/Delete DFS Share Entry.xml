@@ -1,0 +1,159 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:DFS:Delete DFS Share Entry">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the name of the shared DFS resource.</description>
+        <from>dfs share name</from>
+        <to>dfs share name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The path used to access the distributed file system.</description>
+        <from>dfs root</from>
+        <to>dfs root</to>
+      </input>
+      <input global="false" required="true">
+        <description>The actual file system location mapped to a DFS link.</description>
+        <from>file system location</from>
+        <to>file system location</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>dfs share name</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="dfs share name">
+                  <input global="false">
+                    <from>dfs share name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="dfs root">
+                  <input global="false">
+                    <from>dfs root</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="file system location">
+                  <input global="false">
+                    <from>file system location</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">dfscmd /remove </xsl:text>
+        <xsl:if test="string-length('${dfs share name}') !=0 and string-length('${dfs root}') !=0">
+          <xsl:text disable-output-escaping="no">\\$[dfs root]\$[dfs share name] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file system location}') !=0 and string-length('${dfs root}') !=0">
+          <xsl:text disable-output-escaping="no">\\$[file system location]</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows XP">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Windows XP.</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Delete DFS Share Entry
+    Removes a target from the specified DFS link.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a5013181-c15e-3c32-8f8f-3ca1f70636bd</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902409931</last-modified>
+    </meta>
+  </process-def>
+</process>

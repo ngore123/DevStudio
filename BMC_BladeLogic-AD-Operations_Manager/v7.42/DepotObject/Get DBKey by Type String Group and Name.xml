@@ -1,0 +1,214 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:DepotObject:Get DBKey by Type String Group and Name">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>String representation of depot object type. Valid depot object type strings, excluding software packages:
+    - BLPACKAGE: BlPackage
+    - DEPOT_FILE_OBJECT: file
+    - NSHSCRIPT: NshScript
+
+The following is a list of software installables that are also valid depot objects:
+    - AIX_PATCH_INSTALLABLE: AIX patch
+    - AIX_PACKAGE_INSTALLABLE: AIX package
+    - HP_PRODUCT_INSTALLABLE: HP-UX product
+    - HP_BUNDLE_INSTALLABLE: HP-UX bundle
+    - HP_PATCH_INSTALLABLE: HP-UX patch
+    - RPM_INSTALLABLE: Linux RPM
+    - SOLARIS_PATCH_INSTALLABLE: Solaris patch
+    - SOLARIS_PACKAGE_INSTALLABLE: Solaris package
+    - HOTFIX_WINDOWS_INSTALLABLE: Windows HotFix
+    - SERVICEPACK_WINDOWS_INSTALLABLE: Windows Service Pack
+    - MSI_WINDOWS_INSTALLABLE: Windows MSI Package
+    - INSTALLSHIELD_WINDOWS_INSTALLABLE: Windows InstallShield Package</description>
+        <from>depotObjectTypeString</from>
+        <to>depotObjectTypeString</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified path to the parent depot group.</description>
+        <from>groupName</from>
+        <to>groupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the depot object.</description>
+        <from>depotObjectName</from>
+        <to>depotObjectName</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the DBKey returned by the command.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the Adapter response for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>depotObjectTypeString</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>groupName</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>depotObjectName</from>
+            <to>argument 3</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>DepotObject</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>getDBKeyByTypeStringGroupAndName</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <compensation name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:DepotObject:Get DBKey by Type String Group and Name:999999999" />
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command gets the DBKey to a depot object. You must provide the name of the depot object and the full path to the depot group containing the depot object. You must also provide a string describing the type of depot object. The following is a list of all valid depot object type strings, excluding software packages:
+
+    - BLPACKAGE: BlPackage
+    - DEPOT_FILE_OBJECT: file
+    - NSHSCRIPT: NshScript
+
+The following is a list of software installables that are also valid depot objects:
+
+    - AIX_PATCH_INSTALLABLE: AIX patch
+    - AIX_PACKAGE_INSTALLABLE: AIX package
+    - HP_PRODUCT_INSTALLABLE: HP-UX product
+    - HP_BUNDLE_INSTALLABLE: HP-UX bundle
+    - HP_PATCH_INSTALLABLE: HP-UX patch
+    - RPM_INSTALLABLE: Linux RPM
+    - SOLARIS_PATCH_INSTALLABLE: Solaris patch
+    - SOLARIS_PACKAGE_INSTALLABLE: Solaris package
+    - HOTFIX_WINDOWS_INSTALLABLE: Windows HotFix
+    - SERVICEPACK_WINDOWS_INSTALLABLE: Windows Service Pack
+    - MSI_WINDOWS_INSTALLABLE: Windows MSI Package
+    - INSTALLSHIELD_WINDOWS_INSTALLABLE: Windows InstallShield Package</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7533ca1a-90ed-3b40-8bba-2ec5e8103457</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179805911</last-modified>
+    </meta>
+  </process-def>
+  <compensation-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:DepotObject:Get DBKey by Type String Group and Name:999999999">
+    <meta>
+      <peer-location>
+        <location>this</location>
+      </peer-location>
+    </meta>
+    <parameters />
+    <sequence />
+  </compensation-def>
+</process>

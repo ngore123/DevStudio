@@ -1,0 +1,416 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Physical_Device_Utilities:Disk:Volume:Perform Disk Usage Statistics Evaluation">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML document containing the system directories and values indicating the disk space usage limit for those directories.
+Note:  The value should be indicated as a percentage of the total disk space.
+
+For example:
+&lt;limits&gt;
+  &lt;limit directory="/"&gt;95&lt;/limit&gt;
+  &lt;limit directory="/boot"&gt;20&lt;/limit&gt;
+  &lt;limit directory="/dev/shm"&gt;5&lt;/limit&gt;
+&lt;/limits&gt;</description>
+        <from>acceptable thresholds</from>
+        <to>acceptable thresholds</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document containing information on the current disk usage and whether it is within the limits specified in the request.</description>
+        <to>limits</to>
+        <from>limits</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <for-each>
+        <document>
+          <input>
+            <from>acceptable thresholds</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>limvalue</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//limit]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>limvalue</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>dir</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//limit/@directory]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[1]</location>
+          </assign>
+          <call-process>
+            <process-name>:AutoPilot-OA-Physical_Device_Utilities:Disk:Volume:Get Device Free Statistics</process-name>
+            <parameters>
+              <input>
+                <from>connection details</from>
+                <to>connection details</to>
+              </input>
+              <input>
+                <from>dir</from>
+                <to>device name</to>
+              </input>
+              <output>
+                <from>adapter response</from>
+                <to>disk check output</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <after-execution>
+              <console-output>
+                <type>INFO</type>
+                <summary>
+                  <concat>
+                    <input>
+                      <value></value>
+                    </input>
+                  </concat>
+                </summary>
+                <detail>
+                  <concat>
+                    <input>
+                      <value></value>
+                    </input>
+                  </concat>
+                </detail>
+              </console-output>
+            </after-execution>
+            <location>:call-process[1]</location>
+          </call-process>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>connection details</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>limits</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens />
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <limits>
+      <directory/>
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[2]</location>
+          </assign>
+          <for-each>
+            <document>
+              <input>
+                <from>disk check output</from>
+              </input>
+            </document>
+            <result>
+              <output>
+                <to>limit</to>
+              </output>
+            </result>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//line[position() > 1 and position() < last ()]]]></xpath>
+            </xpath-expression>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <sequence>
+              <console-output>
+                <type>INFO</type>
+                <summary>
+                  <concat>
+                    <input>
+                      <value></value>
+                    </input>
+                  </concat>
+                </summary>
+                <detail>
+                  <concat>
+                    <input>
+                      <value></value>
+                    </input>
+                  </concat>
+                </detail>
+              </console-output>
+              <assign>
+                <assignment>
+                  <document>
+                    <input>
+                      <from>limit</from>
+                    </input>
+                  </document>
+                  <result>
+                    <output>
+                      <to>directory</to>
+                    </output>
+                  </result>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[normalize-space(substring-after(//line/text(), "%"))]]></xpath>
+                  </xpath-expression>
+                </assignment>
+                <meta>
+                  <documentation />
+                  <checkpoint>false</checkpoint>
+                </meta>
+                <after-execution>
+                  <log>
+                    <level>debug</level>
+                    <parameters>
+                      <input>
+                        <value>Disk usage</value>
+                      </input>
+                      <input>
+                        <from>limits</from>
+                      </input>
+                    </parameters>
+                  </log>
+                </after-execution>
+                <location>:assign[3]</location>
+              </assign>
+              <switch>
+                <meta>
+                  <documentation />
+                  <run-mode-handling>
+                    <run-mode>OCP</run-mode>
+                    <allow-step-into>true</allow-step-into>
+                  </run-mode-handling>
+                  <checkpoint></checkpoint>
+                </meta>
+                <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                <default>
+                  <sequence />
+                </default>
+                <case>
+                  <condition>
+                    <document>
+                      <input>
+                        <from>acceptable thresholds</from>
+                      </input>
+                    </document>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="directory">
+                          <input global="false">
+                            <from>directory</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[string-length(//limit[@directory='$[directory]']) > 0]]></xpath>
+                    </xpath-expression>
+                  </condition>
+                  <sequence>
+                    <assign>
+                      <assignment>
+                        <document>
+                          <input>
+                            <from>limit</from>
+                          </input>
+                        </document>
+                        <result>
+                          <output>
+                            <to>usage</to>
+                          </output>
+                        </result>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[normalize-space(substring(substring-before(., "%"), string-length(substring-before(., "%")) - 5))]]></xpath>
+                        </xpath-expression>
+                      </assignment>
+                      <assignment>
+                        <document>
+                          <input>
+                            <from>acceptable thresholds</from>
+                          </input>
+                        </document>
+                        <result>
+                          <output>
+                            <to>max-usage</to>
+                          </output>
+                        </result>
+                        <xpath-expression>
+                          <xpath-replacement-tokens>
+                            <replacement-token name="directory">
+                              <input global="false">
+                                <from>directory</from>
+                              </input>
+                            </replacement-token>
+                          </xpath-replacement-tokens>
+                          <xpath><![CDATA[//limit[@directory = "${directory}"]/text()]]></xpath>
+                        </xpath-expression>
+                      </assignment>
+                      <assignment>
+                        <document>
+                          <input>
+                            <from>limits</from>
+                          </input>
+                        </document>
+                        <result>
+                          <output>
+                            <to>limits</to>
+                          </output>
+                        </result>
+                        <xslt-stylesheet>
+                          <stylesheet-replacement-tokens>
+                            <replacement-token name="directory">
+                              <input global="false">
+                                <from>directory</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="max-usage">
+                              <input global="false">
+                                <from>max-usage</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="usage">
+                              <input global="false">
+                                <from>usage</from>
+                              </input>
+                            </replacement-token>
+                          </stylesheet-replacement-tokens>
+                          <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location"/>
+  <xsl:template match="/">
+    <limits>
+      <xsl:if test="string-length(//directory) &gt; 0"><xsl:copy-of select="//directory" /></xsl:if>
+      <directory>
+        <location>${directory}</location>
+        <usage>${usage}</usage>
+        <limit>${max-usage}</limit>
+        <within-limit><xsl:value-of select="${max-usage} > ${usage}" /></within-limit>
+      </directory>
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                        </xslt-stylesheet>
+                      </assignment>
+                      <meta>
+                        <documentation />
+                        <checkpoint>false</checkpoint>
+                      </meta>
+                      <after-execution>
+                        <log>
+                          <level>debug</level>
+                          <parameters>
+                            <input>
+                              <value>Disk usage</value>
+                            </input>
+                            <input>
+                              <from>limits</from>
+                            </input>
+                          </parameters>
+                        </log>
+                      </after-execution>
+                      <location>:switch[1]:sequence[2]:assign[1]</location>
+                    </assign>
+                  </sequence>
+                </case>
+                <location>:switch[1]</location>
+              </switch>
+            </sequence>
+            <location>:for-each[2]</location>
+          </for-each>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Disk Usage Statistics Evaluation
+   Determines if current disk usage is within defined disk space usage limits. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d0515150-9551-31b3-8e99-f91570d60be8</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1292079895021</last-modified>
+    </meta>
+  </process-def>
+</process>

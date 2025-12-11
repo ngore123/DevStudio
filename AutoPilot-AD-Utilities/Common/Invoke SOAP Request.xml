@@ -1,0 +1,605 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-AD-Utilities:Common:Invoke SOAP Request">
+    <parameters>
+      <input global="false" required="false">
+        <description>The adapter name. The default is SOAPAdapter.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The URL for the remote SOAP service. 
+(URL - http://x.y or https://x.y)Yes. 
+</description>
+        <from>soap url</from>
+        <to>soap url</to>
+      </input>
+      <input global="false" required="false">
+        <description>The username to be used for authentication.</description>
+        <from>http auth username</from>
+        <to>http auth username</to>
+      </input>
+      <input global="false" required="false">
+        <description>The password to use for authentication.
+</description>
+        <from>http auth password</from>
+        <to>http auth password</to>
+      </input>
+      <input global="false" required="false">
+        <description>This parameter will permit a connection to persist for multiple requests within a Process. A connection is named when established, and subsequent requests can specify this named connection to be re- used for a request. The connection will remain available until the 
+endpoint of the Process, or until the connection is terminated with a &lt;terminate-on-exit&gt; element. 
+</description>
+        <from>connection name</from>
+        <to>connection name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Defines the termination of a named connection.  Valid values: true or false.</description>
+        <from>terminate on exit</from>
+        <to>terminate on exit</to>
+      </input>
+      <input global="false" required="false">
+        <description>The content of the WSDL service definition. If WSDL Content is included then the WSDL URL will be excluded.</description>
+        <from>wsdl content</from>
+        <to>wsdl content</to>
+      </input>
+      <input global="false" required="false">
+        <description>The location of the WSDL service definition.  If WSDL Content is included then the WSDL URL will be excluded.</description>
+        <from>wsdl url</from>
+        <to>wsdl url</to>
+      </input>
+      <input global="false" required="true">
+        <description>The version of the AMP web services WSDL-based client generator.</description>
+        <from>generator version</from>
+        <to>generator version</to>
+      </input>
+      <input global="false" required="true">
+        <description>The namespace of the service, which is used to aggregate a set of related ports.</description>
+        <from>request service namespace</from>
+        <to>request service namespace</to>
+      </input>
+      <input global="false" required="true">
+        <description>The name of the service, which is used to aggregate a set of related ports.</description>
+        <from>request service name</from>
+        <to>request service name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The namespace of the port, which specifies an address for a binding, thus defining a single communication endpoint.</description>
+        <from>request port namespace</from>
+        <to>request port namespace</to>
+      </input>
+      <input global="false" required="true">
+        <description>The name of the port, which specifies an address for a binding, thus defining a single communication endpoint.</description>
+        <from>request port name</from>
+        <to>request port name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The name of action supported by the service</description>
+        <from>request operation name</from>
+        <to>request operation name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Must be a valid XML document. With root element named &lt;parameters/&gt;</description>
+        <from>request parameters</from>
+        <to>request parameters</to>
+      </input>
+      <output global="false" required="false">
+        <description>An adapter response contains the result returned from an adapter request. The contents of the response will vary by adapter.</description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+      <output global="false" required="false">
+        <description>This is the status returned in the adapter response.  Valid values are success and error.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>This attribute contains a message in the form of a text string whenever the status attribute contains "error".  If the status contains success then error message is empty.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <spawn>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>adapter name</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(.)=0]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>adapter name</to>
+                      <value>SOAPAdapter</value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:spawn[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:spawn[1]:sequence[1]:switch[1]</location>
+          </switch>
+        </sequence>
+        <sequence>
+          <utility>
+            <string>
+              <lowercase>
+                <input>
+                  <from>terminate on exit</from>
+                </input>
+              </lowercase>
+            </string>
+            <output global="false">
+              <to>terminate on exit</to>
+            </output>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:spawn[1]:sequence[2]:utility[1]</location>
+          </utility>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>terminate on exit</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.)!='true']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>terminate on exit</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.)!='false']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>terminate on exit</to>
+                      <value>
+                        <empty />
+                      </value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:spawn[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:spawn[1]:sequence[2]:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:spawn[1]</location>
+      </spawn>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>request parameters</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="username">
+                <input global="false">
+                  <from>http auth username</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="password">
+                <input global="false">
+                  <from>http auth password</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="soap url">
+                <input global="false">
+                  <from>soap url</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="connection name">
+                <input global="false">
+                  <from>connection name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="terminate on exit">
+                <input global="false">
+                  <from>terminate on exit</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="generator version">
+                <input global="false">
+                  <from>generator version</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="wsdl url">
+                <input global="false">
+                  <from>wsdl url</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="request service name">
+                <input global="false">
+                  <from>request service name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="request service namespace">
+                <input global="false">
+                  <from>request service namespace</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="request port name">
+                <input global="false">
+                  <from>request port name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="request port namespace">
+                <input global="false">
+                  <from>request port namespace</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="request operation name">
+                <input global="false">
+                  <from>request operation name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="request parameters">
+                <input global="false">
+                  <from>request parameters</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="wsdl content">
+                <input global="false">
+                  <from>wsdl content</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <xsl:param name="wsdl-content">$[wsdl content]</xsl:param>
+    <request-data>
+      <soap-rpc-request>
+        <soap-url>$[soap url]</soap-url>
+        <xsl:if test="string-length('${connection name}')!=0">
+          <connection>
+            <name>$[connection name]</name>
+            <xsl:if test="string-length('${terminate on exit}')!=0">
+              <terminate-on-exit>${terminate on exit}</terminate-on-exit>
+            </xsl:if>
+          </connection>
+        </xsl:if>
+        <xsl:if test="string-length('${username}')!=0">
+          <username>${username}</username>
+          <xsl:if test="string-length('${password}')!=0">
+            <password>$[password]</password>
+          </xsl:if>
+        </xsl:if>
+        <wsdl>
+          <xsl:choose>
+            <xsl:when test="string-length($wsdl-content)!=0">
+              <content>${wsdl content}</content>
+            </xsl:when>
+            <xsl:otherwise>
+              <reference>${wsdl url}</reference>
+            </xsl:otherwise>
+          </xsl:choose>
+        </wsdl>
+        <xsl:if test="string-length('$[generator version]')!=0">
+          <xsl:choose>
+            <xsl:when test="${generator version}= 1.0">
+              <generator-version>${generator version}</generator-version>
+            </xsl:when>
+            <xsl:otherwise>
+              <generator-version>
+                <xsl:text disable-output-escaping="no">1.0</xsl:text>
+              </generator-version>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+        <request>
+          <service>
+            <xsl:if test="string-length('${request service namespace}')!=0">
+              <namespace>$[request service namespace]</namespace>
+            </xsl:if>
+            <xsl:if test="string-length('${request service name}')!=0">
+              <name>${request service name}</name>
+            </xsl:if>
+          </service>
+          <port>
+            <xsl:if test="string-length('$[request port namespace]')!=0">
+              <namespace>$[request port namespace]</namespace>
+            </xsl:if>
+            <xsl:if test="string-length('${request port name}')!=0">
+              <name>${request port name}</name>
+            </xsl:if>
+          </port>
+          <xsl:if test="string-length('${request operation name}')!=0">
+            <operation-name>${request operation name}</operation-name>
+          </xsl:if>
+          <xsl:if test="string-length('$[request parameters]')=0">
+            <parameters />
+          </xsl:if>
+          ${request parameters}
+        </request>
+      </soap-rpc-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+                <request-action>invoke</request-action>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <output global="false">
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Adapter request</value>
+              </input>
+              <input>
+                <from>adapter request</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Adapter response</value>
+              </input>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//metadata/status/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value>
+                    <empty />
+                  </value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="error"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//metadata/error/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter response</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="//soap-response">
+    <parameters>
+      <xsl:if test="//metadata/status/text()=&quot;success&quot;">
+        <xsl:copy-of select="//parameters/*" />
+      </xsl:if>
+    </parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[3]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Invoke SOAP Request
+      
+</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e4ee164d-f3e7-35bf-8c2c-e277e677d2be</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1281950352406</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,206 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":BMC-SA-ITSM_Automation:Change_Management:ITSM_Mappings:Get Reason for Change Mappings">
+    <parameters>
+      <input global="false" required="true">
+        <description>ITSM platform type, BMC_AR_System or ServiceNow</description>
+        <from>ITSMPlatform</from>
+        <to>ITSMPlatform</to>
+      </input>
+      <output global="false" required="false">
+        <to>change-reason-mappings-response-xml</to>
+        <from>change-reason-mappings-response-xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>invalid-itsm-platform</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>error</level>
+                  <parameters>
+                    <input>
+                      <value>Invalid ITSM platfrom input provided. Please provide valid ITSM platform.</value>
+                    </input>
+                    <input>
+                      <from>ITSMPlatform</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>ITSMPlatform</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[lower-case(.)]]></xpath>
+            </xpath-expression>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "bmc_ar_system"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-ITSM_Configuration:ITSM:BMC_AR_System:ChangeManagement:REASON_FOR_CHANGE_MAPPING</configuration>
+                </input>
+                <output>
+                  <to>change-reason-mappings-response-xml</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <value>Retrieving change reason mappings from module configuration</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Change reason mapping from module configuration is -</value>
+                    </input>
+                    <input>
+                      <from>change-reason-mappings-response-xml</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>ITSMPlatform</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[lower-case(.)]]></xpath>
+            </xpath-expression>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "servicenow"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-ITSM_Configuration:ITSM:ServiceNow:ChangeManagement:REASON_FOR_CHANGE_MAPPING</configuration>
+                </input>
+                <output>
+                  <to>change-reason-mappings-response-xml</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <value>Retrieving change reason mappings from module configuration</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Change reason mapping from module configuration is -</value>
+                    </input>
+                    <input>
+                      <from>change-reason-mappings-response-xml</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Workflow to get Change Type Mapping from OA change module configuration</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ebc08451-99bb-4420-8b5e-b5902cadeb77</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1592502379837</last-modified>
+    </meta>
+  </process-def>
+</process>

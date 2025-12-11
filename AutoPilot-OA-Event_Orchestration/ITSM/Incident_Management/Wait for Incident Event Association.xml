@@ -1,0 +1,328 @@
+<process draft="false" dev-studio-version="8.1.00">
+  <process-def name=":AutoPilot-OA-Event_Orchestration:ITSM:Incident_Management:Wait for Incident Event Association">
+    <parameters>
+      <input global="false" required="true">
+        <from>itsm type</from>
+        <to>itsm type</to>
+      </input>
+      <input global="false" required="true">
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <input global="false" required="true">
+        <from>all configurations</from>
+        <to>all configurations</to>
+      </input>
+      <input global="false" required="true">
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <output global="false" required="false">
+        <to>incident number</to>
+        <from>incident number</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>max poll count</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="itsm type">
+                <input global="false">
+                  <from>itsm type</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[//Specifics/${itsm type}/IncidentManagementDefaults/EventIncidentAssociationMaxPollCount/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>poll interval secs</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="itsm type">
+                <input global="false">
+                  <from>itsm type</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[//Specifics/${itsm type}/IncidentManagementDefaults/EventIncidentAssociationPollIntevalSecs/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>incident number</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>====Waiting for event &lt;-&gt; incident association==</value>
+              </input>
+              <input>
+                <from>max poll count</from>
+              </input>
+              <input>
+                <from>poll interval secs</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Create For Loop XML</process-name>
+        <parameters>
+          <input>
+            <from>max poll count</from>
+            <to>loopcount</to>
+          </input>
+          <output>
+            <from>loop</from>
+            <to>loop</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <for-each>
+        <document>
+          <input>
+            <from>loop</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>poll-loop</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//loop]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>incident number</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(normalize-space(.)) = 0]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>status</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. = 'success']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <call-process>
+                  <process-name>:AutoPilot-OA-Event_Orchestration:Utilities:Wait N Seconds</process-name>
+                  <parameters>
+                    <input>
+                      <from>poll interval secs</from>
+                      <to>num seconds</to>
+                    </input>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:call-process[1]</location>
+                </call-process>
+                <call-process>
+                  <process-name>:AutoPilot-OA-Event_Orchestration:ITSM:Incident_Management:Get Incident ID by Event ID</process-name>
+                  <parameters>
+                    <input>
+                      <from>event source type</from>
+                      <to>event source type</to>
+                    </input>
+                    <input>
+                      <from>itsm type</from>
+                      <to>itsm type</to>
+                    </input>
+                    <input>
+                      <from>all configurations</from>
+                      <to>all configurations</to>
+                    </input>
+                    <input>
+                      <from>event data</from>
+                      <to>event data</to>
+                    </input>
+                    <output>
+                      <from>incident id</from>
+                      <to>incident number</to>
+                    </output>
+                    <output>
+                      <from>status</from>
+                      <to>status</to>
+                    </output>
+                    <output>
+                      <from>error message</from>
+                      <to>error message</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:call-process[2]</location>
+                </call-process>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==== Wait for Incident Event Association Output==</value>
+              </input>
+              <input>
+                <from>incident number</from>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Wait for incident to be associated to an event. Look for incident with its event field set. The wait for a finite period of time and intervals as defined in the module configuration
+
+At the end of the interval return an empty incident number if it was not found.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>27838760-8a8b-44cd-9968-a6258bda8418</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1528325618881</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,305 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:Compliance:Create BLPackage Deploy Job from Package Key">
+    <parameters>
+      <input global="false" required="false">
+        <description>&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <from>deployJobName</from>
+        <to>deployJobName</to>
+      </input>
+      <input global="false" required="true">
+        <from>packageDBKey</from>
+        <to>packageDBKey</to>
+      </input>
+      <input global="false" required="true">
+        <description>This is the deploy job group name.</description>
+        <from>groupName</from>
+        <to>groupName</to>
+      </input>
+      <input global="false" required="true">
+        <from>serverName</from>
+        <to>serverName</to>
+      </input>
+      <input global="false" required="true">
+        <from>isSimulateEnabled</from>
+        <to>isSimulateEnabled</to>
+      </input>
+      <input global="false" required="true">
+        <from>isCommitEnabled</from>
+        <to>isCommitEnabled</to>
+      </input>
+      <input global="false" required="true">
+        <from>isStagedIndirect</from>
+        <to>isStagedIndirect</to>
+      </input>
+      <output global="false" required="false">
+        <to>success</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="false">
+        <to>success message</to>
+        <from>success message</from>
+      </output>
+      <output global="false" required="false">
+        <to>DBKey</to>
+        <from>DBKey</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:JobGroup:Group Name to ID</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>groupName</from>
+            <to>groupName</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>success</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>ID</from>
+            <to>groupId</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.43:DeployJob:Create Deploy Job</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>deployJobName</from>
+                  <to>deployJobName</to>
+                </input>
+                <input>
+                  <from>groupId</from>
+                  <to>groupId</to>
+                </input>
+                <input>
+                  <from>packageDBKey</from>
+                  <to>packageKey</to>
+                </input>
+                <input>
+                  <from>serverName</from>
+                  <to>serverName</to>
+                </input>
+                <input>
+                  <from>isSimulateEnabled</from>
+                  <to>isSimulateEnabled</to>
+                </input>
+                <input>
+                  <from>isCommitEnabled</from>
+                  <to>isCommitEnabled</to>
+                </input>
+                <input>
+                  <from>isStagedIndirect</from>
+                  <to>isStagedIndirect</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>void</from>
+                  <to>void</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:DeployJob:Get DBKey by Group and Name</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>groupName</from>
+                  <to>groupName</to>
+                </input>
+                <input>
+                  <from>deployJobName</from>
+                  <to>jobName</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>DBKey</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Format Error message</process-name>
+        <parameters>
+          <input>
+            <from>error message</from>
+            <to>error message</to>
+          </input>
+          <input>
+            <from>success</from>
+            <to>success</to>
+          </input>
+          <input>
+            <value>Execution Successful.</value>
+            <to>message text</to>
+          </input>
+          <output>
+            <from>error message</from>
+            <to>success message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process creates a deploy job for a BL Package.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>f43ae8b0-3e7e-317b-ad47-77b4eff4370b</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179702410</last-modified>
+    </meta>
+  </process-def>
+</process>

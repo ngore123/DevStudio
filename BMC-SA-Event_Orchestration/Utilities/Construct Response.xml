@@ -1,0 +1,237 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":BMC-SA-Event_Orchestration:Utilities:Construct Response">
+    <parameters>
+      <input global="false" required="true">
+        <description>Output of Perform Triage workflow</description>
+        <from>triage response</from>
+        <to>triage response</to>
+      </input>
+      <input global="false" required="true">
+        <description>Output of Perform Remediation workflow</description>
+        <from>remediation response</from>
+        <to>remediation response</to>
+      </input>
+      <input global="false" required="true">
+        <description>Output of Perform Validation workflow</description>
+        <from>va.idation response</from>
+        <to>va.idation response</to>
+      </input>
+      <output global="false" required="false">
+        <description>Sample:
+&lt;process-event-response&gt;
+    &lt;triage-output /&gt;
+    &lt;remediation-output /&gt;
+&lt;/process-event-response&gt;</description>
+        <to>process event data</to>
+        <from>process event response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>process event response</to>
+            <value>
+              <process-event-response />
+            </value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML</process-name>
+        <parameters>
+          <input>
+            <from>process event response</from>
+            <to>parent xml</to>
+          </input>
+          <input>
+            <from>triage response</from>
+            <to>child xml</to>
+          </input>
+          <output>
+            <from>result xml</from>
+            <to>process event response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML</process-name>
+        <parameters>
+          <input>
+            <from>process event response</from>
+            <to>parent xml</to>
+          </input>
+          <input>
+            <from>remediation response</from>
+            <to>child xml</to>
+          </input>
+          <output>
+            <from>result xml</from>
+            <to>process event response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML</process-name>
+        <parameters>
+          <input>
+            <from>process event response</from>
+            <to>parent xml</to>
+          </input>
+          <input>
+            <from>va.idation response</from>
+            <to>child xml</to>
+          </input>
+          <output>
+            <from>result xml</from>
+            <to>process event response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[3]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>process event response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <status>
+      <xsl:choose>
+        <xsl:when test="boolean(//status[text() = 'failure'])">
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">success</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </status>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML</process-name>
+        <parameters>
+          <input>
+            <from>process event response</from>
+            <to>parent xml</to>
+          </input>
+          <input>
+            <from>status</from>
+            <to>child xml</to>
+          </input>
+          <output>
+            <from>result xml</from>
+            <to>process event response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[4]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+        <parameters>
+          <input>
+            <from>process event response</from>
+            <to>XML</to>
+          </input>
+          <output>
+            <from>JSON</from>
+            <to>process event response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[5]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Add up triage and remediation responses and return it as process output.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a8e75e5d-2ffa-4e45-bcbe-63e69fcd4162</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1594655214344</last-modified>
+    </meta>
+  </process-def>
+</process>

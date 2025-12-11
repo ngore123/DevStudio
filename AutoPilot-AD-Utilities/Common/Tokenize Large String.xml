@@ -1,0 +1,408 @@
+<process draft="false" dev-studio-version="20.02.01">
+  <process-def name=":AutoPilot-AD-Utilities:Common:Tokenize Large String">
+    <parameters>
+      <input global="false" required="true">
+        <description>The string to be parsed on a specified character.</description>
+        <from>string</from>
+        <to>string</to>
+      </input>
+      <input global="false" required="true">
+        <description>The character on which the specified string will be tokenized. </description>
+        <from>delimiter</from>
+        <to>delimiter</to>
+      </input>
+      <output global="false" required="false">
+        <to>tokens</to>
+        <from>tokenlisttotal</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>tokenlisttotal</to>
+            <value>
+              <tokens />
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>string</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>string</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="delimit">
+                <input global="false">
+                  <from>delimiter</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[concat(.,"${delimit}")]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>tokenlistcurrent</to>
+            <value>
+              <temp />
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>string</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>loopcount</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[floor(string-length(.) div 10000)+2]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input>
+                <value>'</value>
+              </input>
+              <input required="false">
+                <from>delimiter</from>
+              </input>
+              <input>
+                <value>'</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>delimiter</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>string</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Common:Create For Loop XML</process-name>
+        <parameters>
+          <input>
+            <from>loopcount</from>
+            <to>loopcount</to>
+          </input>
+          <output>
+            <from>loop</from>
+            <to>loop</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>loop</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <for-each>
+        <document>
+          <input>
+            <from>loop</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>loopcount</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//loop]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>string</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>tempstring</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[substring(., 1,10000)]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[2]</location>
+          </assign>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>tempstring</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>tokenlistcurrent</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="delimit">
+                    <input global="false">
+                      <from>delimiter</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <tokens>
+      <xsl:choose>
+        <xsl:when test="boolean(.)">
+          <xsl:call-template name="substring-before-last">
+            <xsl:with-param name="list" select="." />
+            <xsl:with-param name="delimiter" select="${delimit}" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise />
+      </xsl:choose>
+    </tokens>
+  </xsl:template>
+  <xsl:template name="substring-before-last">
+    <xsl:param name="list" />
+    <xsl:param name="delimiter" />
+    <xsl:choose>
+      <xsl:when test="contains($list, $delimiter)">
+        <token>
+          <xsl:value-of select="substring-before($list, $delimiter)" disable-output-escaping="no" />
+        </token>
+        <xsl:call-template name="substring-before-last">
+          <xsl:with-param name="list" select="substring-after($list, $delimiter)" />
+          <xsl:with-param name="delimiter" select="$delimiter" />
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[3]</location>
+          </assign>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>tokenlistcurrent</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>length</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[string-length(.) + count(//tokens/*) +1]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[4]</location>
+          </assign>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>string</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>string</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens>
+                  <replacement-token name="length">
+                    <input global="false">
+                      <from>length</from>
+                    </input>
+                  </replacement-token>
+                </xpath-replacement-tokens>
+                <xpath><![CDATA[substring(., ${length})]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[5]</location>
+          </assign>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>tokenlisttotal</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>tokenlisttotal</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="tokenlistcurrent">
+                    <input global="false">
+                      <from>tokenlistcurrent</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <tokens>
+      <xsl:copy-of select="." />
+      ${tokenlistcurrent}
+    </tokens>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[6]</location>
+          </assign>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>tokenlisttotal</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>tokenlisttotal</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <tokens>
+      <xsl:copy-of select="//token" />
+    </tokens>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>tokenlisttotal</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[7]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This tokenizer workflow overcomes the limitation of traditional tokenizer against large inputs by setting up a loop that will detect the size of the input and parse it in 10,000-character segments, appending the segments together to create a fully-parsed result.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5b9ad6a8-02e9-450a-a7c1-8f07d9df3d31</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1637222934481</last-modified>
+    </meta>
+  </process-def>
+</process>

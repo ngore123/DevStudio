@@ -1,0 +1,228 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":Closed_Loop_Server-SA-Audit:Utilities:Format Audit Results">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The CSV file path on the machine where CDP is installed.
+For example:
+c:\tmp\2iexport2.csv</description>
+        <from>csv file path</from>
+        <to>csv file path</to>
+      </input>
+      <output global="false" required="false">
+        <to>audit run</to>
+        <from>audit run</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Terminal:File:Read</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>adapter name</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//adapter-name/text()]]></xpath>
+            </xpath-expression>
+          </input>
+          <input>
+            <from>csv file path</from>
+            <to>file name</to>
+          </input>
+          <input>
+            <value>text</value>
+            <to>file type</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>file content</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>file content</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>audit run</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <bladelogic-audit-export>
+      <xsl:apply-templates select="//line" mode="base" />
+    </bladelogic-audit-export>
+  </xsl:template>
+  <xsl:template match="line" mode="base">
+    <xsl:choose>
+      <xsl:when test="starts-with(text(), 'Date:')">
+        <date>
+          <xsl:value-of select="substring-after(text(), 'Date:,')" disable-output-escaping="no" />
+        </date>
+      </xsl:when>
+      <xsl:when test="starts-with(text(), 'Job Name:')">
+        <job-name>
+          <xsl:value-of select="substring-after(text(), 'Job Name:,')" disable-output-escaping="no" />
+        </job-name>
+      </xsl:when>
+      <xsl:when test="starts-with(text(), 'Master:')">
+        <master>
+          <xsl:value-of select="substring-after(text(), 'Master:,')" disable-output-escaping="no" />
+        </master>
+      </xsl:when>
+      <xsl:when test="starts-with(text(), 'Objects Audited:')">
+        <objects-audited>
+          <xsl:if test="not(contains(text(), 'N/A'))">
+            <xsl:variable name="line-number-var" select="following-sibling::line[starts-with(text(), 'Consistent Targets:')]/@number" />
+            <xsl:value-of select="substring-after(text(), 'Objects Audited:,')" disable-output-escaping="no" />
+            <xsl:for-each select="following-sibling::line[@number &lt; $line-number-var]">
+              <xsl:value-of select="text()" disable-output-escaping="no" />
+            </xsl:for-each>
+          </xsl:if>
+        </objects-audited>
+      </xsl:when>
+      <xsl:when test="starts-with(text(), 'Consistent Targets:')">
+        <consistent-targets>
+          <xsl:if test="not(contains(text(), 'N/A'))">
+            <target>
+              <xsl:value-of select="substring-after(text(), 'Consistent Targets:,')" disable-output-escaping="no" />
+            </target>
+            <xsl:apply-templates select="following-sibling::line[starts-with(text(), ' ,')]" mode="common">
+              <xsl:with-param name="element-name" select="'target'" />
+              <xsl:with-param name="threshold" select="following-sibling::line[contains(text(), 'Inconsistent Targets')]/@number" />
+            </xsl:apply-templates>
+          </xsl:if>
+        </consistent-targets>
+      </xsl:when>
+      <xsl:when test="starts-with(text(), 'Inconsistent Targets:')">
+        <inconsistent-targets>
+          <xsl:if test="not(contains(text(), 'N/A'))">
+            <target>
+              <xsl:value-of select="substring-after(text(), 'Inconsistent Targets:,')" disable-output-escaping="no" />
+            </target>
+            <xsl:apply-templates select="following-sibling::line[starts-with(text(), ' ,')]" mode="common">
+              <xsl:with-param name="element-name" select="'target'" />
+              <xsl:with-param name="threshold" select="following-sibling::line[contains(text(), 'Failed servers')]/@number" />
+            </xsl:apply-templates>
+          </xsl:if>
+        </inconsistent-targets>
+      </xsl:when>
+      <xsl:when test="starts-with(text(), 'Failed servers:')">
+        <failed-servers>
+          <xsl:if test="not(contains(text(), 'N/A'))">
+            <server>
+              <xsl:value-of select="substring-after(text(), 'Failed servers:,')" disable-output-escaping="no" />
+            </server>
+            <xsl:apply-templates select="following-sibling::line[starts-with(text(), ' ,')]" mode="common">
+              <xsl:with-param name="element-name" select="'server'" />
+              <xsl:with-param name="threshold" select="following-sibling::line[contains(text(), 'Show Compliant Audit Item(s)')]/@number" />
+            </xsl:apply-templates>
+          </xsl:if>
+        </failed-servers>
+      </xsl:when>
+      <xsl:when test="starts-with(text(), 'Show Compliant Audit Item(s):')">
+        <show-compliant-audit-items>
+          <xsl:value-of select="substring-after(text(), 'Show Compliant Audit Item(s):,')" disable-output-escaping="no" />
+        </show-compliant-audit-items>
+      </xsl:when>
+      <xsl:when test="contains(text(), 'Server Object,Stat,Item,Target,ACL Path,Consistent,Details')">
+        <xsl:apply-templates select="following-sibling::line" mode="compliant-audit-items" />
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template match="line" mode="compliant-audit-items">
+    <compliant-audit-items>
+      <xsl:variable name="server-object-removed" select="substring-after(text(), ',')" />
+      <xsl:variable name="stat-removed" select="substring-after($server-object-removed, ',')" />
+      <xsl:variable name="item-removed" select="substring-after($stat-removed, ',')" />
+      <xsl:variable name="target-removed" select="substring-after($item-removed, ',')" />
+      <xsl:variable name="acl-path-removed" select="substring-after($target-removed, ',')" />
+      <xsl:variable name="consistent-removed" select="substring-after($acl-path-removed, ',')" />
+      <server-object>
+        <xsl:value-of select="substring-before(text(), ',')" disable-output-escaping="no" />
+      </server-object>
+      <stat>
+        <xsl:value-of select="substring-before($server-object-removed, ',')" disable-output-escaping="no" />
+      </stat>
+      <item>
+        <xsl:value-of select="substring-before($stat-removed, ',')" disable-output-escaping="no" />
+      </item>
+      <target>
+        <xsl:value-of select="substring-before($item-removed, ',')" disable-output-escaping="no" />
+      </target>
+      <acl>
+        <xsl:value-of select="substring-before($target-removed, ',')" disable-output-escaping="no" />
+      </acl>
+      <consistent>
+        <xsl:value-of select="substring-before($acl-path-removed, ',')" disable-output-escaping="no" />
+      </consistent>
+      <details>
+        <xsl:value-of select="$consistent-removed" disable-output-escaping="no" />
+      </details>
+    </compliant-audit-items>
+  </xsl:template>
+  <xsl:template match="line" mode="common">
+    <xsl:param name="element-name" />
+    <xsl:param name="threshold" />
+    <xsl:if test="@number &lt; $threshold">
+      <xsl:element name="{$element-name}">
+        <xsl:value-of select="substring-after(text(), ' ,')" disable-output-escaping="no" />
+      </xsl:element>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow create a well structured xml document from the export audit job results.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>23009a02-2ccb-335a-97a1-2a4ecd5ebd33</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283245417787</last-modified>
+    </meta>
+  </process-def>
+</process>

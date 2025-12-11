@@ -1,0 +1,558 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-Credentials_Store:EventOrchestration:Get Ping Host Details">
+    <parameters>
+      <input global="false" required="true">
+        <description>host name or IP address of host used to perform ping operation.</description>
+        <from>host name</from>
+        <to>host name</to>
+      </input>
+      <input global="false" required="true">
+        <description>unix or windows</description>
+        <from>component type</from>
+        <to>component type</to>
+      </input>
+      <output global="false" required="false">
+        <to>connection details</to>
+        <from>connection details</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:AutoPilot-OA-Credentials_Store</configuration>
+          </input>
+          <output>
+            <to>configuration</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>host name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>domain</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(substring-after(., '.')) &gt; 0">
+          <xsl:value-of select="translate(substring-after(., '.'), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">*</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>matching domain name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="host name">
+                <input global="false">
+                  <from>host name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="domain">
+                <input global="false">
+                  <from>domain</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="component type">
+                <input global="false">
+                  <from>component type</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="boolean(//domains/domain[@name='${domain}'])">${domain}</xsl:when>
+        <xsl:when test="boolean(//domains/domain[contains('${domain}', @name)])">
+          <xsl:value-of select="//domains/domain[contains('${domain}', @name)]/@name" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">*</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>matching component name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="matching domain name">
+                <input global="false">
+                  <from>matching domain name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="host name">
+                <input global="false">
+                  <from>host name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="boolean(//domains/domain[@name='${matching domain name}']/component[@name='${host name}'])">
+          <xsl:value-of select="//domains/domain[@name='${matching domain name}']/component[@name='${host name}']/@name" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">*</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>matching credential name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="matching domain name">
+                <input global="false">
+                  <from>matching domain name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="matching component name">
+                <input global="false">
+                  <from>matching component name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="component type">
+                <input global="false">
+                  <from>component type</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[//domain[@name='${matching domain name}']/component[@type='${component type}' and @name='${matching component name}']/password-configuration-name/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>matching credential name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="matching domain name">
+                <input global="false">
+                  <from>matching domain name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="component type">
+                <input global="false">
+                  <from>component type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="matching component name">
+                <input global="false">
+                  <from>matching component name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="//domain[@name='${matching domain name}']/component[@type='${component type}' and @name='${matching component name}'][1]/password-configuration-name/text()" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="component name">
+                <input global="false">
+                  <from>matching component name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="matching domain name">
+                <input global="false">
+                  <from>matching domain name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="component type">
+                <input global="false">
+                  <from>component type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="matching credential name">
+                <input global="false">
+                  <from>matching credential name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-detail>
+      <xsl:copy-of select="//domain[@name='${matching domain name}']/component[@type='${component type}' and @name='${component name}'][1]" />
+      <password>
+        <xsl:choose>
+          <xsl:when test="boolean(//Credentials/*[name() = '${matching credential name}']/*)">
+            <xsl:copy-of select="//Credentials/*[name() = '${matching credential name}']/*" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="//Credentials/*[name() = '${matching credential name}']/text()" disable-output-escaping="no" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </password>
+    </connection-detail>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>connection details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>invocation mechanism</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//invocation-mechanism/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>connection details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ping mechanism</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ping-mechanism/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Configuration</configuration>
+          </input>
+          <output>
+            <to>all configurations</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="invocation mechanism">
+                <input global="false">
+                  <from>invocation mechanism</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="key" select="//Adapters/Adapter_Invocation_Mechanism_Mappings/mappings/adapter-name[@invocation-mechanism='${invocation mechanism}']/text()" />
+  <xsl:variable name="adapterName" select="//Adapters/*[name() = $key]/text()" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space($adapterName)) &gt; 0">
+          <xsl:value-of select="$adapterName" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">NOT FOUND</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ping adapter name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="ping mechanism">
+                <input global="false">
+                  <from>ping mechanism</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="key" select="//Adapters/Adapter_Invocation_Mechanism_Mappings/mappings/adapter-name[@invocation-mechanism='${ping mechanism}']/text()" />
+  <xsl:variable name="adapterName" select="//Adapters/*[name() = $key]/text()" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space($adapterName)) &gt; 0">
+          <xsl:value-of select="$adapterName" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">NOT FOUND</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[3]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>connection details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="adapter name">
+                <input global="false">
+                  <from>adapter name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="ping adapter name">
+                <input global="false">
+                  <from>ping adapter name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootElementName" select="name(/*)" />
+  <xsl:template match="@* | node()">
+    <xsl:element name="{$rootElementName}">
+      <xsl:copy>
+        <xsl:apply-templates select="@* | node()" />
+      </xsl:copy>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@* | node()" />
+      <xsl:if test="name() = 'component'">
+        <adapter-name>${adapter name}</adapter-name>
+        <ping-adapter-name>${ping adapter name}</ping-adapter-name>
+      </xsl:if>
+    </xsl:copy>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[4]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>connection details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="host name">
+                <input global="false">
+                  <from>host name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootElementName" select="name(/*)" />
+  <xsl:template match="@* | node()">
+    <xsl:element name="{$rootElementName}">
+      <xsl:copy>
+        <xsl:apply-templates select="@* | node()" />
+      </xsl:copy>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@* | node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="component">
+    <component>
+      <xsl:attribute name="type">
+        <xsl:value-of select="@type" disable-output-escaping="no" />
+      </xsl:attribute>
+      <xsl:attribute name="name">${host name}</xsl:attribute>
+      <xsl:apply-templates select="node()" />
+    </component>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== ping host connection details final===</value>
+              </input>
+              <input>
+                <from>connection details</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[5]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Get Ping Host's connection details. Input is only host name.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ddec1ca7-0946-4e6b-a2c2-b4878df8c894</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1551987973995</last-modified>
+    </meta>
+  </process-def>
+</process>

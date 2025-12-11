@@ -1,0 +1,179 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:v5.5:Image:Backup Image">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is IBMTSMActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The backup image command creates an image backup of one or more volumes on your system.
+
+Note for Windows Clients:
+These volumes can be formatted FAT, FAT32, NTFS, or unformatted RAW volumes. If a volume is NTFS-formatted, only those blocks used by the file system will be backed up.
+
+Notes for Unix Clients:
+      1. For the Linux clients, image backup is only supported on partitions with id 0x83 or logical volumes created with the Linux Logical Volume Manager. Backing up other partitions, such as extended partitions that contain mounted file systems or database data, can produce inconsistent backup data if the data changes during the image backup operation.
+      2. The usage of GPFS snapshot, and image backup is not supported for GPFS file systems on Linux x86/x86_64, Linux on POWER and Linux for zSeries.
+
+
+      The Tivoli Storage Manager client must support the raw device type on the specific platform to perform an image backup of a raw device. You can only perform an image backup on local devices. Clustered devices or file systems as well as devices or file   systems shared between two or more systems are not supported. If you want to perform an image backup for a file system mounted on a raw device, the raw device must be supported.
+
+Sample Request XML:
+
+&lt;items&gt;
+  &lt;item&gt;
+  &lt;operation-name&gt;backup-image&lt;/operation-name&gt;
+  &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+      &lt;command-options&gt;
+        &lt;compressalways&gt;no&lt;/compressalways&gt;
+        &lt;compression&gt;yes&lt;/compression&gt;
+        &lt;imagegapsize&gt;10k&lt;/imagegapsize&gt;
+        &lt;mode&gt;Selective&lt;/mode&gt;
+        &lt;snapshotcachesize&gt;10&lt;/snapshotcachesize&gt;
+        &lt;snapshotcachelocation&gt;e:&lt;/snapshotcachelocation&gt;
+        &lt;snapshotfsidleretries&gt;1&lt;/snapshotfsidleretries&gt;
+        &lt;snapshotfsidlewait&gt;4s,500ms&lt;/snapshotfsidlewait&gt;
+      &lt;/command-options&gt;
+      &lt;command-arguments&gt;
+        &lt;volume-list&gt;e:&lt;/volume-list&gt;
+      &lt;/command-arguments&gt;
+  &lt;/item&gt;
+&lt;/items&gt;
+
+
+Command Arguments Description
+
+volume-list[Required]
+	Specifies the name of one or more logical volumes. Image backup is only supported on a volume that has a mount point assigned or a drive letter assigned. A volume without a drive letter or mount point cannot be backed up. If you want to back up more than one file system, separate their names with spaces. Do not use pattern matching characters.
+
+Command Options Description
+
+compressalways[Optional]
+	The compressalways option specifies whether to continue compressing an object if it grows during compression. Valid values-Yes(Default),No.
+	
+compression[optional]
+	The compression option compresses files before you send them to the server.Valid values - yes,no(default)
+
+imagegapsize[Optional]
+	Use the imagegapsize option to specify the minimum size of empty regions on a volume that you want to skip during backup. For example, if you specify a gap size of 10, this means that an empty region on the disk that is larger than 10k in size will not be backed up. Gaps that are exactly 10k will be backed up. However, an empty region that is smaller than 10k will be backed up, even though it does not contain data.
+
+You can specify k (kilobytes) m (megabytes) or g (gigabytes) qualifiers with the value. Without a qualifier, the value is interpreted in kilobytes. Valid values are zero through 4294967295. If you specify a value of 0, all blocks, including unused blocks at the end of the volume, will be backed up. If you specify any value other than 0, unused blocks at the end of the volume will not be backed up. For LAN-based and LAN-free image backup the value is 32k.
+
+Note: Because of operating system limitations, use this option for NTFS file systems only. If you specify imagegapsize &gt; 0 for a file system other than NTFS, the error log receives a warning message.
+
+mode[Optional]
+	To specify whether to perform a selective or incremental image backup of client file systems.
+Valid values – Selective, Incremental
+
+
+
+
+postsnapshotcmd[Optional]
+The postsnapshotcmd option allows you to run a command or script after a snapshot is started. This option can be used in conjunction with the presnapshotcmd option to allow you to quiesce an application while a snapshot is created, and then to restart that application after the snapshot is started. This option is only valid if OFS or online image backup has been configured.
+
+For an online image backup, use this option with the backup image command. If the command string contains blanks, enclose the command string in double quotes.
+
+presnapshotcmd[Optional]
+The presnapshotcmd option allows you to run a command or script before a snapshot is started. This option can be used in conjunction with the postsnapshotcmd option to allow you to quiesce an application while a snapshot is created, and then to
+restart that application after the snapshot is started. This option is only valid if OFS or online image backup has been configured.
+
+For an online image backup, use this option with the backup image command. If the command string contains blanks, enclose the command string in double quotes.
+
+snapshotcachelocation[Optional]
+	Use the snapshotcachelocation option during an online image backup or open file support operation to specify the location where the LVSA places the cache files. The cache files contain changes made to a volume by other system applications during an online image backup or open file support operation. For an online image backup, the cache files are backed up to the server and the changes are applied to the volume image when you restore the volume. This option is only valid if OFS or online image backup has been configured and the LVSA has been selected as the snapshot provider.
+
+Recommendation: Do not specify the snapshotcachelocation option on a different volume than the target. For example, do not use non-resident cache.
+
+For an online image backup, use the snapshotcachelocation option with the backup image command.
+
+snapshotcachesize[Optional]
+	Use the snapshotcachesize option to determine the size of the cache file containing the original data for blocks that change during an online image backup or open file support operation. The value is the percent of the used space on the volume on which the snapshot is taken. On a volume with high file system write activity, this value can be increased to remove the condition where the snapshot cache fills up during the operation. The snapshot cache location is specified with the snapshotcachelocation option. This option is only valid if OFS or online image backup has been configured and the LVSA has been selected as the snapshot provider.
+
+For online image backups, use the snapshotcachesize option with the backup image command.
+
+snapshotfsidleretries[Optional]
+	Use the snapshotfsidleretries option to specify the number of additional times the LVSA should try to achieve the snapshot file system idle wait time before the online image backup or open file support operation fails. This option is only valid if OFS or
+online image backup has been configured, and the LVSA has been selected as the snapshot provider.
+Valid values - The range of values is zero through 99; the default is 99.
+
+snapshotfsidlewait[Optional]
+	Use the snapshotfsidlewait option during an online image backup or open file support operation to specify the amount of time that must pass in which there is no write activity (read activity is ignored) on a volume before a snapshot can be taken. This allows
+the disk to reach an idle state. This option is only valid if OFS or online image backup has been configured, and the LVSA has been selected as the snapshot provider.
+Parameters
+
+   maximum wait time
+      Specifies the maximum amount of time that must pass during which there is no write activity on a volume before a snapshot can be taken. You can specify ms (milliseconds) or s (seconds) qualifiers with the value. If you do not specify a qualifier, the value you specify is interpreted as seconds. The range of values is zero through 999; the default value is 2 s. A value of zero (0) indicates that the snapshot will occur immediately  without waiting for a period of inactivity. You can specify a maximum wait time value without specifying a minimum wait time value.
+
+   minimum wait time
+      Specifies the minimum amount of time that must pass during which there is no write activity on a volume before a snapshot can be taken. You can specify ms (milliseconds) or s (seconds) qualifiers with the value. If you do not specify a qualifier, the value you specify is interpreted as seconds. The range of values is zero through 999; the default value is 50 ms.
+
+Sample: 4s,500ms
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-IBM_Tivoli_Storage_Manager:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <value>backup-image</value>
+            <to>valid operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper creates an image backup of one or more volumes on your system.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>36a48bda-b93f-3de2-b265-b56ef0abc03d</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290597037458</last-modified>
+    </meta>
+  </process-def>
+</process>

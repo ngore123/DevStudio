@@ -1,0 +1,274 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Common_Utilities:Format Date">
+    <parameters>
+      <input global="false" required="true">
+        <description>This is an integer that represents the epoch.</description>
+        <from>date</from>
+        <to>date</to>
+      </input>
+      <input global="false" required="false">
+        <description>Time zones are interpreted as text if they have names. For time zones representing a GMT offset value, the following syntax is used:
+     GMTOffsetTimeZone:
+             GMT Sign Hours : Minutes
+     Sign: one of
+             + -
+     Hours:
+             Digit
+             Digit Digit
+     Minutes:
+             Digit Digit
+     Digit: one of
+             0 1 2 3 4 5 6 7 8 9
+Hours must be between 0 and 23, and Minutes must be between 00 and 59. The format is locale independent and digits must be taken from the Basic Latin block of the Unicode standard.</description>
+        <from>time zone</from>
+        <to>time zone</to>
+      </input>
+      <input global="false" required="false">
+        <description>This is a string that represents the requested date format.
+
+The following examples show how date and time patterns are interpreted in the U.S. locale. The given date and time are 2001-07-04 12:08:56 local time in the U.S. Pacific Time time zone.
+
+Date and Time Pattern	Result
+"yyyy.MM.dd G 'at' HH:mm:ss z"	2001.07.04 AD at 12:08:56 PDT
+"EEE, MMM d, ''yy"	Wed, Jul 4, '01
+"h:mm a"	12:08 PM
+"hh 'o''clock' a, zzzz"	12 o'clock PM, Pacific Daylight Time
+"K:mm a, z"	0:08 PM, PDT
+"yyyyy.MMMMM.dd GGG hh:mm aaa"	02001.July.04 AD 12:08 PM
+"EEE, d MMM yyyy HH:mm:ss Z"	Wed, 4 Jul 2001 12:08:56 -0700
+"yyMMddHHmmssZ"	010704120856-0700
+
+	Date or Time Component	Presentation	Examples
+G	Era designator	Text	AD
+y	Year	Year	1996; 96
+M	Month in year	Month	July; Jul; 07
+w	Week in year	Number	27
+W	Week in month	Number	2
+D	Day in year	Number	189
+d	Day in month	Number	10
+F	Day of week in month	Number	2
+E	Day in week	Text	Tuesday; Tue
+a	Am/pm marker	Text	PM
+H	Hour in day (0-23)	Number	0
+k	Hour in day (1-24)	Number	24
+K	Hour in am/pm (0-11)	Number	0
+h	Hour in am/pm (1-12)	Number	12
+m	Minute in hour	Number	30
+s	Second in minute	Number	55
+S	Millisecond	Number	978
+z	Time zone	General time zone	Pacific Standard Time; PST; GMT-08:00
+Z	Time zone	RFC 822 time zone	-0800
+
+
+Class SimpleDateFormat
+
+java.lang.Object
+  java.text.Format
+      java.text.DateFormat
+          java.text.SimpleDateFormat
+All Implemented Interfaces:
+Cloneable, Serializable
+public class SimpleDateFormat
+extends DateFormat
+SimpleDateFormat is a concrete class for formatting and parsing dates in a locale-sensitive manner. It allows for formatting (date -&gt; text), parsing (text -&gt; date), and normalization.
+
+SimpleDateFormat allows you to start by choosing any user-defined patterns for date-time formatting. However, you are encouraged to create a date-time formatter with either getTimeInstance, getDateInstance, or getDateTimeInstance in DateFormat. Each of these class methods can return a date/time formatter initialized with a default format pattern. You may modify the format pattern using the applyPattern methods as desired. For more information on using these methods, see DateFormat.
+
+Date and Time Patterns
+
+Date and time formats are specified by date and time pattern strings. Within date and time pattern strings, unquoted letters from 'A' to 'Z' and from 'a' to 'z' are interpreted as pattern letters representing the components of a date or time string. Text can be quoted using single quotes (') to avoid interpretation. "''" represents a single quote. All other characters are not interpreted; they're simply copied into the output string during formatting or matched against the input string during parsing.
+
+The following pattern letters are defined (all other characters from 'A' to 'Z' and from 'a' to 'z' are reserved):
+
+Letter	Date or Time Component	Presentation	Examples
+G	Era designator	Text	AD
+y	Year	Year	1996; 96
+M	Month in year	Month	July; Jul; 07
+w	Week in year	Number	27
+W	Week in month	Number	2
+D	Day in year	Number	189
+d	Day in month	Number	10
+F	Day of week in month	Number	2
+E	Day in week	Text	Tuesday; Tue
+a	Am/pm marker	Text	PM
+H	Hour in day (0-23)	Number	0
+k	Hour in day (1-24)	Number	24
+K	Hour in am/pm (0-11)	Number	0
+h	Hour in am/pm (1-12)	Number	12
+m	Minute in hour	Number	30
+s	Second in minute	Number	55
+S	Millisecond	Number	978
+z	Time zone	General time zone	Pacific Standard Time; PST; GMT-08:00
+Z	Time zone	RFC 822 time zone	-0800
+Pattern letters are usually repeated, as their number determines the exact presentation:
+Text: For formatting, if the number of pattern letters is 4 or more, the full form is used; otherwise a short or abbreviated form is used if available. For parsing, both forms are accepted, independent of the number of pattern letters.
+Number: For formatting, the number of pattern letters is the minimum number of digits, and shorter numbers are zero-padded to this amount. For parsing, the number of pattern letters is ignored unless it's needed to separate two adjacent fields.
+Year: For formatting, if the number of pattern letters is 2, the year is truncated to 2 digits; otherwise it is interpreted as a number.
+For parsing, if the number of pattern letters is more than 2, the year is interpreted literally, regardless of the number of digits. So using the pattern "MM/dd/yyyy", "01/11/12" parses to Jan 11, 12 A.D.
+
+For parsing with the abbreviated year pattern ("y" or "yy"), SimpleDateFormat must interpret the abbreviated year relative to some century. It does this by adjusting dates to be within 80 years before and 20 years after the time the SimpleDateFormat instance is created. For example, using a pattern of "MM/dd/yy" and a SimpleDateFormat instance created on Jan 1, 1997, the string "01/11/12" would be interpreted as Jan 11, 2012 while the string "05/04/64" would be interpreted as May 4, 1964. During parsing, only strings consisting of exactly two digits, as defined by Character.isDigit(char), will be parsed into the default century. Any other numeric string, such as a one digit string, a three or more digit string, or a two digit string that isn't all digits (for example, "-1"), is interpreted literally. So "01/02/3" or "01/02/003" are parsed, using the same pattern, as Jan 2, 3 AD. Likewise, "01/02/-3" is parsed as Jan 2, 4 BC.
+
+Month: If the number of pattern letters is 3 or more, the month is interpreted as text; otherwise, it is interpreted as a number.
+General time zone: Time zones are interpreted as text if they have names. For time zones representing a GMT offset value, the following syntax is used:
+     GMTOffsetTimeZone:
+             GMT Sign Hours : Minutes
+     Sign: one of
+             + -
+     Hours:
+             Digit
+             Digit Digit
+     Minutes:
+             Digit Digit
+     Digit: one of
+             0 1 2 3 4 5 6 7 8 9
+Hours must be between 0 and 23, and Minutes must be between 00 and 59. The format is locale independent and digits must be taken from the Basic Latin block of the Unicode standard.
+For parsing, RFC 822 time zones are also accepted.
+
+RFC 822 time zone: For formatting, the RFC 822 4-digit time zone format is used:
+     RFC822TimeZone:
+             Sign TwoDigitHours Minutes
+     TwoDigitHours:
+             Digit Digit
+TwoDigitHours must be between 00 and 23. Other definitions are as for general time zones.
+For parsing, general time zones are also accepted.
+
+SimpleDateFormat also supports localized date and time pattern strings. In these strings, the pattern letters described above may be replaced with other, locale dependent, pattern letters. SimpleDateFormat does not deal with the localization of text other than the pattern letters; that's up to the client of the class.
+Examples
+
+The following examples show how date and time patterns are interpreted in the U.S. locale. The given date and time are 2001-07-04 12:08:56 local time in the U.S. Pacific Time time zone.
+Date and Time Pattern	Result
+"yyyy.MM.dd G 'at' HH:mm:ss z"	2001.07.04 AD at 12:08:56 PDT
+"EEE, MMM d, ''yy"	Wed, Jul 4, '01
+"h:mm a"	12:08 PM
+"hh 'o''clock' a, zzzz"	12 o'clock PM, Pacific Daylight Time
+"K:mm a, z"	0:08 PM, PDT
+"yyyyy.MMMMM.dd GGG hh:mm aaa"	02001.July.04 AD 12:08 PM
+"EEE, d MMM yyyy HH:mm:ss Z"	Wed, 4 Jul 2001 12:08:56 -0700
+"yyMMddHHmmssZ"	010704120856-0700</description>
+        <from>format string</from>
+        <to>format string</to>
+      </input>
+      <output global="false" required="true">
+        <to>formatted date</to>
+        <from>formatted date</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint></checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>format string</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>format string</to>
+                  <value>MM/dd/yyyy</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>date</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>formatted date</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="time zone">
+                <input global="false">
+                  <from>time zone</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="format string">
+                <input global="false">
+                  <from>format string</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<?xml version="1.0" encoding="ISO-8859-1"?>
+<xsl:stylesheet version="1.0"
+xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+xmlns:java="java">
+
+<xsl:template match="/">
+<xsl:variable name="dateFormat" select="java:text.SimpleDateFormat.new('${format string}')"/>
+<xsl:variable name="dateAsLong" select="java:lang.Long.parseLong(.)"/>
+<xsl:variable name="passedDate" select="java:util.Date.new($dateAsLong)"/>
+<xsl:variable name="timezone" select="java:util.TimeZone.getTimeZone('${time zone}')"/>
+<xsl:variable name="empty" select="java:setTimeZone($dateFormat, $timezone)"/>
+<value><xsl:value-of select="java:format($dateFormat, $passedDate)"/></value>
+</xsl:template>
+
+</xsl:stylesheet>
+]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process converts and formats epoch dates into human readable strings.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>3d1bbdec-8e1f-37b2-9706-172b0455ecf4</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283174462726</last-modified>
+    </meta>
+  </process-def>
+</process>

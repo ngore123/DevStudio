@@ -1,0 +1,294 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:BlPackage:Create Package from Component">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the package.</description>
+        <from>packageName</from>
+        <to>packageName</to>
+      </input>
+      <input global="false" required="true">
+        <description>ID of a group that should contain the package.</description>
+        <from>groupId</from>
+        <to>groupId</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to create a package soft linked to the depot object resources, false otherwise.</description>
+        <from>bSoftLinked</from>
+        <to>bSoftLinked</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to package the file ACLs, false otherwise.</description>
+        <from>bCollectFileAcl</from>
+        <to>bCollectFileAcl</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to package the file attributes, false otherwise.</description>
+        <from>bCollectFileAttributes</from>
+        <to>bCollectFileAttributes</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to package the file contents, false otherwise.</description>
+        <from>bCopyFileContents</from>
+        <to>bCopyFileContents</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to package the registry ACLs, false otherwise.</description>
+        <from>bCollectRegistryAcl</from>
+        <to>bCollectRegistryAcl</to>
+      </input>
+      <input global="false" required="true">
+        <description>Handle to the component that you want to package.</description>
+        <from>componentKey</from>
+        <to>componentKey</to>
+      </input>
+      <input global="false" required="false">
+        <description>The single-user mode. You can set the singleUserMode argument to one of the following strings:
+    - NotRequired: Not Required
+    - RevertTo: Use single-user mode without reboot
+    - RebootAs: Reboot into single-user mode</description>
+        <from>singleUserMode</from>
+        <to>singleUserMode</to>
+      </input>
+      <input global="false" required="false">
+        <description>The reboot mode. You can set the rebootMode argument to one of the following strings:
+    - NotRequired: Not required
+    - AfterDeploy: After item deployment
+    - AfterDeployWithReconfiguration: After item deployment with reconfiguration (Solaris ONLY)
+    - OutOfBand: Out-of-band
+    - AtJobEnd: By end of job
+    - AtJobEndWithReconfigration: By end of job with reconfiguration (Solaris ONLY)</description>
+        <from>rebootMode</from>
+        <to>rebootMode</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the DB Key for the newly created BlPackage.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the Adapter response for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>packageName</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>groupId</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>bSoftLinked</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>bCollectFileAcl</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>bCollectFileAttributes</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>bCopyFileContents</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>bCollectRegistryAcl</from>
+            <to>argument 7</to>
+          </input>
+          <input>
+            <from>componentKey</from>
+            <to>argument 8</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>singleUserMode</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+              <parameters>
+                <input>
+                  <from>singleUserMode</from>
+                  <to>argument 1</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>current list</to>
+                </input>
+                <input>
+                  <from>rebootMode</from>
+                  <to>argument 2</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>BlPackage</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>createPackageFromComponent</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Note: This command applies only to Application Release Manager.
+
+This command creates a BLPackage based on all the assets (server objects) specified in a component. It also lets you specify single-user mode and reboot settings.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e81009ae-a771-31c9-aea8-511419c9e5c1</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179763909</last-modified>
+    </meta>
+  </process-def>
+</process>

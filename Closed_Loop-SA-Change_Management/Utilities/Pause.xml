@@ -1,0 +1,210 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":Closed_Loop-SA-Change_Management:Utilities:Pause">
+    <parameters>
+      <input global="false" required="false">
+        <description>Count of number times to pause</description>
+        <from>count</from>
+        <to>count</to>
+      </input>
+      <output global="false" required="true">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>count</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>iterator</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:variable name="elements">
+      <root />
+    </xsl:variable>
+    <xsl:call-template name="create-xml">
+      <xsl:with-param name="count" select="." />
+      <xsl:with-param name="xml" select="$elements" />
+    </xsl:call-template>
+  </xsl:template>
+  <xsl:template name="create-xml">
+    <xsl:param name="count" />
+    <xsl:param name="xml" />
+    <xsl:choose>
+      <xsl:when test="count(xalan:nodeset($xml)/root/element)&lt;$count">
+        <xsl:variable name="new-xml">
+          <root>
+            <xsl:copy-of select="xalan:nodeset($xml)/root/element" />
+            <element />
+          </root>
+        </xsl:variable>
+        <xsl:call-template name="create-xml">
+          <xsl:with-param name="count" select="$count" />
+          <xsl:with-param name="xml" select="$new-xml" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="$xml" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input>
+                <value>Process has paused for </value>
+              </input>
+              <input required="false">
+                <from>count</from>
+              </input>
+              <input>
+                <value> minutes.</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>log message</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>iterator</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>element</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//element]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>log message</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <sequence>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+          <pause>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <duration>60000</duration>
+            <location>:pause[1]</location>
+          </pause>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <assign>
+        <assignment>
+          <output>
+            <to>success status</to>
+            <value>0</value>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input>
+                <value>Process paused for </value>
+              </input>
+              <input required="false">
+                <from>count</from>
+              </input>
+              <input>
+                <value> minutes.</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>status message</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Tries to access the event and check if its status is paused every minute till the time either the pause count expires or we get event as closed.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4156e9ec-6039-3c0a-baf8-ced42308d150</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283245776055</last-modified>
+    </meta>
+  </process-def>
+</process>

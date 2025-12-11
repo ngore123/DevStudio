@@ -1,0 +1,244 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:Use_Case:Use_Case_1:Provision Storage(With OCP)">
+    <parameters>
+      <input global="false" required="false">
+        <description>hpse adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is HPSEActor</description>
+        <from>hpse adapter name</from>
+        <to>hpse adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the storage system on which new storage pool will be created.</description>
+        <from>storage system name</from>
+        <to>storage system name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Size of the storage pool</description>
+        <from>pool size</from>
+        <to>pool size</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name that will be assigned to the newly created volume</description>
+        <from>volume name</from>
+        <to>volume name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Size of the volume that will be created in GB</description>
+        <from>volume size</from>
+        <to>volume size</to>
+      </input>
+      <input global="false" required="true">
+        <description>This parameter dictates whether pool creation is required while creating a volume.
+Valid values - yes,no
+yes - Pool creation required
+no - Pool creation not required</description>
+        <from>pool creation required</from>
+        <to>pool creation required</to>
+      </input>
+      <output global="false" required="false">
+        <to>create volume final response</to>
+        <from>create volume final response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Use_Case_1:Provision Storage Pool For Storage(Semi Automated)</process-name>
+        <parameters>
+          <input>
+            <from>hpse adapter name</from>
+            <to>hpse adapter name</to>
+          </input>
+          <input>
+            <from>storage system name</from>
+            <to>storage system name</to>
+          </input>
+          <input>
+            <from>pool size</from>
+            <to>pool size</to>
+          </input>
+          <input>
+            <from>volume name</from>
+            <to>volume name</to>
+          </input>
+          <input>
+            <from>volume size</from>
+            <to>volume size</to>
+          </input>
+          <input>
+            <from>pool creation required</from>
+            <to>pool creation required</to>
+          </input>
+          <output>
+            <from>storage system id</from>
+            <to>storage system id</to>
+          </output>
+          <output>
+            <from>final error</from>
+            <to>storage pool creation error</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>storage pool creation error</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="pool creation error">
+                  <input global="false">
+                    <from>storage pool creation error</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[string('${pool creation error}') = '']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Use_Case_1:Provision Volume For Storage(Semi Automated)</process-name>
+              <parameters>
+                <input>
+                  <from>hpse adapter name</from>
+                  <to>hpse adapter name</to>
+                </input>
+                <input>
+                  <from>storage system id</from>
+                  <to>storage system id</to>
+                </input>
+                <input>
+                  <from>volume name</from>
+                  <to>volume name</to>
+                </input>
+                <input>
+                  <from>volume size</from>
+                  <to>volume size</to>
+                </input>
+                <output>
+                  <from>create volume response</from>
+                  <to>create volume final response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description>It is detected that the existing Storage Pool is running out of space and there is a need to provision additional storage on the Storage System, associate a RAID configuration, create Volumes which could be Associated to Hosts.
+
+This version of use case runs with OCP integration.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7db3921a-c48e-3af6-9f57-35c915980f52</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588045665</last-modified>
+    </meta>
+  </process-def>
+</process>

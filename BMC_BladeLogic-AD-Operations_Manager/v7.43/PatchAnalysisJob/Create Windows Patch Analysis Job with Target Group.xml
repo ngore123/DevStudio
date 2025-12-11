@@ -1,0 +1,238 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.43:PatchAnalysisJob:Create Windows Patch Analysis Job with Target Group">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the job.</description>
+        <from>jobName</from>
+        <to>jobName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Parent group for this job.</description>
+        <from>groupName</from>
+        <to>groupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the initial target server group.</description>
+        <from>targetGroupName</from>
+        <to>targetGroupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified NSH path to a file that lists the QNumbers of patches that should be analyzed. The list should include only one QNumber per line.</description>
+        <from>includeQNumberFileName</from>
+        <to>includeQNumberFileName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified NSH path to a file that lists the QNumbers of patches that should not be analyzed. The list should include only one QNumber per line.</description>
+        <from>excludeQNumberFileName</from>
+        <to>excludeQNumberFileName</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to analyze security patches, false otherwise.</description>
+        <from>analyzeSecurityPatches</from>
+        <to>analyzeSecurityPatches</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to analyze security tools patches, false otherwise.</description>
+        <from>analyzeSecurityTools</from>
+        <to>analyzeSecurityTools</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to analyze non-security patches, false otherwise.</description>
+        <from>analyzeNonSecurityPatches</from>
+        <to>analyzeNonSecurityPatches</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to exclude service packs, false otherwise.</description>
+        <from>filterSP</from>
+        <to>filterSP</to>
+      </input>
+      <input global="false" required="true">
+        <description>True to exclude effectively installed patches, false otherwise.</description>
+        <from>excludeEffectivelyInstalled</from>
+        <to>excludeEffectivelyInstalled</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the DBKey for the newly created patch analysis job.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>jobName</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>groupName</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>targetGroupName</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>includeQNumberFileName</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>excludeQNumberFileName</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>analyzeSecurityPatches</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>analyzeSecurityTools</from>
+            <to>argument 7</to>
+          </input>
+          <input>
+            <from>analyzeNonSecurityPatches</from>
+            <to>argument 8</to>
+          </input>
+          <input>
+            <from>filterSP</from>
+            <to>argument 9</to>
+          </input>
+          <input>
+            <from>excludeEffectivelyInstalled</from>
+            <to>argument 10</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <value>PatchAnalysisJob</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>createWindowsPatchAnalysisJobWithTargetGroup</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command creates a Patch Analysis Job that is run against one server group, using the Shavlik engine.
+The jobGroupName argument provides the fully qualified path to the parent group. The targetGroupName argument provides the target server group for the new Patch Analysis job.
+This command returns a handle to the newly created Patch Analysis Job. The handle can be used in other commands that need to reference the Patch Analysis Job.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>14f9e5cd-eb52-3355-9d9c-fe9b80637502</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179985242</last-modified>
+    </meta>
+  </process-def>
+</process>

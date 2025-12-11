@@ -1,0 +1,615 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":AutoPilot-OA-ITSM_Automation:Incident_Management:Do Update">
+    <parameters>
+      <input global="false" required="true">
+        <description>The name of the WebService adapter to make the Soap call to Remedy ITSM. </description>
+        <from>AdapterName</from>
+        <to>AdapterName</to>
+      </input>
+      <input global="false" required="true">
+        <description>The target SoapUrl of the Remedy ITSM web service to call</description>
+        <from>SoapUrl</from>
+        <to>SoapUrl</to>
+      </input>
+      <input global="false" required="true">
+        <description>The UserName of the Remedy ITSM.
+</description>
+        <from>UserName</from>
+        <to>UserName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Password of the Remedy ITSM</description>
+        <from>Password</from>
+        <to>Password</to>
+      </input>
+      <input global="false" required="true">
+        <description>The Incident for which the WorkInfo needs to be updated.</description>
+        <from>IncidentNumber</from>
+        <to>IncidentNumber</to>
+      </input>
+      <input global="false" required="false">
+        <description>The Web Service Interface name to update the incident.
+
+Sample value:
+HPD_IncidentServiceInterface</description>
+        <from>UpdateIncidentInterface</from>
+        <to>UpdateIncidentInterface</to>
+      </input>
+      <input global="false" required="false">
+        <description>The Status of the Incident Ticket. 
+
+Valid Values:
+
+New
+Assigned
+In Progress
+Pending
+Resolved
+Closed
+Cancelled
+</description>
+        <from>Status</from>
+        <to>Status</to>
+      </input>
+      <input global="false" required="false">
+        <description>The reason for the current status of the incident ticket.
+
+Valid Values:
+
+Infrastructure Change Created
+Local Site Action Required
+Purchase Order Approval
+Registration Approval
+Supplier Delivery
+Support Contact Hold
+Third Party Vendor Action Reqd
+Client Action Required
+Infrastructure Change
+Request
+Future Enhancement
+Pending Original Incident
+Client Hold
+Monitoring Incident
+Customer Follow-Up Required
+Temporary Corrective Action
+No Further Action Required
+Resolved by Original Incident
+Automated Resolution Reported
+No longer a Causal CI
+Pending Causal Incident Resolution
+Resolved by Causal Incident</description>
+        <from>StatusReason</from>
+        <to>StatusReason</to>
+      </input>
+      <input global="false" required="false">
+        <description>The Impact of the incident ticket.
+
+Valid Values:
+
+1-Extensive/Widespread
+2-Significant/Large
+3-Moderate/Limited
+4-Minor/Localized
+</description>
+        <from>Impact</from>
+        <to>Impact</to>
+      </input>
+      <input global="false" required="false">
+        <description>The Urgency of the Incident Ticket.
+
+Valid Values:
+
+1-Critical
+2-High
+3-Medium
+4-Low</description>
+        <from>Urgency</from>
+        <to>Urgency</to>
+      </input>
+      <input global="false" required="false">
+        <description>The WorkInfo Details to be updated in the Incident ticket.</description>
+        <from>WorkInfoDetails</from>
+        <to>WorkInfoDetails</to>
+      </input>
+      <input global="false" required="false">
+        <description>The type of the WorkInfo to be updated in the Incident ticket.
+
+Valid Values:
+
+----- Customer Inbound -----
+Customer Communication
+Customer Follow-up
+Customer Status Update
+----- Customer Outbound -----
+Closure Follow Up
+Detail Clarification
+General Information
+Resolution Communications
+Satisfaction Survey
+Status Update
+----- General -----
+Incident Task / Action
+Problem Script
+Working Log
+Email System
+Paging System
+BMC Impact Manager Update
+Chat</description>
+        <from>WorkInfoType</from>
+        <to>WorkInfoType</to>
+      </input>
+      <input global="false" required="false">
+        <description>The source of the WorkInfo to be updated in the Incident ticket.
+
+Valid Values:
+
+Email
+Fax
+Phone
+Voice Mail
+Walk In
+Pager
+System Assignment
+Web
+Other
+BMC Impact Manager Event
+</description>
+        <from>WorkInfoSource</from>
+        <to>WorkInfoSource</to>
+      </input>
+      <input global="false" required="false">
+        <description>Indicates whether the WorkInfo to be updated is locked.
+
+Valid Values:
+
+Yes
+No</description>
+        <from>WorkInfoLocked</from>
+        <to>WorkInfoLocked</to>
+      </input>
+      <input global="false" required="false">
+        <description>Indicates the view access of the WorkInfo to be updated in the incident ticket.
+
+Valid Values:
+
+Internal
+Public</description>
+        <from>WorkInfoViewAccess</from>
+        <to>WorkInfoViewAccess</to>
+      </input>
+      <output global="false" required="false">
+        <to>json response</to>
+        <from>json response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>SoapUrl</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>soapurl</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="update incident interface">
+                <input global="false">
+                  <from>UpdateIncidentInterface</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:variable name="UpdateInterface">
+      <xsl:choose>
+        <xsl:when test="string-length('${update incident interface}') &gt; 0">${update incident interface}</xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">HPD_IncidentServiceInterface</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <value>
+      <xsl:choose>
+        <xsl:when test="substring(., string-length(.)) = '&amp;'">
+          <xsl:value-of select="concat(., 'webService=',  $UpdateInterface)" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat(., '&amp;webService=',  $UpdateInterface)" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>soapurl</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>soap request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="username">
+                <input global="false">
+                  <from>UserName</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="password">
+                <input global="false">
+                  <from>Password</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="incident number">
+                <input global="false">
+                  <from>IncidentNumber</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo details">
+                <input global="false">
+                  <from>WorkInfoDetails</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo type">
+                <input global="false">
+                  <from>WorkInfoType</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo source">
+                <input global="false">
+                  <from>WorkInfoSource</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo locked">
+                <input global="false">
+                  <from>WorkInfoLocked</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo view access">
+                <input global="false">
+                  <from>WorkInfoViewAccess</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="status">
+                <input global="false">
+                  <from>Status</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="status reason">
+                <input global="false">
+                  <from>StatusReason</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="impact">
+                <input global="false">
+                  <from>Impact</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="urgency">
+                <input global="false">
+                  <from>Urgency</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:urn="urn:HPD_IncidentServiceInterface" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org" version="1.0">
+  <xsl:output indent="yes" encoding="XML" cdata-section-elements="HPD_IncidentServiceInterface " />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Header>
+        <xsl:element name="urn:AuthenticationInfo">
+          <xsl:element name="urn:userName">$[username]</xsl:element>
+          <xsl:element name="urn:password">$[password]</xsl:element>
+        </xsl:element>
+      </soapenv:Header>
+      <soapenv:Body>
+        <xsl:element name="urn:Process_Event">
+          <xsl:element name="urn:Action">
+            <xsl:text disable-output-escaping="no">PROCESS_EVENT</xsl:text>
+          </xsl:element>
+          <Incident_Number>${incident number}</Incident_Number>
+          <xsl:element name="urn:Work_Info_Details">
+            <xsl:text disable-output-escaping="no">$[workinfo details]</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Work_Info_Type">
+            <xsl:text disable-output-escaping="no">${workinfo type}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Work_Info_Source">
+            <xsl:text disable-output-escaping="no">${workinfo source}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Work_Info_Locked">${workinfo locked}</xsl:element>
+          <xsl:element name="urn:Work_Info_View_Access">${workinfo view access}</xsl:element>
+          <xsl:element name="urn:Incident_Status">${status}</xsl:element>
+          <xsl:element name="urn:Incident_Status_Reason">${status reason}</xsl:element>
+          <xsl:element name="urn:Impact">${impact}</xsl:element>
+          <xsl:element name="urn:Urgency">${urgency}</xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>remedyRequest=&gt;</value>
+              </input>
+              <input>
+                <from>soap request</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+        <parameters>
+          <input>
+            <from>AdapterName</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>http-rpc</value>
+            <to>transport</to>
+          </input>
+          <input>
+            <from>soapurl</from>
+            <to>soap url</to>
+          </input>
+          <input>
+            <from>soap request</from>
+            <to>soap message</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>Create Change call executed</value>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Utilities:Generate Response</process-name>
+              <unique-id>075b947d-4cef-42fe-95e7-19439aba8809</unique-id>
+              <parameters>
+                <input>
+                  <value>failure</value>
+                  <to>status</to>
+                </input>
+                <input>
+                  <from>adapter response</from>
+                  <to>error message</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[concat("Could not update WorkInfo.", string(//faultstring))]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <value>Update WorkInfo</value>
+                  <to>request type</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//faultcode) =0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='Success' or .='success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>incident id</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"><xsl:output indent="yes" /><xsl:template match="/"><result><xsl:for-each select="//*"><xsl:choose><xsl:when test="contains(name(.), &quot;Incident_Number&quot;)"><xsl:copy-of select="." /></xsl:when></xsl:choose></xsl:for-each></result></xsl:template></xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Utilities:Generate Response</process-name>
+              <unique-id>075b947d-4cef-42fe-95e7-19439aba8809</unique-id>
+              <parameters>
+                <input>
+                  <from>status</from>
+                  <to>status</to>
+                </input>
+                <input>
+                  <from>error message</from>
+                  <to>error message</to>
+                </input>
+                <input>
+                  <value>Update WorkInfo</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>incident id</from>
+                  <to>data</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens>
+                      <replacement-token name="incident id">
+                        <input global="false">
+                          <from>incident id</from>
+                        </input>
+                      </replacement-token>
+                    </stylesheet-replacement-tokens>
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <response-data>
+      <incident-id>${incident id}</incident-id>
+      <message>
+        <xsl:text disable-output-escaping="no">WorkInfo Updated Successfully.</xsl:text>
+      </message>
+    </response-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8d97d244-bd3b-4ead-8914-6725e14805ea</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1593518805655</last-modified>
+    </meta>
+  </process-def>
+</process>

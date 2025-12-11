@@ -1,0 +1,114 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Errors:Get Errors by Category">
+    <parameters>
+      <input global="false" required="true">
+        <description>An error category, like Remedy, Incident, etc. 
+
+If code exists, then, an XML is returned. For example:
+&lt;Remedy&gt;
+   &lt;errors&gt;
+     &lt;error&gt;
+       &lt;code&gt;100&lt;/code&gt;
+       &lt;summary&gt;Unknown error&lt;/summary&gt;
+       &lt;details&gt;Uknown error&lt;/details&gt;
+       &lt;resolution&gt;Please contact BAO administrator&lt;/resolution&gt;
+    &lt;/error&gt;
+  &lt;/errors&gt;
+&lt;/Remedy&gt;
+
+If category does not exist, it will return an error text indicating category with the given name does not exist. For example: 
+
+Error definitions with category: '10' not found!
+</description>
+        <from>category</from>
+        <to>category</to>
+      </input>
+      <output global="false" required="false">
+        <to>errors</to>
+        <from>errors</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:AutoPilot-OA-Errors</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>errors</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="category">
+                <input global="false">
+                  <from>category</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//Categories/*[name() = '${category}'])">
+        <xsl:copy-of select="//Categories/*[name() = '${category}']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <result>
+          <xsl:text disable-output-escaping="no">Error definitions with category: '${category}' not found!</xsl:text>
+        </result>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Get Errors by Category - errors</value>
+              </input>
+              <input>
+                <from>errors</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility work flow to get all errors underneath a given category</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>25dc83b1-618e-4abc-bb28-1b3a4dd13d42</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1437662124837</last-modified>
+    </meta>
+  </process-def>
+</process>

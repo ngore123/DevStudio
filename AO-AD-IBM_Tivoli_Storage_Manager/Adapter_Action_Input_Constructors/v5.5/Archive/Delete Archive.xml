@@ -1,0 +1,226 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Adapter_Action_Input_Constructors:v5.5:Archive:Delete Archive">
+    <parameters>
+      <input global="false" required="false">
+        <description>The description option assigns or specifies a description for files when performing archive, delete archive, retrieve, query archive, or query backupset.</description>
+        <from>description</from>
+        <to>description</to>
+      </input>
+      <input global="false" required="false">
+        <description>The Tivoli Storage Manager client opens the file you specify with this option and processes the list of files within according to the specific command. With the exception of the restore and retrieve commands, when you use the filelist option, Tivoli Storage Manager ignores all other file specifications on the command line.
+Note: The &lt;FILELIST&gt; option does not support the wildcard characters.</description>
+        <from>filelist</from>
+        <to>filelist</to>
+      </input>
+      <input global="false" required="false">
+        <description>The subdir option specifies whether you want to include subdirectories of named directories for processing. Valid values-yes,no         
+Note: SUBDIR is not a valid option when using FILELIST option.</description>
+        <from>subdir</from>
+        <to>subdir</to>
+      </input>
+      <input global="false" required="false">
+        <description>The noprompt option suppresses the confirmation prompt that is presented by the delete group, delete archive, expire, restore image, and set event commands.  
+Note: Although this tag is optional but user must provide this tag otherwise application might prompt the user in which case the adapter will hang and time out after a specifc time period.
+Valid values-true,false</description>
+        <from>noprompt</from>
+        <to>noprompt</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the path and file name that you want to delete from storage. Use wildcard characters to specify a group of files or all files in a directory. You can specify as many file specifications as available resources or other operating system limits permit. Separate file specifications with a space. You can also use the filelist option to process a list of files.</description>
+        <from>filespec</from>
+        <to>filespec</to>
+      </input>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="false">
+        <description>The dateformat option specifies the format you want to use to display dates. Valid values - MM/DD/YYYY, DD-MM-YYYY, DD.MM.YYYY, YYYY.MM.DD, YYYY-MM-DD</description>
+        <from>dateformat</from>
+        <to>dateformat</to>
+      </input>
+      <input global="false" required="false">
+        <description>The numberformat option specifies the format you want to use to display numbers. Valid values – 
+1. d,ddd.dd
+2. d,ddd,dd
+3. d ddd,dd
+4. d ddd.dd
+5. d.ddd,dd
+6. d'ddd,dd</description>
+        <from>numberformat</from>
+        <to>numberformat</to>
+      </input>
+      <input global="false" required="false">
+        <description>The timeformat option specifies the format in which you want to display system time. Valid values – 1) HH:MM:SS 2) HH,MM,SS 3)HH.MM.SS 4) hh:mm:ssAM/PM.  The formats 1,2 and 3 follow 0-23 hour format.</description>
+        <from>timeformat</from>
+        <to>timeformat</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>final items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>final items</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="description">
+                <input global="false">
+                  <from>description</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="filelist">
+                <input global="false">
+                  <from>filelist</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="filespec">
+                <input global="false">
+                  <from>filespec</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="subdir">
+                <input global="false">
+                  <from>subdir</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="noprompt">
+                <input global="false">
+                  <from>noprompt</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="numberformat">
+                <input global="false">
+                  <from>numberformat</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="timeformat">
+                <input global="false">
+                  <from>timeformat</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="dateformat">
+                <input global="false">
+                  <from>dateformat</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" omit-xml-declaration="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">delete-archive</xsl:text>
+        </operation-name>
+        <xsl:if test="string('${timeout secs}')!=''">
+          <timeout-secs>
+            <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+        <command-options>
+          <xsl:if test="string('${description}')!=''">
+            <description>
+              <xsl:value-of select="'${description}'" disable-output-escaping="no" />
+            </description>
+          </xsl:if>
+          <xsl:if test="string('${filelist}')!=''">
+            <filelist>
+              <xsl:value-of select="'${filelist}'" disable-output-escaping="no" />
+            </filelist>
+          </xsl:if>
+          <xsl:if test="string('${subdir}')!=''">
+            <subdir>
+              <xsl:value-of select="'${subdir}'" disable-output-escaping="no" />
+            </subdir>
+          </xsl:if>
+          <xsl:if test="string('${noprompt}')='true'">
+            <noprompt />
+          </xsl:if>
+          <xsl:if test="string('${numberformat}')!=''">
+            <numberformat>
+              <xsl:value-of select="'${numberformat}'" disable-output-escaping="no" />
+            </numberformat>
+          </xsl:if>
+          <xsl:if test="string('${timeformat}')!=''">
+            <timeformat>
+              <xsl:value-of select="'${timeformat}'" disable-output-escaping="no" />
+            </timeformat>
+          </xsl:if>
+          <xsl:if test="string('${dateformat}')!=''">
+            <dateformat>
+              <xsl:value-of select="'${dateformat}'" disable-output-escaping="no" />
+            </dateformat>
+          </xsl:if>
+        </command-options>
+        <command-arguments>
+          <xsl:if test="string('${filespec}')!=''">
+            <filespec>
+              <xsl:value-of select="'${filespec}'" disable-output-escaping="no" />
+            </filespec>
+          </xsl:if>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>FINAL ITEMS: </value>
+              </input>
+              <input>
+                <from>final items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for Delete Archive process.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>cbef9d8f-55e1-390f-98d0-72f7accaf173</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290596955813</last-modified>
+    </meta>
+  </process-def>
+</process>

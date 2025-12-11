@@ -1,0 +1,590 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-NetAPP_Storage:Utilities:Use_Case_Utilities:Provision_Storage_Use_Case:Parse Mail Event">
+    <parameters>
+      <input global="false" required="true">
+        <from>inputevent</from>
+        <to>inputevent</to>
+      </input>
+      <output global="false" required="false">
+        <to>storage name</to>
+        <from>storage name</from>
+      </output>
+      <output global="false" required="false">
+        <to>size</to>
+        <from>size</from>
+      </output>
+      <output global="false" required="false">
+        <to>description</to>
+        <from>description</from>
+      </output>
+      <output global="false" required="false">
+        <to>provisioning policy</to>
+        <from>provisioning policy</from>
+      </output>
+      <output global="false" required="false">
+        <to>resource pool</to>
+        <from>resource pool</from>
+      </output>
+      <output global="false" required="false">
+        <to>entity id</to>
+        <from>entity id</from>
+      </output>
+      <output global="false" required="false">
+        <to>error</to>
+        <from>error</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>entity</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-before(string(//subject), ":")]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>entity id</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(string(//subject), ":")]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>No valid change found</value>
+                      </input>
+                    </concat>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>error</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>error</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:utility[1]</location>
+            </utility>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>entity</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Change']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>entity id</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>find change items</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="change id">
+                      <input global="false">
+                        <from>entity id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">retrieve-change</xsl:text>
+        </operation-name>
+        <model>
+          <keys>
+            <change-number>
+              <value>
+                <xsl:value-of select="'${change id}'" disable-output-escaping="no" />
+              </value>
+              <type>
+                <xsl:text disable-output-escaping="no">String</xsl:text>
+              </type>
+            </change-number>
+          </keys>
+          <instance>
+            <header />
+            <description-structure />
+            <middle />
+            <close />
+          </instance>
+        </model>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-HP_ServiceCenter:v6.2:Change_Management:Find Change</process-name>
+              <parameters>
+                <input>
+                  <from>find change items</from>
+                  <to>items</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>find change response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <utility>
+                    <string>
+                      <concat>
+                        <input>
+                          <concat>
+                            <input>
+                              <value>An error occurred while fetching change details</value>
+                            </input>
+                          </concat>
+                        </input>
+                      </concat>
+                    </string>
+                    <output global="false">
+                      <to>error</to>
+                    </output>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <from>error</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:utility[1]</location>
+                  </utility>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>find change response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(//response/item/metadata/status)='success']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>find change response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>change description</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[string(//brief-description/value)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <utility>
+                          <string>
+                            <concat>
+                              <input>
+                                <concat>
+                                  <input>
+                                    <value>No valid provision storage data found</value>
+                                  </input>
+                                </concat>
+                              </input>
+                            </concat>
+                          </string>
+                          <output global="false">
+                            <to>error</to>
+                          </output>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <from>error</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:utility[1]</location>
+                        </utility>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>change description</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens>
+                            <replacement-token name="desc">
+                              <input global="false">
+                                <from>change description</from>
+                              </input>
+                            </replacement-token>
+                          </xpath-replacement-tokens>
+                          <xpath><![CDATA[substring-before('${desc}', ";")='provision-storage']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>change description</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>storage name</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="desc">
+                                  <input global="false">
+                                    <from>change description</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[substring-before(substring-after('${desc}', ";"), ";")]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>change description</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>size</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="desc">
+                                  <input global="false">
+                                    <from>change description</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[substring-before(substring-after(substring-after('${desc}', ";"), ";"), ";")]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>change description</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>description</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="desc">
+                                  <input global="false">
+                                    <from>change description</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[substring-before(substring-after(substring-after(substring-after('${desc}', ";"), ";"), ";"), ";")]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>change description</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>provisioning policy</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="desc">
+                                  <input global="false">
+                                    <from>change description</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[substring-before(substring-after(substring-after(substring-after(substring-after('${desc}', ";"), ";"), ";"), ";"), ";")]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>change description</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>resource pool</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="desc">
+                                  <input global="false">
+                                    <from>change description</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[substring-after(substring-after(substring-after(substring-after(substring-after('${desc}', ";"), ";"), ";"), ";"), ";")]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>fba0ce21-4e74-375e-8d15-9f96d2db3483</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598170876</last-modified>
+    </meta>
+  </process-def>
+</process>

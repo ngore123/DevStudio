@@ -1,0 +1,245 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-AD-CyberArk:Web_SDK_API:Safes:Delete Safe">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter to use to handle the request. 
+
+Default value: CyberArkActorAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The token that identifies the session. A session token that was returned from the “Logon” method.
+</description>
+        <from>authorization token</from>
+        <to>authorization token</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the safe to be deleted</description>
+        <from>safe name</from>
+        <to>safe name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Option to return the response in message body in XML or JSON in output context. If no input is provided, it is assumed to XML.
+
+Default Value: XML
+
+Please note: If JSON provided then headers in adapter response will also be converted into JSON and assigned in output context.
+
+Please note: This parameter is not part of adapter request XML, this parameter is only used to process adapter response in given format.
+</description>
+        <from>return data format</from>
+        <to>return data format</to>
+      </input>
+      <output global="false" required="false">
+        <description>Status represents whether request executed successfully on server
+Valid values:
+
+success
+error</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>Body in response</description>
+        <to>response body</to>
+        <from>response body</from>
+      </output>
+      <output global="false" required="false">
+        <description>response code</description>
+        <to>status code</to>
+        <from>status code</from>
+      </output>
+      <output global="false" required="false">
+        <description>Response header values
+</description>
+        <to>response headers</to>
+        <from>response headers</from>
+      </output>
+      <output global="false" required="false">
+        <description>Error message in case of status error</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>authorization token</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="safe name">
+                <input global="false">
+                  <from>safe name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request>
+      <authorization-token>
+        <xsl:value-of select="." disable-output-escaping="no" />
+      </authorization-token>
+      <safe-name>$[safe name]</safe-name>
+    </request>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Formed Request</value>
+              </input>
+              <input>
+                <from>request</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-AD-CyberArk:Utilities:Create And Execute Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>cyberark-websdk-safes-delete-safe</value>
+            <to>operation name</to>
+          </input>
+          <input>
+            <from>request</from>
+            <to>request</to>
+          </input>
+          <input>
+            <from>return data format</from>
+            <to>return data format</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+          <output>
+            <from>return data format</from>
+            <to>return data format</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>------------------Adapter Response----------------</value>
+              </input>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Process Response</process-name>
+        <parameters>
+          <input>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </input>
+          <input>
+            <from>return data format</from>
+            <to>return data format</to>
+          </input>
+          <output>
+            <from>response headers</from>
+            <to>response headers</to>
+          </output>
+          <output>
+            <from>response body</from>
+            <to>response body</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>status code</from>
+            <to>status code</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This method deletes a Safe from the Vault.
+
+The user who runs this operation requires Manage Safe permissions in the Vault.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>22209ab0-c36b-4602-8b68-33171c4a7d9f</process-id>
+      <author>dbhola</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1573747930386</last-modified>
+    </meta>
+  </process-def>
+</process>

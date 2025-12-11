@@ -1,0 +1,214 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Network_Utilities:Interface:Delete Static IP Address">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the name of the interface for which you want to configure address and gateway information. The InterfaceName parameter must match the name of the interface as specified in Network Connections. If InterfaceName contains spaces</description>
+        <from>interface name</from>
+        <to>interface name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the IP address to delete.</description>
+        <from>ip address</from>
+        <to>ip address</to>
+      </input>
+      <input global="false" required="true">
+        <description>On Windows servers the Default Gateway will specify the IP address of the gateway to delete or "all" to specify delete all default gateways.</description>
+        <from>default gateway</from>
+        <to>default gateway</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional: Defines the subnet mask for use on Unix servers.</description>
+        <from>subnet mask</from>
+        <to>subnet mask</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional: Used to configure Unix like system interfaces.</description>
+        <from>broadcast address</from>
+        <to>broadcast address</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="interface name">
+                  <input global="false">
+                    <from>interface name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="ip address">
+                  <input global="false">
+                    <from>ip address</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="default gateway">
+                  <input global="false">
+                    <from>default gateway</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="subnet mask">
+                  <input global="false">
+                    <from>subnet mask</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="broadcast address">
+                  <input global="false">
+                    <from>broadcast address</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show </xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">netsh interface ip delete address name="${interface name}"  addr=${ip address}</xsl:text>
+        <xsl:choose>
+          <xsl:when test="string-length('${default gateway}')=0">
+            <xsl:text disable-output-escaping="no"> gateway=all</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> gateway=${default gateway}</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/sbin/ifconfig ${interface name} removeif ${IP address} </xsl:text>
+        <xsl:choose>
+          <xsl:when test="string-length('${subnet mask}')=0">
+            <xsl:text disable-output-escaping="no"> netmask +</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> netmask ${subnet mask}</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="string-length('${broadcast address}')=0">
+            <xsl:text disable-output-escaping="no"> broadcast +</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> broadcast ${broadcast address}</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/sbin/ifconfig ${interface name} removeif ${IP address} </xsl:text>
+        <xsl:choose>
+          <xsl:when test="string-length('${subnet mask}')=0">
+            <xsl:text disable-output-escaping="no"> netmask +</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> netmask ${subnet mask}</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="string-length('${broadcast address}')=0">
+            <xsl:text disable-output-escaping="no"> broadcast +</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> broadcast ${broadcast address}</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Deletes an IP address or a default gateway on a statically configured interface.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>bc221ddd-4fa9-34ed-91ae-d546eb8a4891</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288093254010</last-modified>
+    </meta>
+  </process-def>
+</process>

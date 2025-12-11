@@ -1,0 +1,217 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AO-AD-ServiceNow:Utilities:Tokenize String">
+    <parameters>
+      <input global="false" required="true">
+        <description>The string to be parsed on a specified character.</description>
+        <from>string</from>
+        <to>string</to>
+      </input>
+      <input global="false" required="true">
+        <description>The character on which the specified string will be parsed.</description>
+        <from>delimiter</from>
+        <to>delimiter</to>
+      </input>
+      <output global="false" required="true">
+        <description>An XML document with a root element of &lt;tokens&gt; and child element(s) of &lt;token&gt;, containing the resulting string segments.</description>
+        <to>tokens</to>
+        <from>tokens</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>string</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>split</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="delimiter">
+                <input global="false">
+                  <from>delimiter</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output omit-xml-declaration="yes" cdata-section-elements="split " indent="yes" />
+  <xsl:template match="/">
+    <split at="$[delimiter]">
+      <xsl:value-of select="." disable-output-escaping="no" />
+    </split>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>delimiter</from>
+              </input>
+              <input>
+                <from>string</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>done</value>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>split</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>tokens</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:output indent="yes" omit-xml-declaration="yes"/>
+<xsl:template name="tokenize">
+  <xsl:param name="str"/><!-- The string to process -->
+  <xsl:param name="sep"/><!-- String containing legal token separators -->
+
+  <xsl:variable name="rss">
+    <xsl:call-template name="repeat-string">
+      <xsl:with-param name="str" select="'&#xFFFC;'"/>
+      <xsl:with-param name="cnt" select="string-length($sep)"/>
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:call-template name="tokenize-1">
+    <xsl:with-param name="pat" select="translate($str,$sep,$rss)"/>
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="tokenize-1">
+  <xsl:param name="pat"/><!-- String with record separators inserted -->
+  <xsl:choose>
+    <xsl:when test="contains($pat,'&#xFFFC;')">
+      <xsl:call-template name="process-token">
+ <xsl:with-param name="token" select="substring-before($pat,'&#xFFFC;')"/>
+      </xsl:call-template>
+      <xsl:call-template name="tokenize-1">
+ <xsl:with-param name="pat" select="substring-after($pat,'&#xFFFC;')"/>
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="process-token">
+ <xsl:with-param name="token" select="$pat"/>
+      </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="repeat-string">
+  <xsl:param name="str"/><!-- The string to repeat -->
+  <xsl:param name="cnt"/><!-- The number of times to repeat the string -->
+  <xsl:param name="pfx"/><!-- The prefix to add to the string -->
+  <xsl:choose>
+    <xsl:when test="$cnt = 0">
+      <xsl:value-of select="$pfx"/>
+    </xsl:when>
+    <xsl:when test="$cnt mod 2 = 1">
+      <xsl:call-template name="repeat-string">
+   <xsl:with-param name="str" select="concat($str,$str)"/>
+   <xsl:with-param name="cnt" select="($cnt - 1) div 2"/>
+   <xsl:with-param name="pfx" select="concat($pfx,$str)"/>
+ </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+ <xsl:call-template name="repeat-string">
+   <xsl:with-param name="str" select="concat($str,$str)"/>
+   <xsl:with-param name="cnt" select="$cnt div 2"/>
+   <xsl:with-param name="pfx" select="$pfx"/>
+ </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<!-- Use the template above -->
+
+<xsl:template name="process-token">
+  <xsl:param name="token"/>
+<token><xsl:value-of select="$token"/></token>
+</xsl:template>
+
+<xsl:template match="split">
+<tokens>
+  <xsl:call-template name="tokenize">
+    <xsl:with-param name="str" select="."/>
+    <xsl:with-param name="sep" select="@at"/>
+  </xsl:call-template>
+</tokens>
+</xsl:template>
+
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>tokens</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Tokenize String   
+          Segments a string on a specified delimiter. </description>
+        <version>1.1</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ff0d6f01-43df-4f99-89ce-679260946305</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1419576098474</last-modified>
+    </meta>
+  </process-def>
+</process>

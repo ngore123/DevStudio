@@ -1,0 +1,185 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":RBA-AD-Active_Directory:Utilities:Create Adapter Request">
+    <parameters>
+      <input global="false" required="false">
+        <description>This element is required if a target will be referenced or defined in the request.
+In the absence of this element, the default target in the Adapter configuration will be used.</description>
+        <from>target</from>
+        <to>target</to>
+      </input>
+      <input global="false" required="true">
+        <description>The command to be executed.
+
+Valid values: Create, Disable GC, Enable GC, Move From Computers OU, Rename Computer Account, Search, Remove</description>
+        <from>active directory command</from>
+        <to>active directory command</to>
+      </input>
+      <input global="false" required="false">
+        <description>The type of object.
+ 
+Valid values: Computer, Server, Group, Local Distribution Group, Local Security Group, Global Distribution Group, Global Security Group, Universal Distribution Group, Universal Security Group</description>
+        <from>object class</from>
+        <to>object class</to>
+      </input>
+      <input global="false" required="false">
+        <description>The distinguished name of the object.</description>
+        <from>object distinguished name</from>
+        <to>object distinguished name</to>
+      </input>
+      <input global="false" required="false">
+        <description>The name of the object.</description>
+        <from>object name</from>
+        <to>object name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Contains the parameter list for the command.</description>
+        <from>parameters</from>
+        <to>parameters</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>request</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="target">
+                <input global="false">
+                  <from>target</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="parameters">
+                <input global="false">
+                  <from>parameters</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="object distinguished name">
+                <input global="false">
+                  <from>object distinguished name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request>${target}${parameters}</request>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>request</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="object class">
+                <input global="false">
+                  <from>object class</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="object distinguished name">
+                <input global="false">
+                  <from>object distinguished name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="active directory command">
+                <input global="false">
+                  <from>active directory command</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="object name">
+                <input global="false">
+                  <from>object name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <active-directory-request>
+        <xsl:if test="//target">
+          <xsl:copy-of select="//target" />
+        </xsl:if>
+        <commands>
+          <command>
+            <active-directory-command>${active directory command}</active-directory-command>
+            <xsl:if test="string-length('${object class}')!=0">
+              <object-class>${object class}</object-class>
+            </xsl:if>
+            <xsl:if test="string-length('${object distinguished name}')!=0">
+              <object-distinguished-name>${object distinguished name}</object-distinguished-name>
+            </xsl:if>
+            <xsl:if test="string-length('${object name}')!=0">
+              <object-name>${object name}</object-name>
+            </xsl:if>
+            <xsl:if test="//parameters">
+              <parameters>
+                <xsl:copy-of select="//parameters/*" />
+              </parameters>
+            </xsl:if>
+          </command>
+        </commands>
+      </active-directory-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Create Adapter Request.
+           Creates a valid adapter request</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a77000f4-726d-346b-92c1-11f22342b1cb</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1282032501885</last-modified>
+    </meta>
+  </process-def>
+</process>

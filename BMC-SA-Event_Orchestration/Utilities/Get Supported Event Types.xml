@@ -1,0 +1,133 @@
+<process draft="false" dev-studio-version="8.1.00">
+  <process-def name=":BMC-SA-Event_Orchestration:Utilities:Get Supported Event Types">
+    <parameters>
+      <input global="false" required="false">
+        <description>Optional and can be xml or json. Default is xml.</description>
+        <from>return data format</from>
+        <to>return data format</to>
+      </input>
+      <output global="false" required="false">
+        <to>supported event types</to>
+        <from>supported event types</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-Event_Orchestration_Configuration:Specifics:WorkflowDefinitions:ModuleMappings</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>supported event types</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <supported-event-types>
+      <xsl:apply-templates select="//module" mode="module" />
+    </supported-event-types>
+  </xsl:template>
+  <xsl:template match="module" mode="module">
+    <supported-event-type>
+      <xsl:value-of select="event-type" disable-output-escaping="no" />
+    </supported-event-type>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) > 0 and translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') = 'JSON']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+              <parameters>
+                <input>
+                  <from>supported event types</from>
+                  <to>XML</to>
+                </input>
+                <output>
+                  <from>JSON</from>
+                  <to>supported event types</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Retrieve a list of supported event types.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>e3c2d744-47e6-4561-b5f4-1a5d83fb3283</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1544106807144</last-modified>
+    </meta>
+  </process-def>
+</process>

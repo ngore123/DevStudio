@@ -1,0 +1,1094 @@
+<process draft="false" dev-studio-version="7.9.00">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:Persistence:StoreARConnectionDetails">
+    <parameters>
+      <input global="false" required="true">
+        <from>ARMidTierHost</from>
+        <to>ARMidTierHost</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARMidTierPort</from>
+        <to>ARMidTierPort</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARServerHost</from>
+        <to>ARServerHost</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARProtocol</from>
+        <to>ARProtocol</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARUsername</from>
+        <to>ARUsername</to>
+      </input>
+      <input global="false" required="true">
+        <from>ARPassword</from>
+        <to>ARPassword</to>
+      </input>
+      <output global="false" required="true">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="true">
+        <to>reason</to>
+        <from>reason</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>reason</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:Defaults:separator</configuration>
+          </input>
+          <output>
+            <to>seperator</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:AUTOMATIONHOSTS:Columns</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>hostInfoColumn</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='HOSTINFO']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:AUTOMATIONHOSTS:Columns</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connectionDetailsColumn</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='CONNECTIONDETAILS']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:AUTOMATIONHOSTS:Columns</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>productCodeColumn</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='PRODUCTCODE']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:AUTOMATIONHOSTS:Name</configuration>
+          </input>
+          <output>
+            <to>AutomationHostTableName</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:StoreARConnectionDetails:Global context values=&gt;</value>
+              </input>
+              <input global="true">
+                <from>AROutboundUrl</from>
+              </input>
+              <input global="true">
+                <from>ARInboundUrl</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:SQL:Select</process-name>
+        <parameters>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Default_SQL_Actor_Adapter</configuration>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>hostInfoColumn</from>
+            <to>where</to>
+          </input>
+          <input>
+            <value>Remedy</value>
+            <to>where value</to>
+          </input>
+          <input>
+            <value>=</value>
+            <to>where operator</to>
+          </input>
+          <input>
+            <from>AutomationHostTableName</from>
+            <to>table name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>connectivityDetails</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//column[@name='CONNECTIONDETAILS']/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectivityDetails</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>existingARMidTierHost</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "midTierHost=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectivityDetails</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>existingARMidTierPort</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "midTierPort=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectivityDetails</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>existingARServerHost</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "serverHost=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectivityDetails</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>existingARServerProtocol</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "protocol=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectivityDetails</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>existingARUsername</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "username=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connectivityDetails</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>existingARPassword</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(., "password=")]]></xpath>
+                </xpath-expression>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>StoreARConnectionDetails:AR details existing and new=&gt;</value>
+                    </input>
+                    <input>
+                      <from>existingARMidTierHost</from>
+                    </input>
+                    <input>
+                      <from>ARMidTierHost</from>
+                    </input>
+                    <input>
+                      <from>existingARMidTierPort</from>
+                    </input>
+                    <input>
+                      <from>ARMidTierPort</from>
+                    </input>
+                    <input>
+                      <from>existingARServerHost</from>
+                    </input>
+                    <input>
+                      <from>ARServerHost</from>
+                    </input>
+                    <input>
+                      <from>existingARServerProtocol</from>
+                    </input>
+                    <input>
+                      <from>ARProtocol</from>
+                    </input>
+                    <input>
+                      <from>existingARUsername</from>
+                    </input>
+                    <input>
+                      <from>ARUsername</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case applies-if-any-condition-true="true">
+                <condition>
+                  <document>
+                    <input>
+                      <from>existingARMidTierHost</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="new">
+                        <input global="false">
+                          <from>ARMidTierHost</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string(.)!='${new}']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>existingARMidTierPort</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="new">
+                        <input global="false">
+                          <from>ARMidTierPort</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string(.)!='${new}']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>existingARServerHost</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="new">
+                        <input global="false">
+                          <from>ARServerHost</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string(.)!='${new}']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>existingARServerProtocol</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="new">
+                        <input global="false">
+                          <from>ARProtocol</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string(.)!='${new}']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>existingARUsername</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="new">
+                        <input global="false">
+                          <from>ARUsername</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string(.)!='${new}']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>existingARPassword</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="new">
+                        <input global="false">
+                          <from>ARPassword</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string(.)!='${new}']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>midTierHost=</value>
+                          </input>
+                          <input required="false">
+                            <from>ARMidTierHost</from>
+                          </input>
+                          <input required="false">
+                            <from>seperator</from>
+                          </input>
+                          <input>
+                            <value>midTierPort=</value>
+                          </input>
+                          <input required="false">
+                            <from>ARMidTierPort</from>
+                          </input>
+                          <input required="false">
+                            <from>seperator</from>
+                          </input>
+                          <input>
+                            <value>serverHost=</value>
+                          </input>
+                          <input required="false">
+                            <from>ARServerHost</from>
+                          </input>
+                          <input required="false">
+                            <from>seperator</from>
+                          </input>
+                          <input>
+                            <value>username=</value>
+                          </input>
+                          <input required="false">
+                            <from>ARUsername</from>
+                          </input>
+                          <input required="false">
+                            <from>seperator</from>
+                          </input>
+                          <input>
+                            <value>password=</value>
+                          </input>
+                          <input required="false">
+                            <from>ARPassword</from>
+                          </input>
+                          <input required="false">
+                            <from>seperator</from>
+                          </input>
+                          <input>
+                            <value>protocol=</value>
+                          </input>
+                          <input required="false">
+                            <from>ARProtocol</from>
+                          </input>
+                          <input required="false">
+                            <from>seperator</from>
+                          </input>
+                        </concat>
+                      </input>
+                      <output>
+                        <to>connection1</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AutoPilot-AD-Utilities:SQL:Update</process-name>
+                    <parameters>
+                      <input global="true">
+                        <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Default_SQL_Actor_Adapter</configuration>
+                        <to>adapter name</to>
+                      </input>
+                      <input global="true">
+                        <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:AUTOMATIONHOSTS:Name</configuration>
+                        <to>table</to>
+                      </input>
+                      <input>
+                        <from>connectionDetailsColumn</from>
+                        <to>column</to>
+                      </input>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>'</value>
+                          </input>
+                          <input required="false">
+                            <from>connection1</from>
+                          </input>
+                          <input>
+                            <value>'</value>
+                          </input>
+                        </concat>
+                        <to>value</to>
+                      </input>
+                      <input>
+                        <concat>
+                          <input required="false">
+                            <from>hostInfoColumn</from>
+                          </input>
+                          <input>
+                            <value>='Remedy'</value>
+                          </input>
+                        </concat>
+                        <to>where</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>update response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>StoreARConnectionDetails:UpdateResponse=&gt;</value>
+                          </input>
+                          <input>
+                            <from>update response</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>update response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//status/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>update response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>reason</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//error/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>StoreARConnectionDetails:Update status=&gt;</value>
+                          </input>
+                          <input>
+                            <from>status</from>
+                          </input>
+                          <input>
+                            <from>reason</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[2]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+            <call-process>
+              <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:UpdateARUrls</process-name>
+              <parameters>
+                <input>
+                  <from>ARMidTierHost</from>
+                  <to>ARMidTierHost</to>
+                </input>
+                <input>
+                  <from>ARMidTierPort</from>
+                  <to>ARMidTierPort</to>
+                </input>
+                <input>
+                  <from>ARServerHost</from>
+                  <to>ARServerHost</to>
+                </input>
+                <input>
+                  <from>ARProtocol</from>
+                  <to>ARProtocol</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>ARUsername</from>
+                </input>
+                <output global="true">
+                  <to>ARUsername</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>ARPassword</from>
+                </input>
+                <output global="true">
+                  <to>ARPassword</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:StoreARConnectionDetails:Update Global context=&gt;</value>
+                    </input>
+                    <input global="true">
+                      <from>ARUsername</from>
+                    </input>
+                    <input global="true">
+                      <from>AROutboundUrl</from>
+                    </input>
+                    <input global="true">
+                      <from>ARInboundUrl</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[2]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//responseRowCount/text()=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:UpdateARUrls</process-name>
+              <unique-id>8c140286-a52f-4dc7-beb9-46d6c6a50e7a</unique-id>
+              <parameters>
+                <input>
+                  <from>ARMidTierHost</from>
+                  <to>ARMidTierHost</to>
+                </input>
+                <input>
+                  <from>ARMidTierPort</from>
+                  <to>ARMidTierPort</to>
+                </input>
+                <input>
+                  <from>ARServerHost</from>
+                  <to>ARServerHost</to>
+                </input>
+                <input>
+                  <from>ARProtocol</from>
+                  <to>ARProtocol</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>ARUsername</from>
+                </input>
+                <output global="true">
+                  <to>ARUsername</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>ARPassword</from>
+                </input>
+                <output global="true">
+                  <to>ARPassword</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input required="false">
+                      <from>hostInfoColumn</from>
+                    </input>
+                    <input>
+                      <value>,</value>
+                    </input>
+                    <input required="false">
+                      <from>productCodeColumn</from>
+                    </input>
+                    <input>
+                      <value>,</value>
+                    </input>
+                    <input required="false">
+                      <from>connectionDetailsColumn</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>coulmnToBeUpdated</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:StoreARConnectionDetails:Set Global context=&gt;</value>
+                    </input>
+                    <input global="true">
+                      <from>ARUsername</from>
+                    </input>
+                    <input global="true">
+                      <from>AROutboundUrl</from>
+                    </input>
+                    <input global="true">
+                      <from>ARInboundUrl</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>midTierHost=</value>
+                    </input>
+                    <input required="false">
+                      <from>ARMidTierHost</from>
+                    </input>
+                    <input required="false">
+                      <from>seperator</from>
+                    </input>
+                    <input>
+                      <value>midTierPort=</value>
+                    </input>
+                    <input required="false">
+                      <from>ARMidTierPort</from>
+                    </input>
+                    <input required="false">
+                      <from>seperator</from>
+                    </input>
+                    <input>
+                      <value>serverHost=</value>
+                    </input>
+                    <input required="false">
+                      <from>ARServerHost</from>
+                    </input>
+                    <input required="false">
+                      <from>seperator</from>
+                    </input>
+                    <input>
+                      <value>username=</value>
+                    </input>
+                    <input required="false">
+                      <from>ARUsername</from>
+                    </input>
+                    <input required="false">
+                      <from>seperator</from>
+                    </input>
+                    <input>
+                      <value>password=</value>
+                    </input>
+                    <input required="false">
+                      <from>ARPassword</from>
+                    </input>
+                    <input required="false">
+                      <from>seperator</from>
+                    </input>
+                    <input>
+                      <value>protocol=</value>
+                    </input>
+                    <input required="false">
+                      <from>ARProtocol</from>
+                    </input>
+                    <input required="false">
+                      <from>seperator</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>connection1</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>'Remedy','Remedy','</value>
+                    </input>
+                    <input required="false">
+                      <from>connection1</from>
+                    </input>
+                    <input>
+                      <value>'</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>whereValue</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-AD-Utilities:SQL:Insert</process-name>
+              <parameters>
+                <input>
+                  <value>CLA_DBActorAdapter</value>
+                  <to>adapter name</to>
+                </input>
+                <input global="true">
+                  <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:AUTOMATIONHOSTS:Name</configuration>
+                  <to>table</to>
+                </input>
+                <input>
+                  <from>coulmnToBeUpdated</from>
+                  <to>columns</to>
+                </input>
+                <input>
+                  <from>whereValue</from>
+                  <to>values</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>insertQueryResponse</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                </console-output>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:StoreARConnectionDetails:Insert Remedy response=&gt;</value>
+                    </input>
+                    <input>
+                      <from>insertQueryResponse</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>insertQueryResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//status/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>insertQueryResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>reason</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//error/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:StoreARConnectionDetails:Update status=&gt;</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>reason</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>fa7cc0d8-775a-48e9-9ded-728555ee3dd1</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1479295970523</last-modified>
+    </meta>
+  </process-def>
+</process>

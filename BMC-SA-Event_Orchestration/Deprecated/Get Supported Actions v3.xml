@@ -1,0 +1,214 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration:Deprecated:Get Supported Actions v3">
+    <parameters>
+      <input global="false" required="false">
+        <description>Event type shall be one of the "supported event types" returned when "Get Supported Event Types" workflow is invoked.
+
+Input is optional. If no input is provided all actions related to all event-types are returned. If event type is provided, only actions supported by the event type is returned.</description>
+        <from>event type</from>
+        <to>event type</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional and can be xml or json. Default is xml.</description>
+        <from>return data format</from>
+        <to>return data format</to>
+      </input>
+      <output global="false" required="false">
+        <to>supported actions</to>
+        <from>supported actions</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Configuration:Specifics:Defaults:SupportedActionsDelimiter</configuration>
+          </input>
+          <output>
+            <to>delim</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Configuration:Specifics:Defaults:SupportedActionsPrefixEventType</configuration>
+          </input>
+          <output>
+            <to>prefix event type</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-Event_Orchestration_Configuration:Specifics:WorkflowDefinitions:ModuleMappings</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>supported actions</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="event type">
+                <input global="false">
+                  <from>event type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="delim">
+                <input global="false">
+                  <from>delim</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="prefix event type">
+                <input global="false">
+                  <from>prefix event type</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="string-length(normalize-space('${event type}')) &gt; 0 and contains(., '${event type}')">
+        <supported-actions>
+          <xsl:apply-templates select="//module" mode="event-type" />
+        </supported-actions>
+      </xsl:when>
+      <xsl:when test="string-length(normalize-space('${event type}')) = 0">
+        <supported-actions>
+          <xsl:apply-templates select="//module" mode="all" />
+        </supported-actions>
+      </xsl:when>
+      <xsl:otherwise>
+        <error>
+          <xsl:text disable-output-escaping="no">Event type is not supported.</xsl:text>
+        </error>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template match="module" mode="event-type">
+    <xsl:choose>
+      <xsl:when test="event-type = '${event type}'">
+        <xsl:apply-templates select="actions/action" mode="actionByEvent">
+          <xsl:with-param name="eventType" select="'${event type}'" />
+        </xsl:apply-templates>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template match="module" mode="all">
+    <xsl:variable name="eventType" select="event-type/text()" />
+    <xsl:apply-templates select="actions/action" mode="actionByEvent">
+      <xsl:with-param name="eventType" select="$eventType" />
+    </xsl:apply-templates>
+  </xsl:template>
+  <xsl:template name="action" match="action" mode="actionByEvent">
+    <xsl:param name="eventType" />
+    <action>
+      <action-id>
+        <xsl:value-of select="concat($eventType, '${delim}', action-type/text(), '${delim}', action-name/text())" disable-output-escaping="no" />
+      </action-id>
+      <action-name>
+        <xsl:choose>
+          <xsl:when test="'${prefix event type}' = 'true'">
+            <xsl:value-of select="concat($eventType, '${delim}', action-name/text())" disable-output-escaping="no" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="action-name/text()" disable-output-escaping="no" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </action-name>
+    </action>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>return data format</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) > 0 and translate(., 'abcdefghijklmnopqrstuvwxyz', 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') = 'JSON']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+              <parameters>
+                <input>
+                  <from>supported actions</from>
+                  <to>XML</to>
+                </input>
+                <output>
+                  <from>JSON</from>
+                  <to>supported actions</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Retrieve a list of supported event types.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>fe76feb2-d200-43c9-8019-1a92e61ed5f1</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1549208451997</last-modified>
+    </meta>
+  </process-def>
+</process>

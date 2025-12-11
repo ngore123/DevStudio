@@ -1,0 +1,127 @@
+<process draft="false" dev-studio-version="7.6.02.04">
+  <process-def name=":AMP-AD-BMC-Remedy-ARS:Query Server Info">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to be used by this process, as configured in Grid Manager. If the adapter name is not provided, then "ARSAdapter" will be used.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <output global="false" required="true">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AMP-AD-BMC-Remedy-ARS:Utilities:Set Default Adapter Name</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <output>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>adapter request</to>
+            <value>
+              <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+                <request-data />
+              </xsl:stylesheet>
+            </value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+                <request-action>query-server-info</request-action>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <output global="false">
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Adapter response</value>
+              </input>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Query Server Info
+    Returns data relating to the current implementation of the Remedy Server. 
+
+  
+    </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>538b7eed-70ca-3064-82f2-82223d31298e</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1336470041062</last-modified>
+    </meta>
+  </process-def>
+</process>

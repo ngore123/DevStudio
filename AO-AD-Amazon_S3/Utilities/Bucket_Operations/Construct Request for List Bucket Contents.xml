@@ -1,0 +1,206 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AO-AD-Amazon_S3:Utilities:Bucket_Operations:Construct Request for List Bucket Contents">
+    <parameters>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon S3. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - 
+http://s3.amazonaws.com/doc/2006-03-01/AmazonS3.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon S3 buckets across different regions. Respective values for different regions are as below:
+
+    * https://s3.amazonaws.com/soap — Endpoint located in the US Standard Region
+    * https://s3-us-west-1.amazonaws.com/soap — Endpoint located in the US-West (Northern California) Region
+    * https://s3-eu-west-1.amazonaws.com/soap ---Endpoint located in the EU (Ireland) Region
+    * https://s3-ap-southeast-1.amazonaws.com/soap ---Endpoint located in the Asia Pacific (Singapore) Region
+    * https://s3-ap-northeast-1.amazonaws.com/soap ---Endpoint located in the Asia Pacific (Tokyo) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>aws access key id [Optional]
+
+The WebService access key is used to for identifying yourself as the sender of the request for the Amazon S3 operations. This key is provided by Amazon at the time of registration on Amazon S3 account.
+
+Sample access key is is as follows:
+1D9FVRAYCP1VJEXAMPLE=</description>
+        <from>aws access key id</from>
+        <to>aws access key id</to>
+      </input>
+      <input global="false" required="false">
+        <description>secret access key id [Optional]
+
+Each access key has a secret key associated with it. Secret key is secret and should be known only by you and AWS. this is used only to calculate signatures to include in requestssent to AWS.</description>
+        <from>secret access key</from>
+        <to>secret access key</to>
+      </input>
+      <input global="false" required="true">
+        <description>bucket [Mandatory]
+
+Name of the bucket for which list is to be queried</description>
+        <from>bucket</from>
+        <to>bucket</to>
+      </input>
+      <input global="false" required="false">
+        <description>prefix [Optional]
+
+Limits the response to keys which begin with the indicated prefix</description>
+        <from>prefix</from>
+        <to>prefix</to>
+      </input>
+      <input global="false" required="false">
+        <description>delimiter [Optional]
+
+Type: xsd:String
+
+Causes keys that contain the same string between the prefix and the first occurrence of the delimiter to be rolled up into a single result element in the CommonPrefixes collection</description>
+        <from>delimiter</from>
+        <to>delimiter</to>
+      </input>
+      <input global="false" required="false">
+        <description>max keys [Optional]
+
+The maximum number of keys you'd like to see in the response body</description>
+        <from>max keys</from>
+        <to>max keys</to>
+      </input>
+      <input global="false" required="false">
+        <description>marker [Optional]
+
+Indicates where in the bucket to begin listing</description>
+        <from>marker</from>
+        <to>marker</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>adapter request</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="wsdl location">
+                <input global="false">
+                  <from>wsdl location</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="aws access key id">
+                <input global="false">
+                  <from>aws access key id</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="secret access key">
+                <input global="false">
+                  <from>secret access key</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="bucket">
+                <input global="false">
+                  <from>bucket</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="prefix">
+                <input global="false">
+                  <from>prefix</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="delimiter">
+                <input global="false">
+                  <from>delimiter</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="max keys">
+                <input global="false">
+                  <from>max keys</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="marker">
+                <input global="false">
+                  <from>marker</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="endpoint address">
+                <input global="false">
+                  <from>endpoint address</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request-data>
+      <amazon-s3-request>
+        <xsl:if test="string-length('${wsdl location}')&gt;0">
+          <wsdl-location>${wsdl location}</wsdl-location>
+        </xsl:if>
+        <xsl:if test="string-length('${endpoint address}')&gt;0">
+          <endpoint-address>${endpoint address}</endpoint-address>
+        </xsl:if>
+        <xsl:if test="string-length('${aws access key id}')&gt;0">
+          <aws-access-key-id>${aws access key id}</aws-access-key-id>
+        </xsl:if>
+        <xsl:if test="string-length('${secret access key}')&gt;0">
+          <secret-access-key>${secret access key}</secret-access-key>
+        </xsl:if>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">list-bucket-contents</xsl:text>
+        </operation-name>
+        <parameters>
+          <bucket>${bucket}</bucket>
+          <prefix>${prefix}</prefix>
+          <delimiter>${delimiter}</delimiter>
+          <max-keys>${max keys}</max-keys>
+          <marker>${marker}</marker>
+        </parameters>
+      </amazon-s3-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs request for List Bucket operation</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0ea5f22b-a55c-34bb-ba9b-7534a2bd4247</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1305022519437</last-modified>
+    </meta>
+  </process-def>
+</process>

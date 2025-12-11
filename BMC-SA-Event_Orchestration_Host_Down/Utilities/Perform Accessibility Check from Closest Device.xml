@@ -1,0 +1,568 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration_Host_Down:Utilities:Perform Accessibility Check from Closest Device">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to connect to a given host or device.
+</description>
+        <from>traceroute details</from>
+        <to>local connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The host name or ip address of the target destination</description>
+        <from>destination</from>
+        <to>destination</to>
+      </input>
+      <input global="false" required="false">
+        <description>This is the default router which will be used when traceroute command does not return any router.</description>
+        <from>default router</from>
+        <to>default router</to>
+      </input>
+      <output global="false" required="true">
+        <description>true for success / false for failure</description>
+        <to>success</to>
+        <from>ping success</from>
+      </output>
+      <output global="false" required="false">
+        <description>The router (extracted from tracert command) from where the ping was performed.</description>
+        <to>new source</to>
+        <from>new source</from>
+      </output>
+      <output global="false" required="false">
+        <description>traceroute and ping combined output</description>
+        <to>closest device triage data</to>
+        <from>tracert ping output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Extract IP Address</process-name>
+        <parameters>
+          <input>
+            <from>local connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>destination</from>
+            <to>destination</to>
+          </input>
+          <output>
+            <from>traceroute output</from>
+            <to>traceroute output</to>
+          </output>
+          <output>
+            <from>address list</from>
+            <to>ips list</to>
+          </output>
+          <output>
+            <from>ip address pinged</from>
+            <to>ip address pinged</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>$$$$</value>
+              </input>
+              <input>
+                <from>ips list</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>default router</from>
+                </input>
+                <output>
+                  <to>new source</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>traceroute output</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>traceroute output</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="newsource">
+                      <input global="false">
+                        <from>new source</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="." disable-output-escaping="no" />
+      <xsl:text disable-output-escaping="no">
+</xsl:text>
+      <xsl:text disable-output-escaping="no">Could not get router from traceroute command. So, selecting module configuration default-router ${newsource} as closest router. </xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>ips list</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+            </console-output>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>ips list</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>new source</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="ip address pinged">
+                      <input global="false">
+                        <from>ip address pinged</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="//ip[position() = last()]/text() != '${ip address pinged}'">
+          <!-- This happens when there are nodes in the middle that don't respond to traceroute -->
+          <xsl:value-of select="//ip[position() = last()]/text()" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="//ip[position() = last() - 1]/text()" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>ips list</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>traceroute output</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="newsource">
+                      <input global="false">
+                        <from>new source</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="defaultrouter">
+                      <input global="false">
+                        <from>default router</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">Performed traceroute and extracted IPs</xsl:text>
+      <xsl:text disable-output-escaping="no">
+</xsl:text>
+      <xsl:for-each select="/ips/*">
+        <xsl:value-of select="." disable-output-escaping="no" />
+        <xsl:text disable-output-escaping="no">
+</xsl:text>
+      </xsl:for-each>
+      <xsl:text disable-output-escaping="no">
+</xsl:text>
+      <xsl:choose>
+        <xsl:when test="string-length('$[newsource]') &gt; 0">
+          <xsl:text disable-output-escaping="no">From Traceroute command, Closest router is ${newsource}</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">The target host is in same domain as the host from where traceroute is done. Target host is reachable through traceroute. Hence selecting default router from configuration ${defaultrouter} for doing ping operation.</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:text disable-output-escaping="no">
+</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>new source</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[not(string-length(.) > 0)]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <input>
+                        <from>default router</from>
+                      </input>
+                      <output>
+                        <to>new source</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>router ping message</to>
+                  <value>Ping-from-router process was not performed because no router was available either from traceroute command or from host down module configuration.</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>traceroute output</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>tracert ping output</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="routerpingmsg">
+                      <input global="false">
+                        <from>router ping message</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <tracertping>
+      <xsl:value-of select="." disable-output-escaping="no" />
+      <xsl:text disable-output-escaping="no">
+</xsl:text>
+      <xsl:text disable-output-escaping="no">
+</xsl:text>
+      <xsl:text disable-output-escaping="no">${routerpingmsg}</xsl:text>
+    </tracertping>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>ping success</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>new source</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+            </console-output>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>router ping message</to>
+                        <value>Ping-from-router process was not performed because router connection details were not available.</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>ping success</to>
+                        <value>false</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[2]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>local connection details</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(.) > 0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Ping from Router</process-name>
+                    <parameters>
+                      <input>
+                        <from>local connection details</from>
+                        <to>router address</to>
+                      </input>
+                      <input>
+                        <from>destination</from>
+                        <to>destination</to>
+                      </input>
+                      <input global="true">
+                        <configuration>:BMC-SA-Event_Orchestration_Host_Down:HostDownConfig:PingMappings</configuration>
+                        <to>router ping command</to>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//ping-mapping[@name = '*']/ping-command/text()]]></xpath>
+                        </xpath-expression>
+                      </input>
+                      <output>
+                        <from>success</from>
+                        <to>ping success</to>
+                      </output>
+                      <output>
+                        <from>ping message</from>
+                        <to>router ping message</to>
+                      </output>
+                      <output>
+                        <from>command ping output</from>
+                        <to>router ping output</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[2]:sequence[2]:switch[1]</location>
+            </switch>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>traceroute output</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>tracert ping output</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="routerpingoutput">
+                      <input global="false">
+                        <from>router ping message</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="." disable-output-escaping="no" />
+      <xsl:text disable-output-escaping="no">Pinging the host from closest-router.....
+$[routerpingoutput]</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow performs a traceroute on a given device, from the returned IP list, it will 
+select the closest device, and then attempts to log on and perform a ping of the original 
+destination.</description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b03f3e0f-c4c9-4226-bc90-9dd4a77d8c44</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1552127803880</last-modified>
+    </meta>
+  </process-def>
+</process>

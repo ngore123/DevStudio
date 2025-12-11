@@ -1,0 +1,401 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AO-AD-VitalQIP:Get Subnet List">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the Adapter to use for this Process. </description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The user name name that will be used to execute the command on QIP.</description>
+        <from>user name</from>
+        <to>user name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The password for the user name that will be used to execute the command on the QIP.</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="true">
+        <description>The QIP organization name that will be used while executing the command on the QIP.</description>
+        <from>organization</from>
+        <to>organization</to>
+      </input>
+      <input global="false" required="true">
+        <description>Valid values are:
+Subnetorg
+Corp
+Domain
+OSPF
+Network
+
+</description>
+        <from>owner type</from>
+        <to>owner type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Corresponding value of owner type</description>
+        <from>onwer value</from>
+        <to>onwer value</to>
+      </input>
+      <input global="false" required="false">
+        <description>Scope can have twos possible values
+1. Any string : It is a organization name same as pod name. 
+2. null : in this case we will use default organization.</description>
+        <from>scope</from>
+        <to>scope</to>
+      </input>
+      <output global="false" required="false">
+        <description>incase of any error, error message goes here.  </description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>command status.
+valid values: true, false.</description>
+        <to>success</to>
+        <from>Success</from>
+      </output>
+      <output global="false" required="false">
+        <description>List of all the availabe subnet from the QIP.
+Format must be as below...
+&lt;pools&gt;
+   &lt;pool&gt;
+        &lt;network-address&gt;a.b.c.d&lt;/network-address&gt;
+        &lt;subnet-address&gt;l.m.n.o&lt;/subnet-address&gt;
+        &lt;subnet-mask&gt;p.q.r.s&lt;/subnet-mask&gt;
+   &lt;/pool&gt;
+   &lt;pool&gt;
+        &lt;network-address&gt;w.x.y.z&lt;/network-address&gt;
+        &lt;subnet-address&gt;s.t.u.v&lt;/subnet-address&gt;
+        &lt;subnet-mask&gt;p.q.r.s&lt;/subnet-mask&gt;
+   &lt;/pool&gt;
+&lt;/pools&gt;
+</description>
+        <to>subnet-list</to>
+        <from>subnet-list</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>user name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>Adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="user">
+                <input global="false">
+                  <from>user name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="pass">
+                <input global="false">
+                  <from>password</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="org">
+                <input global="false">
+                  <from>organization</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="owner-type">
+                <input global="false">
+                  <from>owner type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="owner-value">
+                <input global="false">
+                  <from>onwer value</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="scope">
+                <input global="false">
+                  <from>scope</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <command-request>
+        <xsl:if test="string-length(&quot;${scope}&quot;) &gt; 0">
+          <commands>
+            <command>
+              <xsl:text disable-output-escaping="no">qip-getsubnetlst -u "${user}" -p "${pass}" -o "${scope}" -t ${owner-type} -n "${owner-value}"</xsl:text>
+            </command>
+          </commands>
+        </xsl:if>
+        <xsl:if test="string-length(&quot;${scope}&quot;) = 0">
+          <commands>
+            <command>
+              <xsl:text disable-output-escaping="no">qip-getsubnetlst -u "${user}" -p "${pass}" -o "${org}" -t ${owner-type} -n "${owner-value}"</xsl:text>
+            </command>
+          </commands>
+        </xsl:if>
+      </command-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>Adapter request</from>
+          </input>
+          <input global="false">
+            <from>Adapter request</from>
+          </input>
+          <output global="false">
+            <to>Adapter Response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>Adapter Response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>pools</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <start>
+      <xsl:for-each select="//line">
+        <data>
+          <xsl:call-template name="tokenizer">
+            <xsl:with-param name="string" select="string(.)" />
+            <xsl:with-param name="delimiter" select="'&quot;'" />
+          </xsl:call-template>
+        </data>
+      </xsl:for-each>
+    </start>
+  </xsl:template>
+  <xsl:template name="tokenizer">
+    <xsl:param name="string" />
+    <xsl:param name="delimiter" select="' '" />
+    <xsl:choose>
+      <xsl:when test="$delimiter and contains($string, $delimiter)">
+        <xyz>
+          <xsl:value-of select="substring-before($string,$delimiter)" disable-output-escaping="no" />
+        </xyz>
+        <xsl:call-template name="tokenizer">
+          <xsl:with-param name="string" select="substring-after($string,$delimiter)" />
+          <xsl:with-param name="delimiter" select="$delimiter" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xyz>
+          <xsl:value-of select="$string" disable-output-escaping="no" />
+        </xyz>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>pools</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>subnet-list</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <pools>
+      <xsl:for-each select="//data">
+        <pool>
+          <pool-id>
+            <xsl:value-of select=".//xyz[ position() =4]" disable-output-escaping="no" />
+          </pool-id>
+          <pool-address>
+            <xsl:value-of select=".//xyz[ position() =4]" disable-output-escaping="no" />
+          </pool-address>
+          <subnet-mask>
+            <xsl:value-of select=".//xyz[ position() = 16]" disable-output-escaping="no" />
+          </subnet-mask>
+          <reserved>
+            <xsl:text disable-output-escaping="no">false</xsl:text>
+          </reserved>
+        </pool>
+      </xsl:for-each>
+    </pools>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Success</to>
+                  <value>true</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="true">
+          <condition>
+            <document>
+              <input>
+                <from>Adapter Response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(//error/text())]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>Adapter Response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[lower-case(string(//command-output/metadata/status)) = "error"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <output>
+                  <to>Success</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>Adapter Response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//line/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Get Subnet List:
+Retrieves a list of all subnets the specified domain ([name]) manages from the VitalQIP database.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4a80f8c1-f195-4924-84ef-0c8c63dfad08</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1298640300728</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,623 @@
+<process draft="false" dev-studio-version="7.8.00">
+  <process-def name=":BMC-SA-Service_Desk_Automation:Process Event">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML - Event from BMC AR system 
+
+Example:
+&lt;alert-message alert-id="000000000000912"&gt;
+  &lt;server-name&gt;clm-pun-008040&lt;/server-name&gt;
+  &lt;form-name&gt;HPD:IncidentInterface&lt;/form-name&gt;
+  &lt;object-id&gt;INC000000000804&lt;/object-id&gt;
+  &lt;source&gt;Service Request Management&lt;/source&gt;
+  &lt;timestamp&gt;1436341135&lt;/timestamp&gt;
+  &lt;priority&gt;1&lt;/priority&gt;
+  &lt;text&gt;Action: Reset Password,Configuration Name: BMC_AR_System&lt;/text&gt;
+&lt;/alert-message&gt;</description>
+        <from>inputevent</from>
+        <to>inputevent</to>
+      </input>
+      <output global="false" required="false">
+        <to>response xml</to>
+        <from>response xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set Start Time</process-name>
+        <unique-id>c113440d-ac61-4f97-bc14-2607426fd912</unique-id>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>object id</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//text]]></xpath>
+          </xpath-expression>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"><xsl:output indent="no" /><xsl:template match="/"><text> <xsl:for-each select="/*/*"> <xsl:value-of select="." disable-output-escaping="no" /> <xsl:text disable-output-escaping="no"> 
+</xsl:text> </xsl:for-each> </text> </xsl:template> </xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(., "Number=")]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-before(., "Description")]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(.)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>source</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//alert-message/source/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>form name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//alert-message/form-name/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>server name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//alert-message/server-name/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>action</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(substring-before(substring-after(//text, "ActionType="), "Number"))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>configuration name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(substring-before(substring-after(//text, "ConfigurationName="), "ServiceType"))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>parent number</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(substring-before(substring-after(//text, "ParentNumber="), "Description"))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inputevent</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>task id</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(substring-before(substring-after(//text, "Number="), "ParentNumber"))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>true</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>1</value>
+                      </input>
+                    </concat>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>success status</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown form name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>Input event does not contain all the required fields.</value>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-Service_Desk_Automation:FulfillmentIntegrations:Defaults:Templates:RequestResponseTemplate</configuration>
+                </input>
+                <output>
+                  <to>bao process data</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+              <parameters>
+                <input>
+                  <from>success status</from>
+                  <to>success status</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <input>
+                  <value>Unknown</value>
+                  <to>target name</to>
+                </input>
+                <input>
+                  <value>Process Incident event</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <value>&lt;response/&gt;</value>
+                  <to>target response</to>
+                </input>
+                <input>
+                  <from>bao process data</from>
+                  <to>fulfillment response</to>
+                </input>
+                <input>
+                  <from>status message</from>
+                  <to>error summary</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>action</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="form name">
+                  <input global="false">
+                    <from>form name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="object id">
+                  <input global="false">
+                    <from>object id</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="source">
+                  <input global="false">
+                    <from>source</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="configuration name">
+                  <input global="false">
+                    <from>configuration name</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[string-length(.) > 0 and string-length("${object id}") > 0 and string-length("${form name}") > 0 and string-length("${source}") > 0 and string-length("${configuration name}") > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>1</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>form name</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[concat("Unknown form name: ", .)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>Unsupported Form.</value>
+                          </input>
+                          <input>
+                            <value></value>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+                    <parameters>
+                      <input>
+                        <from>success status</from>
+                        <to>success status</to>
+                      </input>
+                      <input>
+                        <from>start time</from>
+                        <to>start time</to>
+                      </input>
+                      <input>
+                        <value>Unknown</value>
+                        <to>target name</to>
+                      </input>
+                      <input>
+                        <value>Incident event read</value>
+                        <to>request type</to>
+                      </input>
+                      <input>
+                        <value>&lt;response/&gt;</value>
+                        <to>target response</to>
+                      </input>
+                      <input global="true">
+                        <configuration>:BMC-SA-Service_Desk_Automation:FulfillmentIntegrations:Defaults:Templates:RequestResponseTemplate</configuration>
+                        <to>fulfillment response</to>
+                      </input>
+                      <input>
+                        <from>status message</from>
+                        <to>error summary</to>
+                      </input>
+                      <output>
+                        <from>response xml</from>
+                        <to>response xml</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>form name</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = "HPD:Help Desk"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-SA-Service_Desk_Automation:Incident_Management:Process Incident Event</process-name>
+                    <parameters>
+                      <input>
+                        <from>configuration name</from>
+                        <to>configuration name</to>
+                      </input>
+                      <input>
+                        <from>object id</from>
+                        <to>incident number</to>
+                      </input>
+                      <input>
+                        <from>action</from>
+                        <to>action</to>
+                      </input>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>form name</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = "TMS:Task"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-SA-Service_Desk_Automation:Change_Management:Process Change Event</process-name>
+                    <parameters>
+                      <input>
+                        <from>configuration name</from>
+                        <to>configuration name</to>
+                      </input>
+                      <input>
+                        <from>parent number</from>
+                        <to>change id</to>
+                      </input>
+                      <input>
+                        <from>task id</from>
+                        <to>task id</to>
+                      </input>
+                      <input>
+                        <from>action</from>
+                        <to>action</to>
+                      </input>
+                      <output>
+                        <from>response xml</from>
+                        <to>response xml</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[3]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>form name</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="WOI:WorkOrder"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-SA-Service_Desk_Automation:Work_Order_Management:Process Work Order</process-name>
+                    <parameters>
+                      <input>
+                        <from>configuration name</from>
+                        <to>configuration name</to>
+                      </input>
+                      <input>
+                        <from>object id</from>
+                        <to>work order id</to>
+                      </input>
+                      <input>
+                        <from>action</from>
+                        <to>action</to>
+                      </input>
+                      <output>
+                        <from>response xml</from>
+                        <to>response xml</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[4]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set End Time</process-name>
+        <unique-id>56b1f95f-1714-4c2e-9eec-f10b4e43f060</unique-id>
+        <parameters>
+          <output>
+            <from>end time</from>
+            <to>end time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Receive alerts from BMC AR system and extracts and validates notification data. Also, depending on the Remedy form which triggered the alert event, the corresponding process is called to read and validate the change ticket.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>true</is-enabled>
+        <log-file-name>Process-Event.log</log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>68daa787-bb58-456e-b177-242a9baa6d4f</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1444042348906</last-modified>
+    </meta>
+  </process-def>
+</process>

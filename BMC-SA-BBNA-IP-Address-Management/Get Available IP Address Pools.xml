@@ -1,0 +1,428 @@
+<process draft="false" dev-studio-version="7.6.02.04">
+  <process-def name=":BMC-SA-BBNA-IP-Address-Management:Get Available IP Address Pools">
+    <parameters>
+      <output global="false" required="false">
+        <description>operation status.
+valid values: true, false.</description>
+        <to>success</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="false">
+        <description>Operation result
+Format:
+&lt;operation-result&gt;
+     &lt;message&gt;error message incase of any error&lt;/message&gt;
+     &lt;pool&gt;
+         &lt;subnet-address&gt;w.x.y.z&lt;/subnet-address&gt;
+         &lt;subnet-mask&gt;xyz&lt;/subnet-mask&gt;
+         &lt;network-address&gt;p.q.r.s&lt;/network-address&gt;
+     &lt;/pool&gt;
+     &lt;pool&gt;
+         &lt;subnet-address&gt;l.m.n.o&lt;/subnet-address&gt;
+         &lt;subnet-mask&gt;abc&lt;/subnet-mask&gt;
+         &lt;network-address&gt;p.q.r.s&lt;/network-address&gt;
+     &lt;/pool&gt;
+&lt;/operation-result&gt;
+</description>
+        <to>operation result</to>
+        <from>operation result</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>------------ Get Available IP Address Pools Starts ------------</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-IP-Address-Management:Searches:Get All Subnets</process-name>
+              <parameters>
+                <input global="true">
+                  <configuration>:BMC-SA-BBNA-IP-Address-Management:IP_Address_Management:Configuration_Name</configuration>
+                  <to>configuration name</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>pools</from>
+                  <to>pools</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>success</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>operation result</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="error">
+                      <input global="false">
+                        <from>error message</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="pools">
+                      <input global="false">
+                        <from>pools</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <operation-result>
+      <xsl:if test="string(.) = &quot;false&quot;">
+        <message>
+          <xsl:text disable-output-escaping="no">${error}</xsl:text>
+        </message>
+      </xsl:if>
+      <xsl:if test="string(.) = &quot;true&quot;">
+        <xsl:variable name="pools">${pools}</xsl:variable>
+        <xsl:copy-of select="xalan:nodeset($pools)//node()[name() = 'pool']" />
+      </xsl:if>
+    </operation-result>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>------------ Get Available IP Address Pools Ends ------------</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input global="true">
+                <configuration>:BMC-SA-BBNA-IP-Address-Management:IP_Address_Management:Configuration_Name</configuration>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[starts-with(., "Infoblox")]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-IP_Address_Management:Searches:Get Network List</process-name>
+              <parameters>
+                <input global="true">
+                  <configuration>:BMC-SA-BBNA-IP-Address-Management:IP_Address_Management:Configuration_Name</configuration>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <value>default</value>
+                  <to>network view</to>
+                </input>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>output</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>error</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens />
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:if test="not(contains(//line[@ index =&quot;1&quot;], &quot;Response Code:0&quot;))">
+      <error-message>
+        <xsl:value-of select="//line[@ index =&quot;2&quot;]" disable-output-escaping="no" />
+      </error-message>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>error</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>error message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//error-message/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>success</to>
+                        <value>false</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>pools</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'success']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>output</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>pools</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens />
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <pools>
+      <xsl:for-each select="//item">
+        <pool>
+          <xsl:value-of select=".//network/text()" disable-output-escaping="no" />
+        </pool>
+      </xsl:for-each>
+    </pools>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>success</to>
+                        <value>true</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>error message</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>success</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>operation result</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="error">
+                      <input global="false">
+                        <from>error message</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="pools">
+                      <input global="false">
+                        <from>pools</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <operation-result>
+      <xsl:if test="string(.) = &quot;false&quot;">
+        <message>
+          <xsl:text disable-output-escaping="no">${error}</xsl:text>
+        </message>
+      </xsl:if>
+      <xsl:if test="string(.) = &quot;true&quot;">
+        <networks>${pools}</networks>
+      </xsl:if>
+    </operation-result>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>------------ Get Available IP Address Pools Ends ------------</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Get Available IP Address Pools:
+This operation returns the list of all available pools.
+</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>c9eada2d-cfd6-43c9-9899-0160f0023acf</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1340351098329</last-modified>
+    </meta>
+  </process-def>
+</process>

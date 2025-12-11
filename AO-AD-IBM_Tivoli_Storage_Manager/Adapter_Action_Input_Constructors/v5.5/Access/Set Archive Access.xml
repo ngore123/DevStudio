@@ -1,0 +1,126 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Adapter_Action_Input_Constructors:v5.5:Access:Set Archive Access">
+    <parameters>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the path, file, image, or directory to which your are giving access to another node or user. Use wildcard characters to specify a group of files or images, or all files in a directory; all objects in a directory branch; or all objects in a drive. However, you cannot use a wildcard to specify all drives. Use a single asterisk "*" for the file spec to give access to all files or images owned by you and backed up on the server. When the command set access backup "*" node is entered, no check is made with the server; it is assumed you have at least one object backed up.</description>
+        <from>filespec</from>
+        <to>filespec</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the client node of the user to whom you are giving access. Use wildcards to give access to more than one node with similar node names. Use an asterisk (*) to give access to all nodes.</description>
+        <from>nodename</from>
+        <to>nodename</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>final items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>final items</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="filespec">
+                <input global="false">
+                  <from>filespec</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="nodename">
+                <input global="false">
+                  <from>nodename</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" omit-xml-declaration="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">set-archive-access</xsl:text>
+        </operation-name>
+        <xsl:if test="string('${timeout secs}')!=''">
+          <timeout-secs>
+            <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+        <command-arguments>
+          <xsl:if test="string('${filespec}')!=''">
+            <filespec>
+              <xsl:value-of select="'${filespec}'" disable-output-escaping="no" />
+            </filespec>
+          </xsl:if>
+          <xsl:if test="string('${nodename}')!=''">
+            <nodename>
+              <xsl:value-of select="'${nodename}'" disable-output-escaping="no" />
+            </nodename>
+          </xsl:if>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>FINAL ITEMS: </value>
+              </input>
+              <input>
+                <from>final items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for Set Archive Access process.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>502f0a55-ee84-344d-a453-d3cf74c3d1ed</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290596954827</last-modified>
+    </meta>
+  </process-def>
+</process>

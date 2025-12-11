@@ -1,0 +1,622 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Add Volume to HSG(Without OCP)">
+    <parameters>
+      <input global="false" required="false">
+        <from>host security group name</from>
+        <to>host security group name</to>
+      </input>
+      <input global="false" required="false">
+        <from>hpse adapter name</from>
+        <to>hpse adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <from>storage system name</from>
+        <to>storage system name</to>
+      </input>
+      <input global="false" required="false">
+        <from>pool name</from>
+        <to>pool name</to>
+      </input>
+      <input global="false" required="false">
+        <from>volume name</from>
+        <to>volume name</to>
+      </input>
+      <input global="false" required="false">
+        <from>access id</from>
+        <to>access id</to>
+      </input>
+      <input global="false" required="false">
+        <from>storage system port ids</from>
+        <to>storage system port ids</to>
+      </input>
+      <input global="false" required="false">
+        <from>host ports</from>
+        <to>host ports</to>
+      </input>
+      <output global="false" required="false">
+        <to>hsg id</to>
+        <from>hsg id</from>
+      </output>
+      <output global="false" required="false">
+        <to>add volume to hsg response</to>
+        <from>add volume to hsg response</from>
+      </output>
+      <output global="false" required="false">
+        <to>execution status</to>
+        <from>execution status</from>
+      </output>
+      <output global="false" required="false">
+        <to>volume name</to>
+        <from>volume name</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Create Initial Request</process-name>
+        <parameters>
+          <input>
+            <from>host ports</from>
+            <to>host ports</to>
+          </input>
+          <input>
+            <from>storage system name</from>
+            <to>storage system name</to>
+          </input>
+          <input>
+            <from>pool name</from>
+            <to>storage pool name</to>
+          </input>
+          <input>
+            <from>volume name</from>
+            <to>volume name</to>
+          </input>
+          <output>
+            <from>initial request</from>
+            <to>initial request</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>initial request</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>find ss id request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <command>
+          <xsl:text disable-output-escaping="no">show</xsl:text>
+        </command>
+        <category>
+          <xsl:text disable-output-escaping="no">storagesystem</xsl:text>
+        </category>
+        <process-id>
+          <xsl:text disable-output-escaping="no">find-storage-system-details</xsl:text>
+        </process-id>
+        <command-arguments>
+          <all />
+        </command-arguments>
+        <filter-by>
+          <Name>
+            <xsl:value-of select="//storage-system-name" disable-output-escaping="no" />
+          </Name>
+        </filter-by>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-HP_Storage_Essentials:v6.0:Storage_System:Find Storage System Details</process-name>
+        <parameters>
+          <input>
+            <from>hpse adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>find ss id request</from>
+            <to>items</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>storage system id</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//command-response/ID)]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>No valid storage system id found.</value>
+                      </input>
+                    </concat>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>final error</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>final error</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:utility[1]</location>
+            </utility>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>storage system id</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="ss id">
+                  <input global="false">
+                    <from>storage system id</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[string('${ss id}')!='']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Find Volume ID From Name</process-name>
+              <parameters>
+                <input>
+                  <from>hpse adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>storage system id</from>
+                  <to>storage system id</to>
+                </input>
+                <input>
+                  <from>volume name</from>
+                  <to>volume name</to>
+                </input>
+                <output>
+                  <from>volume id</from>
+                  <to>selected volume id</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <utility>
+                    <string>
+                      <concat>
+                        <input>
+                          <concat>
+                            <input>
+                              <value>No valid volume id found.</value>
+                            </input>
+                          </concat>
+                        </input>
+                      </concat>
+                    </string>
+                    <output global="false">
+                      <to>final error</to>
+                    </output>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <from>final error</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:utility[1]</location>
+                  </utility>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>selected volume id</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="volume id">
+                        <input global="false">
+                          <from>selected volume id</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string('${volume id}')!='']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Find HSG ID From Name</process-name>
+                    <parameters>
+                      <input>
+                        <from>storage system id</from>
+                        <to>storage system id</to>
+                      </input>
+                      <input>
+                        <from>host security group name</from>
+                        <to>hsg name</to>
+                      </input>
+                      <output>
+                        <from>hsg id</from>
+                        <to>hsg id</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>access id</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>update hsg request</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="vol id">
+                            <input global="false">
+                              <from>selected volume id</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="access id">
+                            <input global="false">
+                              <from>access id</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="hsg id">
+                            <input global="false">
+                              <from>hsg id</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <command>
+          <xsl:text disable-output-escaping="no">add</xsl:text>
+        </command>
+        <category>
+          <xsl:text disable-output-escaping="no">hostsecuritygroup</xsl:text>
+        </category>
+        <process-id>
+          <xsl:text disable-output-escaping="no">update-host-security-group</xsl:text>
+        </process-id>
+        <command-arguments>
+          <hostsecuritygroup-id>${hsg id}</hostsecuritygroup-id>
+          <volume-ids>${vol id}</volume-ids>
+          <deviceaccess-ids>${access id}</deviceaccess-ids>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AO-AD-HP_Storage_Essentials:v6.0:Host_Security_Group:Update Host Security Group</process-name>
+                    <parameters>
+                      <input>
+                        <from>hpse adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>update hsg request</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>add volume to hsg response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>add volume to hsg response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>execution status</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[string(//command-output/metadata/status/.)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[2]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b74d7282-94d6-3355-8270-6c6a35e45a42</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588066311</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,400 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AO-AD-Amazon_S3:Find Items">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter to use to handle the request. 
+
+Default value: AmazonS3ActorAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>version
+         The Amazon S3 version. The current supported version is v1.0</description>
+        <from>version</from>
+        <to>version</to>
+      </input>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon S3. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - 
+
+http://s3.amazonaws.com/doc/2006-03-01/AmazonS3.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon S3 buckets across different regions. Respective values for different regions are as below:
+
+    * https://s3.amazonaws.com/soap — Endpoint located in the US Standard Region
+    * https://s3-us-west-1.amazonaws.com/soap — Endpoint located in the US-West (Northern California) Region
+    * https://s3-eu-west-1.amazonaws.com/soap ---Endpoint located in the EU (Ireland) Region
+    * https://s3-ap-southeast-1.amazonaws.com/soap ---Endpoint located in the Asia Pacific (Singapore) Region
+    * https://s3-ap-northeast-1.amazonaws.com/soap ---Endpoint located in the Asia Pacific (Tokyo) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>aws access key id [Optional]
+
+The WebService access key is used to for identifying yourself as the sender of the request for the Amazon S3 operations. This key is provided by Amazon at the time of registration on Amazon S3 account.
+
+Sample access key is is as follows:
+1D9FVRAYCP1VJEXAMPLE=</description>
+        <from>aws access key id</from>
+        <to>aws access key id</to>
+      </input>
+      <input global="false" required="false">
+        <description>secret access key [Optional]
+
+Each aws access key id has a secret key associated with it. Secret key is secret and should be known only by you and AWS. This is used only to calculate signatures to include in requests sent to AWS.</description>
+        <from>secret access key</from>
+        <to>secret access key</to>
+      </input>
+      <input global="false" required="true">
+        <description>item type
+              The item type that makes the judgement on what wrapper must be executed.
+
+Valid values: 
+list-bucket
+list-all-my-buckets</description>
+        <from>item type</from>
+        <to>item type</to>
+      </input>
+      <input global="false" required="true">
+        <description>items
+       The items XML used to perform an operation within Amazon S3
+
+Value takes the form:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;parameters&gt;
+			..........
+		&lt;/parameters&gt;
+	&lt;/item&gt;
+&lt;/items&gt;</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <description>The adapter response containing the results. </description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Amazon_S3:Utilities:Version Error Reporting</process-name>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>version</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='v1.0']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Amazon_S3:Utilities:Item Type Error Reporting</process-name>
+                    <parameters>
+                      <input>
+                        <from>item type</from>
+                        <to>item type</to>
+                      </input>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='list-bucket-contents']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-Amazon_S3:v1.0:Bucket_Operations:List Bucket Contents</process-name>
+                    <unique-id>6f9d15ef-d844-3d74-9aab-14c6465fae81</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>wsdl location</from>
+                        <to>wsdl location</to>
+                      </input>
+                      <input>
+                        <from>endpoint address</from>
+                        <to>endpoint address</to>
+                      </input>
+                      <input>
+                        <from>aws access key id</from>
+                        <to>aws access key id</to>
+                      </input>
+                      <input>
+                        <from>secret access key</from>
+                        <to>secret access key</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='list-all-my-buckets']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Amazon_S3:v1.0:Service_Operations:List All My Buckets</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>wsdl location</from>
+                        <to>wsdl location</to>
+                      </input>
+                      <input>
+                        <from>endpoint address</from>
+                        <to>endpoint address</to>
+                      </input>
+                      <input>
+                        <from>aws access key id</from>
+                        <to>aws access key id</to>
+                      </input>
+                      <input>
+                        <from>secret access key</from>
+                        <to>secret access key</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[3]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Find Items
+      Finds items within Amazon S3.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>001789e3-d316-47af-b360-763624a96d60</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1308557458436</last-modified>
+    </meta>
+  </process-def>
+</process>

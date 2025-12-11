@@ -1,0 +1,159 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":RBA-AD-BMC_Configuration_Automation_Networks:v8.9:User:Add User">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter to use to handle the request. 
+
+Default value: BCANActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>&lt;items&gt;
+    &lt;item&gt;
+		&lt;parameters&gt;
+            &lt;user-dto&gt;
+				&lt;dynamic-fields&gt;
+					&lt;!--zero or more array elements follow--&gt;
+					&lt;element&gt;
+					  &lt;name&gt;Full Name&lt;/name&gt;
+					  &lt;values&gt;
+						&lt;!--zero or more array elements follow--&gt;
+						&lt;element&gt;full name of user&lt;/element&gt;
+					  &lt;/values&gt;
+					&lt;/element&gt;
+				&lt;/dynamic-fields&gt;
+				&lt;email-address&gt;ag@xyzc.com&lt;/email-address&gt;
+  				&lt;enabled&gt;true&lt;/enabled&gt;
+				&lt;force-password-change&gt;false&lt;/force-password-change&gt;
+				&lt;password-never-expires&gt;true&lt;/password-never-expires&gt;
+				&lt;roles&gt;
+						&lt;!--zero or more array elements follow--&gt;
+						&lt;element&gt;Administrator&lt;/element&gt;
+						&lt;element&gt;Developer&lt;/element&gt;
+					&lt;/roles&gt;
+				&lt;root-account&gt;true&lt;/root-account&gt;
+				&lt;user-name&gt;devUser&lt;/user-name&gt;
+                        
+			&lt;/user-dto&gt;
+			&lt;cleartext-password&gt;devpass&lt;/cleartext-password&gt;
+		&lt;/parameters&gt;
+     &lt;/item&gt;
+&lt;/items&gt;</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="false">
+        <description>connection parameters [optional]
+        The XML containing the metadata needed by the adapter to connect to the target.
+
+Value takes the form:
+
+&lt;connection-parameters&gt;
+	&lt;soap-url&gt;&lt;/soap-url&gt;
+ 	&lt;user-name&gt;&lt;/user-name&gt;
+	&lt;password&gt;&lt;/password&gt;
+	&lt;soap-version&gt;&lt;/soap-version&gt;
+&lt;/connection-parameters&gt;</description>
+        <from>connection parameters</from>
+        <to>connection parameters</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:RBA-AD-BMC_Configuration_Automation_Networks:Utilities:Create Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <value>user</value>
+            <to>entity</to>
+          </input>
+          <input>
+            <value>add-user</value>
+            <to>operation-name</to>
+          </input>
+          <input>
+            <from>connection parameters</from>
+            <to>connection parameters</to>
+          </input>
+          <output>
+            <from>request</from>
+            <to>request</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:RBA-AD-BMC_Configuration_Automation_Networks:Utilities:Execute Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>request</from>
+            <to>adapter request</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Adds the user in TSNA system</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>009d0db4-fdc3-4327-8238-ba8a6dab773e</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1558961846899</last-modified>
+    </meta>
+  </process-def>
+</process>

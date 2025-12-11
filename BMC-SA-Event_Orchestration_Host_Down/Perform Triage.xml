@@ -1,0 +1,728 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration_Host_Down:Perform Triage">
+    <parameters>
+      <input global="false" required="true">
+        <description>host down event or trace route event data</description>
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <input global="false" required="false">
+        <description>Target host connection data as below:
+
+&lt;connection-details&gt;
+  &lt;component type="unix" name="clm-aus-021691.clm-mgmt.clm.bmc.com"&gt;
+    &lt;username&gt;root&lt;/username&gt;
+    &lt;password-configuration-name&gt;UnixCredentials&lt;/password-configuration-name&gt;
+    &lt;invocation-mechanism&gt;ssh&lt;/invocation-mechanism&gt;
+    &lt;ping-mechanism&gt;command-line&lt;/ping-mechanism&gt;
+    &lt;adapter-options /&gt;
+    &lt;command-options&gt;&lt;![CDATA[ignore-exit-code="true"]]&gt;&lt;/command-options&gt;
+    &lt;adapter-name xmlns:xalan="http://xml.apache.org/xalan"&gt;SSHAdapter&lt;/adapter-name&gt;
+    &lt;ping-adapter-name xmlns:xalan="http://xml.apache.org/xalan"&gt;Command Line&lt;/ping-adapter-name&gt;
+  &lt;/component&gt;
+  &lt;password&gt;
+    &lt;EncryptedData xmlns="http://www.w3.org/2001/04/xmlenc#" Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
+      &lt;CipherData&gt;
+        &lt;CipherValue&gt;EypYPlQ/ST66jSgT8mqE5Q==&lt;/CipherValue&gt;
+      &lt;/CipherData&gt;
+    &lt;/EncryptedData&gt;
+  &lt;/password&gt;
+&lt;/connection-details&gt;</description>
+        <from>target connection data</from>
+        <to>target connection data</to>
+      </input>
+      <output global="false" required="false">
+        <to>triage output</to>
+        <from>triage output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <utility>
+        <date>
+          <now />
+        </date>
+        <output global="false">
+          <to>start time</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[1]</location>
+      </utility>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>event data</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="//situationData/service">
+    <xsl:variable name="nodeName" select="name()" />
+    <xsl:element name="{$nodeName}">
+      <xsl:value-of select="//sourceData/componentCaption/text()" disable-output-escaping="no" />
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Host_Down:HostDownConfig</configuration>
+          </input>
+          <output>
+            <to>configuration</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>target host caption</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//sourceData/componentCaption/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>target host caption</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>target host name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-before(., "@")]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>target host name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>domain name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="contains(., '.')">
+          <xsl:value-of select="substring-after(., '.')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">*</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ping mapping</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="domain name">
+                <input global="false">
+                  <from>domain name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="domain">
+    <xsl:choose>
+      <xsl:when test="boolean(//ping-mapping[@name='${domain name}']) = 'true'">${domain name}</xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">*</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:template match="/">
+    <xsl:copy-of select="//ping-mapping[@name = $domain]" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>connection details</to>
+            <value>
+              <connection-details />
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>router host details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="domain name">
+                <input global="false">
+                  <from>domain name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="domain">
+    <xsl:choose>
+      <xsl:when test="string-length(//ping-mapping[@name = '${domain name}']) &gt; 0">
+        <xsl:value-of select="//ping-mapping[@name = '${domain name}']/@name" disable-output-escaping="no" />
+      </xsl:when>
+      <xsl:when test="string-length(//ping-mapping[contains('${domain name}', @name)]) &gt; 0">
+        <xsl:value-of select="//ping-mapping[contains('${domain name}', @name)]/@name" disable-output-escaping="no" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">*</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:template match="/">
+    <xsl:copy-of select="//ping-mapping[@name= $domain]/router-host" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>router host details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>routerhost</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>router host details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>router host type</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[@component-type]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>investigation message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>Triage Data</to>
+            <value>
+              <enrichment-data />
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input>
+                <value>ping </value>
+              </input>
+              <input required="false">
+                <from>target host name</from>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>command</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>------------------Hot details-------------------</value>
+              </input>
+              <input>
+                <from>target host name</from>
+              </input>
+              <input>
+                <from>domain name</from>
+              </input>
+              <input>
+                <from>ping mapping</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>ping mapping</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>ping host</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//ping-host]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <call-process>
+            <process-name>:AutoPilot-OA-Credentials_Store:EventOrchestration:Get Ping Host Details</process-name>
+            <parameters>
+              <input>
+                <from>ping host</from>
+                <to>host name</to>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[text()]]></xpath>
+                </xpath-expression>
+              </input>
+              <input>
+                <from>ping host</from>
+                <to>component type</to>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[@component-type]]></xpath>
+                </xpath-expression>
+              </input>
+              <output>
+                <from>connection details</from>
+                <to>ping host connection details</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:call-process[1]</location>
+          </call-process>
+          <call-process>
+            <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML Preserve Namespace</process-name>
+            <parameters>
+              <input>
+                <from>connection details</from>
+                <to>parent xml</to>
+              </input>
+              <input>
+                <from>ping host connection details</from>
+                <to>child xml</to>
+              </input>
+              <output>
+                <from>result xml</from>
+                <to>connection details</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <after-execution>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>-------------------Consolidated connection details------------------</value>
+                  </input>
+                  <input>
+                    <from>connection details</from>
+                  </input>
+                </parameters>
+              </log>
+            </after-execution>
+            <location>:call-process[2]</location>
+          </call-process>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>Triage success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Triage success message</to>
+                  <value>Server credential Extraction failed. Please check AO configuration for Host Down.</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Triage Data</to>
+                  <value>Server credential Extraction failed. Please check AO configuration for Host Down and corresponding Credential store details.</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>$$$$ Extraction Failed : All connection details 1,2,3,router,AO</value>
+                    </input>
+                    <input>
+                      <from>host 1 details</from>
+                    </input>
+                    <input>
+                      <from>host 2 details</from>
+                    </input>
+                    <input>
+                      <from>host 3 details</from>
+                    </input>
+                    <input>
+                      <from>router details</from>
+                    </input>
+                    <input>
+                      <from>ao host details</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>connection details</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(/*/*) = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+            </console-output>
+            <call-process>
+              <process-name>:BMC-SA-Event_Orchestration_Host_Down:Utilities:Perform 360 Service Verification</process-name>
+              <parameters>
+                <input>
+                  <from>target host name</from>
+                  <to>host</to>
+                </input>
+                <input>
+                  <from>router host details</from>
+                  <to>router host details</to>
+                </input>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <output>
+                  <from>investigation message</from>
+                  <to>Triage success message</to>
+                </output>
+                <output>
+                  <from>investigation status</from>
+                  <to>Triage success status</to>
+                </output>
+                <output>
+                  <from>triagedata</from>
+                  <to>Triage Data</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==== After Perform 360 degress verification===</value>
+                    </input>
+                    <input>
+                      <from>Triage success status</from>
+                    </input>
+                    <input>
+                      <from>Triage success message</from>
+                    </input>
+                    <input>
+                      <from>Triage Data</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <utility>
+        <date>
+          <now />
+        </date>
+        <output global="false">
+          <to>end time</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[2]</location>
+      </utility>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>Triage Data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>triage output</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="status">
+                <input global="false">
+                  <from>Triage success status</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="command">
+                <input global="false">
+                  <from>command</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="end time">
+                <input global="false">
+                  <from>end time</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="start time">
+                <input global="false">
+                  <from>start time</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="command command-output " />
+  <xsl:template match="/">
+    <triage-output>
+      <remediation-required>
+        <xsl:choose>
+          <xsl:when test="'${status}' = 'success'">
+            <xsl:text disable-output-escaping="no">false</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no">true</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </remediation-required>
+      <status>
+        <xsl:choose>
+          <xsl:when test="'${status}' = 'success'">
+            <xsl:text disable-output-escaping="no">failure</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no">success</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </status>
+      <command>${command}</command>
+      <command-output>
+        <xsl:value-of select="." disable-output-escaping="no" />
+      </command-output>
+      <start-time>${start time}</start-time>
+      <end-time>${end time}</end-time>
+    </triage-output>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==== Forming triage output===</value>
+              </input>
+              <input>
+                <from>Triage success status</from>
+              </input>
+              <input>
+                <from>command</from>
+              </input>
+              <input>
+                <from>start time</from>
+              </input>
+              <input>
+                <from>end time</from>
+              </input>
+              <input>
+                <from>Triage Data</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>====Host Down - triage output====</value>
+              </input>
+              <input>
+                <from>triage output</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[3]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform triage for a host down scenario.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>ca313583-e4f3-4376-83c4-654d691ce514</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1552872071531</last-modified>
+    </meta>
+  </process-def>
+</process>

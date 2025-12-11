@@ -1,0 +1,183 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:BlAclTemplate:List All ACL Templates">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains list of all ACL templates, with all ACL template properties included in the list.</description>
+        <to>templateList</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>BlAclTemplate</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>listAllAclTemplates</value>
+            <to>command name</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>template list</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens />
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <template-list>
+      <xsl:for-each select="//line[starts-with(text(), 'Name:')]">
+        <template>
+          <xsl:attribute name="name">
+            <xsl:value-of select="substring-after(text(), ' ')" disable-output-escaping="no" />
+          </xsl:attribute>
+        </template>
+        <xsl:apply-templates select="following-sibling::line">
+          <xsl:with-param name="threshold">
+            <xsl:choose>
+              <xsl:when test="following-sibling::line[(starts-with(text(), 'Name:'))]">
+                <xsl:value-of select="following-sibling::line[(starts-with(text(), 'Name:'))]/@index" disable-output-escaping="no" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="following-sibling::line[position() = last()]/@index + 1" disable-output-escaping="no" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:with-param>
+        </xsl:apply-templates>
+      </xsl:for-each>
+    </template-list>
+  </xsl:template>
+  <xsl:template match="line">
+    <xsl:param name="threshold" />
+    <xsl:if test="@index &lt; $threshold">
+      <property>
+        <xsl:variable name="var" select="normalize-space(text())" />
+        <role>
+          <xsl:variable name="role-var">
+            <xsl:choose>
+              <xsl:when test="starts-with($var, 'Current Role')">
+                <xsl:text disable-output-escaping="no">Current Role</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-before($var, ' ')" disable-output-escaping="no" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <xsl:value-of select="$role-var" disable-output-escaping="no" />
+        </role>
+        <authorization>
+          <xsl:variable name="auth-var">
+            <xsl:choose>
+              <xsl:when test="starts-with($var, 'Current Role')">
+                <xsl:value-of select="substring-after($var, 'Current Role ')" disable-output-escaping="no" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="substring-after($var, ' ')" disable-output-escaping="no" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:variable>
+          <xsl:value-of select="$auth-var" disable-output-escaping="no" />
+        </authorization>
+      </property>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command returns a list of all ACL templates, with all ACL template properties included in the list.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a5ab312c-f841-3379-ab88-28ac5b663529</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179756285</last-modified>
+    </meta>
+  </process-def>
+</process>

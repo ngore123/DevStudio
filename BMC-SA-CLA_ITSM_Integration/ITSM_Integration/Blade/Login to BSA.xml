@@ -1,0 +1,506 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Login to BSA">
+    <parameters>
+      <input global="false" required="true">
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <input global="false" required="false">
+        <from>connectivityIssueFoundWithBlade</from>
+        <to>connectivityIssueFoundWithBlade</to>
+      </input>
+      <input global="false" required="false">
+        <from>errorMessage</from>
+        <to>errorMessage</to>
+      </input>
+      <input global="false" required="true">
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <input global="false" required="true">
+        <from>username</from>
+        <to>username</to>
+      </input>
+      <input global="false" required="true">
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <output global="false" required="true">
+        <to>sessionId</to>
+        <from>sessionId</from>
+      </output>
+      <output global="false" required="true">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="true">
+        <to>connectivityIssueFoundWithBlade</to>
+        <from>connectivityIssueFoundWithBlade</from>
+      </output>
+      <output global="false" required="true">
+        <to>errorMessage</to>
+        <from>errorMessage</from>
+      </output>
+      <output global="false" required="false">
+        <to>bladeResponse</to>
+        <from>bladeResponse</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>url</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>req</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="username">
+                <input global="false">
+                  <from>username</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="password">
+                <input global="false">
+                  <from>password</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://bladelogic.com/webservices/framework/xsd" xmlns:log="http://bladelogic.com/webservices/skeleton/login" version="1.0">
+  <xsl:output indent="yes" encoding="XML" />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Body>
+        <xsl:element name="log:loginUsingUserCredential">
+          <xsl:element name="log:userName">
+            <xsl:text disable-output-escaping="no">${username}</xsl:text>
+          </xsl:element>
+          <xsl:element name="log:password">
+            <xsl:text disable-output-escaping="no">${password}</xsl:text>
+          </xsl:element>
+          <xsl:element name="log:authenticationType">
+            <xsl:text disable-output-escaping="no">SRP</xsl:text>
+          </xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Default_WebService_Adapter</configuration>
+          </input>
+          <output>
+            <to>WSAdapter</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Connection_Details:transport</configuration>
+          </input>
+          <output>
+            <to>transport</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>sessionId</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:Login to BSA:Request=&gt;</value>
+              </input>
+              <input>
+                <from>req</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+        <parameters>
+          <input>
+            <from>WSAdapter</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>http-rpc</value>
+            <to>transport</to>
+          </input>
+          <input>
+            <from>url</from>
+            <to>soap url</to>
+          </input>
+          <input>
+            <from>req</from>
+            <to>soap message</to>
+          </input>
+          <input>
+            <value>bladelogicNamespace:loginUsingUserCredential</value>
+            <to>soap action</to>
+          </input>
+          <input>
+            <value>true</value>
+            <to>use ssl certificate</to>
+          </input>
+          <input>
+            <value>true</value>
+            <to>install certificate</to>
+          </input>
+          <input>
+            <value>true</value>
+            <to>allow unsigned certificate</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>bladeResponse</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>In BMC-SA-CLA_ITSM_Integration:Login to BSA</value>
+              </input>
+              <input>
+                <from>bladeResponse</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Utility:Strip Namespaces</process-name>
+        <parameters>
+          <input>
+            <from>bladeResponse</from>
+            <to>XML</to>
+          </input>
+          <output>
+            <from>XML</from>
+            <to>XML</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>:BMC-SA-CLA_ITSM_Integration:Utility:Strip Namespaces</value>
+              </input>
+              <input>
+                <from>XML</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>error</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>connectivityIssueFoundWithBlade</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>XML</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>errorMessage</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//faultstring/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>errorMessage</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>errorMessage</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring(., 0, 200)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:Login to BSA failed:Set status=&gt;</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>XML</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//status/text()='success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>XML</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(//Fault)]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>XML</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>sessionId</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//returnSessionId/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>connectivityIssueFoundWithBlade</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:Login to BSA:sessionid=&gt;</value>
+                    </input>
+                    <input>
+                      <from>sessionId</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>XML</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//status/text()='error' and not(//faultstring)]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>error</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>connectivityIssueFoundWithBlade</to>
+                  <value>true</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>XML</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>errorMessage</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//error/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>errorMessage</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>errorMessage</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring(., 0, 200)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>******Login to BSA=&gt;</value>
+                    </input>
+                    <input>
+                      <from>errorMessage</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2702317a-892c-437c-899d-7342cf314bcb</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1475750043072</last-modified>
+    </meta>
+  </process-def>
+</process>

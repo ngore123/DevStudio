@@ -1,0 +1,260 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:RSS:Update RSS Storage">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Sets the runaway recall limit to the specified number.</description>
+        <from>recall limit</from>
+        <to>recall limit</to>
+      </input>
+      <input global="false" required="false">
+        <description>Schedules jobs using the following inputs:
+Valid values: login, idle, startup</description>
+        <from>schedule start</from>
+        <to>schedule start</to>
+      </input>
+      <input global="false" required="false">
+        <description>Schedule time is only specified if a schedule start is not specified. time is in the 24 hour format</description>
+        <from>schedule time</from>
+        <to>schedule time</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies how many days</description>
+        <from>schedule occurence</from>
+        <to>schedule occurence</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies time period.
+Valid values: day, week, month</description>
+        <from>occurence option</from>
+        <to>occurence option</to>
+      </input>
+      <input global="false" required="false">
+        <description>Occurence value input is valid only if "week" or "month" have been specified in "occurence option":
+It indicates in the case of "week"</description>
+        <from>occurence value</from>
+        <to>occurence value</to>
+      </input>
+      <input global="false" required="false">
+        <description>Time is always specified in 24 hour</description>
+        <from>occurence time</from>
+        <to>occurence time</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the number of media copies.</description>
+        <from>media copies</from>
+        <to>media copies</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies how many migrate jobs/recalls can be executed concurrently.</description>
+        <from>concurrency</from>
+        <to>concurrency</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies whether administrators are exempt from the runaway recall limit. 0 indicates that they are not; 1 indicates that they are.
+Valid values: 0, 1</description>
+        <from>admin exempt</from>
+        <to>admin exempt</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>recall limit</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="recall limit">
+                  <input global="false">
+                    <from>recall limit</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="media copies">
+                  <input global="false">
+                    <from>media copies</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="schedule start">
+                  <input global="false">
+                    <from>schedule start</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="schedule time">
+                  <input global="false">
+                    <from>schedule time</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="schedule occurence">
+                  <input global="false">
+                    <from>schedule occurence</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="concurrency">
+                  <input global="false">
+                    <from>concurrency</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="admin exempt">
+                  <input global="false">
+                    <from>admin exempt</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="occurence value">
+                  <input global="false">
+                    <from>occurence value</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="occurence time">
+                  <input global="false">
+                    <from>occurence time</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="occurence option">
+                  <input global="false">
+                    <from>occurence option</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">rss admin set </xsl:text>
+        <xsl:if test="string-length('${recall limit}') !=0">
+          <xsl:text disable-output-escaping="no">/recalllimit:${recall limit} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${media copies}') !=0">
+          <xsl:text disable-output-escaping="no">/mediacopies:${media copies} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${schedule start}') !=0 and '${schedule start}' ='login'">
+          <xsl:text disable-output-escaping="no">at ${schedule start} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${schedule start}') !=0 and '${schedule start}' ='idle'">
+          <xsl:text disable-output-escaping="no">at ${schedule start} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${schedule start}') !=0 and '${schedule start}' ='startup'">
+          <xsl:text disable-output-escaping="no">at ${schedule start} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${schedule start}') =0 and string-length('${schedule time}') !=0">
+          <xsl:text disable-output-escaping="no">at ${schedule time} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${schedule occurence}') !=0 and '${occurence option}' ='day'">
+          <xsl:text disable-output-escaping="no">every ${schedule occurence} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${schedule occurence}') !=0 and '${occurence option}' ='week'">
+          <xsl:text disable-output-escaping="no">every ${schedule occurence} week ${occurence value} $[occurence time] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${schedule occurence}') !=0 and '${occurence option}' ='month'">
+          <xsl:text disable-output-escaping="no">every ${schedule occurence} month ${occurence value} $[occurence time] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${concurrency}') !=0">
+          <xsl:text disable-output-escaping="no">/concurrency:${concurrency} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${admin exempt}') !=0">
+          <xsl:text disable-output-escaping="no">/adminexempt:${admin exempt} </xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows XP">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Windows XP.</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update RSS Storage
+    Update Remote Storage parameters.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>6cf5577b-95c5-3990-90d3-b18356ff4818</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902429674</last-modified>
+    </meta>
+  </process-def>
+</process>

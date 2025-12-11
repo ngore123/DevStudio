@@ -1,0 +1,380 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":Closed_Loop-SA-Change_Management:Retrieve Tasks by Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - of the configuration name 
+
+Example: BCAN</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - The URL of the assigned BCAN server. 
+
+Example: https://bcan-dev-03.bmc.com</description>
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <output global="false" required="false">
+        <description>XML document  containing detail for one or more tasks.</description>
+        <to>tasks</to>
+        <from>tasks</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: 0-success,1-failure</description>
+        <to>status code</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Verbose status message 
+
+Example: 
+Query complete for Group Name Network Support Group</description>
+        <to>error message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:Closed_Loop-SA-Change_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>query status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>request id prefix</from>
+            <to>request id prefix</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>configuration name success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>configuration name status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:Closed_Loop-SA-Change_Management:Utilities:Retrieve Tasks by Group</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>url</from>
+                  <to>url</to>
+                </input>
+                <output>
+                  <from>tasks</from>
+                  <to>tasks</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>group name</from>
+                  <to>group name</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>0</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>group name</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[concat("Query complete for Group Name ", .)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:Closed_Loop-SA-Change_Management:Utilities:Retrieve Configuration Items by Task ID</process-name>
+                    <parameters>
+                      <input>
+                        <from>configuration name</from>
+                        <to>configuration name</to>
+                      </input>
+                      <input>
+                        <from>tasks</from>
+                        <to>tasks</to>
+                      </input>
+                      <output>
+                        <from>tasks</from>
+                        <to>tasks</to>
+                      </output>
+                      <output>
+                        <from>success status</from>
+                        <to>success status</to>
+                      </output>
+                      <output>
+                        <from>status message</from>
+                        <to>status message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>success status</to>
+                              <value>0</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>status message</to>
+                              <value>All Configuration Items have been successfully retrieved</value>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>success status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[text() ='1']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>success status</to>
+                              <value>1</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>status message</to>
+                              <value>All Configuration Items have been retrieved.</value>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() ='1']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>1</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status message</to>
+                        <value>No Tasks found.</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() = '1']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Retrieve the Change and Task information for populating a BCAN Job.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b6556c70-c195-3e03-9ee3-592668048bff</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283245734784</last-modified>
+    </meta>
+  </process-def>
+</process>

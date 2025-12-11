@@ -1,0 +1,474 @@
+<process draft="false" dev-studio-version="8.0.00">
+  <process-def name=":BMC-SA-ITSM_Automation:Utilities:Generate ITSM Config Map">
+    <parameters>
+      <input global="false" required="false">
+        <description>First key of map</description>
+        <from>key1</from>
+        <to>key1</to>
+      </input>
+      <input global="false" required="false">
+        <description>First set of values for map
+&lt;output&gt;
+&lt;values&gt;1&lt;/values&gt;
+&lt;values&gt;2&lt;/values&gt;
+&lt;values&gt;3&lt;/values&gt;
+&lt;/output&gt;</description>
+        <from>value1</from>
+        <to>value1</to>
+      </input>
+      <input global="false" required="false">
+        <description>Second key of map</description>
+        <from>key2</from>
+        <to>key2</to>
+      </input>
+      <input global="false" required="false">
+        <description>Second set of values of map</description>
+        <from>value2</from>
+        <to>value2</to>
+      </input>
+      <input global="false" required="false">
+        <description>Third key of map</description>
+        <from>key3</from>
+        <to>key3</to>
+      </input>
+      <input global="false" required="false">
+        <description>Third set of values of map.</description>
+        <from>value3</from>
+        <to>value3</to>
+      </input>
+      <input global="false" required="false">
+        <description>Fourth key of map</description>
+        <from>key4</from>
+        <to>key4</to>
+      </input>
+      <input global="false" required="false">
+        <description>Forth set of values for Map.</description>
+        <from>value4</from>
+        <to>value4</to>
+      </input>
+      <input global="false" required="false">
+        <description>Top parent tag under which values are present.</description>
+        <from>RootTag</from>
+        <to>RootTag</to>
+      </input>
+      <input global="false" required="false">
+        <description>Expected ParentTag under which the key values must be wrapped</description>
+        <from>ExpectedRootTag</from>
+        <to>ExpectedRootTag</to>
+      </input>
+      <output global="false" required="false">
+        <to>ValueMap</to>
+        <from>valueMap</from>
+      </output>
+      <output global="false" required="false">
+        <to>JSON</to>
+        <from>JSON</from>
+      </output>
+      <output global="false" required="false">
+        <to>value1</to>
+        <from>value1</from>
+      </output>
+      <output global="false" required="false">
+        <to>value2</to>
+        <from>value2</from>
+      </output>
+      <output global="false" required="false">
+        <to>value3</to>
+        <from>value3</from>
+      </output>
+      <output global="false" required="false">
+        <to>value4</to>
+        <from>value4</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>true</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>ExpectedRootTag</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)]]></xpath>
+            </xpath-expression>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>ExpectedRootTag</to>
+                  <value>InputParameters</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>RootTag</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)]]></xpath>
+            </xpath-expression>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>RootTag</to>
+                  <value>output</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>value1</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>value1</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="key1">
+                <input global="false">
+                  <from>key1</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="expectedroottag">
+                <input global="false">
+                  <from>ExpectedRootTag</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="roottag">
+                <input global="false">
+                  <from>RootTag</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:element name="${expectedroottag}">
+      <key>${key1}</key>
+      <xsl:copy-of select="//values" />
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>value2</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>value2</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="key2">
+                <input global="false">
+                  <from>key2</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="expectedroottag">
+                <input global="false">
+                  <from>ExpectedRootTag</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="roottag">
+                <input global="false">
+                  <from>RootTag</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:element name="${expectedroottag}">
+      <key>${key2}</key>
+      <xsl:copy-of select="//values" />
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>value3</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>value3</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="key3">
+                <input global="false">
+                  <from>key3</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="expectedroottag">
+                <input global="false">
+                  <from>ExpectedRootTag</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="roottag">
+                <input global="false">
+                  <from>RootTag</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:element name="${expectedroottag}">
+      <key>${key3}</key>
+      <xsl:copy-of select="//values" />
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>value4</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>value4</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="key4">
+                <input global="false">
+                  <from>key4</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="expectedroottag">
+                <input global="false">
+                  <from>ExpectedRootTag</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="roottag">
+                <input global="false">
+                  <from>RootTag</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:element name="${expectedroottag}">
+      <key>${key4}</key>
+      <xsl:copy-of select="//values" />
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>valueMap</to>
+            <value>
+              <map />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="value1">
+                <input global="false">
+                  <from>value1</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="value2">
+                <input global="false">
+                  <from>value2</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="value3">
+                <input global="false">
+                  <from>value3</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="value4">
+                <input global="false">
+                  <from>value4</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="key1">
+                <input global="false">
+                  <from>key1</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="key2">
+                <input global="false">
+                  <from>key2</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="key3">
+                <input global="false">
+                  <from>key3</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="key4">
+                <input global="false">
+                  <from>key4</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <response-data>
+      <xsl:if test="string-length(normalize-space('$[key1]')) &gt; 0">${value1}</xsl:if>
+      <xsl:if test="string-length(normalize-space(string('$[key2]'))) &gt; 0">${value2}</xsl:if>
+      <xsl:if test="string-length(normalize-space('$[key3]')) &gt; 0">${value3}</xsl:if>
+      <xsl:if test="string-length(normalize-space('$[key4]')) &gt; 0">${value4}</xsl:if>
+    </response-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>--Value Map--</value>
+              </input>
+              <input>
+                <from>ExpectedRootTag</from>
+              </input>
+              <input>
+                <from>valueMap</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+        <parameters>
+          <input>
+            <from>valueMap</from>
+            <to>XML</to>
+          </input>
+          <output>
+            <from>JSON</from>
+            <to>JSON</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Takes the key value pair and generates a Json structure based on those inputs.
+
+Sample output:
+&lt;Map&gt;
+  &lt;InputParameters&gt;
+    &lt;key&gt;urgency&lt;/key&gt;
+    &lt;values&gt;High&lt;/values&gt;
+  &lt;/InputParameters&gt;
+  &lt;InputParameters&gt;
+    &lt;key&gt;Impact&lt;/key&gt;
+    &lt;values&gt;Critical&lt;/values&gt;
+  &lt;/InputParameters&gt;
+&lt;/Map&gt;</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1d65c8a7-c5dd-400a-a5ee-91524835159b</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1521454115366</last-modified>
+    </meta>
+  </process-def>
+</process>

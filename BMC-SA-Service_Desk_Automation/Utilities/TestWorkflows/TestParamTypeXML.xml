@@ -1,0 +1,122 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BMC-SA-Service_Desk_Automation:Utilities:TestWorkflows:TestParamTypeXML">
+    <parameters />
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>input xml</to>
+            <value>
+              <input-xml>
+                <child-1>child1</child-1>
+                <child-2>child2</child-2>
+              </input-xml>
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>param xml</to>
+            <value>
+              <value>
+                <param-1>param1</param-1>
+              </value>
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>input xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>output xml</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="parameter xml">
+                <input global="false">
+                  <from>param xml</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:variable name="rootElem" select="name(/*[1])" />
+  <xsl:template match="/">
+    <xsl:element name="{$rootElem}">
+      <xsl:variable name="paramXML">${parameter xml}</xsl:variable>
+      <xsl:apply-templates select="/*/*" />
+      <xsl:copy-of select="$paramXML" />
+      <xsl:call-template name="ByCall">
+        <xsl:with-param name="childXml" select="$paramXML" />
+      </xsl:call-template>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template name="InputXML" match="@*|node()">
+    <xsl:copy-of select="." />
+  </xsl:template>
+  <xsl:template name="ByCall">
+    <xsl:param name="childXml" />
+    <by-call-template>
+      <xsl:copy-of select="$childXml" />
+    </by-call-template>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>inputs, params and output xml</value>
+              </input>
+              <input>
+                <from>input xml</from>
+              </input>
+              <input>
+                <from>param xml</from>
+              </input>
+              <input>
+                <from>output xml</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Test an XSLT where the token is an XML and is passed into a template as a parameter</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0278679f-bfec-4aeb-ae80-40578de39ed2</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1437415136769</last-modified>
+    </meta>
+  </process-def>
+</process>

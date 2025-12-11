@@ -1,0 +1,286 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-AD-Remedy_REST:Utilities:Logout">
+    <parameters>
+      <input global="false" required="true">
+        <description>Adapter supporting requests to Remedy REST API</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Remedy REST API URL. For example: http(s)://&lt;remedy-host&gt;:&lt;remedy-rest-api-port&gt;
+
+By default, out of the box, Remedy REST API server port is 8008.
+
+http://remedy-server-name:8008</description>
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <input global="false" required="true">
+        <description>Authorization token received via login to Remedy REST API.</description>
+        <from>authorization token</from>
+        <to>authorization token</to>
+      </input>
+      <output global="false" required="false">
+        <description>success or failure</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>HTTP status code</description>
+        <to>status code</to>
+        <from>status code</from>
+      </output>
+      <output global="false" required="false">
+        <description>Error message if status is failure</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>url</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>url</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="java.net.URLEncoder" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="concat(., '/api/jwt/logout')" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input>
+                <value>{
+   "headers": {
+       "Authorization" : "AR-JWT </value>
+              </input>
+              <input required="false">
+                <from>authorization token</from>
+              </input>
+              <input>
+                <value>",
+       "Content-Type": "application/x-www-form-urlencoded"
+    }
+}</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>headers</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:REST:Post</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>url</from>
+            <to>url</to>
+          </input>
+          <input>
+            <from>headers</from>
+            <to>headers</to>
+          </input>
+          <input>
+            <value>xml</value>
+            <to>return data format</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status code</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//status-line/code/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat('Status code:', //status-line/code/text(), '; Reason: ', //status-line/reason/text())]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>============login adapter response============</value>
+                    </input>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//status-line/code/text() = '204' and string-length(normalize-space(//message-body/non-xml-data-response/text())) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>============login adapter response============</value>
+                    </input>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Logout from Remedy using REST API.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1f17d959-114c-4001-8ebe-f80125616876</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Remedy REST API</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1569605836932</last-modified>
+    </meta>
+  </process-def>
+</process>

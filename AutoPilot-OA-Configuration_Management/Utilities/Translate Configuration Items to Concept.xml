@@ -1,0 +1,555 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":AutoPilot-OA-Configuration_Management:Utilities:Translate Configuration Items to Concept">
+    <parameters>
+      <input global="false" required="true">
+        <description>The data to be translated from an specific application, to an internal common data concept.</description>
+        <from>source data</from>
+        <to>source</to>
+      </input>
+      <input global="false" required="true">
+        <description>Maps a specific application field ID to a common data model/concept. 
+</description>
+        <from>context to target mapping</from>
+        <to>mapping</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML document providing the data template for the output.</description>
+        <from>collection template</from>
+        <to>template</to>
+      </input>
+      <output global="false" required="true">
+        <description>The output containing the source data in the collections template format.</description>
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>template</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>collection name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[name(.)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>template</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>item name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="name">
+                <input global="false">
+                  <from>collection name</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[name(//${name}/*)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>template</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>items</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="name">
+                <input global="false">
+                  <from>collection name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output cdata-section-elements="details rule-name directory-name" indent="yes" />
+  <xsl:template match="/" >
+   <xsl:element name="${name}"/>
+   </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>template</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>default item</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="name">
+                <input global="false">
+                  <from>item name</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[//${name}]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>source</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>source</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="//metadata" />
+    <xsl:template match="/">
+    <xsl:choose>
+      <!-- Remove the result tag put in by not creating the collection via XSL. -->
+     <xsl:when test="name(node())='result'"><xsl:copy-of select="//result/*"/></xsl:when>
+     <xsl:otherwise><xsl:copy-of select="./*"/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+ 
+</xsl:stylesheet>
+
+]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>source</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>source item</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[/node()/*]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <assign>
+            <assignment>
+              <input>
+                <from>default item</from>
+              </input>
+              <output>
+                <to>item</to>
+              </output>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[2]</location>
+          </assign>
+          <for-each>
+            <document>
+              <input>
+                <from>mapping</from>
+              </input>
+            </document>
+            <result>
+              <output>
+                <to>mapping element</to>
+              </output>
+            </result>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[./*]]></xpath>
+            </xpath-expression>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <sequence>
+              <assign>
+                <assignment>
+                  <document>
+                    <input>
+                      <from>mapping element</from>
+                    </input>
+                  </document>
+                  <result>
+                    <output>
+                      <to>concept name</to>
+                    </output>
+                  </result>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[name(.)]]></xpath>
+                  </xpath-expression>
+                </assignment>
+                <assignment>
+                  <document>
+                    <input>
+                      <from>mapping element</from>
+                    </input>
+                  </document>
+                  <result>
+                    <output>
+                      <to>target name</to>
+                    </output>
+                  </result>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()]]></xpath>
+                  </xpath-expression>
+                </assignment>
+                <assignment>
+                  <document>
+                    <input>
+                      <from>source item</from>
+                    </input>
+                  </document>
+                  <result>
+                    <output>
+                      <to>target value</to>
+                    </output>
+                  </result>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="name">
+                        <input global="false">
+                          <from>target name</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[//node()[@name="${name}"]/text()]]></xpath>
+                  </xpath-expression>
+                </assignment>
+                <meta>
+                  <documentation />
+                  <checkpoint>false</checkpoint>
+                </meta>
+                <location>:assign[3]</location>
+              </assign>
+              <switch>
+                <meta>
+                  <documentation />
+                  <run-mode-handling>
+                    <run-mode>OCP</run-mode>
+                    <allow-step-into>true</allow-step-into>
+                  </run-mode-handling>
+                  <checkpoint>false</checkpoint>
+                </meta>
+                <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                <default>
+                  <sequence>
+                    <assign>
+                      <assignment>
+                        <document>
+                          <input>
+                            <from>item</from>
+                          </input>
+                        </document>
+                        <result>
+                          <output>
+                            <to>item</to>
+                          </output>
+                        </result>
+                        <xslt-stylesheet>
+                          <stylesheet-replacement-tokens>
+                            <replacement-token name="name">
+                              <input global="false">
+                                <from>concept name</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="value">
+                              <input global="false">
+                                <from>target value</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="item name">
+                              <input global="false">
+                                <from>item name</from>
+                              </input>
+                            </replacement-token>
+                          </stylesheet-replacement-tokens>
+                          <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" omit-xml-declaration="no" />
+  <xsl:template match="/">
+    <xsl:element name="${item name}">
+      <xsl:copy-of select="//${item name}/*" />
+      <xsl:element name="${name}">
+        <xsl:text disable-output-escaping="no">$[value]</xsl:text>
+      </xsl:element>
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                        </xslt-stylesheet>
+                      </assignment>
+                      <meta>
+                        <documentation />
+                        <checkpoint>false</checkpoint>
+                      </meta>
+                      <location>:switch[1]:sequence[1]:assign[1]</location>
+                    </assign>
+                  </sequence>
+                </default>
+                <case>
+                  <condition>
+                    <document>
+                      <input>
+                        <from>target name</from>
+                      </input>
+                    </document>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[string(.) = "Notes"]]></xpath>
+                    </xpath-expression>
+                  </condition>
+                  <sequence>
+                    <assign>
+                      <assignment>
+                        <document>
+                          <input>
+                            <from>source item</from>
+                          </input>
+                        </document>
+                        <result>
+                          <output>
+                            <to>target value</to>
+                          </output>
+                        </result>
+                        <xslt-stylesheet>
+                          <stylesheet-replacement-tokens>
+                            <replacement-token name="name">
+                              <input global="false">
+                                <from>target name</from>
+                              </input>
+                            </replacement-token>
+                          </stylesheet-replacement-tokens>
+                          <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="notes " />
+  <xsl:template match="/">
+    <xsl:if test="&quot;${name}&quot; = 'Notes'">
+      <notes>
+        <xsl:for-each select="//diary">
+          <note>
+            <xsl:value-of select="info" disable-output-escaping="no" />
+          </note>
+        </xsl:for-each>
+      </notes>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                        </xslt-stylesheet>
+                      </assignment>
+                      <assignment>
+                        <document>
+                          <input>
+                            <from>target value</from>
+                          </input>
+                        </document>
+                        <result>
+                          <output>
+                            <to>value length</to>
+                          </output>
+                        </result>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string-length(.)]]></xpath>
+                        </xpath-expression>
+                      </assignment>
+                      <assignment>
+                        <document>
+                          <input>
+                            <from>item</from>
+                          </input>
+                        </document>
+                        <result>
+                          <output>
+                            <to>item</to>
+                          </output>
+                        </result>
+                        <xslt-stylesheet>
+                          <stylesheet-replacement-tokens>
+                            <replacement-token name="name">
+                              <input global="false">
+                                <from>concept name</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="value">
+                              <input global="false">
+                                <from>target value</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="item name">
+                              <input global="false">
+                                <from>item name</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="length">
+                              <input global="false">
+                                <from>value length</from>
+                              </input>
+                            </replacement-token>
+                          </stylesheet-replacement-tokens>
+                          <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" omit-xml-declaration="no" />
+  <xsl:template match="/">
+    <xsl:element name="${item name}">
+      <xsl:copy-of select="//${item name}/*" />
+      <xsl:choose>
+        <xsl:when test="&quot;${length}&quot; = 0">
+          <xsl:element name="${name}">
+            <xsl:text disable-output-escaping="yes">$[value]</xsl:text>
+          </xsl:element>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="yes">$[value]</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                        </xslt-stylesheet>
+                      </assignment>
+                      <meta>
+                        <documentation />
+                        <checkpoint>false</checkpoint>
+                      </meta>
+                      <after-execution>
+                        <log>
+                          <level>debug</level>
+                          <parameters>
+                            <input>
+                              <value>target value</value>
+                            </input>
+                            <input>
+                              <from>target value</from>
+                            </input>
+                          </parameters>
+                        </log>
+                      </after-execution>
+                      <location>:switch[1]:sequence[2]:assign[1]</location>
+                    </assign>
+                  </sequence>
+                </case>
+                <location>:switch[1]</location>
+              </switch>
+            </sequence>
+            <location>:for-each[2]</location>
+          </for-each>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>items</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>items</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="item">
+                    <input global="false">
+                      <from>item</from>
+                    </input>
+                  </replacement-token>
+                  <replacement-token name="name">
+                    <input global="false">
+                      <from>collection name</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" omit-xml-declaration="no" />
+  <xsl:template match="/">
+    <xsl:element name="${name}">
+      <xsl:copy-of select="./node()/*" />
+      ${item}
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[4]</location>
+          </assign>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Translate Source to Concept
+           Translates application specific field ID's to an internal common data concept.
+</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>f1e98f30-2ef6-4dc7-a0a8-1817b7aa8828</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1325137060921</last-modified>
+    </meta>
+  </process-def>
+</process>

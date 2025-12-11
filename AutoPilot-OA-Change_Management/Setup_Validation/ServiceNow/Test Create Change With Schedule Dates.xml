@@ -1,0 +1,324 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Change_Management:Setup_Validation:ServiceNow:Test Create Change With Schedule Dates">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - A description of the change.</description>
+        <from>change description</from>
+        <to>change description</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document that contains detail for one or more incidents </description>
+        <to>changes</to>
+        <from>changes</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - A process specific explanation for the value of success status.</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Change_Management:Setup_Validation:ServiceNow:Get Service Now Configuration Name</process-name>
+        <unique-id>7e75ca13-a384-432e-82c6-a434a0bc3732</unique-id>
+        <parameters>
+          <output>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <utility>
+        <date>
+          <now />
+        </date>
+        <output global="false">
+          <to>now</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[1]</location>
+      </utility>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Format Date</process-name>
+        <parameters>
+          <input>
+            <from>now</from>
+            <to>date</to>
+          </input>
+          <input>
+            <value>est</value>
+            <to>time zone</to>
+          </input>
+          <input>
+            <value>yyyy-MM-dd HH:mm:ss</value>
+            <to>format string</to>
+          </input>
+          <output>
+            <from>formatted date</from>
+            <to>scheduled start date</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <utility>
+        <number>
+          <add>
+            <input>
+              <from>now</from>
+            </input>
+            <input>
+              <value>86400000</value>
+            </input>
+          </add>
+        </number>
+        <output global="false">
+          <to>now plus 1 day</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[2]</location>
+      </utility>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Format Date</process-name>
+        <parameters>
+          <input>
+            <from>now plus 1 day</from>
+            <to>date</to>
+          </input>
+          <input>
+            <value>est</value>
+            <to>time zone</to>
+          </input>
+          <input>
+            <value>yyyy-MM-dd HH:mm:ss</value>
+            <to>format string</to>
+          </input>
+          <output>
+            <from>formatted date</from>
+            <to>scheduled end date</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[3]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <input>
+            <from>scheduled start date</from>
+          </input>
+          <output>
+            <to>change</to>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>scheduled-start-date</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>scheduled end date</from>
+          </input>
+          <output>
+            <to>change</to>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>scheduled-end-date</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>change description</from>
+          </input>
+          <output>
+            <to>change</to>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>description</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>change</to>
+            <value>3 - Low</value>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>impact</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>change</to>
+            <value>3 - Low</value>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>urgency</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>change</to>
+            <value>Moderate</value>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>risk-level</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:AutoPilot-OA-Change_Management:ServiceNow:Default_Change_Type</configuration>
+          </input>
+          <output>
+            <to>change</to>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>change-type</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>change</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>changes</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="change">
+                <input global="false">
+                  <from>change</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Changes>
+      <xsl:choose>
+        <xsl:when test="string-length(//change) &gt; 0">
+          <xsl:copy-of select="//change" />
+        </xsl:when>
+        <xsl:otherwise>${change}</xsl:otherwise>
+      </xsl:choose>
+    </Changes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Show contents of changes</value>
+              </input>
+              <input>
+                <from>changes</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Change_Management:Create Changes</process-name>
+        <parameters>
+          <input>
+            <from>changes</from>
+            <to>changes</to>
+          </input>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>changes</from>
+            <to>changes</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[4]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow tests creating a change record. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>beb5a450-ff79-413b-8bc8-52ca53841dd4</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1415810516131</last-modified>
+    </meta>
+  </process-def>
+</process>

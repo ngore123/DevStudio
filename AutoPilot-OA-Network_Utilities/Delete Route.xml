@@ -1,0 +1,230 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Network_Utilities:Delete Route">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The target network or host address.</description>
+        <from>target</from>
+        <to>target</to>
+      </input>
+      <input global="false" required="true">
+        <description>Indicates whether the target is a network or host address. 
+
+Valid values:  net, host.</description>
+        <from>target type</from>
+        <to>target type</to>
+      </input>
+      <input global="false" required="false">
+        <description>The netmask for the route.</description>
+        <from>netmask</from>
+        <to>netmask</to>
+      </input>
+      <input global="false" required="false">
+        <description>The gateway to which packets will be routed.</description>
+        <from>gateway</from>
+        <to>gateway</to>
+      </input>
+      <input global="false" required="false">
+        <description>The metric for the route.</description>
+        <from>metric</from>
+        <to>metric</to>
+      </input>
+      <input global="false" required="false">
+        <description>The name of the interface from which packets will be routed.</description>
+        <from>interface</from>
+        <to>interface</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>target</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="target type">
+                  <input global="false">
+                    <from>target type</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="netmask">
+                  <input global="false">
+                    <from>netmask</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="metric">
+                  <input global="false">
+                    <from>metric</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="gateway">
+                  <input global="false">
+                    <from>gateway</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="interface">
+                  <input global="false">
+                    <from>interface</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="target">
+                  <input global="false">
+                    <from>target</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">route delete </xsl:text>
+        <xsl:value-of select="." disable-output-escaping="no" />
+        <xsl:if test="string-length('${netmask}')!=0">
+          <xsl:text> mask ${netmask}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> ${gateway}</xsl:text>
+        <xsl:if test="string-length('${metric}')!=0">
+          <xsl:text disable-output-escaping="no"> metric ${metric}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${interface}')!=0">
+          <xsl:text> if ${interface}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Linux" space="preserve">
+        <xsl:text disable-output-escaping="no">/sbin/route del</xsl:text>
+        <xsl:choose>
+          <xsl:when test="'net'='${target type}'">
+            <xsl:text disable-output-escaping="no"> -net </xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> -host </xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="." disable-output-escaping="no" />
+        <xsl:if test="string-length('${netmask}')!=0">
+          <xsl:text> netmask ${netmask}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> gw ${gateway}</xsl:text>
+        <xsl:if test="string-length('${metric}')!=0">
+          <xsl:text> metric ${metric}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${interface}')!=0">
+          <xsl:text> dev ${interface}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/sbin/route delete </xsl:text>
+        <xsl:choose>
+          <xsl:when test="'net'='${target type}'">
+            <xsl:text disable-output-escaping="no"> -net </xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> -host </xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:value-of select="." disable-output-escaping="no" />
+        <xsl:if test="string-length('${netmask}')!=0">
+          <xsl:text> -netmask ${netmask}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> ${gateway}</xsl:text>
+        <xsl:if test="string-length('${metric}')!=0">
+          <xsl:text disable-output-escaping="no"> ${metric}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${interface}')!=0">
+          <xsl:text> -interface ${interface}</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Delete a routing table entry.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>82c03b1f-0a30-39ec-9e6f-a742dbfbab0d</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288093239340</last-modified>
+    </meta>
+  </process-def>
+</process>

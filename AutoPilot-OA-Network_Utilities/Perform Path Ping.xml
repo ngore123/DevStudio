@@ -1,0 +1,246 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Network_Utilities:Perform Path Ping">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the destination</description>
+        <from>target name</from>
+        <to>target name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the source address.</description>
+        <from>source</from>
+        <to>source</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies that the Echo Request messages use the Loose Source Route option in the IP header with the set of intermediate destinations specified in HostList. With loose source routing</description>
+        <from>host list</from>
+        <to>host list</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the maximum number of hops in the path to search for the target (destination). The default is 30 hops.</description>
+        <from>max hops</from>
+        <to>max hops</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the number of Echo Request messages sent to each router in the path. The default is 100 queries.</description>
+        <from>num queries</from>
+        <to>num queries</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the number of milliseconds to wait for each reply. The default is 3000 milliseconds (3 seconds).</description>
+        <from>timeout</from>
+        <to>timeout</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the number of milliseconds to wait between consecutive pings. The default is 250 milliseconds (1/4 second).</description>
+        <from>period</from>
+        <to>period</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>traceroute output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid value: true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="source">
+                  <input global="false">
+                    <from>source</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="target">
+                  <input global="false">
+                    <from>target name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="max hops">
+                  <input global="false">
+                    <from>max hops</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="num queries">
+                  <input global="false">
+                    <from>num queries</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="host list">
+                  <input global="false">
+                    <from>host list</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="timeout">
+                  <input global="false">
+                    <from>timeout</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="period">
+                  <input global="false">
+                    <from>period</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported."</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported."</xsl:text>
+      </command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">pathping -n </xsl:text>
+        <xsl:if test="string-length('${max hops}') != 0">
+          <xsl:choose>
+            <xsl:when test="number(${max hops})">
+              <xsl:text disable-output-escaping="no"> -h ${max hops}</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no"> -h 30</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+        <xsl:if test="string-length('${host list}') != 0">
+          <xsl:text disable-output-escaping="no"> -g "${host list}"</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${period}')!=0">
+          <xsl:choose>
+            <xsl:when test="number('${period}')">
+              <xsl:text disable-output-escaping="no"> -p ${period}</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no"> -p 250</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+        <xsl:if test="string-length('${num queries}')!=0">
+          <xsl:choose>
+            <xsl:when test="number('${num queries}')">
+              <xsl:text disable-output-escaping="no"> -q ${num queries}</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no"> -q 100</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+        <xsl:if test="string-length('${timeout}')!=0">
+          <xsl:choose>
+            <xsl:when test="number('${timeout}')">
+              <xsl:text disable-output-escaping="no"> -w  ${timeout}</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no"> -w 3000</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:if>
+        <xsl:if test="string-length('${source}') != 0">
+          <xsl:text disable-output-escaping="no"> -i ${source}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> ${target}</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>traceroute output</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//output]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Provides information about network latency and network loss at intermediate hops between a source and destination. Pathping sends multiple Echo Request messages to each router between a source and destination over a period of time and then computes results based on the packets returned from each router. Because pathping displays the degree of packet loss at any given router or link, you can determine which routers or subnets might be having network problems. Pathping performs the equivalent of the tracert command by identifying which routers are on the path. It then sends pings periodically to all of the routers over a specified time period and computes statistics based on the number returned from each. Used without parameters, pathping displays help.</description>
+        <version>1.0</version>
+      </documentation>
+      <time-to-live>6000000</time-to-live>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>982757e0-3abb-38e6-aa4e-c260111482f5</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288093281944</last-modified>
+    </meta>
+  </process-def>
+</process>

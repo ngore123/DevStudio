@@ -1,0 +1,408 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-AD-CyberArk:Web_SDK_API:Accounts:Update Account">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter to use to handle the request. 
+
+Default value: CyberArkActorAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The token that identifies the session. A session token that was returned from the “Logon” method.
+</description>
+        <from>authorization token</from>
+        <to>authorization token</to>
+      </input>
+      <input global="false" required="true">
+        <description>The unique ID of the account to update. This is retrieved by the Get Accounts operation.
+
+Tip: The account id of user can be retrieved using Get Account operation to input account id required for this operation.</description>
+        <from>account id</from>
+        <to>account id</to>
+      </input>
+      <input global="false" required="true">
+        <description>Body parameters provide input to update existing account
+
+Sample format to Update Account :
+----------------------------------------------
+[{ "op": "replace", "path": "/address", "value": "10.10.27.254"},
+  { "op": "replace", "path": "/secretManagement/automaticManagementEnabled", "value": "false"}]
+
+
+----------------------------------------------
+
+---------------------------------------------- NOTE---------------------------------------
+
+It is not mandatory to send all the account’s details. Any changed values sent in the request will be updated. All other properties values will remain the same.
+
+On each property, the following operations can be performed:
+
+Replace - replace the existing value of a property
+
+Remove (to remove the property from the account)
+
+Add (to add that property to the account)
+
+When sending several operations on the same property, only the last operation will affect the property.
+
+---------------------------------------------- NOTE---------------------------------------
+
+-------------------------Parameters Description-------------------------
+A.  Parameter : op
+     Type : string
+     Description : The allowed operations to perform on the properties.
+     Valid values: 
+                          . replace (to replace the existing value of that property)
+                          . remove (to remove the property from the account)
+                          . add (to add that property to the account)
+
+B.  Parameter : path
+     Type : String
+     Description :The path of the property name.
+                        The list of possible properties are described below.
+      Valid values : Property name. Example: "/address"
+
+C.  Parameter : value
+     Type  : String
+     Description: The updated property value
+     Valid values: Property value
+
+Note: The above three properties are common and mandatory to define for each property to be updated 
+
+Below is the list of available properties that can be updated
+
+
+1. Parameter : name
+   Type : string
+   Description : The name of the account.
+   Valid values : Account name
+
+2. Parameter : address
+   Type : String
+   Description : The name or address of the machine where the account is used.
+   Valid values : vDNS/IP/URL where the account is managed
+
+3. Parameter : userName
+   Type : String
+   Description : Account user's name.
+   Valid values : User name
+
+4. Parameter: platformId
+   Type : string
+   Description : The platform assigned to this account.
+   Valid values : Valid platform IDs, example: WinServerLocal
+
+
+5. Parameter : platformAccountProperties
+   Type : string
+   Description : Object containing key-value pairs to associate with the account, as defined by the account platform. These properties are validated against the mandatory and optional properties of the specified platform's definition. Optional properties that do not exist on the account will not be returned here.
+   
+   Valid values: example: {"Location": "IT", "OwnerName": "MSSPAdmin"}
+
+secretManagement 
+
+1. Parameter : automaticManagementEnabled
+   Type : Boolean
+   Description : Whether the account secret is automatically managed by the CPM.
+   Default : true
+   Valid values : true, false
+
+2. Parameter : manualManagementReason
+   Type : string
+   Description : Reason for disabling automatic secret management.
+   Valid values : Reason.
+   
+3. Parameter : status
+   Type : string
+   Description : Account management status.
+   Valid values : inProcess, succeeded, failed, partiallySucceeded
+   
+4. Parameter : lastModifiedDateTime
+   Type : string
+   Description : Last modified date of the account.
+   Valid values : date-time
+
+5. Parameter : lastReconciledDateTime
+   Type : string
+   Description : Last reconciled date of the account.
+   Valid values : date-time
+
+6. Parameter : lastVerifiedDateTime
+   Type : string
+   Description : Last verified date of the account.
+   Valid values : date-time
+
+remoteMachinesAccess
+
+1. Parameter : remoteMachines
+   Type : string
+   Description : List of remote machines, separated by semicolons.
+   Example : server1.cyberark.com;server2.cyberark.com
+   
+   Valid values : List of machines.
+
+2. Parameter : accessRestrictedToRemoteMachines
+   Type : Boolean
+   Description : Whether or not to restrict access only to specified remote machines
+   Valid values : true, false
+
+----------------------------------------------------------------------------------------------
+
+Example Input Body Parameters 
+Example 1:
+
+{ "op": "replace", "path": "/address", "value": "NewAddress"}
+{ "op": "add", "path": "/platformaccountproperties/port", "value": "456"}
+{ "op": "remove", "path": "/secretmanagement/manualmanagementreason"}
+
+Example 2:
+
+[
+	{
+		"op": "replace",
+		"path": "/address",
+		"value": "9.10.11.12"
+	}
+]</description>
+        <from>body parameters</from>
+        <to>body parameters</to>
+      </input>
+      <input global="false" required="false">
+        <description>Option to return the response in message body in XML or JSON in output context. If no input is provided, it is assumed to XML.
+
+Default Value: XML
+
+Please note: If JSON provided then headers in adapter response will also be converted into JSON and assigned in output context.
+
+Please note: This parameter is not part of adapter request XML, this parameter is only used to process adapter response in given format.
+</description>
+        <from>return data format</from>
+        <to>return data format</to>
+      </input>
+      <output global="false" required="false">
+        <description>Status represents whether request executed successfully on server
+Valid values:
+
+success
+error</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>Body in response</description>
+        <to>response body</to>
+        <from>response body</from>
+      </output>
+      <output global="false" required="false">
+        <description>response code</description>
+        <to>status code</to>
+        <from>status code</from>
+      </output>
+      <output global="false" required="false">
+        <description>Response header values
+</description>
+        <to>response headers</to>
+        <from>response headers</from>
+      </output>
+      <output global="false" required="false">
+        <description>Error message in case of status error</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>authorization token</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="body parameters">
+                <input global="false">
+                  <from>body parameters</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="account id">
+                <input global="false">
+                  <from>account id</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request>
+      <authorization-token>
+        <xsl:value-of select="." disable-output-escaping="no" />
+      </authorization-token>
+      <account-id>$[account id]</account-id>
+      <body-parameters>$[body parameters]</body-parameters>
+    </request>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Formed Request</value>
+              </input>
+              <input>
+                <from>request</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-AD-CyberArk:Utilities:Create And Execute Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>cyberark-websdk-accounts-update-account</value>
+            <to>operation name</to>
+          </input>
+          <input>
+            <from>request</from>
+            <to>request</to>
+          </input>
+          <input>
+            <from>return data format</from>
+            <to>return data format</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+          <output>
+            <from>return data format</from>
+            <to>return data format</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>------------------Adapter Response----------------</value>
+              </input>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Process Response</process-name>
+        <parameters>
+          <input>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </input>
+          <input>
+            <from>return data format</from>
+            <to>return data format</to>
+          </input>
+          <output>
+            <from>response headers</from>
+            <to>response headers</to>
+          </output>
+          <output>
+            <from>response body</from>
+            <to>response body</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>status code</from>
+            <to>status code</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This operation updates an existing account's details. It is not mandatory to send all the account's details. Any changed values sent in the request will be updated. All other properties values will remain the same.
+
+On each property, the following operations can be performed:
+
+Replace - replace the existing value of a property
+
+Remove (to remove the property from the account)
+
+Add (to add that property to the account)
+
+When sending several operations on the same property, only the last operation will affect the property.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>c2b2613f-ad35-4317-9af1-98e93c762719</process-id>
+      <author>dbhola</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1573804730012</last-modified>
+    </meta>
+  </process-def>
+</process>

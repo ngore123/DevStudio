@@ -1,0 +1,199 @@
+<process draft="false" dev-studio-version="8.3.00">
+  <process-def name=":BMC-SA-Event_Orchestration_PatrolAgent_Down:Utilities:Extract Service name and Port">
+    <parameters>
+      <input global="false" required="true">
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <input global="false" required="true">
+        <from>target connection data</from>
+        <to>target connection data</to>
+      </input>
+      <output global="false" required="false">
+        <to>service name</to>
+        <from>service name</from>
+      </output>
+      <output global="false" required="false">
+        <to>port</to>
+        <from>port</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_PatrolAgent_Down:Service_Actions_Aliasing</configuration>
+          </input>
+          <output>
+            <to>service alias configuration</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>service alias configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>default service name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//Default_Service_Name/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>service name from event</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//sourceData/componentCaption/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>target connection data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>host name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//component/@name]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>service name from event</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>service name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="default service name">
+                <input global="false">
+                  <from>default service name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="host name">
+                <input global="false">
+                  <from>host name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="contains(., '${host name}')">${default service name}</xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>service name from event</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>port</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="host name">
+                <input global="false">
+                  <from>host name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <port>
+      <xsl:choose>
+        <xsl:when test="contains(., '${host name}')">
+          <xsl:value-of select="substring-after(substring-after(., &quot;:&quot;), &quot;:&quot;)" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text></xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </port>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>service name</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>97978fc5-450d-4f63-9277-bd69d42d570c</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1571228995792</last-modified>
+    </meta>
+  </process-def>
+</process>

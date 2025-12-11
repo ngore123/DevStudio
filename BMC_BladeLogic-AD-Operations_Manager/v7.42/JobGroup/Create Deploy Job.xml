@@ -1,0 +1,202 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:JobGroup:Create Deploy Job">
+    <parameters>
+      <input global="false" required="false">
+        <description>&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name assigned to this Deploy Job.</description>
+        <from>deployJobName</from>
+        <to>deployJobName</to>
+      </input>
+      <input global="false" required="true">
+        <description>ID of the job group where this job is saved.</description>
+        <from>ID</from>
+        <to>groupId</to>
+      </input>
+      <input global="false" required="true">
+        <description>Handle associated with the BLPackage for this Deploy Job.</description>
+        <from>dbKey</from>
+        <to>packageKey</to>
+      </input>
+      <input global="false" required="true">
+        <description>Server where you want to run this job.</description>
+        <from>serverName</from>
+        <to>serverName</to>
+      </input>
+      <input global="false" required="true">
+        <description>True indicates the job should include a Simulate phase, during which a dry run is performed without actually deploying the package.</description>
+        <from>isSimulateEnabled</from>
+        <to>isSimulateEnabled</to>
+      </input>
+      <input global="false" required="true">
+        <description>True indicates the job should include a Commit phase, during which the package is actually applied to the target server.</description>
+        <from>isCommitEnabled</from>
+        <to>isCommitEnabled</to>
+      </input>
+      <input global="false" required="true">
+        <description>True indicates the package is delivered to a server functioning as a repeater. During the Commit phase, the package is actually applied to the target server.
+</description>
+        <from>isStagedIndirect</from>
+        <to>isStagedIndirect</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>void</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>deployJobName</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>groupId</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>packageKey</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>serverName</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>isSimulateEnabled</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>isCommitEnabled</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>isStagedIndirect</from>
+            <to>argument 7</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>DeployJob</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>createDeployJob</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command creates a basic Deploy Job for a BLPackage. The most fundamental feature of a basic Deploy Job is that the job is automatically reset should it fail. See a similar command, createDeployJob , to create an advanced Deploy Job. Also, see the command createDeployJob to create an advanced Deploy Job with various job options.
+
+The argument groupId is the ID of the parent depot group containing the Deploy Job. Use a command like groupNameToId to determine this ID.
+
+The argument packageKey provides the handle to the BLPackage to be deployed. Use the command getDBKeyByGroupAndName to get this handle.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>81ddcfab-ec6a-3216-9c5b-522e8d2d47f9</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179830803</last-modified>
+    </meta>
+  </process-def>
+</process>

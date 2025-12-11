@@ -1,0 +1,266 @@
+<process draft="false" dev-studio-version="7.5.02.04">
+  <process-def name=":AutoPilot-OA-Virtual_Server_Management:Utilities:BladeLogic:Update VM Property">
+    <parameters>
+      <input global="false" required="true">
+        <description>Name of the virtual server</description>
+        <from>vm name</from>
+        <to>vm name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Value of the attribute that will be updated</description>
+        <from>attribute value</from>
+        <to>attribute value</to>
+      </input>
+      <input global="false" required="true">
+        <description>Property to be updated</description>
+        <from>property name</from>
+        <to>property name</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Timeout in milliseconds for BladeLogic connection details</description>
+        <from>timeout</from>
+        <to>timeout</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] User role for BladeLogic connection details</description>
+        <from>user role</from>
+        <to>user role</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. </description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status.</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <value>BladeLogic</value>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+          <output>
+            <from>adapter</from>
+            <to>adapter</to>
+          </output>
+          <output>
+            <from>system</from>
+            <to>system</to>
+          </output>
+          <output>
+            <from>default timeout</from>
+            <to>default timeout</to>
+          </output>
+          <output>
+            <from>default user role</from>
+            <to>default user role</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="adapter">
+                <input global="false">
+                  <from>adapter</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="timeout">
+                <input global="false">
+                  <from>timeout</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="user role">
+                <input global="false">
+                  <from>user role</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="default user role">
+                <input global="false">
+                  <from>default user role</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="default timeout">
+                <input global="false">
+                  <from>default timeout</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-details>
+      <adapter-name>${adapter}</adapter-name>
+      <role-name>
+        <xsl:choose>
+          <xsl:when test="string-length('${user role}') &gt; 0">${user role}</xsl:when>
+          <xsl:otherwise>${default user role}</xsl:otherwise>
+        </xsl:choose>
+      </role-name>
+      <timeout>
+        <xsl:choose>
+          <xsl:when test="string-length('${timeout}') &gt; 0">${timeout}</xsl:when>
+          <xsl:otherwise>${default timeout}</xsl:otherwise>
+        </xsl:choose>
+      </timeout>
+    </connection-details>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:PropertyInstance:Set Overridden Value</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>vm name</from>
+            <to>fullyQualifiedInstanceName</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[concat('Class://SystemObject/Lifecycle/', .)]]></xpath>
+            </xpath-expression>
+          </input>
+          <input>
+            <from>property name</from>
+            <to>propertyName</to>
+          </input>
+          <input>
+            <from>attribute value</from>
+            <to>valueAsString</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>success status</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens />
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(.) = 'true'">
+          <xsl:text disable-output-escaping="no">success</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This action attempts to set a value on an instance for the specified property</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+    </meta>
+  </process-def>
+</process>

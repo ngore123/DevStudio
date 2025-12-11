@@ -1,0 +1,173 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":RBA-AD-BMC_Configuration_Automation_Networks:Utilities:Create Adapter Request">
+    <parameters>
+      <input global="false" required="true">
+        <description>&lt;items&gt;
+	&lt;item&gt;
+		&lt;parameters&gt;
+			&lt;username&gt;sysadmin&lt;/username&gt;
+			&lt;password&gt;bmc123&lt;/password&gt;
+		&lt;/parameters&gt;
+	&lt;/item&gt;
+&lt;/items&gt;</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="true">
+        <description>For BMC Configuration Automation Networks application, there are five entity types that are supported:
+
+1.	authentication
+2.	device
+3.	event
+4.	report
+5.	span-action</description>
+        <from>entity</from>
+        <to>entity</to>
+      </input>
+      <input global="false" required="true">
+        <description>Different operations are supported like
+doLogin, doLogout, doApprovalByJobID, doApprovalByRequestID ..etc</description>
+        <from>operation-name</from>
+        <to>operation name</to>
+      </input>
+      <input global="false" required="false">
+        <from>connection parameters</from>
+        <to>connection parameters</to>
+      </input>
+      <output global="false" required="true">
+        <to>request</to>
+        <from>formed request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>request</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="connection parameters">
+                <input global="false">
+                  <from>connection parameters</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="items">
+                <input global="false">
+                  <from>items</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request>${connection parameters}${items}</request>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>request</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>formed request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="entity">
+                <input global="false">
+                  <from>entity</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="operation-name">
+                <input global="false">
+                  <from>operation name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="connection parameters">
+                <input global="false">
+                  <from>connection parameters</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <bmc-configuration-automation-networks-request>
+        <xsl:if test="//connection-parameters">
+          <xsl:copy-of select="//connection-parameters/*" />
+        </xsl:if>
+        <entity>${entity}</entity>
+        <request>
+          <operation-name>${operation-name}</operation-name>
+          <xsl:if test="//items/item">
+            <xsl:copy-of select="//items/item/*" />
+          </xsl:if>
+        </request>
+      </bmc-configuration-automation-networks-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>request</value>
+              </input>
+              <input>
+                <from>formed request</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>be65012c-4c0b-3efc-85be-87a2860e70d7</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1281352092720</last-modified>
+    </meta>
+  </process-def>
+</process>

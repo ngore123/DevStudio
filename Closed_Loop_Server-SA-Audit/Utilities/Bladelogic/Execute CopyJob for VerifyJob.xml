@@ -1,0 +1,352 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":Closed_Loop_Server-SA-Audit:Utilities:Bladelogic:Execute CopyJob for VerifyJob">
+    <parameters>
+      <input global="false" required="false">
+        <description>Bladelogic connection details..e.g.
+&lt;connection-details&gt;
+  &lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/connection-details&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>type of job
+e.g. ComplinceJob or AuditJob</description>
+        <from>job type</from>
+        <to>job type</to>
+      </input>
+      <input global="false" required="true">
+        <description>name of verify job.
+e.g. compliance jobVerify or audit jobVrify</description>
+        <from>jobName</from>
+        <to>jobName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Folder name under which sample verify job is stored.
+/Compliance Job Folder/CLSC or /Compliance Job Folder/CLSA
+
+This folder must be existing on BL.</description>
+        <from>groupName</from>
+        <to>groupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Folder name under which copyjob for verify action needs to be created.
+/Compliance Job Folder/CLSC/Verify Job Folder or /Compliance Job Folder/CLSA/Verify Job Folder
+
+This folder must be existing on BL.</description>
+        <from>copyJob group name</from>
+        <to>copyJob group name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Tartget server against which verify job must run.</description>
+        <from>target</from>
+        <to>target</to>
+      </input>
+      <input global="false" required="true">
+        <description>Change ID for the complete compliance run.
+e.g. CHG0000009987</description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="true">
+        <description>verify job delimiter
+e.g. -AO- or :</description>
+        <from>job delimiter</from>
+        <to>job delimiter</to>
+      </input>
+      <input global="false" required="false">
+        <from>parent group</from>
+        <to>parent group</to>
+      </input>
+      <output global="false" required="false">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>verify copy job id</to>
+        <from>verify copy job id</from>
+      </output>
+      <output global="false" required="false">
+        <to>copy job name</to>
+        <from>copy job name</from>
+      </output>
+      <output global="false" required="false">
+        <to>copyJob group name</to>
+        <from>copyJob group name</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Get DBKey for any Job</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>job type</from>
+            <to>job type</to>
+          </input>
+          <input>
+            <from>groupName</from>
+            <to>groupName</to>
+          </input>
+          <input>
+            <from>jobName</from>
+            <to>jobName</to>
+          </input>
+          <input>
+            <from>parent group</from>
+            <to>parentGroup</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>success</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>DBKey</from>
+            <to>jobKey</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint></checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <utility>
+              <date>
+                <now />
+              </date>
+              <output global="false">
+                <to>time now</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:utility[1]</location>
+            </utility>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <from>target</from>
+                  </input>
+                  <input>
+                    <from>job delimiter</from>
+                  </input>
+                  <input>
+                    <from>change id</from>
+                  </input>
+                  <input>
+                    <from>job delimiter</from>
+                  </input>
+                  <input>
+                    <from>time now</from>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>copy job name</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:utility[2]</location>
+            </utility>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v8.1:Job:Create Copy Job</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>jobKey</from>
+                  <to>jobKey</to>
+                </input>
+                <input>
+                  <from>copy job name</from>
+                  <to>copyJobName</to>
+                </input>
+                <input>
+                  <from>copyJob group name</from>
+                  <to>groupName</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>verify copy job id</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Format Error message</process-name>
+        <parameters>
+          <input>
+            <from>error message</from>
+            <to>error message</to>
+          </input>
+          <input>
+            <from>success</from>
+            <to>success</to>
+          </input>
+          <input global="true">
+            <configuration>:BMC_BladeLogic-AD-Operations_Manager:CommonStrings:DefaultError</configuration>
+            <to>message text</to>
+          </input>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>create a separate job for each server audit/compliance verification</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>399b6876-90d9-321e-9e60-1d1ec7fe2678</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288607260151</last-modified>
+    </meta>
+  </process-def>
+</process>

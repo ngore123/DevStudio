@@ -1,0 +1,367 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:Compliance:Export Audit Results by Run ID">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified path to the job group containing the job.</description>
+        <from>auditJobGroup</from>
+        <to>auditJobGroup</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the job.</description>
+        <from>auditJobName</from>
+        <to>auditJobName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified component template group containing the template that is the basis of the Audit Job.</description>
+        <from>templateGroupName</from>
+        <to>templateGroupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the component template specifying the Audit Job results to be exported.</description>
+        <from>templateName</from>
+        <to>templateName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Audit job's job run index whoes results are required.</description>
+        <from>runIndex</from>
+        <to>runIndex</to>
+      </input>
+      <input global="false" required="true">
+        <description>The full path name of the exported file created on the server that hosts the adapter.
+
+
+Example: "C:/tmp/dummyExport.csv"</description>
+        <from>exportFileName</from>
+        <to>exportFileName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Valid Values: CSV, HTML</description>
+        <from>exportType</from>
+        <to>exportType</to>
+      </input>
+      <output global="false" required="false">
+        <to>success</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>exportFileName</to>
+        <from>exportFileName</from>
+      </output>
+      <output global="false" required="false">
+        <to>audit job name</to>
+        <from>auditJobName</from>
+      </output>
+      <output global="false" required="false">
+        <to>audit job key</to>
+        <from>auditJobKey</from>
+      </output>
+      <output global="false" required="false">
+        <to>audit job run key</to>
+        <from>auditJobRunKey</from>
+      </output>
+      <output global="false" required="false">
+        <to>audit job run index</to>
+        <from>runIndex</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:AuditJob:Get DBKey by Group and Name</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>auditJobName</from>
+            <to>jobName</to>
+          </input>
+          <input>
+            <from>auditJobGroup</from>
+            <to>groupName</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>success</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>DBKey</from>
+            <to>auditJobKey</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:JobRun:Find Run Key by ID</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>runIndex</from>
+                  <to>jobRunId</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>auditJobRunKey</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="true"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <utility>
+                    <string>
+                      <uppercase>
+                        <input>
+                          <from>exportType</from>
+                        </input>
+                      </uppercase>
+                    </string>
+                    <output global="false">
+                      <to>exportType</to>
+                    </output>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:utility[1]</location>
+                  </utility>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Utility:Export Audit Run</process-name>
+                    <parameters>
+                      <input>
+                        <from>connection details</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>templateGroupName</from>
+                        <to>templateGroupName</to>
+                      </input>
+                      <input>
+                        <from>templateName</from>
+                        <to>templateName</to>
+                      </input>
+                      <input>
+                        <from>auditJobGroup</from>
+                        <to>jobGroupName</to>
+                      </input>
+                      <input>
+                        <from>auditJobName</from>
+                        <to>jobName</to>
+                      </input>
+                      <input>
+                        <from>runIndex</from>
+                        <to>runIndex</to>
+                      </input>
+                      <input>
+                        <from>exportFileName</from>
+                        <to>exportFileName</to>
+                      </input>
+                      <input>
+                        <from>exportType</from>
+                        <to>exportType</to>
+                        <xslt-stylesheet>
+                          <stylesheet-replacement-tokens />
+                          <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=".=&quot;HTML&quot;">
+          <xsl:text disable-output-escaping="no">HTML</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">CSV</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                        </xslt-stylesheet>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>success</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>void</from>
+                        <to>void</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process exports the results of an Audit Job run to a file. You can specify HTML or CSV format.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>67500772-cee9-32b4-9a8a-97edec6c6546</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179711649</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,284 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Change_Management:Utilities:ServiceNow:Translate Status Reason">
+    <parameters>
+      <input global="false" required="true">
+        <description>Supports only ServiceNow</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <input global="false" required="false">
+        <from>status reason</from>
+        <to>status reason</to>
+      </input>
+      <output global="false" required="false">
+        <to>closing notes</to>
+        <from>closing notes</from>
+      </output>
+      <output global="false" required="false">
+        <to>working notes</to>
+        <from>working notes</from>
+      </output>
+      <output global="false" required="false">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Invalid configuration name '</value>
+                    </input>
+                    <input required="false">
+                      <from>configuration name</from>
+                    </input>
+                    <input>
+                      <value>'. Only ServiceNow is expected here.</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>status message</to>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>closing notes</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>working notes</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'ServiceNow']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>closing notes</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>working notes</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>success</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status message</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>status reason</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>status</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>closing notes</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="status reason">
+                            <input global="false">
+                              <from>status reason</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <closing-notes>
+      <xsl:choose>
+        <xsl:when test="contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWZYZ', 'abcdefghijklmnopqrstuvwxyz'), 'close')">${status reason}</xsl:when>
+        <xsl:otherwise>
+          <xsl:text />
+        </xsl:otherwise>
+      </xsl:choose>
+    </closing-notes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>status</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>working notes</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="status reason">
+                            <input global="false">
+                              <from>status reason</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <working-notes>
+      <xsl:choose>
+        <xsl:when test="not(contains(translate(., 'ABCDEFGHIJKLMNOPQRSTUVWZYZ', 'abcdefghijklmnopqrstuvwxyz'), 'close'))">${status reason}</xsl:when>
+        <xsl:otherwise>${status reason}</xsl:otherwise>
+      </xsl:choose>
+    </working-notes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>success</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status message</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>In ServiceNow, there is no enumeration for status reason. So, when the status is one of the close categories, the concept field closing_comment_1 mapped to closing_notes in SNOW shall be populated with the value for Status Reason. Otherwise, the concept field worklog_details mapped to working_notes in SNOW shall be used. 
+
+One design worth using is to populate all status reason values to working_notes and in case of close add the same to closing_notes as well. This keeps the logic simple but the comment is duplicated in two places in the case of close.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b829e88f-1875-40f2-a74d-ba86130962c0</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1423053610675</last-modified>
+    </meta>
+  </process-def>
+</process>

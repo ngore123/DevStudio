@@ -1,0 +1,299 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Convert Input Parameters XML to JSON">
+    <parameters>
+      <input global="false" required="true">
+        <description>Input XML of the format below. Note presence of double-quotes (") in the value of the input. These double-quotes are escaped in the output:
+
+&lt;inputParameters&gt;
+  &lt;inputParameter&gt;
+    &lt;name&gt;adapter name&lt;/name&gt;
+    &lt;value&gt;text with double-quotes - "&lt;/value&gt;
+  &lt;/inputParameter&gt;
+  &lt;inputParameter&gt;
+    &lt;name&gt;target connection data&lt;/name&gt;
+    &lt;value&gt;
+      &lt;connection-details&gt;
+       &lt;hostname&gt;blah.doodle.com&lt;/hostname&gt;
+        &lt;username&gt;somename&lt;/username&gt;
+         &lt;password&gt;
+          &lt;EncryptedData Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
+            &lt;CipherData&gt;
+              &lt;CipherValue&gt;some-enrypted-data&lt;/CipherValue&gt;
+            &lt;/CipherData&gt;
+          &lt;/EncryptedData&gt;
+        &lt;/password&gt;
+        &lt;invocation-mechanism&gt;ssh&lt;/invocation-mechanism&gt;
+        &lt;timeout&gt;120&lt;/timeout&gt;
+        &lt;adapter-name&gt;SSHAdapter&lt;/adapter-name&gt;
+      &lt;/connection-details&gt;
+    &lt;/value&gt;
+  &lt;/inputParameter&gt;
+&lt;/inputParameters&gt;</description>
+        <from>input xml</from>
+        <to>input xml</to>
+      </input>
+      <output global="false" required="false">
+        <to>json output</to>
+        <from>json output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>input xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>json output</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="java.lang.String" xmlns:escapeUtils="org.apache.commons.lang3.StringEscapeUtils" xmlns:json="org.json" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="amp" select="'&amp;'" />
+  <xsl:variable name="eamp" select="'&amp;amp;'" />
+  <xsl:variable name="sq" select="&quot;'&quot;" />
+  <xsl:variable name="esq" select="&quot;\\\'&quot;" />
+  <xsl:variable name="q" select="'&quot;'" />
+  <xsl:variable name="eq" select="'\\&quot;'" />
+  <xsl:variable name="empty">
+    <xsl:text></xsl:text>
+  </xsl:variable>
+  <xsl:variable name="lt" select="'&lt;'" />
+  <xsl:variable name="elt" select="'&amp;lt;'" />
+  <xsl:variable name="gt" select="'&gt;'" />
+  <xsl:variable name="egt" select="'&amp;gt;'" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">{
+  "inputParameters":
+   [
+</xsl:text>
+      <xsl:for-each select="//inputParameter">
+        <xsl:call-template name="inputParameter" />
+      </xsl:for-each>
+      <xsl:text disable-output-escaping="no">    ]
+}
+</xsl:text>
+    </value>
+  </xsl:template>
+  <xsl:template name="inputParameter" match="inputParameter">
+    <xsl:text disable-output-escaping="no">       {
+            "name": "</xsl:text>
+    <xsl:value-of select="name/text()" disable-output-escaping="no" />
+    <xsl:text disable-output-escaping="no">",
+            "value": </xsl:text>
+    <xsl:choose>
+      <xsl:when test="boolean(value/*)">
+        <xsl:variable name="xmlStr">
+          <xsl:apply-templates select="value/*" mode="nodetostring" />
+        </xsl:variable>
+        <xsl:variable name="jsonStr" select="json:XML.toJSONString($xmlStr)" />
+        <xsl:variable name="escapedJson" select="escapeUtils:escapeJson($xmlStr)" />
+        <xsl:value-of select="concat($q, $escapedJson, $q)" disable-output-escaping="no" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:variable name="str1">
+          <xsl:choose>
+            <xsl:when test="java:indexOf(java:new(value/text()), $q) &gt;= 0">
+              <xsl:value-of select="escapeUtils:escapeJson(value/text())" disable-output-escaping="no" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="value/text()" disable-output-escaping="no" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="str2">
+          <xsl:choose>
+            <xsl:when test="java:indexOf(java:new($str1), $sq) &gt;= 0">
+              <xsl:value-of select="escapeUtils:escapeJson(java:new($str1))" disable-output-escaping="no" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$str1" disable-output-escaping="no" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:value-of select="concat($q, $str2, $q)" disable-output-escaping="no" />
+      </xsl:otherwise>
+    </xsl:choose>
+    <xsl:choose>
+      <xsl:when test="boolean(value/*)">
+        <xsl:text disable-output-escaping="no">,
+            "type": "xml"</xsl:text>
+      </xsl:when>
+    </xsl:choose>
+    <xsl:text disable-output-escaping="no">
+        }</xsl:text>
+    <xsl:choose>
+      <xsl:when test="boolean(following-sibling::inputParameter)">
+        <xsl:text disable-output-escaping="no">,
+</xsl:text>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">
+</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template mode="selfclosetag" match="*">
+    <xsl:text disable-output-escaping="no">&lt;</xsl:text>
+    <xsl:value-of select="name()" disable-output-escaping="no" />
+    <xsl:apply-templates select="@*" mode="attribs" />
+    <xsl:text disable-output-escaping="no">/&gt;</xsl:text>
+  </xsl:template>
+  <xsl:template mode="opentag" match="*">
+    <xsl:text disable-output-escaping="no">&lt;</xsl:text>
+    <xsl:value-of select="name()" disable-output-escaping="no" />
+    <xsl:apply-templates select="." mode="namespace" />
+    <xsl:apply-templates select="@*" mode="attribs" />
+    <xsl:text disable-output-escaping="no">&gt;</xsl:text>
+  </xsl:template>
+  <xsl:template mode="closetag" match="*">
+    <xsl:text disable-output-escaping="no">&lt;/</xsl:text>
+    <xsl:value-of select="name()" disable-output-escaping="no" />
+    <xsl:text disable-output-escaping="no">&gt;</xsl:text>
+  </xsl:template>
+  <xsl:template match="* | text()" mode="nodetostring">
+    <xsl:choose>
+      <xsl:when test="boolean(name())">
+        <xsl:choose>
+          <!--if element is not empty-->
+          <xsl:when test="normalize-space(.) != $empty or *">
+            <xsl:apply-templates select="." mode="opentag" />
+            <xsl:apply-templates select="* | text()" mode="nodetostring" />
+            <xsl:apply-templates select="." mode="closetag" />
+          </xsl:when>
+          <!-- assuming emty tags are self closing, e.g. <img/>, <source/>, <input/>-->
+          <xsl:otherwise>
+            <xsl:apply-templates select="." mode="selfclosetag" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <!--Just text-->
+      <xsl:otherwise>
+        <xsl:variable name="txt1">
+          <xsl:value-of select="java:replaceAll(java:new(.), $amp, $eamp)" disable-output-escaping="no" />
+        </xsl:variable>
+        <xsl:variable name="txt2">
+          <xsl:value-of select="java:replaceAll(java:new($txt1), $lt, $elt)" disable-output-escaping="no" />
+        </xsl:variable>
+        <xsl:variable name="txt3">
+          <xsl:value-of select="java:replaceAll(java:new($txt2), $gt, $egt)" disable-output-escaping="no" />
+        </xsl:variable>
+        <xsl:value-of select="$txt3" disable-output-escaping="no" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template match="@*" mode="attribs">
+    <xsl:if test="position() = 1">
+      <xsl:text disable-output-escaping="no"> </xsl:text>
+    </xsl:if>
+    <xsl:value-of select="concat(name(), '=', $q,  java:replaceAll(java:new(.), $q, $eq) , $q)" disable-output-escaping="no" />
+    <xsl:if test="position() != last()">
+      <xsl:text disable-output-escaping="no"> </xsl:text>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template match="*" mode="namespace">
+    <xsl:if test="name(.) = 'EncryptedData'">
+      <xsl:if test="position() = 1">
+        <xsl:text disable-output-escaping="no"> </xsl:text>
+      </xsl:if>
+      <xsl:value-of select="concat('xmlns', '=', $q,  java:replaceAll(java:new(namespace-uri(.)), $q, $eq) , $q)" disable-output-escaping="no" />
+      <xsl:if test="position() != last()">
+        <xsl:text disable-output-escaping="no"> </xsl:text>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+  <xsl:variable name="amp" select="'&amp;'" />
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Given an input XML as below, the process will output JSON string suitable to be used as input parameters while invoking BAO's REST API for execute process.
+
+Note: double quotes are escaped and XML values are converted into XML strings.
+
+&lt;inputParameters&gt;
+  &lt;inputParameter&gt;
+    &lt;name&gt;adapter name&lt;/name&gt;
+    &lt;value&gt;text with double-quotes - "&lt;/value&gt;
+  &lt;/inputParameter&gt;
+  &lt;inputParameter&gt;
+    &lt;name&gt;target connection data&lt;/name&gt;
+    &lt;value&gt;
+      &lt;connection-details&gt;
+       &lt;hostname&gt;blah.doodle.com&lt;/hostname&gt;
+        &lt;username&gt;somename&lt;/username&gt;
+         &lt;password&gt;
+          &lt;EncryptedData xmlns="http://www.w3.org/2001/04/xmlenc" Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
+            &lt;CipherData&gt;
+              &lt;CipherValue&gt;some-enrypted-data&lt;/CipherValue&gt;
+            &lt;/CipherData&gt;
+          &lt;/EncryptedData&gt;
+        &lt;/password&gt;
+        &lt;invocation-mechanism&gt;ssh&lt;/invocation-mechanism&gt;
+        &lt;timeout&gt;120&lt;/timeout&gt;
+        &lt;adapter-name&gt;SSHAdapter&lt;/adapter-name&gt;
+      &lt;/connection-details&gt;
+    &lt;/value&gt;
+  &lt;/inputParameter&gt;
+&lt;/inputParameters&gt;
+
+
+OUTPUT:
+
+{
+  "inputParameters":
+   [
+       {
+            "name": "adapter name",
+            "value": "text with double-quotes - \""
+        },
+       {
+            "name": "target connection data",
+            "value": "&lt;connection-details&gt;&lt;hostname&gt;blah.doodle.com&lt;/hostname&gt;&lt;username&gt;somename&lt;/username&gt;&lt;password&gt;&lt;EncryptedData xmlns=\"http://www.w3.org/2001/04/xmlenc\" Type=\"http://www.w3.org/2001/04/xmlenc#Content\"&gt;&lt;CipherData&gt;&lt;CipherValue&gt;****MASKED****&lt;/CipherValue&gt;&lt;/CipherData&gt;&lt;/EncryptedData&gt;&lt;/password&gt;&lt;invocation-mechanism&gt;****MASKED****&lt;/invocation-mechanism&gt;&lt;timeout&gt;120&lt;/timeout&gt;&lt;adapter-name&gt;SSHAdapter&lt;/adapter-name&gt;&lt;/connection-details&gt;",
+            "type": "xml"
+        }
+    ]
+}
+] </description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7dfe6076-064b-40bd-9b19-eff4d59a6df8</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Common Utilties</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1623996426650</last-modified>
+    </meta>
+  </process-def>
+</process>

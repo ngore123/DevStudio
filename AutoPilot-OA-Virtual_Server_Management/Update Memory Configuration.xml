@@ -1,0 +1,297 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AutoPilot-OA-Virtual_Server_Management:Update Memory Configuration">
+    <parameters>
+      <input global="false" required="true">
+        <description>String value - The name of a configuration item defined in a configuration module.
+
+Example: BladeLogic, VMware, Amazon</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the virtual server</description>
+        <from>vm name</from>
+        <to>vm name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Size of a virtual machine's memory, in MB.
+
+Valid values: Number
+</description>
+        <from>memory</from>
+        <to>memory</to>
+      </input>
+      <input global="false" required="false">
+        <description>memory allocation reservation [optional]
+Amount of resource that is guaranteed available to the virtual machine or resource pool. Reserved resources are not wasted if they are not used. If the utilization is less than the reservation, the resources can be utilized by other running virtual machines. Unit is MB.</description>
+        <from>memory allocation reservation</from>
+        <to>memory allocation reservation</to>
+      </input>
+      <input global="false" required="false">
+        <description>memory allocation limit [optional]
+The utilization of a virtual machine/resource pool will not exceed this limit, even if there are available resources. This is typically used to ensure a consistent performance of virtual machines / resource pools independent of available resources. If set to -1, then there is no fixed limit on resource usage (only bounded by available resources and shares). Unit is MB.</description>
+        <from>memory allocation limit</from>
+        <to>memory allocation limit</to>
+      </input>
+      <input global="false" required="false">
+        <description>memory allocation shares [optional]
+The number of shares allocated. Used to determine resource allocation in case of resource contention. This value is only set if level is set to custom. If level is not set to custom, this value is ignored. Therefore, only shares with custom values can be compared. 
+There is no unit for this value. It is a relative measure based on the settings for other resource pools.</description>
+        <from>memory allocation shares</from>
+        <to>memory allocation shares</to>
+      </input>
+      <input global="false" required="false">
+        <description>memory allocation level [optional]
+The allocation level. The level is a simplified view of shares. Levels map to a pre-determined set of numeric values for shares. If the shares value does not map to a predefined size, then the level is set as custom.
+
+valid values: 
+custom - Shares are specified in the "shares" column.  
+high - Shares =Shares = 20 * virtual machine memory size in megabytes
+low - Shares = 5 * virtual machine memory size in megabytes
+normal - Shares = 10 * virtual machine memory size in megabytes</description>
+        <from>memory allocation level</from>
+        <to>memory allocation level</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Name/IP Address of the virtual center on which the given virtual machine is hosted. </description>
+        <from>virtual center</from>
+        <to>virtual center</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Number of seconds to wait before polling for the virtual center task status</description>
+        <from>delay</from>
+        <to>delay</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the url for the remote soap service running on the vmware virtual center.</description>
+        <from>soap url</from>
+        <to>soap url</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the user name that will be used for http basic authentication on the vmware virtual center.</description>
+        <from>user name</from>
+        <to>user name</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the password corresponding to the specified user name.</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the transport protocol for the message.</description>
+        <from>transport</from>
+        <to>transport</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. 	
+Valid values: success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>Given system is not supported</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'VMware']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:VMware:Update Memory Configuration</process-name>
+              <parameters>
+                <input>
+                  <from>vm name</from>
+                  <to>vm name</to>
+                </input>
+                <input>
+                  <from>memory</from>
+                  <to>memory</to>
+                </input>
+                <input>
+                  <from>virtual center</from>
+                  <to>virtual center</to>
+                </input>
+                <input>
+                  <from>memory allocation reservation</from>
+                  <to>memory allocation reservation</to>
+                </input>
+                <input>
+                  <from>memory allocation limit</from>
+                  <to>memory allocation limit</to>
+                </input>
+                <input>
+                  <from>memory allocation shares</from>
+                  <to>memory allocation shares</to>
+                </input>
+                <input>
+                  <from>memory allocation level</from>
+                  <to>memory allocation level</to>
+                </input>
+                <input>
+                  <from>delay</from>
+                  <to>delay</to>
+                </input>
+                <input>
+                  <from>soap url</from>
+                  <to>soap url</to>
+                </input>
+                <input>
+                  <from>user name</from>
+                  <to>username</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>password</to>
+                </input>
+                <input>
+                  <from>transport</from>
+                  <to>transport</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This action updates vm memory configuration.
+
+[For configuration name "VMware"]
+This action supports dynamic targeting for multiple virtual centers. For using dynamic targeting, one has to pass in the input the connection details for the target virtual center comprising of:
+
+- soap url
+- username
+- password
+- transport
+
+The above parameters are optional. If one does not pass the above parameters, then the "virtual center" input parameter has to be passed.  In this case, the connection details for the given virtual center will be extracted from the module configuration.  The pre-requisite for the latter case is that the connection details for the given virtual center have to be present in module configuration of the AO Virtual Server Management module.
+</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1295940583531</last-modified>
+    </meta>
+  </process-def>
+</process>

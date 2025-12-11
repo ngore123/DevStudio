@@ -1,0 +1,338 @@
+<process draft="false" dev-studio-version="20.02.02">
+  <process-def name=":ESA_ITSM:TSSA_Job:BSA_Log_Write">
+    <parameters>
+      <input global="false" required="false">
+        <from>JobRunID</from>
+        <to>JobRunID</to>
+      </input>
+      <input global="false" required="false">
+        <from>lg_JobRunID</from>
+        <to>lg_JobRunID</to>
+      </input>
+      <input global="false" required="false">
+        <from>Connection_BBSA</from>
+        <to>Connection_BBSA</to>
+      </input>
+      <input global="false" required="false">
+        <from>ErrCode</from>
+        <to>ErrCode</to>
+      </input>
+      <input global="false" required="false">
+        <from>ErrorMessage</from>
+        <to>ErrorMessage</to>
+      </input>
+      <input global="false" required="false">
+        <from>Result</from>
+        <to>Result</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>lg_JobRunID</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>Job_LogLevel</to>
+                        <value>-1</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>ErrorMessage: 
+</value>
+                          </input>
+                          <input required="false">
+                            <from>ErrorMessage</from>
+                          </input>
+                          <input>
+                            <value></value>
+                          </input>
+                        </concat>
+                      </input>
+                      <output>
+                        <to>Result</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v8.1:WorkflowJob:Update Workflow Job Run Log</process-name>
+                    <parameters>
+                      <input>
+                        <from>Connection_BBSA</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>JobRunID</from>
+                        <to>workFlowJobRunID</to>
+                      </input>
+                      <input>
+                        <from>Job_LogLevel</from>
+                        <to>logLevel</to>
+                      </input>
+                      <input>
+                        <from>Result</from>
+                        <to>log_Msg</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>return values</from>
+                        <to>return values</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                  <call-process>
+                    <process-name>:ESA_ITSM:TSSA_Job:BSA_Set_JobStatus_Error</process-name>
+                    <parameters>
+                      <input>
+                        <from>Connection_BBSA</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>JobRunID</from>
+                        <to>workFlowJobRunID</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>return values</from>
+                        <to>return values</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[2]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>ErrorMessage</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(.) = 0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>Job_LogLevel</to>
+                        <value>-2</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>Result:
+</value>
+                          </input>
+                          <input required="false">
+                            <from>Result</from>
+                          </input>
+                          <input>
+                            <value></value>
+                          </input>
+                        </concat>
+                      </input>
+                      <output>
+                        <to>Result</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v8.1:WorkflowJob:Update Workflow Job Run Log</process-name>
+                    <parameters>
+                      <input>
+                        <from>Connection_BBSA</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>JobRunID</from>
+                        <to>workFlowJobRunID</to>
+                      </input>
+                      <input>
+                        <from>Job_LogLevel</from>
+                        <to>logLevel</to>
+                      </input>
+                      <input>
+                        <from>Result</from>
+                        <to>log_Msg</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>return values</from>
+                        <to>return values</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>816221b2-5034-4663-aecf-e6aa50ca94c4</process-id>
+      <author>C. Lenz</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1680784897939</last-modified>
+    </meta>
+  </process-def>
+</process>

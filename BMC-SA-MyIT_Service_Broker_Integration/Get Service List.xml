@@ -1,0 +1,219 @@
+<process draft="false" dev-studio-version="7.8.01">
+  <process-def name=":BMC-SA-MyIT_Service_Broker_Integration:Get Service List">
+    <parameters>
+      <output global="false" required="false">
+        <to>response</to>
+        <from>response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-MyIT_Service_Broker_Integration:ServiceBrokerIntegration:ServiceMapping</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>services</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <service-list>
+      <xsl:apply-templates select="//service" />
+    </service-list>
+  </xsl:template>
+  <xsl:template match="service">
+    <service>
+      <xsl:value-of select="service-name" disable-output-escaping="no" />
+    </service>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Reading the Service Mappings from the Module Configuration...</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Read the Service Mappings from the Module Configuration...</value>
+              </input>
+              <input>
+                <from>services</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-MyIT_Service_Broker_Integration:Utilities:Generate Response</process-name>
+              <parameters>
+                <input>
+                  <value>failure</value>
+                  <to>status</to>
+                </input>
+                <input>
+                  <value>Service Mappings not found.</value>
+                  <to>error message</to>
+                </input>
+                <input>
+                  <value>Get Service List</value>
+                  <to>request type</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Get Service List - bao response</value>
+                    </input>
+                    <input>
+                      <from>bao response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>services</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)!=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-MyIT_Service_Broker_Integration:Utilities:Generate Response</process-name>
+              <parameters>
+                <input>
+                  <value>success</value>
+                  <to>status</to>
+                </input>
+                <input>
+                  <value>Get Service List</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>services</from>
+                  <to>data</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Get Service List - bao response</value>
+                    </input>
+                    <input>
+                      <from>bao response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>28c042ac-e2d9-41e9-992c-d057959e0fbc</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1463474976940</last-modified>
+    </meta>
+  </process-def>
+</process>

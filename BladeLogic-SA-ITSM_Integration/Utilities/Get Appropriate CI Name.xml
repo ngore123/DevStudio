@@ -1,0 +1,287 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BladeLogic-SA-ITSM_Integration:Utilities:Get Appropriate CI Name">
+    <parameters>
+      <input global="false" required="true">
+        <description>Platform in which the configuration items have been defined.
+
+For example: BMC_AR_System</description>
+        <from>configuration platform</from>
+        <to>configuration platform</to>
+      </input>
+      <input global="false" required="true">
+        <description>bl atrium integration enabled
+
+true if BL-Atrium integration is enabled in this environment, else false.
+
+Allowed Values: true, false</description>
+        <from>bl atrium integration enabled</from>
+        <to>bl atrium integration enabled</to>
+      </input>
+      <input global="false" required="true">
+        <description>class name
+
+class name of the CI to retrieve.</description>
+        <from>class name</from>
+        <to>class name</to>
+      </input>
+      <input global="false" required="true">
+        <description>reconciliation ID
+
+reconciliation ID of the CI to be retrieved from CMDB.</description>
+        <from>reconciliation ID</from>
+        <to>reconciliation ID</to>
+      </input>
+      <output global="false" required="true">
+        <to>CI name</to>
+        <from>CI name</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Configuration_Management:Searches:Get Configuration Item by Reconciliation ID</process-name>
+              <parameters>
+                <input>
+                  <concat>
+                    <input required="false">
+                      <from>configuration platform</from>
+                    </input>
+                  </concat>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>class name</from>
+                  <to>class name</to>
+                </input>
+                <input>
+                  <concat>
+                    <input required="false">
+                      <from>reconciliation ID</from>
+                    </input>
+                  </concat>
+                  <to>reconciliation id</to>
+                </input>
+                <output>
+                  <from>configuration items</from>
+                  <to>configuration items</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration items</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>CI name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//name/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>bl atrium integration enabled</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Configuration_Management:Get Configuration Item by Reconciliation ID</process-name>
+              <parameters>
+                <input>
+                  <from>configuration platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>class name</from>
+                  <to>class name</to>
+                </input>
+                <input>
+                  <from>reconciliation ID</from>
+                  <to>reconciliation id</to>
+                </input>
+                <output>
+                  <from>configuration items</from>
+                  <to>configuration items</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration items</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>CI name</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(//cd-machine-id/text())&gt;0">
+          <xsl:value-of select="//cd-machine-id/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="//name/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Returns the CD Machine ID/CI Name based on whether BL-atrium integration is enabled in the given environment or not.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>528e29a7-c4ba-3ebb-b447-dbdadcd6a373</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283178273380</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,269 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.5:BlPackage:Add Asset Action to Start">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+
+Example:
+
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Handle to the BLPackage.</description>
+        <from>pkgDBKey</from>
+        <to>pkgDBKey</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the custom object class.</description>
+        <from>className</from>
+        <to>className</to>
+      </input>
+      <input global="false" required="true">
+        <description>The path to the custom object that the action will be performed on.</description>
+        <from>classPath</from>
+        <to>classPath</to>
+      </input>
+      <input global="false" required="true">
+        <description>Action on failure for the asset action (Ignore, Continue, or Abort).</description>
+        <from>actFailure</from>
+        <to>actFailure</to>
+      </input>
+      <input global="false" required="true">
+        <description>The single-user mode.</description>
+        <from>singleUserMode</from>
+        <to>singleUserMode</to>
+      </input>
+      <input global="false" required="true">
+        <description>The reboot mode.</description>
+        <from>rebootMode</from>
+        <to>rebootMode</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the asset action to be performed.</description>
+        <from>assetAction</from>
+        <to>assetAction</to>
+      </input>
+      <input global="false" required="true">
+        <description>The comma-separated list of parameters name=value for the asset action. If the parameter is for a specific applicability, then before the = you should list the applicability within parentheses. If the value is a list it must be a comma separated string within quotes.</description>
+        <from>actionParameters</from>
+        <to>actionParameters</to>
+      </input>
+      <output global="false" required="false">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Returns DBKey</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>pkgDBKey</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>className</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>classPath</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>actFailure</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>singleUserMode</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>rebootMode</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>assetAction</from>
+            <to>argument 7</to>
+          </input>
+          <input>
+            <from>actionParameters</from>
+            <to>argument 8</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>BlPackage</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>addAssetActionToStart</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command adds an asset action to the start of a BLPackage. The command will always use the latest version of an asset class. You can specify the following single-user mode and reboot settings:
+You can set the singleUserMode argument to one of the following strings:
+• NotRequired: Not Required
+• RevertTo: Use single-user mode without reboot
+• RebootAs: Reboot into single-user mode
+You can set the rebootMode argument to one of the following strings:
+• NotRequired: Not required
+• AfterDeploy: After item deployment
+• AfterDeployWithReconfiguration: After item deployment with reconfiguration (Solaris ONLY)
+• OutOfBand: Out-of-band
+• AtJobEnd: By end of job
+• AtJobEndWithReconfigration: By end of job with reconfiguration (Solaris ONLY) </description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7b8def10-18bd-33d3-897e-f34aed2e0a4e</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179997342</last-modified>
+    </meta>
+  </process-def>
+</process>

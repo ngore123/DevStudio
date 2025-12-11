@@ -1,0 +1,174 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:v6.0:Security:Create Organization">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is HPSEActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>1. Creates a new organization and adds top-level and sub-elements in the organization.
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;create&lt;/command&gt;
+	    &lt;category&gt;security&lt;/category&gt;
+		&lt;process-id&gt;create-organization&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;name&gt;"Test Org 123456"&lt;/name&gt;
+	      &lt;description&gt;Description123&lt;/description&gt;
+	      &lt;application-ids&gt;1504 1505&lt;/application-ids&gt;
+	      &lt;host-ids&gt;1504&lt;/host-ids&gt;
+	      &lt;storagesystem-ids&gt;1504&lt;/storagesystem-ids&gt;
+	      &lt;tapelibrary-ids&gt;1504&lt;/tapelibrary-ids&gt;
+	      &lt;switch-ids&gt;1504&lt;/switch-ids&gt;
+	      &lt;childorganization-ids&gt;1504&lt;/childorganization-ids&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+name[Required]
+	Name of the organization
+description[Optional]
+	Description of the organization
+application-ids[Optional]
+	space-separated list of ids of applications to be added
+host-ids[Optional]
+	space-separated list of ids of hosts to be added
+storagesystem-ids[Optional]
+	space-separated list of ids of storagesystems to be added
+tapelibrary-ids[Optional]
+	space-separated list of ids of tapelibrarys to be added
+switch-ids[Optional]
+	space-separated list of ids of switchs to be added
+childorganization-ids[Optional]
+	space-separated list of ids of childorganizations to be added
+	
+NOTE: Atleast one of the following components should be provided in the request:- application-ids, host-ids, storagesystem-ids, tapelibrary-ids, switch-ids and childorganization-ids.
+
+However, "childorganization-ids" can not be provided alone while creating an organization. Atleast one of the following components should be provided in the request in this specific scenario:- application-ids, host-ids, storagesystem-ids, tapelibrary-ids, switch-ids.
+
+NOTE: Any text which contains spaces should be enetered between double quotes</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Process ID Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <value>create-organization</value>
+                  <to>process id</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//items/item/process-id)='create-organization']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Invoke Adapter Request</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper supports the following requirements:-
+
+1. Creates a new organization and adds top-level and sub-elements in the organization.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5ed51d06-96ad-3fe4-8f91-fecfadbf909d</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588096089</last-modified>
+    </meta>
+  </process-def>
+</process>

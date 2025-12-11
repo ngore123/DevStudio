@@ -1,0 +1,230 @@
+<process draft="false" dev-studio-version="7.6.02.04">
+  <process-def name=":AO-AD-Infoblox-NIOS:v6.3:IPAM:Reserve IP Range">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+Default adapter name: InfobloxNIOS.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Creates and reserves a new IP range within an existing network.
+
+Sample items Xml: 
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;target&gt;
+			&lt;host&gt;localhost&lt;/host&gt;
+			&lt;user-name&gt;admin&lt;/user-name&gt;
+			&lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+			&lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+		&lt;/target&gt;
+           &lt;parameters&gt;
+			&lt;network&gt;10.10.10.0/24&lt;/network&gt;	
+			&lt;start-address&gt;10.10.10.20&lt;/start-address&gt;
+			&lt;end-address&gt;10.10.10.30&lt;/end-address&gt;
+			&lt;ipv6-start-prefix&gt;2001:db8:0:c000:0011::&lt;/ipv6-start-prefix&gt;
+			&lt;ipv6-end-prefix&gt;2001:db8:0:c000:0021::&lt;/ipv6-end-prefix&gt;
+			&lt;ipv6-prefix-bits&gt;32&lt;/ipv6-prefix-bits&gt;
+			&lt;template&gt;Test template&lt;/template&gt;
+			&lt;name&gt;Test Range&lt;/name&gt;
+			&lt;comment&gt;user comment&lt;/comment&gt;
+			&lt;disable&gt;true&lt;/disable&gt;
+			&lt;failover-association&gt;Test Association&lt;/failover-association&gt;
+			&lt;grid-member-address&gt;10.0.0.1&lt;/grid-member-address&gt;
+			&lt;recycle-leases&gt;true&lt;/recycle-leases&gt;
+			&lt;lease-settings&gt;
+				&lt;lease-time&gt;360&lt;/lease-time&gt;
+				&lt;routers&gt;10.0.0.1,10.0.0.2&lt;/routers&gt;
+				&lt;domain-name&gt;domain.com&lt;/domain-name&gt;
+				&lt;broadcast-address&gt;10.0.0.3&lt;/broadcast-address&gt;
+				&lt;dns-servers&gt;10.0.0.4,10.0.0.5&lt;/dns-servers&gt;
+			&lt;/lease-settings&gt;			
+			&lt;extensible-attributes&gt;
+				&lt;attribute&gt;
+					&lt;key&gt;Building&lt;/key&gt;
+					&lt;value&gt;value1&lt;/value&gt;
+				&lt;/attribute&gt;
+				&lt;attribute&gt;
+					&lt;key&gt;Site&lt;/key&gt;
+					&lt;value&gt;value2&lt;/value&gt;
+				&lt;/attribute&gt;
+			&lt;/extensible-attributes&gt;
+           &lt;/parameters&gt;
+      &lt;/item&gt;
+&lt;/items&gt;
+
+
+Elements' Description:
+
+target[Conditional]:
+		host[Conditional]:
+			Host name or IP address of Infoblox Grid Manager. This tag is required while providing dynamic targets.
+
+		user-name[Conditional]:
+			Username required to connect Infoblox Grid Manager. This tag is required while providing dynamic targets.
+
+		password[Conditional]:
+			The password associated with the &lt;user-name&gt; provided. Encrypted password can be provided by providing an "encryption-type" attribute. This tag is required while providing dynamic targets. 
+			Valid values for encryption-type are: Plain, Base64
+			Default value: Plain
+
+		timeout-secs[Optional]
+			Specifies the time, in seconds, after which the attempt to connect to the Infoblox Grid Manager Server fails.
+			Default value in seconds: 60
+	
+		Note: If no adapter configurations are specified while configuring the adapter dynamic target need to be defined under "target" tag.
+
+network[Required]
+	Specify the network in CIDR format.
+
+start-address[Conditional]
+	Specify the start address of the IP range. This parameter is required for IPv4 range.
+
+end-address[Conditional]
+	Specify the end address of the IP range. This parameter is required for IPv4 range.
+
+ipv6-start-prefix[Optional]
+	Specify the start prefix of the IPv6 range. This parameter is only valid for IPv6 range.
+
+ipv6-end-prefix[Optional]
+	Specify the end prefix of the IPv6 range. This parameter is only valid for IPv6 range.
+
+ipv6-prefix-bits[Optional]
+	Specify the prefix bits of the IPv6 range. This parameter is only valid for IPv6 range.
+
+template[Optional]
+	Specify the template to create the IP range.
+
+name[Optional]	
+	Specify a name for the range.
+	
+disable[Optional]
+     Disable the network after creation. This is a boolean parameter.
+	 Valid values - true, false
+
+comment[Optional]
+     Specify the user comment for the created range.
+
+failover-association[Optional]
+     Specify the failover association for the created range. This parameter is only applicable for IPv4 range.
+Note: Either one of "failover-association" or "grid-member-address" should be provided. If both are provided "failover-association" takes precedence.
+
+grid-member-address[Optional]
+     Specify the IP address of the grid member for the created range.
+Note: Either one of "failover-association" or "grid-member-address" should be provided. If both are provided "failover-association" takes precedence.
+
+recycle-leases[Optional]
+	If the flag is enabled, the leases are kept in recycle bin until one week after expiration. When the flag is disabled, the leases are irrecoverably deleted. This is a boolean parameter and is only applicable when grid-member-address is specified for this range. This  parameter is only valid for IPv6 range.
+	Valid values - true, false
+
+extensible-attributes[Optional]
+	Specifies additional custom attributes defined in Infoblox Grid Manager application.
+	Sample format to define an attribute:
+	&lt;attribute&gt;
+		&lt;key&gt;Site&lt;/key&gt;
+		&lt;value&gt;value2&lt;/value&gt;
+	&lt;/attribute&gt;
+
+key[Optional]
+	Specify the key for the attribute
+
+value[Optional]
+	Specify the value for the attribute
+
+lease-settings[Optional]
+	Specifies the optional lease setting options. These options are only valid for IPv4 range.
+
+lease-time[Optional]
+	Specify the lease time. This paramter is only valid if either one of "failover-association" or "grid-member-address" is provided. This option is only valid for IPv4 range.
+
+routers[Optional]
+	Specify the ip addresses of routers. Ip address should be seperated by comma. For example 10.0.0.1,10.0.0.2. This paramter is only valid if either one of "failover-association" or "grid-member-address" is provided. This option is only valid for IPv4 range.
+
+domain-name[Optional]
+	Specify the domain name. This paramter is only valid if either one of "failover-association" or "grid-member-address" is provided. This option is only valid for IPv4 range.
+
+broadcast-address[Optional]
+	Specify the broadcast address. This paramter is only valid if either one of "failover-association" or "grid-member-address" is provided. This option is only valid for IPv4 range.
+
+dns-servers[Optional]
+	Specify the dns servers. This paramter is only valid if either one of "failover-association" or "grid-member-address" is provided. This option is only valid for IPv4 range.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>reserve-ip-range</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-Infoblox-NIOS:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Creates and reserves a new IP range within an existing network.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5e66fbd3-c985-4a65-a80d-9649ba476847</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1369656232093</last-modified>
+    </meta>
+  </process-def>
+</process>

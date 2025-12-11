@@ -1,0 +1,1391 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":Closed_Loop-SA-Change_Management:Enhanced Validation">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module. 
+
+Example:BCAN</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML document providing the data template for validation in the form.
+
+&lt;validation&gt;
+     &lt;change-id/&gt;
+     &lt;task-id/&gt;
+     &lt;user-name/&gt;
+     &lt;current-time/&gt;
+     &lt;configuration-item/&gt;      &lt;validate&gt;validateChangeTaskExist,validateTaskStatusAssigned,validateTaskUser,validateTaskDate,validateTaskCI&lt;/validate&gt;
+&lt;/validation&gt;
+
+</description>
+        <from>validation</from>
+        <to>validation</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document providing the data template for single or multiple Concept elements.The change concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <to>status</to>
+        <from>status collection</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure
+</description>
+        <to>status code</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - A process specific string that explains the value of success status.</description>
+        <to>error message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:Closed_Loop-SA-Change_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>task platform</from>
+            <to>task platform</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() = '0']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status collection</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <status />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>change task exist result</to>
+                  <value>
+                    <value>
+                      <validateChangeTaskExist>-1</validateChangeTaskExist>
+                    </value>
+                  </value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task status assigned result</to>
+                  <value>
+                    <value>
+                      <validateTaskStatusAssigned>-1</validateTaskStatusAssigned>
+                    </value>
+                  </value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task user result</to>
+                  <value>
+                    <value>
+                      <validateTaskUser>-1</validateTaskUser>
+                    </value>
+                  </value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task date result</to>
+                  <value>
+                    <value>
+                      <validateTaskDate>-1</validateTaskDate>
+                    </value>
+                  </value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task ci result</to>
+                  <value>
+                    <value>
+                      <validateTaskCI>-1</validateTaskCI>
+                    </value>
+                  </value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>validation</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//change-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>validation</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//task-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>validation</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>user name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//user-name/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>validation</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>current time</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//current-time/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>validation</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>configuration item name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//configuration-item/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[3]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Task_Management:Searches:Get Task by Task ID</process-name>
+              <parameters>
+                <input>
+                  <from>task platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>task id</from>
+                  <to>task id</to>
+                </input>
+                <output>
+                  <from>tasks</from>
+                  <to>tasks</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>tasks</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>task</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens />
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="//Task[1]" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <from>task</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AutoPilot-OA-Common_Utilities:Tokenize String</process-name>
+                    <parameters>
+                      <input>
+                        <from>validation</from>
+                        <to>string</to>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//validate/text()]]></xpath>
+                        </xpath-expression>
+                      </input>
+                      <input>
+                        <value>,</value>
+                        <to>delimiter</to>
+                      </input>
+                      <output>
+                        <from>tokens</from>
+                        <to>tokens</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>true</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>tokens</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//tokens/token/text() = 'validateChangeTaskExist']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>status</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="task id">
+                                  <input global="false">
+                                    <from>task id</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="change id">
+                                  <input global="false">
+                                    <from>change id</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[//*[local-name()='task-id']/text() = '${task id}' and //*[local-name()='root-request-id']/text() = '${change id}']]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>change task exist result</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>change task exist result</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="status">
+                                  <input global="false">
+                                    <from>status</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="string('${status}')='true'">
+        <validateChangeTaskExist>
+          <xsl:text disable-output-escaping="no">0</xsl:text>
+        </validateChangeTaskExist>
+      </xsl:if>
+      <xsl:if test="string('${status}')='false'">
+        <validateChangeTaskExist>
+          <xsl:text disable-output-escaping="no">1</xsl:text>
+        </validateChangeTaskExist>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>tokens</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//tokens/token/text() = 'validateTaskStatusAssigned']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task status</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//*[local-name()='status']/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task status assigned result</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="task status">
+                                  <input global="false">
+                                    <from>task status</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="string('${task status}')='Assigned'">
+        <validateTaskStatusAssigned>
+          <xsl:text disable-output-escaping="no">0</xsl:text>
+        </validateTaskStatusAssigned>
+      </xsl:if>
+      <xsl:if test="string('${task status}')!='Assigned'">
+        <validateTaskStatusAssigned>
+          <xsl:text disable-output-escaping="no">1</xsl:text>
+        </validateTaskStatusAssigned>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[3]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>tokens</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//tokens/token/text() = 'validateTaskUser']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>assignee</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//*[local-name()='assignee']/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task user result</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="assignee">
+                                  <input global="false">
+                                    <from>assignee</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="user name">
+                                  <input global="false">
+                                    <from>user name</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="string('${assignee}')='${user name}'">
+        <validateTaskUser>
+          <xsl:text disable-output-escaping="no">0</xsl:text>
+        </validateTaskUser>
+      </xsl:if>
+      <xsl:if test="string('${assignee}')!='${user name}'">
+        <validateTaskUser>
+          <xsl:text disable-output-escaping="no">1</xsl:text>
+        </validateTaskUser>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[4]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>tokens</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//tokens/token/text() = 'validateTaskDate']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>scheduled start date</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//*[local-name()='scheduled-start-date']/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>scheduled end date</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//*[local-name()='scheduled-end-date']/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>current time</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task date result</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="scheduled start date">
+                                  <input global="false">
+                                    <from>scheduled start date</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="scheduled end date">
+                                  <input global="false">
+                                    <from>scheduled end date</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="current time">
+                                  <input global="false">
+                                    <from>current time</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="'$[current time]' &gt;= '$[scheduled start date]' and '$[current time]' &lt;= '$[scheduled end date]'">
+          <validateTaskDate>
+            <xsl:text disable-output-escaping="no">0</xsl:text>
+          </validateTaskDate>
+        </xsl:when>
+        <xsl:otherwise>
+          <validateTaskDate>
+            <xsl:text disable-output-escaping="no">1</xsl:text>
+          </validateTaskDate>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[5]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>tokens</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//tokens/token/text() = 'validateTaskCI']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Task_Management:Searches:Get Relationships by Task ID</process-name>
+                          <parameters>
+                            <input>
+                              <from>task platform</from>
+                              <to>configuration name</to>
+                            </input>
+                            <input>
+                              <from>task id</from>
+                              <to>task id</to>
+                            </input>
+                            <output>
+                              <from>tasks</from>
+                              <to>task relationship</to>
+                            </output>
+                            <output>
+                              <from>success status</from>
+                              <to>success status</to>
+                            </output>
+                            <output>
+                              <from>status message</from>
+                              <to>status message</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[6]:call-process[1]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>task relationship</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>task relationship</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens />
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="//Task[1]" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <log>
+                                    <level>debug</level>
+                                    <parameters>
+                                      <input>
+                                        <from>task</from>
+                                      </input>
+                                    </parameters>
+                                  </log>
+                                </after-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[6]:switch[1]:sequence[1]:assign[1]</location>
+                              </assign>
+                              <assign>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>task relationship</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>task ci name</to>
+                                    </output>
+                                  </result>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[//*[local-name()='description']/text()]]></xpath>
+                                  </xpath-expression>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>task relationship</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>task ci result</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens>
+                                      <replacement-token name="task ci name">
+                                        <input global="false">
+                                          <from>task ci name</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="configuration item name">
+                                        <input global="false">
+                                          <from>configuration item name</from>
+                                        </input>
+                                      </replacement-token>
+                                    </stylesheet-replacement-tokens>
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="string('${task ci name}')='${configuration item name}'">
+        <validateTaskCI>
+          <xsl:text disable-output-escaping="no">0</xsl:text>
+        </validateTaskCI>
+      </xsl:if>
+      <xsl:if test="string('${task ci name}')!='${configuration item name}'">
+        <validateTaskCI>
+          <xsl:text disable-output-escaping="no">1</xsl:text>
+        </validateTaskCI>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[6]:switch[1]:sequence[1]:assign[2]</location>
+                              </assign>
+                            </sequence>
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>task relationship</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string-length(.) = '0']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <assign>
+                                <assignment>
+                                  <output>
+                                    <to>task ci result</to>
+                                    <value>
+                                      <value>
+                                        <validateTaskCI>1</validateTaskCI>
+                                      </value>
+                                    </value>
+                                  </output>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[6]:switch[1]:sequence[2]:assign[1]</location>
+                              </assign>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[6]:switch[1]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'failure']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>1</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>task id</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[concat("Unable to retrieve Task ID: ", .)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>status collection</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status collection</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="change task exist result">
+                      <input global="false">
+                        <from>change task exist result</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="task status assigned result">
+                      <input global="false">
+                        <from>task status assigned result</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="task user result">
+                      <input global="false">
+                        <from>task user result</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="task date result">
+                      <input global="false">
+                        <from>task date result</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="task ci result">
+                      <input global="false">
+                        <from>task ci result</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="status " />
+  <xsl:variable name="change-task-exist-result">${change task exist result}</xsl:variable>
+  <xsl:variable name="task-status-assigned-result">${task status assigned result}</xsl:variable>
+  <xsl:variable name="task-user-result">${task user result}</xsl:variable>
+  <xsl:variable name="task-date-result">${task date result}</xsl:variable>
+  <xsl:variable name="task-ci-result">${task ci result}</xsl:variable>
+  <xsl:template match="/">
+    <status>
+      <xsl:if test="string-length($change-task-exist-result) &gt; '0'">
+        <xsl:copy-of select="xalan:nodeset($change-task-exist-result)/value/*" />
+      </xsl:if>
+      <xsl:if test="string-length($task-status-assigned-result) &gt; '0'">
+        <xsl:copy-of select="xalan:nodeset($task-status-assigned-result)/value/*" />
+      </xsl:if>
+      <xsl:if test="string-length($task-user-result) &gt; '0'">
+        <xsl:copy-of select="xalan:nodeset($task-user-result)/value/*" />
+      </xsl:if>
+      <xsl:if test="string-length($task-date-result) &gt; '0'">
+        <xsl:copy-of select="xalan:nodeset($task-date-result)/value/*" />
+      </xsl:if>
+      <xsl:if test="string-length($task-ci-result) &gt; '0'">
+        <xsl:copy-of select="xalan:nodeset($task-ci-result)/value/*" />
+      </xsl:if>
+    </status>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>status collection</value>
+                    </input>
+                    <input>
+                      <from>status collection</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[4]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>0</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>
+                    <empty />
+                  </value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[5]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <compensation name=":Closed_Loop-SA-Change_Management:Enhanced Validation:999999999" />
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process will enhance the validation of user provided Change and Task ID during creation of Terminal and SSH proxy jobs in BBNA. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>34c033e1-0939-3b8b-b732-92ec5060a439</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283245731870</last-modified>
+    </meta>
+  </process-def>
+  <compensation-def name=":Closed_Loop-SA-Change_Management:Enhanced Validation:999999999">
+    <meta>
+      <peer-location>
+        <location>this</location>
+      </peer-location>
+    </meta>
+    <parameters />
+    <sequence />
+  </compensation-def>
+</process>

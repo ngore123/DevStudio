@@ -1,0 +1,622 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-IP-Address-Management:Reserve IPAddress">
+    <parameters>
+      <input global="false" required="true">
+        <description>Configuration name from module configuration.
+Valid values: VitalQIP.</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the organization to which this Network belongs.</description>
+        <from>organization name</from>
+        <to>organization name</to>
+      </input>
+      <input global="false" required="true">
+        <description>IPAddress which needs to be reserved in specified Network / Subnet.
+
+e.g.
+10.0.0.1</description>
+        <from>ipaddress</from>
+        <to>ipaddress</to>
+      </input>
+      <output global="false" required="false">
+        <description>operation status.
+valid values: true, false.</description>
+        <to>success status</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="false">
+        <description>incase of any error, error message goes here.  </description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-IP-Address-Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>user name</from>
+            <to>user name</to>
+          </output>
+          <output>
+            <from>password</from>
+            <to>password</to>
+          </output>
+          <output>
+            <from>organization</from>
+            <to>organization</to>
+          </output>
+          <output>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </output>
+          <output>
+            <from>temp folder path</from>
+            <to>temp-folder-path</to>
+          </output>
+          <output>
+            <from>file adapter name</from>
+            <to>file adapter name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>organization name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)  = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-IP-Address-Management:IP_Address_Management:VitalQIP:organization</configuration>
+                </input>
+                <output>
+                  <to>organization name</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value>This IPAM solution s not supported</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>success</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="VitalQIP"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-VitalQIP:Get Org</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>user name</from>
+                  <to>user name</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>password</to>
+                </input>
+                <input>
+                  <from>user name</from>
+                  <to>administrator</to>
+                </input>
+                <input>
+                  <from>organization name</from>
+                  <to>organization name</to>
+                </input>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>success</from>
+                  <to>success</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Organization</value>
+                    </input>
+                    <input>
+                      <from>organization name</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success</to>
+                        <value>false</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <from>error message</from>
+                      </input>
+                      <output>
+                        <to>error message</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[2]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.) ='true']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AutoPilot-OA-IP-Address-Management:Utilities:CLI:Generate Temp File Name and Path</process-name>
+                    <parameters>
+                      <input>
+                        <from>temp-folder-path</from>
+                        <to>Temporary Folder</to>
+                      </input>
+                      <output>
+                        <from>Temp File</from>
+                        <to>temporary-file</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>organization name</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>file_contents</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="orgName">
+                            <input global="false">
+                              <from>organization name</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="ipaddress">
+                            <input global="false">
+                              <from>ipaddress</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <lines>
+      <line>
+        <xsl:text disable-output-escaping="no">ObjectAddress=${ipaddress}</xsl:text>
+      </line>
+      <line>
+        <xsl:text disable-output-escaping="no">ObjectName=IPAddress</xsl:text>
+      </line>
+      <line>
+        <xsl:text disable-output-escaping="no">DynamicConfig=Reserved</xsl:text>
+      </line>
+      <line>
+        <xsl:text disable-output-escaping="no">ObjectClass=Undefined
+</xsl:text>
+      </line>
+    </lines>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>File Name</value>
+                          </input>
+                          <input>
+                            <from>temporary-file</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AutoPilot-OA-IP-Address-Management:Utilities:File:Write File</process-name>
+                    <parameters>
+                      <input>
+                        <from>file adapter name</from>
+                        <to>Adapter Name</to>
+                      </input>
+                      <input>
+                        <from>temporary-file</from>
+                        <to>File Name</to>
+                      </input>
+                      <input>
+                        <from>file_contents</from>
+                        <to>File Contents</to>
+                      </input>
+                      <output>
+                        <from>Success</from>
+                        <to>file success</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <input>
+                              <concat>
+                                <input>
+                                  <value>Failed to create a temp file: </value>
+                                </input>
+                                <input required="false">
+                                  <from>temporary-file</from>
+                                </input>
+                              </concat>
+                            </input>
+                            <output>
+                              <to>error message</to>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>file success</from>
+                            </input>
+                            <output>
+                              <to>success</to>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>file success</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[text()='true']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <call-process>
+                          <process-name>:AO-AD-VitalQIP:Reserve IPAddress</process-name>
+                          <parameters>
+                            <input>
+                              <from>adapter name</from>
+                              <to>adapter name</to>
+                            </input>
+                            <input>
+                              <from>user name</from>
+                              <to>user name</to>
+                            </input>
+                            <input>
+                              <from>password</from>
+                              <to>password</to>
+                            </input>
+                            <input>
+                              <from>temporary-file</from>
+                              <to>input file</to>
+                            </input>
+                            <input>
+                              <from>organization name</from>
+                              <to>organization</to>
+                            </input>
+                            <output>
+                              <from>error message</from>
+                              <to>error message</to>
+                            </output>
+                            <output>
+                              <from>success</from>
+                              <to>success</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <input>
+                                    <concat>
+                                      <input>
+                                        <value>Failed to Reserve IPAddress :</value>
+                                      </input>
+                                      <input required="false">
+                                        <from>error message</from>
+                                      </input>
+                                    </concat>
+                                  </input>
+                                  <output>
+                                    <to>error message</to>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <input>
+                                    <from>success</from>
+                                  </input>
+                                  <output>
+                                    <to>success</to>
+                                  </output>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                              </assign>
+                            </sequence>
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>success</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[text()='true']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <output>
+                                    <to>success</to>
+                                    <value>true</value>
+                                  </output>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                              </assign>
+                            </sequence>
+                          </case>
+                          <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-IP-Address-Management:Utilities:File:Delete File</process-name>
+                          <parameters>
+                            <input>
+                              <from>file adapter name</from>
+                              <to>Adapter Name</to>
+                            </input>
+                            <input>
+                              <from>temporary-file</from>
+                              <to>File Name</to>
+                            </input>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                        </call-process>
+                      </sequence>
+                    </case>
+                    <location>:switch[2]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[2]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>40351d26-de21-478b-85eb-c8aeb9cf910c</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1417780475620</last-modified>
+    </meta>
+  </process-def>
+</process>

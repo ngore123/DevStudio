@@ -1,0 +1,222 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.5:Support:Create Full Support File">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+
+Example:
+
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Comma separated list of the names of the Application Servers for which you want to generate data.</description>
+        <from>appServers</from>
+        <to>appServers</to>
+      </input>
+      <input global="false" required="true">
+        <description>The server, static group, or smart group whose agent logs you want to include.</description>
+        <from>agentLogServer</from>
+        <to>agentLogServer</to>
+      </input>
+      <input global="false" required="true">
+        <description>The server, static group, or smart group whose security files you want to include.</description>
+        <from>agentSecurityServer</from>
+        <to>agentSecurityServer</to>
+      </input>
+      <input global="false" required="true">
+        <description>Path to the file that will contain the generated data.</description>
+        <from>outputPath</from>
+        <to>outputPath</to>
+      </input>
+      <output global="false" required="false">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Return Void</description>
+        <to>void</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>appServers</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>agentLogServer</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>agentSecurityServer</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>outputPath</from>
+            <to>argument 4</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>Support</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>createFullSupportFile</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>For each Application Server that you specify, this command generates a zip file that contains Application Server files, agent logs, and agent security files.
+Use the outputPath argument to specify the path to the zip file, for example, /tmp/supportData/support.zip.
+You can use the appServers argument to request data for one Application Server, or for multiple Application Servers. The actual name of the resulting zip file depends on whether you specify one Application Server or multiple Application Servers:
+• If you specify one Application Server, the resulting zip file will have the exact name you specified in the outputPath argument. Using the example above, the file would be called support.zip.
+• If you specify multiple Application Servers, this command creates one zip file for each Application Server. The name of each zip file takes the outputPath value and appends the name of the Application Server. For example, suppose you pass in the following values for the appServers argument: "appServer1, appServer2" and you pass in the following value for outputPath: support.zip. In this case, the command would produce two zip files named support-appServer1.zip and support-appServer2.zip. </description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>111db9cd-bb20-3475-a78d-37f0fbecb976</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283180019478</last-modified>
+    </meta>
+  </process-def>
+</process>

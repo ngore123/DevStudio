@@ -1,0 +1,140 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Use_Cases:Restart Schedule Job Utility">
+    <parameters>
+      <input global="false" required="true">
+        <from>schedule name</from>
+        <to>schedule name</to>
+      </input>
+      <output global="false" required="false">
+        <to>update schedule response</to>
+        <from>update schedule response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>adapter name</to>
+            <value>IBMTSMActor</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>version</to>
+            <value>v5.5</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>item type</to>
+            <value>schedule</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="schedule name">
+                <input global="false">
+                  <from>schedule name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">update-schedule</xsl:text>
+        </operation-name>
+        <timeout-secs>
+          <xsl:text disable-output-escaping="no">30</xsl:text>
+        </timeout-secs>
+        <command-options>
+          <start-time>
+            <xsl:text disable-output-escaping="no">now+00:02</xsl:text>
+          </start-time>
+          <schedule-name>
+            <xsl:value-of select="'${schedule name}'" disable-output-escaping="no" />
+          </schedule-name>
+          <domain-name>
+            <xsl:text disable-output-escaping="no">standard</xsl:text>
+          </domain-name>
+        </command-options>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-IBM_Tivoli_Storage_Manager:Update Items</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>version</from>
+            <to>version</to>
+          </input>
+          <input>
+            <from>item type</from>
+            <to>item type</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>da3e0565-63ae-34f0-ae46-65759b352237</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290597004730</last-modified>
+    </meta>
+  </process-def>
+</process>

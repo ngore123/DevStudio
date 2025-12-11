@@ -1,0 +1,636 @@
+<process draft="false" dev-studio-version="8.1.00">
+  <process-def name=":AutoPilot-OA-BAOGridManagement:Module:Update Module Conifiguration Items with Login">
+    <parameters>
+      <input global="false" required="true">
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <description>https://hostname:port/baocontext
+
+hostname: Hostname or IP address where AO peer supporting REST API is present.
+port: Port# where AO peer's web service is listening.
+baocontext: baocdp or baoap</description>
+        <from>target url</from>
+        <to>target url</to>
+      </input>
+      <input global="false" required="false">
+        <description>BAO user name</description>
+        <from>user name</from>
+        <to>user name</to>
+      </input>
+      <input global="false" required="false">
+        <description>password</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>Module name active in the grid.</description>
+        <from>module name</from>
+        <to>module name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Module version like 20.17.01.00</description>
+        <from>module version</from>
+        <to>module version</to>
+      </input>
+      <input global="false" required="false">
+        <description>Revision of the module that is active, like 1. Default value is 1</description>
+        <from>module revision</from>
+        <to>module revision</to>
+      </input>
+      <input global="false" required="false">
+        <description>Sample:
+ path: can be colon separated tokens, where each token is a configuration group, from the root of the configuration.
+name: Name os the configuration parameter
+value: New value to be set.
+
+&lt;parameters&gt;
+    &lt;parameter&gt;
+        &lt;path&gt;ConnectionDetails&lt;/path&gt;
+        &lt;name&gt;UserName&lt;/name&gt;
+        &lt;value&gt;aoadmin123&lt;/value&gt;
+     &lt;/parameter&gt;
+    &lt;parameter&gt;
+        &lt;path&gt;ConnectionDetails&lt;/path&gt;
+        &lt;name&gt;UserName&lt;/name&gt;
+        &lt;value&gt;aoadmin123&lt;/value&gt;
+     &lt;/parameter&gt;
+&lt;/parameters&gt;</description>
+        <from>parameter list</from>
+        <to>parameter list</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>module version</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>module version</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) = 0">
+          <xsl:value-of select="'1'" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>module revision</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>module revision</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) = 0">
+          <xsl:value-of select="'1'" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=====inputs===</value>
+              </input>
+              <input>
+                <from>target url</from>
+              </input>
+              <input>
+                <from>user name</from>
+              </input>
+              <input>
+                <from>password</from>
+              </input>
+              <input>
+                <from>module name</from>
+              </input>
+              <input>
+                <from>module version</from>
+              </input>
+              <input>
+                <from>module revision</from>
+              </input>
+              <input>
+                <from>parameter containing folder</from>
+              </input>
+              <input>
+                <from>parameter list</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Convert XML to String</process-name>
+        <parameters>
+          <input>
+            <from>parameter list</from>
+            <to>input xml</to>
+          </input>
+          <output>
+            <from>string output</from>
+            <to>parameter list string</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>====Parameter List String===</value>
+              </input>
+              <input>
+                <from>parameter list string</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case applies-if-any-condition-true="true">
+          <condition>
+            <document>
+              <input>
+                <from>target url</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>user name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>password</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>module name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>parameter list</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <operator-dialog>
+              <heading>Get Inputs</heading>
+              <description>
+                <concat>
+                  <input>
+                    <value>Get target, module configuration parameter list</value>
+                  </input>
+                </concat>
+              </description>
+              <assignments>
+                <assignment>
+                  <input required="true">
+                    <console>
+                      <type>string</type>
+                      <label>adapter name</label>
+                      <default-value>
+                        <input>
+                          <from required="false">adapter name</from>
+                        </input>
+                      </default-value>
+                    </console>
+                  </input>
+                  <output required="true" global="false">
+                    <to>adapter name</to>
+                  </output>
+                </assignment>
+                <assignment>
+                  <input required="true">
+                    <console>
+                      <type>string</type>
+                      <label>target url</label>
+                      <default-value>
+                        <input>
+                          <from required="false">target url</from>
+                        </input>
+                      </default-value>
+                    </console>
+                  </input>
+                  <output required="true" global="false">
+                    <to>target url</to>
+                  </output>
+                </assignment>
+                <assignment>
+                  <input required="true">
+                    <console>
+                      <type>string</type>
+                      <label>user name</label>
+                      <default-value>
+                        <input>
+                          <from required="false">user name</from>
+                        </input>
+                      </default-value>
+                    </console>
+                  </input>
+                  <output required="true" global="false">
+                    <to>user name</to>
+                  </output>
+                </assignment>
+                <assignment>
+                  <input required="true">
+                    <console>
+                      <type>password</type>
+                      <label>password</label>
+                      <default-value>
+                        <input>
+                          <from required="false">password</from>
+                        </input>
+                      </default-value>
+                    </console>
+                  </input>
+                  <output required="true" global="false">
+                    <to>password</to>
+                  </output>
+                </assignment>
+                <assignment>
+                  <input required="true">
+                    <console>
+                      <type>string</type>
+                      <label>module name</label>
+                      <default-value>
+                        <input>
+                          <from required="false">module name</from>
+                        </input>
+                      </default-value>
+                    </console>
+                  </input>
+                  <output required="true" global="false">
+                    <to>module name</to>
+                  </output>
+                </assignment>
+                <assignment>
+                  <input required="true">
+                    <console>
+                      <type>string</type>
+                      <label>module version</label>
+                      <default-value>
+                        <input>
+                          <from required="false">module version</from>
+                        </input>
+                      </default-value>
+                    </console>
+                  </input>
+                  <output required="true" global="false">
+                    <to>module version</to>
+                  </output>
+                </assignment>
+                <assignment>
+                  <input required="false">
+                    <console>
+                      <type>string</type>
+                      <label>module revision</label>
+                      <default-value>
+                        <input>
+                          <from required="false">module revision</from>
+                        </input>
+                      </default-value>
+                    </console>
+                  </input>
+                  <output required="false" global="false">
+                    <to>module revision</to>
+                  </output>
+                </assignment>
+                <assignment>
+                  <input required="false">
+                    <console>
+                      <type>string</type>
+                      <label>parameter list</label>
+                      <default-value>
+                        <input>
+                          <from required="false">parameter list string</from>
+                        </input>
+                      </default-value>
+                    </console>
+                  </input>
+                  <output required="false" global="false">
+                    <to>parameter list string</to>
+                  </output>
+                </assignment>
+              </assignments>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:operator-dialog[1]</location>
+            </operator-dialog>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:XML String to XML</process-name>
+        <parameters>
+          <input>
+            <from>parameter list string</from>
+            <to>XML String</to>
+          </input>
+          <output>
+            <from>XML</from>
+            <to>parameter list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== Parameter List===</value>
+              </input>
+              <input>
+                <from>parameter list</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Login</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>target url</from>
+            <to>url</to>
+          </input>
+          <input>
+            <from>user name</from>
+            <to>user name</to>
+          </input>
+          <input>
+            <from>password</from>
+            <to>password</to>
+          </input>
+          <output>
+            <from>authentication token</from>
+            <to>authentication token</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>status reason</from>
+            <to>status reason</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>error number</from>
+            <to>error number</to>
+          </output>
+          <output>
+            <from>remediation message</from>
+            <to>remediation message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[3]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-BAOGridManagement:Module:Update Module Conifiguration Items with Auth Token</process-name>
+              <unique-id>53206a49-f51d-4fd0-9c40-aa1ade60cac7</unique-id>
+              <parameters>
+                <input>
+                  <from>target url</from>
+                  <to>target url</to>
+                </input>
+                <input>
+                  <from>authentication token</from>
+                  <to>authentication token</to>
+                </input>
+                <input>
+                  <from>module name</from>
+                  <to>module name</to>
+                </input>
+                <input>
+                  <from>parameter list</from>
+                  <to>parameter list</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update one module configuration item.
+
+Required inputs are
+Target URL
+Authentication Token
+Module Name
+Parameter Containing Folder
+Parameter Name</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>dc0b233f-4ca8-471d-99ce-bb050a3d4a1d</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>BAO Utils</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1546422458336</last-modified>
+    </meta>
+  </process-def>
+</process>

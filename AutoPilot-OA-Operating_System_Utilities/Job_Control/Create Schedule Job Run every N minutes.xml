@@ -1,0 +1,293 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Operating_System_Utilities:Job_Control:Create Schedule Job Run every N minutes">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies a name for the task. Each task on the system must have a unique name. The name must conform to the rules for file names and must not exceed 238 characters. Use quotation marks to enclose names that include spaces.</description>
+        <from>task name</from>
+        <to>task name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the program or command that the task runs. Type the fully qualified path and file name of an executable file, script file, or batch file. The path name must not exceed 262 characters. If you omit the path, Schtasks assumes that the file is in the Systemroot\System32 directory.</description>
+        <from>task run</from>
+        <to>task run</to>
+      </input>
+      <input global="false" required="false">
+        <description>The /mo (modifier) parameter is optional and specifies the number of minutes between each run of the task. The default value for /mo is 1 (every minute).</description>
+        <from>modifier</from>
+        <to>modifier</to>
+      </input>
+      <input global="false" required="true">
+        <description>{[Domain\]User or System}
+Runs the task with permissions of the specified user account. By default, the task runs with the permissions of the current user of the local computer, or with the permission of the user specified by the /u parameter, if one is included. The /ru parameter is valid when scheduling tasks on local or remote computers. ValueDescription[Domain\]UserSpecifies an alternate user account.System or ""Specifies the Local System account, a highly privileged account used by the operating system and system services.</description>
+        <from>runas user</from>
+        <to>runas user</to>
+      </input>
+      <input global="false" required="true">
+        <description>Provides the password for the user account that is specified in the /ru [Domain\]User parameter. If you omit this parameter when specifying a user account, SchTasks.exe prompts you for the password and obscures the text you type. Do not use the /rp parameter for tasks run with permissions of the System account (/ru System). The system account does not have a password and SchTasks.exe does not prompt for one.</description>
+        <from>runas password</from>
+        <to>runas password</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the time of day that the task starts (each time it starts) in HH:MM 24-hour format. The default value is the current time on the local computer. The /st parameter is valid with MINUTE, HOURLY, DAILY, WEEKLY, MONTHLY, and ONCE schedules. It is required for a ONCE schedule.</description>
+        <from>start time</from>
+        <to>start time</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the time of day that a minute or hourly task schedule ends in HH:MM 24-hour format. After the specified end time, Schtasks does not start the task again until the start time recurs. By default, task schedules have no end time. This parameter is optional and valid only with a MINUTE or HOURLY schedule. For an example, see:"To schedule a task that runs every 100 minutes during non-business hours" in the To schedule a task that runs every N minutes section.</description>
+        <from>end time</from>
+        <to>end time</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies a maximum length of time for a minute or hourly schedule in HHHH:MM 24-hour format. After the specified time elapses, Schtasks does not start the task again until the start time recurs. By default, task schedules have no maximum duration. This parameter is optional and valid only with a MINUTE or HOURLY schedule. For an example, see:"To schedule a task that runs every 3 hours for 10 hours" in the To schedule a task that runs every N hours section.</description>
+        <from>duration</from>
+        <to>duration</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the date on which the task schedule starts. The default value is the current date on the local computer. The /sd parameter is valid and optional for all schedule types. The format for the StartDate argument varies with the locale selected for the local computer in Regional and Language Options in Control Panel. Only one format is valid for each locale.The valid date formats are listed in the following table. Use the format most similar to the format selected for Short date in Regional and Language Options in Control Panel on the local computer.MM/DD/YYYYUse for month-first formats, such as English (United States) and Spanish (Panama).DD/MM/YYYYUse for day-first formats, such as Bulgarian and Dutch (Netherlands).YYYY/MM/DDUse for year-first formats, such as Swedish and French (Canada).</description>
+        <from>start date</from>
+        <to>start date</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the date on which the schedule ends. This parameter is optional. It is not valid in a ONCE, ONSTART, ONLOGON, or ONIDLE schedule. By default, schedules have no ending date. The format for the EndDate argument varies with the locale selected for the local computer in Regional and Language Options in Control Panel. Only one format is valid for each locale.The valid date formats are listed in the following table. Use the format most similar to the format selected for Short date in Regional and Language Options in Control Panel on the local computer.MM/DD/YYYYUse for month-first formats, such as English (United States) and Spanish (Panama).DD/MM/YYYYUse for day-first formats, such as Bulgarian and Dutch (Netherlands).YYYY/MM/DDUse for year-first formats, such as Swedish and French (Canada).</description>
+        <from>end date</from>
+        <to>end date</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>modifier</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. <1 or .>1439]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>modifier</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="tn">
+                  <input global="false">
+                    <from>task name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="tr">
+                  <input global="false">
+                    <from>task run</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="mo">
+                  <input global="false">
+                    <from>modifier</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="st">
+                  <input global="false">
+                    <from>start time</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="et">
+                  <input global="false">
+                    <from>end time</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="du">
+                  <input global="false">
+                    <from>duration</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="sd">
+                  <input global="false">
+                    <from>start date</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="ed">
+                  <input global="false">
+                    <from>end date</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="ru">
+                  <input global="false">
+                    <from>runas user</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="rp">
+                  <input global="false">
+                    <from>runas password</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">schtasks /create /tn ${tn} /tr ${tr} /sc minute</xsl:text>
+        <xsl:if test="string-length('${ru}')!=0">
+          <xsl:text disable-output-escaping="no"> /ru ${ru}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${rp}')!=0">
+          <xsl:text disable-output-escaping="no"> /rp ${rp}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${mo}')!=0">
+          <xsl:text disable-output-escaping="no"> /mo ${mo}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${et}')!=0">
+          <xsl:text disable-output-escaping="no"> /et ${et}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${du}')!=0">
+          <xsl:text disable-output-escaping="no"> /du ${du}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${et}')!=0 and string-length('${du}')!=0">
+          <xsl:text disable-output-escaping="no"> /k</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sd}')!=0">
+          <xsl:text disable-output-escaping="no"> /sd ${sd}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${ed}')!=0">
+          <xsl:text disable-output-escaping="no"> /ed ${ed}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">  /F</xsl:text>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported."</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported."</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Schedules a task that runs every N minutes.  N is set in the modifier input parameter.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>02d9168e-f929-34ee-a4da-b3d5735c0424</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1291031855616</last-modified>
+    </meta>
+  </process-def>
+</process>

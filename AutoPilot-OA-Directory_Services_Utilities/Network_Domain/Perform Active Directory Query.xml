@@ -1,0 +1,237 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AutoPilot-OA-Directory_Services_Utilities:Network_Domain:Perform Active Directory Query">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the domain controller to perform the import or export operation.</description>
+        <from>domain</from>
+        <to>domain</to>
+      </input>
+      <input global="false" required="false">
+        <description>Sets the distinguished name of the search base for data export.</description>
+        <from>base dn</from>
+        <to>base dn</to>
+      </input>
+      <input global="false" required="false">
+        <description>Sets the search scope. 
+
+Valid values are: Base, OneLevel, SubTree</description>
+        <from>scope</from>
+        <to>scope</to>
+      </input>
+      <input global="false" required="false">
+        <description>Sets the command to run using the supplied UserDistinguishedName.</description>
+        <from>user dn</from>
+        <to>user dn</to>
+      </input>
+      <input global="false" required="false">
+        <description>Sets the command to run using the supplied UserDistinguishedName Password</description>
+        <from>user dn password</from>
+        <to>user dn password</to>
+      </input>
+      <input global="false" required="false">
+        <description>Sets the command to run using a domain user name.</description>
+        <from>domain user name</from>
+        <to>domain user name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Sets the command to run the supplied domain username password.</description>
+        <from>domain password</from>
+        <to>domain password</to>
+      </input>
+      <input global="false" required="false">
+        <description>LDAP search object class name</description>
+        <from>ldap filter object class</from>
+        <to>ldap filter object class</to>
+      </input>
+      <input global="false" required="false">
+        <description>The ldap value to filter upon. 
+An example would be: sn=User</description>
+        <from>ldap filter value</from>
+        <to>ldap filter value</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>base dn</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="domain">
+                  <input global="false">
+                    <from>domain</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="base dn">
+                  <input global="false">
+                    <from>base dn</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="scope">
+                  <input global="false">
+                    <from>scope</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="user dn">
+                  <input global="false">
+                    <from>user dn</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="user dn password">
+                  <input global="false">
+                    <from>user dn password</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="domain user name">
+                  <input global="false">
+                    <from>domain user name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="domain password">
+                  <input global="false">
+                    <from>domain password</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="ldap filter object class">
+                  <input global="false">
+                    <from>ldap filter object class</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="ldap filter value">
+                  <input global="false">
+                    <from>ldap filter value</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="command " />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">ldifde</xsl:text>
+        <xsl:if test="string-length('${domain}') != 0">
+          <xsl:text disable-output-escaping="no"> -s ${domain}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${base dn}') != 0">
+          <xsl:text disable-output-escaping="no"> -d $[base dn]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${scope}') != 0 and '${scope}' = 'Base'">
+          <xsl:text disable-output-escaping="no"> -p ${scope}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${scope}') != 0 and '${scope}' = 'OneLevel'">
+          <xsl:text disable-output-escaping="no"> -p ${scope}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${scope}') != 0 and '${scope}' = 'SubTree'">
+          <xsl:text disable-output-escaping="no"> -p ${scope}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('$[ldap filter object class]') != 0 and string-length('$[ldap filter value]')!= 0">
+          <xsl:text disable-output-escaping="no"> -r (&amp;(objectClass=$[ldap filter object class])($[ldap filter value]))</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('$[user dn]') != 0 and string-length('$[user dn password]')!= 0">
+          <xsl:text disable-output-escaping="no"> -a $[user dn] $[user dn password]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('$[domain user name]') != 0 and string-length('$[domain password]')!= 0">
+          <xsl:text disable-output-escaping="no"> -b $[domain user name] $[domain password]</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Active Directory Query
+    Queries Active Directory user and group information.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7ecf1f8b-0222-3238-8bc2-88c85070575a</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290416896568</last-modified>
+    </meta>
+  </process-def>
+</process>

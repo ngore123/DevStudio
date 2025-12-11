@@ -1,0 +1,176 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:Create Directory">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The name of the new directory.</description>
+        <from>directory name</from>
+        <to>directory name</to>
+      </input>
+      <input global="false" required="false">
+        <description>The permissions mode for the new directory.
+Not supported in Windows O/S
+</description>
+        <from>permission mode</from>
+        <to>permission mode</to>
+      </input>
+      <input global="false" required="false">
+        <description>Create parent directories as needed? 
+Not supported in Windows O/S
+Valid values:  true
+</description>
+        <from>create parent directories</from>
+        <to>create parent directories</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>directory name</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="create parent directories">
+                  <input global="false">
+                    <from>create parent directories</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="directory name">
+                  <input global="false">
+                    <from>directory name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="permission mode">
+                  <input global="false">
+                    <from>permission mode</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text>mkdir </xsl:text>
+        <xsl:if test="string-length('${permission mode}') !=0 ">
+          <xsl:text>-m ${permission mode} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${create parent directories}') !=0 and '${create parent directories}' = 'true'">
+          <xsl:text>-p </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${directory name}') !=0">
+          <xsl:text disable-output-escaping="no">${directory name}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/mkdir </xsl:text>
+        <xsl:if test="string-length('${create parent directories}') !=0 and '${create parent directories}' = 'true'">
+          <xsl:text disable-output-escaping="no">-p </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${permission mode}') !=0 ">
+          <xsl:text disable-output-escaping="no">-m ${permission mode} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${directory name}') !=0">
+          <xsl:text disable-output-escaping="no">${directory name}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">mkdir </xsl:text>
+        <xsl:if test="string-length('${directory name}') !=0">
+          <xsl:text disable-output-escaping="no">${directory name}</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Create Directory
+    Create a new directory at the specified location.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>787a37a9-0770-3776-804b-fd76584822f4</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902406322</last-modified>
+    </meta>
+  </process-def>
+</process>

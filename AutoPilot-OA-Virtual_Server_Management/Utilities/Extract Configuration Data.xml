@@ -1,0 +1,481 @@
+<process draft="false" dev-studio-version="7.5.02.04">
+  <process-def name=":AutoPilot-OA-Virtual_Server_Management:Utilities:Extract Configuration Data">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module. 
+
+Example: VMware, BladeLogic</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the virtual center.  Virtual centers are used to host virtual machines</description>
+        <from>virtual center</from>
+        <to>virtual center</to>
+      </input>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - A process specific string that explains the value of success status.
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <description>The name of the adapter to be used by this process</description>
+        <to>adapter</to>
+        <from>adapter</from>
+      </output>
+      <output global="false" required="false">
+        <description>type of system defined within the virtualization management module</description>
+        <to>system</to>
+        <from>system</from>
+      </output>
+      <output global="false" required="false">
+        <description>Default timeout for BladeLogic connection details</description>
+        <to>default timeout</to>
+        <from>default timeout</from>
+      </output>
+      <output global="false" required="false">
+        <description>Default user role for BladeLogic connection details</description>
+        <to>default user role</to>
+        <from>default user role</from>
+      </output>
+      <output global="false" required="false">
+        <description>AO Host name</description>
+        <to>ao hostname</to>
+        <from>ao hostname</from>
+      </output>
+      <output global="false" required="false">
+        <description>The fully qualified folder path under which the vm template parameter file shall be created.</description>
+        <to>file repository</to>
+        <from>file repository</from>
+      </output>
+      <output global="false" required="false">
+        <description>VMware version details</description>
+        <to>version</to>
+        <from>version</from>
+      </output>
+      <output global="false" required="false">
+        <description>soap url of the virtual center server.  One of the connection parameters for the vmware adapter.</description>
+        <to>soap url</to>
+        <from>soap url</from>
+      </output>
+      <output global="false" required="false">
+        <description>Username required for logging into the virtual center.  One of the connection parameters for the vmware adapter.</description>
+        <to>username</to>
+        <from>username</from>
+      </output>
+      <output global="false" required="false">
+        <description>One of the connection parameters for the vmware adapter.</description>
+        <to>transport</to>
+        <from>transport</from>
+      </output>
+      <output global="false" required="false">
+        <description>Username required for logging into the virtual center.  One of the connection parameters for the vmware adapter.</description>
+        <to>password</to>
+        <from>password</from>
+      </output>
+      <output global="false" required="false">
+        <to>host alive delay</to>
+        <from>host alive delay</from>
+      </output>
+      <output global="false" required="false">
+        <description>Delay [in seconds] introduced while polling the status of an action submitted in the virtual center.</description>
+        <to>poll task status delay</to>
+        <from>poll task status delay</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint></checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() = "VMware"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:VMware:Adapter</configuration>
+                </input>
+                <output>
+                  <to>adapter</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:VMware:Version</configuration>
+                </input>
+                <output>
+                  <to>version</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:VMware:Virtual_Center_List</configuration>
+                </input>
+                <output>
+                  <to>virtual centers</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>virtual centers</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>connection parameters</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="virtual center">
+                      <input global="false">
+                        <from>virtual center</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="//Name/text()='${virtual center}'">
+        <xsl:copy-of select="//*[starts-with(local-name(), 'Virtual_Center_') and Name='${virtual center}']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <value />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connection parameters</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>soap url</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//SOAP_URL/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connection parameters</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>username</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//User_Name/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connection parameters</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>password</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Password/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>connection parameters</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>transport</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Transport/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:VMware:Poll_Task_Status_Delay</configuration>
+                </input>
+                <output>
+                  <to>poll task status delay</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Data found for configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() = "BladeLogic"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <input>
+                  <from>configuration name</from>
+                </input>
+                <output>
+                  <to>system</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:BladeLogic:Adapter</configuration>
+                </input>
+                <output>
+                  <to>adapter</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:BladeLogic:Default_Timeout</configuration>
+                </input>
+                <output>
+                  <to>default timeout</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:BladeLogic:Default_User_Role</configuration>
+                </input>
+                <output>
+                  <to>default user role</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:BladeLogic:File_Repository</configuration>
+                </input>
+                <output>
+                  <to>file repository</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:BladeLogic:AO_Hostname</configuration>
+                </input>
+                <output>
+                  <to>ao hostname</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:AutoPilot-OA-Virtual_Server_Management:BladeLogic:Host_Alive_Delay</configuration>
+                </input>
+                <output>
+                  <to>host alive delay</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Data found for configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[2]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Extract Configuration Data
+              This workflow will extract the configuration data for a given configuration name. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,566 @@
+<process draft="false" dev-studio-version="7.6.02.01">
+  <process-def name=":AutoPilot-OA-Storage_Management:Resource_Pool:Remove Member from Resource Pool">
+    <parameters>
+      <input global="false" required="true">
+        <description>The name of a configuration item defined in a configuration module. 
+Valid value: NetApp</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Remove member -- storage system or aggregate -- from an existing resource pool.
+
+Sample Xml:
+
+&lt;storage&gt;
+	&lt;resourcepool-name-or-id&gt;testing&lt;/resourcepool-name-or-id&gt;
+	&lt;member-name-or-id&gt;simeth0:aggr1&lt;/member-name-or-id&gt;
+&lt;/storage&gt;
+
+
+Parameters Description:
+
+
+resourcepool-name-or-id[Required]
+	Name or identifier of the resource pool to extend. It should be a valid DFM object name or object id. A valid DFM object name should contain at least one non-numeric character. A valid DFM object id should be in the range of [1..2^31-1].
+
+member-name-or-id[Required]
+	Name or identifier of member to remove from the resource pool. Possible values are name/id of storage system or aggregate. It should be a valid DFM object name or object id. A valid DFM object name should contain at least one non-numeric character. A valid DFM object id should be in the range of [1..2^31-1].</description>
+        <from>storage</from>
+        <to>storage</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp: 
+[required if dynamic targeting is used otherwise optional] 
+
+Designates a specific target (name of the DFM server where the operation will be performed) that has been defined in the adapter configuration. Valid value- Same value that has been specified for the name attribute of 'config' element in the adapter configuration . If this tag is left empty the request will be executed on the first defined adapter configuration.
+
+for e.g for the  adapter config below , target would be 02.
+&lt;configs&gt;
+   &lt;config name="02"&gt;
+          &lt;target&gt;172.19.224.103&lt;/target&gt;
+          &lt;user-name&gt;root&lt;/user-name&gt;
+          &lt;password&gt;bmcbmc&lt;/password&gt;
+          &lt;protocol&gt;http&lt;/protocol&gt;
+          &lt;port&gt;8088&lt;/port&gt;
+   &lt;/config&gt;
+&lt;/configs&gt;
+
+Dynamic targeting: Host name or IP address of DFM.</description>
+        <from>target</from>
+        <to>target</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp:
+[required only if dynamic targeting is used]
+NetApp DataFabric Manager login username.</description>
+        <from>username</from>
+        <to>username</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp:
+[required only if dynamic targeting is used]
+NetApp DataFabric Manager login password.</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp: [Conditional]  specified only when password parameter is mentioned .
+You can encrypt the password by specifying the encryption type .
+Valid values:  Base64,Plain.</description>
+        <from>encryption type</from>
+        <to>encryption type</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp:
+[Optional and used when dynamic targeting] 
+Communication protocol used by adapter. Valid value is http or https. Default value is http.</description>
+        <from>protocol</from>
+        <to>protocol</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp: 
+[Optional and used when dynamic targeting]
+Port on which NetApp DataFabric Manager is enabled. Default value is 8088 for http protocol and 8488 for https protocol.</description>
+        <from>port</from>
+        <to>port</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success or failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status. </description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <description>String or XML value - Contains required output.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Storage_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>version</from>
+            <to>version</to>
+          </output>
+          <output>
+            <from>module configuration items</from>
+            <to>module configuration items</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown configuration name",.)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()= 'NetApp']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>storage</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>items</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="target">
+                      <input global="false">
+                        <from>target</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="username">
+                      <input global="false">
+                        <from>username</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="password">
+                      <input global="false">
+                        <from>password</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="encryption type">
+                      <input global="false">
+                        <from>encryption type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="protocol">
+                      <input global="false">
+                        <from>protocol</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="port">
+                      <input global="false">
+                        <from>port</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <member-name-or-id>
+          <xsl:value-of select="//member-name-or-id" disable-output-escaping="no" />
+        </member-name-or-id>
+        <resourcepool-name-or-id>
+          <xsl:value-of select="//resourcepool-name-or-id" disable-output-escaping="no" />
+        </resourcepool-name-or-id>
+        <xsl:if test="string-length('${target}') &gt; 0 and string-length('${username}') =0">
+          <target>
+            <xsl:value-of select="'${target}'" disable-output-escaping="no" />
+          </target>
+        </xsl:if>
+        <xsl:if test="string-length('${target}')&gt;0 and string-length('${username}') &gt; 0">
+          <targets>
+            <target>
+              <host>
+                <xsl:value-of select="'${target}'" disable-output-escaping="no" />
+              </host>
+              <user-name>${username}</user-name>
+              <password>
+                <xsl:attribute name="encryption-type">
+                  <xsl:value-of select="'${encryption type}'" disable-output-escaping="no" />
+                </xsl:attribute>
+                <xsl:value-of select="'${password}'" disable-output-escaping="no" />
+              </password>
+              <xsl:if test="string-length('${protocol}') &gt;0">
+                <protocol>${protocol}</protocol>
+              </xsl:if>
+              <xsl:if test="string-length('${port}') &gt;0">
+                <port>${port}</port>
+              </xsl:if>
+            </target>
+          </targets>
+        </xsl:if>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-NetAPP_Storage:Update Items</process-name>
+              <parameters>
+                <input>
+                  <from>module configuration items</from>
+                  <to>adapter name</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="configuration name">
+                        <input global="false">
+                          <from>configuration name</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[//$[configuration name]/Adapter/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>module configuration items</from>
+                  <to>version</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="configuration name">
+                        <input global="false">
+                          <from>configuration name</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[//$[configuration name]/Version/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <value>resource-pool-remove-member</value>
+                  <to>item type</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>adapter response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//response/metadata/error/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(//response/metadata/status/text())!= 'error']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>success</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>adapter response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>output</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//responses]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>NetApp:
+This workflow removes a member from Resource pool
+
+Dynamic targeting:Ability to communicate with multiple DFM servers which are not configured under the adapter configuration. NetApp action can be invoked using dynamic targeting / without dynamic targeting.
+
+When Dynamic targeting is used : target would be Host name or IP address of server on which NetApp DataFabric Manager is running. It is mandatory send all the required parameters:
+username, 
+ password , 
+ encyption type  when using dynamic targeting.
+
+When Dynamic targeting is not used : Designates a specific target (name of the DFM server where the operation will be performed) that has been defined in the adapter configuration. Valid value- Same value that has been specified for the name attribute of 'config' element in the adapter configuration . If this tag is left empty the request will be executed on the first defined adapter configuration.
+
+for e.g for the  adapter config below , target would be 02.
+&lt;configs&gt;
+  &lt;config name="02"&gt;
+    &lt;target&gt;172.19.224.103&lt;/target&gt;
+    &lt;user-name&gt;root&lt;/user-name&gt;
+    &lt;password&gt;bmcbmc&lt;/password&gt;
+    &lt;protocol&gt;http&lt;/protocol&gt;
+    &lt;port&gt;8088&lt;/port&gt;
+  &lt;/config&gt;
+&lt;/configs&gt;
+</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1499c5c1-4b11-382e-b3fe-fd8094fca111</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1311227734459</last-modified>
+    </meta>
+  </process-def>
+</process>

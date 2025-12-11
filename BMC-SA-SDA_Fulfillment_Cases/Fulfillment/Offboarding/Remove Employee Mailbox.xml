@@ -1,0 +1,352 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Offboarding:Remove Employee Mailbox">
+    <parameters>
+      <input global="false" required="false">
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <from>user name</from>
+        <to>user name</to>
+      </input>
+      <input global="false" required="false">
+        <from>email address</from>
+        <to>email address</to>
+      </input>
+      <output global="false" required="false">
+        <to>mailboxDisabled</to>
+        <from>mailboxDisabled</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>workinfo failure details</to>
+        <from>workinfo failure details</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <compose-xml>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;parameters&gt;
+    &lt;parameter&gt;
+        &lt;name&gt;Identity&lt;/name&gt;
+        &lt;value&gt;</value>
+                </input>
+              </fragment>
+              <fragment type="string" encode="true">
+                <input required="false">
+                  <from>user name</from>
+                </input>
+              </fragment>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;/value&gt;
+    &lt;/parameter&gt;
+&lt;/parameters&gt;</value>
+                </input>
+              </fragment>
+            </compose-xml>
+          </input>
+          <output>
+            <to>input parameters</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>format option</to>
+            <value>format-list</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>verbose logging</to>
+            <value>true</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>New Mailbox request params --</value>
+              </input>
+              <input>
+                <from>input parameters</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-Microsoft_Exchange:v2007:Mailbox_Management:Get Mailbox</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>input parameters</from>
+            <to>input parameters</to>
+          </input>
+          <input>
+            <from>format option</from>
+            <to>format option</to>
+          </input>
+          <input>
+            <from>verbose logging</from>
+            <to>verbose logging</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>mailboxFound</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value>Specified mailbox not found.</value>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:ServiceType:Offboarding:MAIL_NOT_FOUND_WORKINFO_TEXT</configuration>
+                </input>
+                <output>
+                  <to>workinfo failure details</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="true">
+          <condition>
+            <document>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[contains(., "Remote application exited with code: 0")]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//metadata/exit-code=1]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:Mailbox_Management:Disable Mailbox</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>mailboxDisabled</to>
+                        <value>false</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>error message</to>
+                        <value>Error disabling the mailbox account.</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input global="true">
+                        <configuration>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:ServiceType:Offboarding:DISABLE_MAILBOX_FAILURE_WORKINFO</configuration>
+                      </input>
+                      <output>
+                        <to>workinfo failure details</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case applies-if-any-condition-true="false">
+                <condition>
+                  <document>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//metadata/exit-code=0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[not(contains(., "Remote application exited with code: 1"))]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>mailboxDisabled</to>
+                        <value>true</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>error message</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>workinfo failure details</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7fbd4b55-7f8e-4212-83c2-31fe5a473de0</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1483678803499</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,152 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Adapter_Action_Input_Constructors:v5.5:Backupset:Query Backupset">
+    <parameters>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the name of the backup set on the server you want to query when -location=server is in effect. You can use wildcards to specify the backup set name. If you use wildcards or do not specify a backup set name, all backup sets that you own are displayed on the screen. When a backup set is created, the server assigns root as the owner of the backup set. When querying a backup set on the server, a non-root user will not see the backup set listed, even if they know the backup set name and use it in the query. This option can take 3 kind of values:
+
+backupsetname - Specifies the name of the backup set.
+bset filename - Specifies the name of the file containing the beginning of the backup set. The location option should be set to file.
+tape device -  Specifies the name of the tape device where the tape containing the start of the backup set is located. The location option should be set to tape.</description>
+        <from>backupsetname</from>
+        <to>backupsetname</to>
+      </input>
+      <input global="false" required="false">
+        <description>The description option assigns or specifies a description for files when performing archive, delete archive, retrieve, query archive, or query backupset.</description>
+        <from>description</from>
+        <to>description</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies where Tivoli Storage Manager searches for a backup set during a query or restore operation. Use this option to locate backup sets on the server or local files. Backup sets that are generated on the server can be used locally specifying the location option and either the file name of the file containing the start of the backup set, or the tape device where the tape containing the start of the backup set is  located.
+Valid values are-
+
+         server   Specifies that Tivoli Storage Manager searches for the backup set on the server. This is the default.
+
+         file     Specifies that Tivoli Storage Manager searches for the backup set on a local file.
+
+         tape     Specifies that Tivoli Storage Manager searches for the backup set on a local tape device.</description>
+        <from>location</from>
+        <to>location</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>final items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>final items</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="description">
+                <input global="false">
+                  <from>description</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="backupsetname">
+                <input global="false">
+                  <from>backupsetname</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="location">
+                <input global="false">
+                  <from>location</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" omit-xml-declaration="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">query-backupset</xsl:text>
+        </operation-name>
+        <xsl:if test="string('${timeout secs}')!=''">
+          <timeout-secs>
+            <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+        <command-options>
+          <xsl:if test="string('${description}')!=''">
+            <description>
+              <xsl:value-of select="'${description}'" disable-output-escaping="no" />
+            </description>
+          </xsl:if>
+          <xsl:if test="string('${location}')!=''">
+            <location>
+              <xsl:value-of select="'${location}'" disable-output-escaping="no" />
+            </location>
+          </xsl:if>
+          <xsl:if test="string('${backupsetname}') != ''">
+            <backupsetname>
+              <xsl:value-of select="'${backupsetname}'" disable-output-escaping="no" />
+            </backupsetname>
+          </xsl:if>
+        </command-options>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>FINAL ITEMS: </value>
+              </input>
+              <input>
+                <from>final items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for Query Backup process.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>abea68b2-996d-398e-b4a6-7e0b636ab76b</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290596960242</last-modified>
+    </meta>
+  </process-def>
+</process>

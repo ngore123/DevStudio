@@ -1,0 +1,136 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-Microsoft_System_Center_Operations_Manager:Adapter_Action_Input_Constructors:v2007:Alert:Find Alert By ID">
+    <parameters>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="true">
+        <description>alert id[Required]
+	The ID of the alert that will be returned to the user.</description>
+        <from>alert id</from>
+        <to>alert id</to>
+      </input>
+      <input global="false" required="true">
+        <description>operator[Required]
+	The 'operator' tag specified under 'criteria-expression specifies the operand for alert id specified.
+	Valid values - equals, not equals, like, in,greater than,less than</description>
+        <from>operator</from>
+        <to>operator</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>final items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>alert id</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>final items</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="alert id">
+                <input global="false">
+                  <from>alert id</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="operator">
+                <input global="false">
+                  <from>operator</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">get-alert-by-id</xsl:text>
+        </operation-name>
+        <xsl:if test="string('${timeout secs}') != ''">
+          <timeout-secs>
+            <xsl:value-of select="string('${timeout secs}')" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+        <command-parameters>
+          <alert-search-criteria>
+            <criteria-expression>
+              <key>
+                <xsl:text disable-output-escaping="no">Id</xsl:text>
+              </key>
+              <value>
+                <xsl:value-of select=" string('${alert id}')" disable-output-escaping="no" />
+              </value>
+              <operator>
+                <xsl:value-of select="string('${operator}')" disable-output-escaping="no" />
+              </operator>
+            </criteria-expression>
+          </alert-search-criteria>
+        </command-parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>FINAL ITEMS: </value>
+              </input>
+              <input>
+                <from>final items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for the process - "Find Alert By ID"</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>62291fde-7dd3-36b1-8372-36e4224e14ef</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598680063</last-modified>
+    </meta>
+  </process-def>
+</process>

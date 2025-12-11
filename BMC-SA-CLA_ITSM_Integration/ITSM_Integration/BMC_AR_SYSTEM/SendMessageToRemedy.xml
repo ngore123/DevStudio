@@ -1,0 +1,1949 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:SendMessageToRemedy">
+    <parameters>
+      <input global="false" required="true">
+        <description>input from monitor event</description>
+        <from>inputevent</from>
+        <to>inputevent</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>connectivityIssueFoundWithRemedy</to>
+            <value>false</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>completedEntries</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>errorMessage</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Status</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status_processing</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='Processing']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Status</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status_completed</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='Completed']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Status</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status_failed</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='Failed']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Default_WebService_Adapter</configuration>
+          </input>
+          <output>
+            <to>wsAdapter</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>sessionID</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:Monitor adapter event received in SendMessageToRemedy=&gt;</value>
+              </input>
+              <input>
+                <from>inputevent</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Utility:Extract all persistenceIDs</process-name>
+        <parameters>
+          <input>
+            <from>inputevent</from>
+            <to>input</to>
+          </input>
+          <output>
+            <from>idValue</from>
+            <to>idValue</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Persistence:UpdateStatusInDB</process-name>
+        <parameters>
+          <input>
+            <from>status_processing</from>
+            <to>status</to>
+          </input>
+          <input>
+            <from>idValue</from>
+            <to>persistenceIDs</to>
+          </input>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <for-each>
+        <document>
+          <input>
+            <from>inputevent</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>fetchedSingleDBEntry</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//row]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>fetchedSingleDBEntry</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>inputParameters</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//*[@name='INPUTPARAMETERS']]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Hostname</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "hostname=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobId</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "jobid=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>ScheduleId</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "scheduleid=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobDesc</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "jobDesc=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>CI_IDs</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "ci_ids=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>CI_Names</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "ci_names=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Notes</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "notes=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Start_date</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "startDate=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>End_date</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "endDate=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>BladeUser</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "bladeUser=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>priority</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "priority=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>RequestType</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "requestType=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobStatus</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "jobstatus=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>ProductCode</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "productCode=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>fetchedSingleDBEntry</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>persistenceID</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[/row/column[@name='ID']/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>changeID</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "InfrastructureChangeID=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>taskID</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "TaskID=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobType</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "jobType=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobName</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "jobName=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobDetailedDescription</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "jobDetailedDescription=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>impact</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "impact=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobVersion</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "JobVersion=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input global="true">
+                        <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Status_Mapping</configuration>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>status_Remedy</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="status_blade">
+                          <input global="false">
+                            <from>JobStatus</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//mapping[@name='${status_blade}']/status/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input global="true">
+                        <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Status_Mapping</configuration>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>statusReason_Remedy</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="status_blade">
+                          <input global="false">
+                            <from>JobStatus</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//mapping[@name='${status_blade}']/reason/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character01</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character01=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character02</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character02=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character03</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character03=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character04</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character04=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character05</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character05=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character06</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character06=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character07</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character07=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character08</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character08=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character09</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character09=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>inputParameters</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Character10</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-after(., "Character10=")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[substring-before(., "%||%")]]></xpath>
+                    </xpath-expression>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(.)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>Notes</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Notes</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="notes">
+                          <input global="false">
+                            <from>Notes</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">$[notes]</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <before-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>BMC-SA-CLA_ITSM_Integration:SendMessageToRemedy:within loop=&gt;</value>
+                        </input>
+                        <input>
+                          <from>fetchedSingleDBEntry</from>
+                        </input>
+                        <input>
+                          <from>connectivityIssueFoundWithRemedy</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </before-execution>
+                  <location>:switch[1]:sequence[1]:assign[1]</location>
+                </assign>
+                <call-process>
+                  <process-name>:BMC-SA-CLA_ITSM_Integration:CustomizedProcesses:Window1</process-name>
+                  <parameters>
+                    <input>
+                      <from>JobId</from>
+                      <to>JobID</to>
+                    </input>
+                    <input>
+                      <from>JobVersion</from>
+                      <to>JobVersion</to>
+                    </input>
+                    <input>
+                      <from>ScheduleId</from>
+                      <to>ScheduleID</to>
+                    </input>
+                    <input>
+                      <from>JobType</from>
+                      <to>JobType</to>
+                    </input>
+                    <input>
+                      <from>JobName</from>
+                      <to>JobName</to>
+                    </input>
+                    <input>
+                      <from>JobDesc</from>
+                      <to>JobDesc</to>
+                    </input>
+                    <input>
+                      <from>JobDetailedDescription</from>
+                      <to>Job Detailed Description</to>
+                    </input>
+                    <input>
+                      <from>CI_IDs</from>
+                      <to>CI_IDs</to>
+                    </input>
+                    <input>
+                      <from>CI_Names</from>
+                      <to>CI_Names</to>
+                    </input>
+                    <input>
+                      <from>Notes</from>
+                      <to>Notes</to>
+                    </input>
+                    <input>
+                      <from>priority</from>
+                      <to>urgency</to>
+                    </input>
+                    <input>
+                      <from>impact</from>
+                      <to>Impact</to>
+                    </input>
+                    <input>
+                      <from>RequestType</from>
+                      <to>Request Type</to>
+                    </input>
+                    <input>
+                      <from>Start_date</from>
+                      <to>Start_date</to>
+                    </input>
+                    <input>
+                      <from>End_date</from>
+                      <to>End_date</to>
+                    </input>
+                    <input>
+                      <from>BladeUser</from>
+                      <to>Blade user</to>
+                    </input>
+                    <input>
+                      <from>JobStatus</from>
+                      <to>Status</to>
+                    </input>
+                    <input>
+                      <from>changeID</from>
+                      <to>InfrastructureChangeID</to>
+                    </input>
+                    <input>
+                      <from>taskID</from>
+                      <to>TaskID</to>
+                    </input>
+                    <input>
+                      <from>Character01</from>
+                      <to>Character01</to>
+                    </input>
+                    <input>
+                      <from>Character02</from>
+                      <to>Character02</to>
+                    </input>
+                    <input>
+                      <from>Character03</from>
+                      <to>Character03</to>
+                    </input>
+                    <input>
+                      <from>Character04</from>
+                      <to>Character04</to>
+                    </input>
+                    <input>
+                      <from>Character05</from>
+                      <to>Character05</to>
+                    </input>
+                    <input>
+                      <from>Character06</from>
+                      <to>Character06</to>
+                    </input>
+                    <input>
+                      <from>Character07</from>
+                      <to>Character07</to>
+                    </input>
+                    <input>
+                      <from>Character08</from>
+                      <to>Character08</to>
+                    </input>
+                    <input>
+                      <from>Character09</from>
+                      <to>Character09</to>
+                    </input>
+                    <input>
+                      <from>Character10</from>
+                      <to>Character10</to>
+                    </input>
+                    <output>
+                      <from>CI_IDs</from>
+                      <to>CI_IDs</to>
+                    </output>
+                    <output>
+                      <from>CI_Names</from>
+                      <to>CI_Names</to>
+                    </output>
+                    <output>
+                      <from>JobDesc</from>
+                      <to>JobDesc</to>
+                    </output>
+                    <output>
+                      <from>Notes</from>
+                      <to>Notes</to>
+                    </output>
+                    <output>
+                      <from>Character01</from>
+                      <to>Character01</to>
+                    </output>
+                    <output>
+                      <from>Character02</from>
+                      <to>Character02</to>
+                    </output>
+                    <output>
+                      <from>Character03</from>
+                      <to>Character03</to>
+                    </output>
+                    <output>
+                      <from>Character04</from>
+                      <to>Character04</to>
+                    </output>
+                    <output>
+                      <from>Character05</from>
+                      <to>Character05</to>
+                    </output>
+                    <output>
+                      <from>Character06</from>
+                      <to>Character06</to>
+                    </output>
+                    <output>
+                      <from>Character07</from>
+                      <to>Character07</to>
+                    </output>
+                    <output>
+                      <from>Character08</from>
+                      <to>Character08</to>
+                    </output>
+                    <output>
+                      <from>Character09</from>
+                      <to>Character09</to>
+                    </output>
+                    <output>
+                      <from>Character10</from>
+                      <to>Character10</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[1]:call-process[1]</location>
+                </call-process>
+                <assign>
+                  <assignment>
+                    <input global="true">
+                      <from>ARInboundUrl</from>
+                    </input>
+                    <output>
+                      <to>soapurl</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <input global="true">
+                      <from>ARUsername</from>
+                    </input>
+                    <output>
+                      <to>remedyUsername</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <input global="true">
+                      <from>ARPassword</from>
+                    </input>
+                    <output>
+                      <to>remedyPassword</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <input global="true">
+                      <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Connection_Details:transport</configuration>
+                    </input>
+                    <output>
+                      <to>transport</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>soapurl</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>req</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="username">
+                          <input global="false">
+                            <from>remedyUsername</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="password">
+                          <input global="false">
+                            <from>remedyPassword</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="host">
+                          <input global="false">
+                            <from>Hostname</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="ciids">
+                          <input global="false">
+                            <from>CI_IDs</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="jobid">
+                          <input global="false">
+                            <from>JobId</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="scheduleid">
+                          <input global="false">
+                            <from>ScheduleId</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="jobdesc">
+                          <input global="false">
+                            <from>JobDesc</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="notes">
+                          <input global="false">
+                            <from>Notes</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="priority">
+                          <input global="false">
+                            <from>priority</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="requestType">
+                          <input global="false">
+                            <from>RequestType</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="startdate">
+                          <input global="false">
+                            <from>Start_date</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="enddate">
+                          <input global="false">
+                            <from>End_date</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="bladeuser">
+                          <input global="false">
+                            <from>BladeUser</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="changeID">
+                          <input global="false">
+                            <from>changeID</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="taskID">
+                          <input global="false">
+                            <from>taskID</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="jobName">
+                          <input global="false">
+                            <from>JobName</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="jobType">
+                          <input global="false">
+                            <from>JobType</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="jobDetailedDescription">
+                          <input global="false">
+                            <from>JobDetailedDescription</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="status">
+                          <input global="false">
+                            <from>status_Remedy</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="statusReason">
+                          <input global="false">
+                            <from>statusReason_Remedy</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="ci_names">
+                          <input global="false">
+                            <from>CI_Names</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="impact">
+                          <input global="false">
+                            <from>impact</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character01">
+                          <input global="false">
+                            <from>Character01</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character02">
+                          <input global="false">
+                            <from>Character02</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character03">
+                          <input global="false">
+                            <from>Character03</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character04">
+                          <input global="false">
+                            <from>Character04</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character05">
+                          <input global="false">
+                            <from>Character05</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character06">
+                          <input global="false">
+                            <from>Character06</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character07">
+                          <input global="false">
+                            <from>Character07</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character08">
+                          <input global="false">
+                            <from>Character08</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character09">
+                          <input global="false">
+                            <from>Character09</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="Character10">
+                          <input global="false">
+                            <from>Character10</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="JobVersion">
+                          <input global="false">
+                            <from>JobVersion</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tem="http://tempuri.org" xmlns:urn="CHG_ChangeServiceInterface" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" version="1.0">
+  <xsl:output indent="yes" encoding="XML" cdata-section-elements="Change_ProcessInterfaceData " />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Header>
+        <xsl:element name="urn:AuthenticationInfo">
+          <xsl:element name="urn:userName">$[username]</xsl:element>
+          <xsl:element name="urn:password">$[password]</xsl:element>
+        </xsl:element>
+      </soapenv:Header>
+      <soapenv:Body>
+        <xsl:element name="urn:Change_ProcessInterfaceData">
+          <xsl:element name="urn:SourceID">
+            <xsl:text disable-output-escaping="no">${host}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobID">
+            <xsl:text disable-output-escaping="no">${jobid}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobVersion">
+            <xsl:text disable-output-escaping="no">${JobVersion}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobInstanceID">
+            <xsl:text disable-output-escaping="no">${scheduleid}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobType">
+            <xsl:text disable-output-escaping="no">${jobType}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobName">
+            <xsl:text disable-output-escaping="no">${jobName}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Summary">
+            <xsl:text disable-output-escaping="no">${jobdesc}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobDetailedDescription">
+            <xsl:text disable-output-escaping="no">${jobDetailedDescription}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:CIReconIDList">
+            <xsl:text disable-output-escaping="no">${ciids}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:CINameList">
+            <xsl:text disable-output-escaping="no">${ci_names}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:AdditionalNotes">
+            <xsl:text disable-output-escaping="no">${notes}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Urgency">
+            <xsl:text disable-output-escaping="no">${priority}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Impact">
+            <xsl:text disable-output-escaping="no">${impact}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:ChangeClass">
+            <xsl:text disable-output-escaping="no">${requestType}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:StartDate">
+            <xsl:text disable-output-escaping="no">${startdate}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:EndDate">
+            <xsl:text disable-output-escaping="no">${enddate}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:CustomerLoginID">
+            <xsl:text disable-output-escaping="no">${bladeuser}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Status">
+            <xsl:text disable-output-escaping="no">${status}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:StatusReason">
+            <xsl:text disable-output-escaping="no">${statusReason}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:TaskID">
+            <xsl:text disable-output-escaping="no">${taskID}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:InfrastructureChangeID">
+            <xsl:text disable-output-escaping="no">${changeID}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character01">
+            <xsl:text disable-output-escaping="no">${Character01}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character02">
+            <xsl:text disable-output-escaping="no">${Character02}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character03">
+            <xsl:text disable-output-escaping="no">${Character03}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character04">
+            <xsl:text disable-output-escaping="no">${Character04}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character05">
+            <xsl:text disable-output-escaping="no">${Character05}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character06">
+            <xsl:text disable-output-escaping="no">${Character06}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character07">
+            <xsl:text disable-output-escaping="no">${Character07}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character08">
+            <xsl:text disable-output-escaping="no">${Character08}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character09">
+            <xsl:text disable-output-escaping="no">${Character09}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Character10">
+            <xsl:text disable-output-escaping="no">${Character10}</xsl:text>
+          </xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>info</level>
+                      <parameters>
+                        <input>
+                          <value>BMC-SA-CLA_ITSM_Integration:SendMessageToRemedy:remedyRequest=&gt;</value>
+                        </input>
+                        <input>
+                          <from>req</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[1]:assign[2]</location>
+                </assign>
+                <call-process>
+                  <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+                  <parameters>
+                    <input>
+                      <from>wsAdapter</from>
+                      <to>adapter name</to>
+                    </input>
+                    <input>
+                      <from>transport</from>
+                      <to>transport</to>
+                    </input>
+                    <input>
+                      <from>soapurl</from>
+                      <to>soap url</to>
+                    </input>
+                    <input>
+                      <from>req</from>
+                      <to>soap message</to>
+                    </input>
+                    <input>
+                      <value>urn:CHG_ChangeServiceInterface/Change_ProcessInterfaceData</value>
+                      <to>soap action</to>
+                    </input>
+                    <output>
+                      <from>adapter response</from>
+                      <to>remedyResponse</to>
+                    </output>
+                    <output>
+                      <from>status</from>
+                      <to>status</to>
+                    </output>
+                    <output>
+                      <from>error message</from>
+                      <to>error message</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>info</level>
+                      <parameters>
+                        <input>
+                          <value>BMC-SA-CLA_ITSM_Integration:SendMessageToRemedy:remedyResponse=&gt;</value>
+                        </input>
+                        <input>
+                          <from>remedyResponse</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[1]:call-process[2]</location>
+                </call-process>
+                <switch>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>true</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                  <default>
+                    <sequence>
+                      <call-process>
+                        <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Evaluate Error</process-name>
+                        <parameters>
+                          <input>
+                            <from>remedyResponse</from>
+                            <to>remedyAdapterResponse</to>
+                          </input>
+                          <output>
+                            <from>connectivityIssueFlag</from>
+                            <to>connectivityIssueFoundWithRemedy</to>
+                          </output>
+                          <output>
+                            <from>errorMessage</from>
+                            <to>errorMessage</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:call-process[1]</location>
+                      </call-process>
+                      <call-process>
+                        <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Handle error in response</process-name>
+                        <parameters>
+                          <input>
+                            <from>connectivityIssueFoundWithRemedy</from>
+                            <to>connectivityIssueFlag</to>
+                          </input>
+                          <input>
+                            <from>fetchedSingleDBEntry</from>
+                            <to>inputMessage</to>
+                          </input>
+                          <input>
+                            <from>errorMessage</from>
+                            <to>errorMessage</to>
+                          </input>
+                          <input>
+                            <value>Remedy</value>
+                            <to>target</to>
+                          </input>
+                          <input>
+                            <from>sessionID</from>
+                            <to>sessionID</to>
+                          </input>
+                          <output>
+                            <from>sessionID</from>
+                            <to>sessionID</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:call-process[2]</location>
+                      </call-process>
+                    </sequence>
+                  </default>
+                  <case>
+                    <condition>
+                      <document>
+                        <input>
+                          <from>remedyResponse</from>
+                        </input>
+                      </document>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[not(//faultstring)  and not(//error)]]></xpath>
+                      </xpath-expression>
+                    </condition>
+                    <sequence>
+                      <call-process>
+                        <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Handle success response from Remedy</process-name>
+                        <parameters>
+                          <input>
+                            <from>changeID</from>
+                            <to>changeID</to>
+                          </input>
+                          <input>
+                            <from>taskID</from>
+                            <to>taskID</to>
+                          </input>
+                          <input>
+                            <from>JobId</from>
+                            <to>JobId</to>
+                          </input>
+                          <input>
+                            <from>Hostname</from>
+                            <to>Hostname</to>
+                          </input>
+                          <input>
+                            <from>ProductCode</from>
+                            <to>ProductCode</to>
+                          </input>
+                          <input>
+                            <from>remedyResponse</from>
+                            <to>remedyResponse</to>
+                          </input>
+                          <input>
+                            <from>completedEntries</from>
+                            <to>completedEntries</to>
+                          </input>
+                          <input>
+                            <from>persistenceID</from>
+                            <to>persistenceID</to>
+                          </input>
+                          <input>
+                            <from>ScheduleId</from>
+                            <to>ScheduleId</to>
+                          </input>
+                          <input>
+                            <from>JobVersion</from>
+                            <to>JobVersion</to>
+                          </input>
+                          <output>
+                            <from>completedEntries</from>
+                            <to>completedEntries</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[1]</location>
+                      </call-process>
+                    </sequence>
+                  </case>
+                  <location>:switch[1]:sequence[1]:switch[1]</location>
+                </switch>
+              </sequence>
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>connectivityIssueFoundWithRemedy</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = "true"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <call-process>
+                  <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Handle error in response</process-name>
+                  <parameters>
+                    <input>
+                      <from>connectivityIssueFoundWithRemedy</from>
+                      <to>connectivityIssueFlag</to>
+                    </input>
+                    <input>
+                      <from>fetchedSingleDBEntry</from>
+                      <to>inputMessage</to>
+                    </input>
+                    <input>
+                      <from>errorMessage</from>
+                      <to>errorMessage</to>
+                    </input>
+                    <input>
+                      <value>Remedy</value>
+                      <to>target</to>
+                    </input>
+                    <input>
+                      <from>sessionID</from>
+                      <to>sessionID</to>
+                    </input>
+                    <output>
+                      <from>sessionID</from>
+                      <to>sessionID</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <before-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>BMC-SA-CLA_ITSM_Integration:SendMessageToRemedy:within loop=&gt;</value>
+                        </input>
+                        <input>
+                          <from>fetchedSingleDBEntry</from>
+                        </input>
+                        <input>
+                          <from>connectivityIssueFoundWithRemedy</from>
+                        </input>
+                        <input>
+                          <from>errorMessage</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </before-execution>
+                  <location>:switch[1]:sequence[2]:call-process[1]</location>
+                </call-process>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Persistence:UpdateStatusInDB</process-name>
+        <parameters>
+          <input>
+            <from>status_completed</from>
+            <to>status</to>
+          </input>
+          <input>
+            <from>completedEntries</from>
+            <to>persistenceIDs</to>
+          </input>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[3]</location>
+      </call-process>
+    </sequence>
+    <compensation name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:SendMessageToRemedy:999999999" />
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4600634b-6c4f-4b1c-9155-167275d9b1a1</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1475748937318</last-modified>
+    </meta>
+  </process-def>
+  <compensation-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:SendMessageToRemedy:999999999">
+    <meta>
+      <peer-location>
+        <location>this</location>
+      </peer-location>
+    </meta>
+    <parameters>
+      <input global="false" required="true">
+        <from>status_failed</from>
+        <to>status_failed</to>
+      </input>
+      <input global="false" required="true">
+        <from>idValue</from>
+        <to>idValue</to>
+      </input>
+    </parameters>
+    <sequence />
+  </compensation-def>
+</process>

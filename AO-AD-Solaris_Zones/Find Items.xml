@@ -1,0 +1,318 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AO-AD-Solaris_Zones:Find Items">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+
+Default value: SolarisZoneActorAdapter
+</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Zone name on which operation to be performed.</description>
+        <from>zone name</from>
+        <to>zone name</to>
+      </input>
+      <input global="false" required="false">
+        <description>The items XML used to create one or more items within Solaris Zone.
+
+Value takes the form:
+   &lt;items&gt;
+         &lt;item&gt;
+              &lt;parameters&gt;
+            	     ..........
+              &lt;/parameters&gt;
+         &lt;/item&gt;
+   &lt;/items&gt;
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="true">
+        <description>The item type that makes the judgement on what wrapper must be executed.
+
+Valid values: 
+Retrieve_Zone_Configuration
+</description>
+        <from>item type</from>
+        <to>item type</to>
+      </input>
+      <input global="false" required="true">
+        <description>The Solaris OS version. The current supported version is v10.4</description>
+        <from>version</from>
+        <to>version</to>
+      </input>
+      <input global="false" required="false">
+        <description>The XML containing the metadata needed by the adapter to connect to the target.
+
+Value takes the form:
+&lt;connection-parameters&gt;
+	&lt;host&gt;&lt;/host&gt;
+	&lt;user-name&gt;&lt;/user-name&gt;
+	&lt;password&gt;&lt;/password&gt;
+&lt;/connection-parameters&gt;
+
+Valid value:  XML
+</description>
+        <from>connection parameters</from>
+        <to>connection parameters</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the time, in seconds, to wait for operation get successful on the target server. If operation is not successful within this duration, an error message is returned. If no value is provided, a default value of 300 seconds is used.</description>
+        <from>operation timeout</from>
+        <to>operation timeout</to>
+      </input>
+      <output global="false" required="false">
+        <to>response</to>
+        <from>response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-Solaris_Zones:Utilities:Convert Connection Parameters</process-name>
+        <parameters>
+          <input>
+            <from>connection parameters</from>
+            <to>connection parameters</to>
+          </input>
+          <output>
+            <from>target parameters</from>
+            <to>target parameters</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Solaris_Zones:Utilities:Version Error Reporting</process-name>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>version</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='v10.4']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-Solaris_Zones:Utilities:Item Type Error Reporting</process-name>
+                    <parameters>
+                      <input>
+                        <from>item type</from>
+                        <to>item type</to>
+                      </input>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='Retrieve_Zone_Configuration']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-Solaris_Zones:v10.4:Configure_Zone_Operations:Retrieve Zone Configuration</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>target parameters</from>
+                        <to>target parameters</to>
+                      </input>
+                      <input>
+                        <from>zone name</from>
+                        <to>zone name</to>
+                      </input>
+                      <input>
+                        <from>operation timeout</from>
+                        <to>operation timeout</to>
+                      </input>
+                      <output>
+                        <from>response</from>
+                        <to>response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Find Items
+    Finds one or more items within Solaris Zones Environment.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e7162ad3-2728-38d3-b162-8c01fa6e21ba</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1282120380323</last-modified>
+    </meta>
+  </process-def>
+</process>

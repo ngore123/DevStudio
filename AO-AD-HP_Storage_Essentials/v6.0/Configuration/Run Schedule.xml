@@ -1,0 +1,241 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:v6.0:Configuration:Run Schedule">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is HPSEActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>1. Runs performance data collection schedules
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;run&lt;/command&gt;
+	    &lt;category&gt;configuration&lt;/category&gt;
+		&lt;process-id&gt;run-schedule&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;performance&gt;
+	        &lt;datacollection-ids&gt;1001 1003&lt;/datacollection-ids&gt;
+	      &lt;/performance&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+performance[Required]
+	Indicates the performance schedules
+datacollection-ids[Required]
+	ids of performance datacollection schedules to run.The list should be separated by space.
+	
+2. Runs reports data collection schedule
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;run&lt;/command&gt;
+	    &lt;category&gt;configuration&lt;/category&gt;
+		&lt;process-id&gt;run-schedule&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;reports&gt;
+	        &lt;datacollection-ids&gt;1001 1003&lt;/datacollection-ids&gt;
+	      &lt;/reports&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+reports[Required]
+	Indicates the reports schedules
+datacollection-ids[Required]
+	ids of reports datacollection schedules to run. The list should be separated by space.
+
+3. Refreshes the report cache
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;run&lt;/command&gt;
+	    &lt;category&gt;configuration&lt;/category&gt;
+		&lt;process-id&gt;run-schedule&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;reports&gt;
+	        &lt;cache/&gt;
+	      &lt;/reports&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+reports[Required]
+	Indicates the reports schedules
+cache[Required]
+	Indicates that report cache is to be refreshed
+	
+4. Refreshes the global reporter
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;run&lt;/command&gt;
+	    &lt;category&gt;configuration&lt;/category&gt;
+		&lt;process-id&gt;run-schedule&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;reports&gt;
+	        &lt;globalreporter/&gt;
+	      &lt;/reports&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+reports[Required]
+	Indicates the reports schedules
+globalreporter[Required]
+	Indicates that report globalreporter is to be refreshed</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Process ID Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <value>run-schedule</value>
+                  <to>process id</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//items/item/process-id)='run-schedule']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Invoke Adapter Request</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper supports the following requirements:-
+
+1. Runs performance data collection schedules.
+2. Runs reports data collection schedules.
+3. Refreshes the report cache
+4. Refreshes the global reporter.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7a54cf09-ef94-3abf-9175-654cf5c48aad</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588087111</last-modified>
+    </meta>
+  </process-def>
+</process>

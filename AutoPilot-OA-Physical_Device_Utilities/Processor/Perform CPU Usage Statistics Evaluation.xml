@@ -1,0 +1,484 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Physical_Device_Utilities:Processor:Perform CPU Usage Statistics Evaluation">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>The cpu number you wish to evaluate. A default of 0 is used in no input is provided.
+</description>
+        <from>cpu</from>
+        <to>cpu</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML document containing the system cpu number and a value indicating the cpu threshold limit for the cpu.
+Note:  The value should be indicated as a percentage of the total cpu utilization.
+An example would be &lt;limit cpu="0"&gt;30&lt;/limit&gt;
+</description>
+        <from>acceptable thresholds</from>
+        <to>acceptable thresholds</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document containing information on the current cpu usage and whether it is within the limits specified in the request.</description>
+        <to>limits</to>
+        <from>limits</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Physical_Device_Utilities:Processor:Get CPU Statistics</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>cpu check output</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>cpu</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>cpu</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="cpu">
+                <input global="false">
+                  <from>cpu</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(.) = 0">
+          <xsl:text disable-output-escaping="no">0</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">${cpu}</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>cpu</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>limits</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <limits>
+      <cpu />
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>cpu check output</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>limit</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//line[position() > 2 and position() < last ()]]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <input>
+                      <from>cpu</from>
+                    </input>
+                    <output>
+                      <to>cpu</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>limit</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[number(100)-number(normalize-space(substring(., (string-length(.)-2))))]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>acceptable thresholds</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>max-usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="cpu">
+                          <input global="false">
+                            <from>cpu</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//limit[@cpu = "${cpu}"]/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>limits</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>limits</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="cpu">
+                          <input global="false">
+                            <from>cpu</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="max-usage">
+                          <input global="false">
+                            <from>max-usage</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="usage">
+                          <input global="false">
+                            <from>usage</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <limits>
+      <xsl:if test="string-length(//cpu) &gt; 0">
+        <xsl:copy-of select="//cpu" />
+      </xsl:if>
+      <cpu>
+        <cpu-number>${cpu}</cpu-number>
+        <usage>${usage}</usage>
+        <limit>${max-usage}</limit>
+        <within-limit>
+          <xsl:value-of select="${max-usage} &gt; ${usage}" />
+        </within-limit>
+      </cpu>
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>cpu usage</value>
+                        </input>
+                        <input>
+                          <from>limits</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[1]:assign[1]</location>
+                </assign>
+              </sequence>
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>cpu check output</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//target-metadata/os-id/text() = 'Linux']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>limit</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>limit string</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens />
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="." disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+                <call-process>
+                  <process-name>:AutoPilot-OA-Common_Utilities:Tokenize String</process-name>
+                  <parameters>
+                    <input>
+                      <from>limit string</from>
+                      <to>string</to>
+                    </input>
+                    <output>
+                      <from>tokens</from>
+                      <to>token list</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:call-process[1]</location>
+                </call-process>
+                <assign>
+                  <assignment>
+                    <input>
+                      <from>cpu</from>
+                    </input>
+                    <output>
+                      <to>cpu</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>token list</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[number(100)-number(//tokens/*[last() -2])]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>acceptable thresholds</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>max-usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="cpu">
+                          <input global="false">
+                            <from>cpu</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//limit[@cpu = "${cpu}"]/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>limits</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>limits</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="cpu">
+                          <input global="false">
+                            <from>cpu</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="max-usage">
+                          <input global="false">
+                            <from>max-usage</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="usage">
+                          <input global="false">
+                            <from>usage</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <limits>
+      <xsl:if test="string-length(//cpu) &gt; 0">
+        <xsl:copy-of select="//cpu" />
+      </xsl:if>
+      <cpu>
+        <cpu-number>${cpu}</cpu-number>
+        <usage>${usage}</usage>
+        <limit>${max-usage}</limit>
+        <within-limit>
+          <xsl:value-of select="${max-usage} &gt; ${usage}" />
+        </within-limit>
+      </cpu>
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>cpu usage</value>
+                        </input>
+                        <input>
+                          <from>limits</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[2]:assign[2]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Disk Usage Statistics Evaluation
+   Determines if current disk usage is within defined disk space usage limits. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>9c6762c7-13a6-344c-abe8-f54701c67d0a</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1292079899646</last-modified>
+    </meta>
+  </process-def>
+</process>

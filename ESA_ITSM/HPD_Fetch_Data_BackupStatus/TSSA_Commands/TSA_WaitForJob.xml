@@ -1,0 +1,215 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":ESA_ITSM:HPD_Fetch_Data_BackupStatus:TSSA_Commands:TSA_WaitForJob">
+    <parameters>
+      <input global="false" required="false">
+        <from>Run_Key</from>
+        <to>Run_Key</to>
+      </input>
+      <input global="false" required="false">
+        <from>TSA_Connection_Details</from>
+        <to>TSA_Connection_Details</to>
+      </input>
+      <output global="false" required="false">
+        <to>Is_Running</to>
+        <from>Is_Running</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:JobRun:Get Job Run is Running by Run Key</process-name>
+        <parameters>
+          <input>
+            <from>TSA_Connection_Details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>Run_Key</from>
+            <to>jobRunKey</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>exists</from>
+            <to>exists</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <input>
+            <from>exists</from>
+          </input>
+          <output>
+            <to>Is_Running</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:ESA_ITSM:TSSA_Jobs:MaxWait_Time</configuration>
+          </input>
+          <output>
+            <to>Max_Wait</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <while-do>
+        <input>
+          <from>Max_Wait</from>
+        </input>
+        <condition>
+          <document>
+            <input>
+              <from>Is_Running</from>
+            </input>
+          </document>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[string(.) = "true"]]></xpath>
+          </xpath-expression>
+        </condition>
+        <output global="false">
+          <to>Wait_Loop</to>
+        </output>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <pause>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <duration>60000</duration>
+            <location>:pause[1]</location>
+          </pause>
+          <call-process>
+            <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:JobRun:Get Job Run is Running by Run Key</process-name>
+            <parameters>
+              <input>
+                <from>TSA_Connection_Details</from>
+                <to>connection details</to>
+              </input>
+              <input>
+                <from>Run_Key</from>
+                <to>jobRunKey</to>
+              </input>
+              <output>
+                <from>status</from>
+                <to>status</to>
+              </output>
+              <output>
+                <from>error message</from>
+                <to>error message</to>
+              </output>
+              <output>
+                <from>exists</from>
+                <to>exists</to>
+              </output>
+              <output>
+                <from>debug message</from>
+                <to>debug message</to>
+              </output>
+              <output>
+                <from>output</from>
+                <to>output</to>
+              </output>
+              <output>
+                <from>script lines</from>
+                <to>script lines</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:call-process[2]</location>
+          </call-process>
+          <assign>
+            <assignment>
+              <input>
+                <from>exists</from>
+              </input>
+              <output>
+                <to>Is_Running</to>
+              </output>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[2]</location>
+          </assign>
+        </sequence>
+        <location>:while-do[1]</location>
+      </while-do>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>22851612-c979-4ed8-a28b-d6dec8e964cf</process-id>
+      <author>Yannic Legermann</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1651491709374</last-modified>
+    </meta>
+  </process-def>
+</process>

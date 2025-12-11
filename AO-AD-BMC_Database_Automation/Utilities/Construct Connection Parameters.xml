@@ -1,0 +1,233 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":AO-AD-BMC_Database_Automation:Utilities:Construct Connection Parameters">
+    <parameters>
+      <input global="false" required="false">
+        <from>use ssl certificate</from>
+        <to>use ssl certificate</to>
+      </input>
+      <input global="false" required="false">
+        <from>install certificate</from>
+        <to>install certificate</to>
+      </input>
+      <input global="false" required="false">
+        <from>allow unsigned certificate</from>
+        <to>allow unsigned certificate</to>
+      </input>
+      <input global="false" required="false">
+        <from>passphrase</from>
+        <to>passphrase</to>
+      </input>
+      <input global="false" required="false">
+        <from>signature mode</from>
+        <to>signature mode</to>
+      </input>
+      <input global="false" required="false">
+        <from>private key file</from>
+        <to>private key file</to>
+      </input>
+      <input global="false" required="false">
+        <from>certificate file</from>
+        <to>certificate file</to>
+      </input>
+      <input global="false" required="false">
+        <from>private key data</from>
+        <to>private key data</to>
+      </input>
+      <input global="false" required="false">
+        <from>certificate data</from>
+        <to>certificate data</to>
+      </input>
+      <input global="false" required="false">
+        <from>key store file</from>
+        <to>key store file</to>
+      </input>
+      <input global="false" required="false">
+        <from>key store password</from>
+        <to>key store password</to>
+      </input>
+      <input global="false" required="false">
+        <from>client alias</from>
+        <to>client alias</to>
+      </input>
+      <output global="false" required="false">
+        <to>connection details</to>
+        <from>connection details</from>
+      </output>
+      <output global="false" required="false">
+        <to>mutual authentication details</to>
+        <from>mutual authentication details</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>connection details</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="use ssl certificate">
+                <input global="false">
+                  <from>use ssl certificate</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="allow unsigned certificate">
+                <input global="false">
+                  <from>allow unsigned certificate</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="install certificate">
+                <input global="false">
+                  <from>install certificate</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="pass phrase">
+                <input global="false">
+                  <from>passphrase</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <connection-parameters>
+      <passphrase>${pass phrase}</passphrase>
+      <allow-unsigned-certificate>${allow unsigned certificate}</allow-unsigned-certificate>
+      <install-certificate>${install certificate}</install-certificate>
+      <use-ssl-certificate>${use ssl certificate}</use-ssl-certificate>
+    </connection-parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>mutual authentication details</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="signature mode">
+                <input global="false">
+                  <from>signature mode</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="key store file">
+                <input global="false">
+                  <from>key store file</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="keystore passphrase">
+                <input global="false">
+                  <from>key store password</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="alias">
+                <input global="false">
+                  <from>client alias</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="private key file">
+                <input global="false">
+                  <from>private key file</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="certificate file">
+                <input global="false">
+                  <from>certificate file</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="private key data">
+                <input global="false">
+                  <from>private key data</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="certificate data">
+                <input global="false">
+                  <from>certificate data</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <mutual-authentication-parameters>
+      <xsl:if test="'${signature mode}' != ''  and ( '${signature mode}' = 'keystore'  or '${signature mode}' = 'key-files' or '${signature mode}' = 'key-data')">
+        <signature-properties>
+          <xsl:attribute name="mode">${signature mode}</xsl:attribute>
+          <xsl:if test="'${signature mode}' = 'keystore'">
+            <keystore-file>${key store file}</keystore-file>
+            <keystore-password>${keystore passphrase}</keystore-password>
+            <alias>${alias}</alias>
+          </xsl:if>
+          <xsl:if test="'${signature mode}' = 'key-data'">
+            <certificate-data>${certificate data}</certificate-data>
+            <private-key-data>${private key data}</private-key-data>
+          </xsl:if>
+          <xsl:if test="'${signature mode}' = 'key-files'">
+            <private-key-file>${private key file}</private-key-file>
+            <certificate-file>${certificate file}</certificate-file>
+          </xsl:if>
+        </signature-properties>
+      </xsl:if>
+    </mutual-authentication-parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>connection details</from>
+              </input>
+              <input>
+                <value></value>
+              </input>
+              <input>
+                <from>mutual authentication details</from>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs complex &lt;connection-parameters&gt; parameter and &lt;mutual-authentication-parameters&gt; parameter</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e01f7f0b-2056-4c79-8d2a-fd4670561102</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1317723855869</last-modified>
+    </meta>
+  </process-def>
+</process>

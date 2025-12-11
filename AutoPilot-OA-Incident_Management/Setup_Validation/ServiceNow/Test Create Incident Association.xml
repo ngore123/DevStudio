@@ -1,0 +1,175 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Incident_Management:Setup_Validation:ServiceNow:Test Create Incident Association">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - Incident ID</description>
+        <from>incident id</from>
+        <to>incident id</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value - A description of the incident association
+
+Note: This is a required input for BMC_AR_System</description>
+        <from>incident description</from>
+        <to>incident description</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - CI Name</description>
+        <from>ci name</from>
+        <to>ci name</to>
+      </input>
+      <output global="false" required="true">
+        <description>An XML document providing the data template for single or multiple Concept elements.The task concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <to>incidents</to>
+        <from>incidents</from>
+      </output>
+      <output global="false" required="true">
+        <description>Indicates whether or not the process completed successfully.
+Valid values: success, failure.
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>A process specific string that explains the value of success status.
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <from>ci name</from>
+          </input>
+          <output>
+            <to>incident</to>
+            <concept type="AutoPilot-OA-Incident_Management:Incident">
+              <attribute>ci-name</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>incident description</from>
+          </input>
+          <output>
+            <to>incident</to>
+            <concept type="AutoPilot-OA-Incident_Management:Incident">
+              <attribute>detailed-description</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>incident id</from>
+          </input>
+          <output>
+            <to>incident</to>
+            <concept type="AutoPilot-OA-Incident_Management:Incident">
+              <attribute>incident-number</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incidents</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="incident">
+                <input global="false">
+                  <from>incident</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Incidents>
+      <xsl:choose>
+        <xsl:when test="string-length(//incident) &gt; 0">
+          <xsl:copy-of select="//incident" />
+        </xsl:when>
+        <xsl:otherwise>${incident}</xsl:otherwise>
+      </xsl:choose>
+    </Incidents>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Incident_Management:Create Incident Association</process-name>
+        <parameters>
+          <input>
+            <value>ServiceNow</value>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>incidents</from>
+            <to>incidents</to>
+          </input>
+          <output>
+            <from>incidents</from>
+            <to>incidents</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow tests associating a given incident to a given change.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2eb7d36a-348a-4b13-91d0-d7e7caedc1de</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1417083251585</last-modified>
+    </meta>
+  </process-def>
+</process>

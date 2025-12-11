@@ -1,0 +1,190 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Adapter_Action_Input_Constructors:v5.5:Archive:Preview Archive">
+    <parameters>
+      <input global="false" required="false">
+        <description>Specifies the output to display - included objects, excluded objects, or both.
+Valid values:
+         ALL      
+Display output for included and excluded objects. This is the default.
+
+         INCL
+Display output for included objects only.
+
+         EXCL
+ Display output for excluded objects only.</description>
+        <from>filter</from>
+        <to>filter</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the filename in which to write the tab-delineated output. The default is dsmprev.txt.</description>
+        <from>filename</from>
+        <to>filename</to>
+      </input>
+      <input global="false" required="false">
+        <description>Output is written to the console, and the file.</description>
+        <from>console</from>
+        <to>console</to>
+      </input>
+      <input global="false" required="false">
+        <description>Preview the current directory and subdirectories.
+Valid values:
+         Yes      
+Preview the current directories and subdirectories. This is the default.
+
+         No       
+Preview only the current directory, not subdirectories.
+
+Note: Specifying -traverse does not preview directories excluded using the exclude.dir option.</description>
+        <from>traverse</from>
+        <to>traverse</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the path and file name that you want to backup. Use wildcard characters to select a group of files or all of the files in a directory.</description>
+        <from>filespec</from>
+        <to>filespec</to>
+      </input>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>final items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>final items</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="filter">
+                <input global="false">
+                  <from>filter</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="filename">
+                <input global="false">
+                  <from>filename</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="console">
+                <input global="false">
+                  <from>console</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="traverse">
+                <input global="false">
+                  <from>traverse</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="filespec">
+                <input global="false">
+                  <from>filespec</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" omit-xml-declaration="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">preview-archive</xsl:text>
+        </operation-name>
+        <xsl:if test="string('${timeout secs}')!=''">
+          <timeout-secs>
+            <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+        <command-options>
+          <xsl:if test="string('${filter}')!=''">
+            <filter>
+              <xsl:value-of select="'${filter}'" disable-output-escaping="no" />
+            </filter>
+          </xsl:if>
+          <xsl:if test="string('${filename}')!=''">
+            <filename>
+              <xsl:value-of select="'${filename}'" disable-output-escaping="no" />
+            </filename>
+          </xsl:if>
+          <xsl:if test="string('${console}')!=''">
+            <console>
+              <xsl:value-of select="'${console}'" disable-output-escaping="no" />
+            </console>
+          </xsl:if>
+          <xsl:if test="string('${traverse}')!=''">
+            <traverse>
+              <xsl:value-of select="'${traverse}'" disable-output-escaping="no" />
+            </traverse>
+          </xsl:if>
+        </command-options>
+        <command-arguments>
+          <xsl:if test="string('${filespec}')!=''">
+            <filespec>
+              <xsl:value-of select="'${filespec}'" disable-output-escaping="no" />
+            </filespec>
+          </xsl:if>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>FINAL ITEMS: </value>
+              </input>
+              <input>
+                <from>final items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for Preview Archive process.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b83d5a47-2694-3692-bd89-66a544cdc7ec</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290596956151</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,165 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:v5.5:Backupset:Restore Backupset">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is IBMTSMActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The restore backupset command restores a backup set from the server, a local file, or a local tape device.
+
+Sample Request XML:
+
+&lt;items&gt;
+  &lt;item&gt;
+  &lt;operation-name&gt;restore-backupset&lt;/operation-name&gt;
+  &lt;timeout-secs&gt;30&lt;/timeout-secs&gt;
+&lt;command-options&gt;
+      &lt;location&gt;server&lt;/location&gt;
+      &lt;backupsetname&gt;testset2&lt;/backupsetname&gt;
+      &lt;preservepath&gt;Complete&lt;/preservepath&gt;
+      &lt;quiet/&gt;
+      &lt;replace&gt;yes&lt;/replace&gt;
+      &lt;skipntpermissions&gt;yes&lt;/skipntpermissions&gt;
+    &lt;/command-options&gt;
+  &lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+Command Options Description
+
+backupsetname[Required]
+	Specifies the name of the backup set on the server you want to query when -location=server is in effect. You can use wildcards to specify the backup set name. If you use wildcards or do not specify a backup set name, all backup sets that you own are displayed on the screen. When a backup set is created, the server assigns root as the owner of the backup set. When querying a backup set on the server, a non-root user will not see the backup set listed, even if they know the backup set name and use it in the query. This option can take 3 kind of values:
+
+backupsetname - Specifies the name of the backup set.
+bset filename - Specifies the name of the file containing the beginning of the backup set. The location option should be set to file.
+tape device -  Specifies the name of the tape device where the tape containing the start of the backup set is located. The location option should be set to tape.
+
+location[Optional]
+	Specifies where Tivoli Storage Manager searches for a backup set during a query or restore operation. Use this option to locate backup sets on the server or local files. Backup sets that are generated on the server can be used locally specifying the location option and either the file name of the file containing the start of the backup set, or the tape device where the tape containing the start of the backup set is  located.
+Valid values are-
+
+         server   Specifies that Tivoli Storage Manager searches for the backup set on the server. This is the default.
+
+         file     Specifies that Tivoli Storage Manager searches for the backup set on a local file.
+
+         tape     Specifies that Tivoli Storage Manager searches for the backup set on a local tape device.
+
+dirsonly[Optional]
+	The dirsonly option processes directories only. The client does not process files.
+	
+filesonly[Optional]
+	The filesonly option restricts archive, backup, restore, retrieve, or query processing to files only. You cannot restore or retrieve directories from the Tivoli Storage Manager server when using the filesonly option with the restore or retrieve commands. However,directories with default attributes are created, if required, as placeholders for files that you restore or retrieve.
+	
+ifnewer[Optional]
+	The ifnewer option replaces an existing file with the latest backup version only if the backup version is newer than the existing file.	
+
+preservepath[Optional]
+	The preservepath option specifies how much of the source path to reproduce as part of the target directory path when you restore or retrieve files to a new location. Use the -subdir=yes option to include the entire subtree of the source directory (directories
+and files below the lowest-level source directory) as source to be restored. If a required target directory does not exist, it is created. If a target file has the same name as a source file, it is overwritten. Vaild values – 
+1) Subtree - Creates the lowest-level source directory as a subdirectory of the target directory. Files from the source directory are stored in the new subdirectory. This is the default.
+
+2) Complete - Restores the entire path, starting from the root, into the specified directory. The entire path includes all the directories except the file space name.
+
+3) NOBase - Restores the contents of the source directory without the lowest level, or base directory, into the specified destination directory.
+
+4) NONe - Restores all selected source files to the target directory. No part of the source path at or above the source directory is reproduced at the target.
+
+quiet[Optional] 
+	The quiet option limits the number of messages that are displayed on your screen during processing. For example, when you run the incremental, selective, or archive commands, information might appear about each file that is backed up. Use the quiet option if you do not want to display this information.
+
+replace[Optional]
+	The replace option specifies whether to overwrite existing files on your workstation, or to prompt you for your selection when you restore or retrieve files.
+Valid values are –
+Prompt
+   For nonscheduled operations, you are asked whether to overwrite existing files. For scheduled operations, existing files are not overwritten and no prompts are displayed. This is the default.
+
+All
+   All existing files are overwritten, including read-only files. All locked files are replaced when the system is rebooted. If  access to a file is denied, you are prompted to skip or
+   overwrite the file. No action is taken on the file until there is a response to the prompt.
+
+Yes
+   Existing files are overwritten, except read-only files. For nonscheduled operations, you are asked whether to overwrite existing read-only files. For scheduled operations, existing read-only files are not overwritten and no prompts are displayed. If access to a file is denied, the file is skipped.
+
+No
+   Existing files are not overwritten. No prompts will be displayed.
+
+Note: Although user can provide any of the above values however since this adapter does not support prompt handling at the moment, it is advisable to provide either “yes” or “no” here as the value.
+
+skipntpermissions[Optional]
+	The skipntpermissions option bypasses processing of NTFS security information. Select this option for incremental backups, selective backups, archives, retrieves and restores. Valid values-yes,no(default)
+	
+skipntsecuritycrc[Optional]
+	The skipntsecuritycrc option controls the computation of the security cyclic redundancy check (CRC) for a comparison of NTFS security information during an incremental or selective backup, archive, restore, or retrieve operation. If you set the skipntsecuritycrc option to no (the default), performance might be slower because the program must retrieve all the security descriptors.  Valid values-yes,no(default)
+
+subdir[Optional]
+	The subdir option specifies whether you want to include subdirectories of named directories for processing. Valid values-yes,no</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-IBM_Tivoli_Storage_Manager:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <value>restore-backupset</value>
+            <to>valid operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper restores a backup set from the server, a local file, or a local tape device.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>f2751506-3130-3f4e-b8b7-03e5a5a69238</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290597034831</last-modified>
+    </meta>
+  </process-def>
+</process>

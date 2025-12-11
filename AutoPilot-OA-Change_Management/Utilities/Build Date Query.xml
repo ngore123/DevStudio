@@ -1,0 +1,448 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Change_Management:Utilities:Build Date Query">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module. 
+
+Example: BMC_AR_System
+
+This is not supported by HP ServiceCenter</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - This contains the name or the id of the field you wish to search against. 
+
+Valid Values: 
+planned start date 
+actual start date 
+</description>
+        <from>query field name 1</from>
+        <to>query field name 1</to>
+      </input>
+      <input global="false" required="true">
+        <description>String value - date / time (epoch) 
+
+Example: 1262304060</description>
+        <from>field name date 1</from>
+        <to>field name date 1</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - This contains the name or the id of the field you wish to search against. 
+
+Valid Values: 
+planned finish date 
+actual finish date</description>
+        <from>query field name 2</from>
+        <to>query field name 2</to>
+      </input>
+      <input global="false" required="true">
+        <description>String value - date / time (epoch) 
+
+Example: 1262304060</description>
+        <from>field name date 2</from>
+        <to>field name date 2</to>
+      </input>
+      <output global="false" required="false">
+        <description>XML document containing detail for one or more changes that matched submitted query.</description>
+        <to>changes</to>
+        <from>changes</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure.</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value - A process specific string that explains the value of success status.</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Change_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>schema</from>
+            <to>schema</to>
+          </output>
+          <output>
+            <from>system type</from>
+            <to>system</to>
+          </output>
+          <output>
+            <from>version</from>
+            <to>version</to>
+          </output>
+          <output>
+            <from>field id mappings</from>
+            <to>field id mappings</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>system</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="Remedy ARS"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>field id mappings</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>key 1</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="query field name 1">
+                      <input global="false">
+                        <from>query field name 1</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//mapping[@name='${query field name 1}']/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>field id mappings</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>key 2</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="query field name 2">
+                      <input global="false">
+                        <from>query field name 2</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//mapping[@name='${query field name 2}']/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>key 1</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>formed query</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="key 1">
+                      <input global="false">
+                        <from>key 1</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="key 2">
+                      <input global="false">
+                        <from>key 2</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="field name date 1">
+                      <input global="false">
+                        <from>field name date 1</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="field name date 2">
+                      <input global="false">
+                        <from>field name date 2</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value " />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">'$[key 1]' &gt;= $[field name date 1] and '$[key 2]' &lt;= $[field name date 2]</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Change_Management:Searches:Get Changes</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>query field name 1</from>
+                  <to>key 1</to>
+                </input>
+                <input>
+                  <from>field name date 1</from>
+                  <to>value 1</to>
+                </input>
+                <input>
+                  <from>formed query</from>
+                  <to>query</to>
+                </input>
+                <output>
+                  <from>changes</from>
+                  <to>changes</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <input>
+                        <from>success status</from>
+                      </input>
+                      <output>
+                        <to>success status</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>field name date 2</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens>
+                          <replacement-token name="field name 1">
+                            <input global="false">
+                              <from>query field name 1</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="field name 2">
+                            <input global="false">
+                              <from>query field name 2</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="date 1">
+                            <input global="false">
+                              <from>field name date 1</from>
+                            </input>
+                          </replacement-token>
+                        </xpath-replacement-tokens>
+                        <xpath><![CDATA[concat("Query successful where ${field name 1} = ${date 1} and ${field name 2} = " , .)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="failure"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <input>
+                        <from>success status</from>
+                      </input>
+                      <output>
+                        <to>success status</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>field name date 2</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens>
+                          <replacement-token name="field 1">
+                            <input global="false">
+                              <from>query field name 1</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="date 1">
+                            <input global="false">
+                              <from>field name date 1</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="field name 1">
+                            <input global="false">
+                              <from>query field name 2</from>
+                            </input>
+                          </replacement-token>
+                        </xpath-replacement-tokens>
+                        <xpath><![CDATA[concat("Query failed where ${field name 1} = ${date 1} and ${field name 2} = " , .)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This work flow retrieves changes within a specified date range
+
+This is not supported by HP ServiceCenter</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>70a8cbc3-f4d0-3465-bbea-011bbe2ea710</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283249283994</last-modified>
+    </meta>
+  </process-def>
+</process>

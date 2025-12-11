@@ -1,0 +1,232 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Network_Utilities:Perform Traceroute">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The network host to trace.</description>
+        <from>destination</from>
+        <to>destination</to>
+      </input>
+      <input global="false" required="false">
+        <description>A network interface to obtain the source IP address for outgoing probe packets.</description>
+        <from>source</from>
+        <to>source</to>
+      </input>
+      <input global="false" required="false">
+        <description>The time</description>
+        <from>probe timeout</from>
+        <to>probe timeout</to>
+      </input>
+      <input global="false" required="false">
+        <description>The maximum number of hops used in outgoing probe packets.</description>
+        <from>max hops</from>
+        <to>max hops</to>
+      </input>
+      <input global="false" required="false">
+        <description>The probe packet size</description>
+        <from>packet size</from>
+        <to>packet size</to>
+      </input>
+      <input global="false" required="false">
+        <description>The time</description>
+        <from>pause between probes</from>
+        <to>pause between probes</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>traceroute output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="source">
+                  <input global="false">
+                    <from>source</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="destination">
+                  <input global="false">
+                    <from>destination</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="max hops">
+                  <input global="false">
+                    <from>max hops</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="packet size">
+                  <input global="false">
+                    <from>packet size</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="pause between probes">
+                  <input global="false">
+                    <from>pause between probes</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="probe timeout">
+                  <input global="false">
+                    <from>probe timeout</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">tracert</xsl:text>
+        <xsl:if test="string-length('${source}') != 0">
+          <xsl:text disable-output-escaping="no"> -s ${source}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${probe timeout}') != 0">
+          <xsl:text disable-output-escaping="no"> -w ${probe timeout}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${max hops}')!=0">
+          <xsl:text disable-output-escaping="no"> -h ${max hops}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> ${destination}</xsl:text>
+      </command>
+      <command os-id="Linux">
+        <xsl:text>/bin/traceroute</xsl:text>
+        <xsl:if test="string-length('${source}') != 0">
+          <xsl:text> -s ${source} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${probe timeout}') != 0">
+          <xsl:text> -w ${probe timeout} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${max hops}') != 0">
+          <xsl:text> -m ${max hops} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${pause between probes}') != 0">
+          <xsl:text> -z ${pause between probes} </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> ${destination}</xsl:text>
+        <xsl:if test="string-length('${packet size}') != 0">
+          <xsl:text disable-output-escaping="no"> ${packet size} </xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text>/usr/sbin/traceroute</xsl:text>
+        <xsl:if test="string-length('${source}') != 0">
+          <xsl:text> -s ${source} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${probe timeout}') != 0">
+          <xsl:text disable-output-escaping="no"> -Q ${probe timeout} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${max hops}') != 0">
+          <xsl:text disable-output-escaping="no"> -m ${max hops} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${pause between probes}') != 0">
+          <xsl:text disable-output-escaping="no"> -P ${pause between probes} </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> ${destination}</xsl:text>
+        <xsl:if test="string-length('${packet size}') != 0">
+          <xsl:text disable-output-escaping="no"> ${packet size} </xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Cisco IOS">
+        <xsl:text>traceroute ip</xsl:text>
+        <xsl:text disable-output-escaping="no"> ${destination}</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>traceroute output</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//output]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Trace Route
+    Print the route that packets take to a specified network host.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8822c128-eece-3cb3-af2c-59d024bcc1ba</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288093282837</last-modified>
+    </meta>
+  </process-def>
+</process>

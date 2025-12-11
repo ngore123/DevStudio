@@ -1,0 +1,3054 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BladeLogic-SA-ITSM_Integration:Update ITSM Ticket">
+    <parameters>
+      <input global="false" required="true">
+        <description>job ID
+
+ID of the job.</description>
+        <from>job ID</from>
+        <to>job ID</to>
+      </input>
+      <input global="false" required="true">
+        <description>job name
+
+Job name of the job for which this process has been invoked.</description>
+        <from>job name</from>
+        <to>job name</to>
+      </input>
+      <input global="false" required="false">
+        <description>job description [Optional]
+
+Description for the job as entered by the operator.</description>
+        <from>job description</from>
+        <to>job description</to>
+      </input>
+      <input global="false" required="true">
+        <description>job type
+
+Job type of job.</description>
+        <from>job type</from>
+        <to>job type</to>
+      </input>
+      <input global="false" required="true">
+        <description>schedule ID
+
+If the job has a schedule defined then this input contains the schedule ID.</description>
+        <from>schedule ID</from>
+        <to>schedule ID</to>
+      </input>
+      <input global="false" required="false">
+        <description>scheduled time of the job</description>
+        <from>schedule Time</from>
+        <to>schedule time</to>
+      </input>
+      <input global="false" required="true">
+        <description>change ID
+
+Change ID assigned to the job.</description>
+        <from>change ID</from>
+        <to>change ID</to>
+      </input>
+      <input global="false" required="true">
+        <description>task ID
+
+Task ID assigned to the job.</description>
+        <from>task ID</from>
+        <to>task ID</to>
+      </input>
+      <input global="false" required="false">
+        <description>targets [Optional]
+
+Comma separated list of target names assigned to the given job if BladeLogic could not retrieve the CMDB reconciliation Ids.</description>
+        <from>targets</from>
+        <to>targets</to>
+      </input>
+      <input global="false" required="false">
+        <description>CI details [Optional]
+
+List of CI Names and Reconciliation IDs of each CI to be associated with the Task.
+
+Sample:
+&lt;Configuration-Items&gt;
+      &lt;Configuration-Item&gt;
+         &lt;name&gt;Persius1&lt;/name&gt;
+         &lt;reconciliation-id&gt;AS0050560C63F2rpytRAn_CoAAWI0A&lt;/reconciliation-id&gt;
+       &lt;/Configuration-Item&gt;
+       &lt;Configuration-Item&gt;
+         &lt;name&gt;Papillon1&lt;/name&gt;
+         &lt;reconciliation-id&gt;AS0050560C63F2L0K0RAX1htAQc5YA&lt;/reconciliation-id&gt;
+       &lt;/Configuration-Item&gt;
+        &lt;Configuration-Item&gt;
+         &lt;name&gt;ATL-cisco1720-04&lt;/name&gt;
+         &lt;reconciliation-id&gt;AG005056B51824Z4EZSQElKeAwo3sB&lt;/reconciliation-id&gt;
+       &lt;/Configuration-Item&gt;
+&lt;/Configuration-Items&gt;
+</description>
+        <from>CI details</from>
+        <to>CI details</to>
+      </input>
+      <input global="false" required="false">
+        <description>BL user ID [Optional] 
+
+User who executes or schedules the job. </description>
+        <from>BL user ID</from>
+        <to>BL user ID</to>
+      </input>
+      <output global="false" required="true">
+        <to>status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>reason</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="true">
+        <to>change ID</to>
+        <from>change ID</from>
+      </output>
+      <output global="false" required="true">
+        <to>task ID</to>
+        <from>task ID</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Extract Configuration Data</process-name>
+              <parameters>
+                <input>
+                  <value>BLADELOGIC</value>
+                  <to>configuration name</to>
+                </input>
+                <output>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </output>
+                <output>
+                  <from>date format</from>
+                  <to>date format</to>
+                </output>
+                <output>
+                  <from>bl task closed reason mappings</from>
+                  <to>bl task closed reason mappings</to>
+                </output>
+                <output>
+                  <from>change platform</from>
+                  <to>change platform</to>
+                </output>
+                <output>
+                  <from>task platform</from>
+                  <to>task platform</to>
+                </output>
+                <output>
+                  <from>authentication platform</from>
+                  <to>authentication platform</to>
+                </output>
+                <output>
+                  <from>configuration platform</from>
+                  <to>configuration platform</to>
+                </output>
+                <output>
+                  <from>bl server class name</from>
+                  <to>bl server class name</to>
+                </output>
+                <output>
+                  <from>remedyforce adapter</from>
+                  <to>remedyforce adapter</to>
+                </output>
+                <output>
+                  <from>remedyforce enabled</from>
+                  <to>remedyforce enabled</to>
+                </output>
+                <output>
+                  <from>remedyforce platform</from>
+                  <to>remedyforce platform</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <output>
+                  <to>CI association success status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>CI association status message</to>
+                  <value>
+                    <value />
+                  </value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>relationship tasks</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Tasks />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>start date</to>
+                  <value>2014-02-17T13:15:30Z</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Check Ticket ID Existence</process-name>
+                    <parameters>
+                      <input>
+                        <from>change platform</from>
+                        <to>change platform</to>
+                      </input>
+                      <input>
+                        <from>task platform</from>
+                        <to>task platform</to>
+                      </input>
+                      <input>
+                        <from>change ID</from>
+                        <to>change ID</to>
+                      </input>
+                      <input>
+                        <from>task ID</from>
+                        <to>task ID</to>
+                      </input>
+                      <output>
+                        <from>success status</from>
+                        <to>success status</to>
+                      </output>
+                      <output>
+                        <from>status message</from>
+                        <to>status message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>success status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(.)='success']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Task_Management:Searches:Get Task by Task ID</process-name>
+                          <parameters>
+                            <input>
+                              <from>task platform</from>
+                              <to>configuration name</to>
+                            </input>
+                            <input>
+                              <from>task ID</from>
+                              <to>task id</to>
+                            </input>
+                            <output>
+                              <from>tasks</from>
+                              <to>retrieved tasks</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                          </after-execution>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <output>
+                                    <to>requested for first name</to>
+                                    <value></value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>requested for last name</to>
+                                    <value></value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>requested for success status</to>
+                                    <value>failure</value>
+                                  </output>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                              </assign>
+                            </sequence>
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>BL user ID</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string-length(.)]]></xpath>
+                              </xpath-expression>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[number(.) > 0.0]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <call-process>
+                                <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Query User Information</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>configuration name</from>
+                                    <to>configuration name</to>
+                                  </input>
+                                  <input>
+                                    <from>BL user ID</from>
+                                    <to>username</to>
+                                  </input>
+                                  <output>
+                                    <from>success status</from>
+                                    <to>requested for success status</to>
+                                  </output>
+                                  <output>
+                                    <from>first name</from>
+                                    <to>requested for first name</to>
+                                  </output>
+                                  <output>
+                                    <from>last name</from>
+                                    <to>requested for last name</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>CI details</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string-length(.)]]></xpath>
+                              </xpath-expression>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[number(.) > 0.0]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <call-process>
+                                <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Associate CIs</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>task platform</from>
+                                    <to>task platform</to>
+                                  </input>
+                                  <input>
+                                    <from>retrieved tasks</from>
+                                    <to>task to associate</to>
+                                  </input>
+                                  <input>
+                                    <from>bl server class name</from>
+                                    <to>configuration server class name</to>
+                                  </input>
+                                  <input>
+                                    <from>CI details</from>
+                                    <to>CI list</to>
+                                  </input>
+                                  <output>
+                                    <from>success status</from>
+                                    <to>CI association success status</to>
+                                  </output>
+                                  <output>
+                                    <from>status message</from>
+                                    <to>CI association status message</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[2]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[2]</location>
+                        </switch>
+                        <assign>
+                          <assignment>
+                            <input>
+                              <from>task ID</from>
+                            </input>
+                            <output>
+                              <to>task</to>
+                              <concept type="AutoPilot-OA-Task_Management:Task">
+                                <attribute>task-id</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>retrieved tasks</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task notes</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//notes/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>requested for first name</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task</to>
+                                <concept type="AutoPilot-OA-Task_Management:Task">
+                                  <attribute>customer-first-name</attribute>
+                                </concept>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="success">
+                                  <input global="false">
+                                    <from>requested for success status</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="'${success}'='success'">
+        <xsl:value-of select="." disable-output-escaping="no" />
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>requested for last name</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task</to>
+                                <concept type="AutoPilot-OA-Task_Management:Task">
+                                  <attribute>customer-last-name</attribute>
+                                </concept>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="success">
+                                  <input global="false">
+                                    <from>requested for success status</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="bl user id">
+                                  <input global="false">
+                                    <from>BL user ID</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="'${success}'='success'">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">${bl user id}</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>targets</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task</to>
+                                <concept type="AutoPilot-OA-Task_Management:Task">
+                                  <attribute>notes</attribute>
+                                </concept>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="notes">
+                                  <input global="false">
+                                    <from>task notes</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      ${notes}
+      <xsl:if test="string-length(.)&gt;0">
+        <xsl:text disable-output-escaping="no">
+----------------------------------------------------------------------------------------------------------
+</xsl:text>
+        <xsl:text disable-output-escaping="no">List of targets not mapped to CMDB:
+
+</xsl:text>
+        <xsl:call-template name="tokenize">
+          <xsl:with-param name="targets" select="." />
+        </xsl:call-template>
+      </xsl:if>
+    </value>
+  </xsl:template>
+  <xsl:template name="tokenize">
+    <xsl:param name="targets" />
+    <xsl:choose>
+      <xsl:when test="contains($targets, ',')">
+        <xsl:value-of select="substring-before($targets, ',')" disable-output-escaping="no" />
+        <xsl:text disable-output-escaping="no">
+</xsl:text>
+        <xsl:call-template name="tokenize">
+          <xsl:with-param name="targets" select="substring-after($targets, ',')" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$targets" disable-output-escaping="no" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>tasks</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="task">
+                                  <input global="false">
+                                    <from>task</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//Task) &gt; 0">
+          <xsl:copy-of select="//Task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <removal>
+                            <input>
+                              <from>task</from>
+                            </input>
+                          </removal>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Task_Management:Update Tasks</process-name>
+                          <parameters>
+                            <input>
+                              <from>task platform</from>
+                              <to>configuration name</to>
+                            </input>
+                            <input>
+                              <from>tasks</from>
+                              <to>tasks</to>
+                            </input>
+                            <output>
+                              <from>success status</from>
+                              <to>success status</to>
+                            </output>
+                            <output>
+                              <from>status message</from>
+                              <to>status message</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                          </after-execution>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[2]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>success status</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string(.) = 'success']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <assign>
+                                <assignment>
+                                  <input>
+                                    <from>task ID</from>
+                                  </input>
+                                  <output>
+                                    <to>task</to>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>task-id</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>task</to>
+                                    <value>Job parameters</value>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>summary</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>job ID</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>task</to>
+                                      <concept type="AutoPilot-OA-Task_Management:Task">
+                                        <attribute>notes</attribute>
+                                      </concept>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens>
+                                      <replacement-token name="ID">
+                                        <input global="false">
+                                          <from>job ID</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="name">
+                                        <input global="false">
+                                          <from>job name</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="type">
+                                        <input global="false">
+                                          <from>job type</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="desc">
+                                        <input global="false">
+                                          <from>job description</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="schedule time">
+                                        <input global="false">
+                                          <from>schedule time</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="schedule ID">
+                                        <input global="false">
+                                          <from>schedule ID</from>
+                                        </input>
+                                      </replacement-token>
+                                    </stylesheet-replacement-tokens>
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">Job ID: ${ID}
+Job Name: ${name}
+Job Type: ${type}
+Job Description: ${desc}
+Schedule ID: ${schedule ID}
+Schedule Time: ${schedule time}</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>task</to>
+                                    <value>Yes</value>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>secure-log</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>task</to>
+                                    <value>General Information</value>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>work-info-type</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>task</to>
+                                    <value>Internal</value>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>view-access</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>task</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>workinfo tasks</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens>
+                                      <replacement-token name="task">
+                                        <input global="false">
+                                          <from>task</from>
+                                        </input>
+                                      </replacement-token>
+                                    </stylesheet-replacement-tokens>
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//task) &gt; 0">
+          <xsl:copy-of select="//task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <removal>
+                                  <input>
+                                    <from>task</from>
+                                  </input>
+                                </removal>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[3]:sequence[2]:assign[1]</location>
+                              </assign>
+                              <call-process>
+                                <process-name>:AutoPilot-OA-Task_Management:Create WorkInfo</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>task platform</from>
+                                    <to>configuration name</to>
+                                  </input>
+                                  <input>
+                                    <from>workinfo tasks</from>
+                                    <to>tasks</to>
+                                  </input>
+                                  <output>
+                                    <from>success status</from>
+                                    <to>success status</to>
+                                  </output>
+                                  <output>
+                                    <from>status message</from>
+                                    <to>status message</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[3]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[3]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>remedyforce enabled</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.)="true"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Check Ticket ID Existence</process-name>
+                    <parameters>
+                      <input>
+                        <from>remedyforce platform</from>
+                        <to>change platform</to>
+                      </input>
+                      <input>
+                        <from>remedyforce platform</from>
+                        <to>task platform</to>
+                      </input>
+                      <input>
+                        <from>change ID</from>
+                        <to>change ID</to>
+                      </input>
+                      <input>
+                        <from>task ID</from>
+                        <to>task ID</to>
+                      </input>
+                      <output>
+                        <from>success status</from>
+                        <to>success status</to>
+                      </output>
+                      <output>
+                        <from>status message</from>
+                        <to>status message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>success status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(.)='success']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Task_Management:Searches:Get Task by Task ID</process-name>
+                          <parameters>
+                            <input>
+                              <from>remedyforce platform</from>
+                              <to>configuration name</to>
+                            </input>
+                            <input>
+                              <from>task ID</from>
+                              <to>task id</to>
+                            </input>
+                            <output>
+                              <from>tasks</from>
+                              <to>retrieved tasks</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                          </after-execution>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case applies-if-any-condition-true="false">
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>success status</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string(.)='success']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>CI details</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string-length(.)]]></xpath>
+                              </xpath-expression>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[number(.) > 0.0]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <for-each>
+                                <document>
+                                  <input>
+                                    <from>CI details</from>
+                                  </input>
+                                </document>
+                                <result>
+                                  <output>
+                                    <to>configuration item</to>
+                                  </output>
+                                </result>
+                                <xpath-expression>
+                                  <xpath-replacement-tokens />
+                                  <xpath><![CDATA[//Configuration-Items/*]]></xpath>
+                                </xpath-expression>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>true</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <sequence>
+                                  <assign>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>configuration item</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>CI name</to>
+                                        </output>
+                                      </result>
+                                      <xpath-expression>
+                                        <xpath-replacement-tokens />
+                                        <xpath><![CDATA[//name/text()]]></xpath>
+                                      </xpath-expression>
+                                    </assignment>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>relationship tasks</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>relationship tasks</to>
+                                        </output>
+                                      </result>
+                                      <xslt-stylesheet>
+                                        <stylesheet-replacement-tokens>
+                                          <replacement-token name="CI name">
+                                            <input global="false">
+                                              <from>CI name</from>
+                                            </input>
+                                          </replacement-token>
+                                          <replacement-token name="task ID">
+                                            <input global="false">
+                                              <from>task ID</from>
+                                            </input>
+                                          </replacement-token>
+                                        </stylesheet-replacement-tokens>
+                                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:copy-of select="./node()/*" />
+      <Task>
+        <task-id>${task ID}</task-id>
+        <instance-name>${CI name}</instance-name>
+      </Task>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                      </xslt-stylesheet>
+                                    </assignment>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                                  </assign>
+                                </sequence>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:for-each[1]</location>
+                              </for-each>
+                              <call-process>
+                                <process-name>:AutoPilot-OA-Task_Management:Create Task Relationships</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>remedyforce platform</from>
+                                    <to>configuration name</to>
+                                  </input>
+                                  <input>
+                                    <from>relationship tasks</from>
+                                    <to>tasks</to>
+                                  </input>
+                                  <output>
+                                    <from>tasks</from>
+                                    <to>tasks</to>
+                                  </output>
+                                  <output>
+                                    <from>failed tasks</from>
+                                    <to>failed tasks</to>
+                                  </output>
+                                  <output>
+                                    <from>success count</from>
+                                    <to>success count</to>
+                                  </output>
+                                  <output>
+                                    <from>failure count</from>
+                                    <to>failure count</to>
+                                  </output>
+                                  <output>
+                                    <from>success status</from>
+                                    <to>success status</to>
+                                  </output>
+                                  <output>
+                                    <from>status message</from>
+                                    <to>status message</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                        <assign>
+                          <assignment>
+                            <input>
+                              <from>task ID</from>
+                            </input>
+                            <output>
+                              <to>task</to>
+                              <concept type="AutoPilot-OA-Task_Management:Task">
+                                <attribute>task-id</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>retrieved tasks</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task notes</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//notes/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>targets</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>task</to>
+                                <concept type="AutoPilot-OA-Task_Management:Task">
+                                  <attribute>notes</attribute>
+                                </concept>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="notes">
+                                  <input global="false">
+                                    <from>task notes</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      ${notes}
+      <xsl:if test="string-length(.)&gt;0">
+        <xsl:text disable-output-escaping="no">
+----------------------------------------------------------------------------------------------------------
+</xsl:text>
+        <xsl:text disable-output-escaping="no">List of targets not mapped to CMDB:
+
+</xsl:text>
+        <xsl:call-template name="tokenize">
+          <xsl:with-param name="targets" select="." />
+        </xsl:call-template>
+      </xsl:if>
+    </value>
+  </xsl:template>
+  <xsl:template name="tokenize">
+    <xsl:param name="targets" />
+    <xsl:choose>
+      <xsl:when test="contains($targets, ',')">
+        <xsl:value-of select="substring-before($targets, ',')" disable-output-escaping="no" />
+        <xsl:text disable-output-escaping="no">
+</xsl:text>
+        <xsl:call-template name="tokenize">
+          <xsl:with-param name="targets" select="substring-after($targets, ',')" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$targets" disable-output-escaping="no" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>task</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>tasks</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="task">
+                                  <input global="false">
+                                    <from>task</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//Task) &gt; 0">
+          <xsl:copy-of select="//Task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <removal>
+                            <input>
+                              <from>task</from>
+                            </input>
+                          </removal>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Task_Management:Update Tasks</process-name>
+                          <parameters>
+                            <input>
+                              <from>remedyforce platform</from>
+                              <to>configuration name</to>
+                            </input>
+                            <input>
+                              <from>tasks</from>
+                              <to>tasks</to>
+                            </input>
+                            <output>
+                              <from>success status</from>
+                              <to>success status</to>
+                            </output>
+                            <output>
+                              <from>status message</from>
+                              <to>status message</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                          </after-execution>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>success status</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string(.) = 'success']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <assign>
+                                <assignment>
+                                  <input>
+                                    <from>task ID</from>
+                                  </input>
+                                  <output>
+                                    <to>task</to>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>task-id</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>task</to>
+                                    <value>Job parameters</value>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>description</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>job ID</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>task</to>
+                                      <concept type="AutoPilot-OA-Task_Management:Task">
+                                        <attribute>notes</attribute>
+                                      </concept>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens>
+                                      <replacement-token name="ID">
+                                        <input global="false">
+                                          <from>job ID</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="name">
+                                        <input global="false">
+                                          <from>job name</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="type">
+                                        <input global="false">
+                                          <from>job type</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="desc">
+                                        <input global="false">
+                                          <from>job description</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="schedule time">
+                                        <input global="false">
+                                          <from>schedule time</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="schedule ID">
+                                        <input global="false">
+                                          <from>schedule ID</from>
+                                        </input>
+                                      </replacement-token>
+                                    </stylesheet-replacement-tokens>
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">Job ID: ${ID}
+Job Name: ${name}
+Job Type: ${type}
+Job Description: ${desc}
+Schedule ID: ${schedule ID}
+Schedule Time: ${schedule time}</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>task</to>
+                                    <value>Notes</value>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>work-info-type</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>task</to>
+                                    <value>false</value>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>inactive</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>task</to>
+                                    <value>false</value>
+                                    <concept type="AutoPilot-OA-Task_Management:Task">
+                                      <attribute>system</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>task</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>workinfo tasks</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens>
+                                      <replacement-token name="task">
+                                        <input global="false">
+                                          <from>task</from>
+                                        </input>
+                                      </replacement-token>
+                                    </stylesheet-replacement-tokens>
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//task) &gt; 0">
+          <xsl:copy-of select="//task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <removal>
+                                  <input>
+                                    <from>task</from>
+                                  </input>
+                                </removal>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:assign[1]</location>
+                              </assign>
+                              <call-process>
+                                <process-name>:AutoPilot-OA-Task_Management:Create WorkInfo</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>remedyforce platform</from>
+                                    <to>configuration name</to>
+                                  </input>
+                                  <input>
+                                    <from>workinfo tasks</from>
+                                    <to>tasks</to>
+                                  </input>
+                                  <output>
+                                    <from>success status</from>
+                                    <to>success status</to>
+                                  </output>
+                                  <output>
+                                    <from>status message</from>
+                                    <to>status message</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>change platform</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.)='ServiceNow']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Check Ticket ID Existence</process-name>
+                    <parameters>
+                      <input>
+                        <from>change platform</from>
+                        <to>change platform</to>
+                      </input>
+                      <input>
+                        <from>task platform</from>
+                        <to>task platform</to>
+                      </input>
+                      <input>
+                        <from>change ID</from>
+                        <to>change ID</to>
+                      </input>
+                      <input>
+                        <from>task ID</from>
+                        <to>task ID</to>
+                      </input>
+                      <output>
+                        <from>success status</from>
+                        <to>success status</to>
+                      </output>
+                      <output>
+                        <from>status message</from>
+                        <to>status message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>success status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(.)='success']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>CI details</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string-length(.)]]></xpath>
+                              </xpath-expression>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[number(.) > 0.0]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <call-process>
+                                <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Associate CIs</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>task platform</from>
+                                    <to>task platform</to>
+                                  </input>
+                                  <input>
+                                    <from>change ID</from>
+                                    <to>task to associate</to>
+                                  </input>
+                                  <input>
+                                    <from>bl server class name</from>
+                                    <to>configuration server class name</to>
+                                  </input>
+                                  <input>
+                                    <from>CI details</from>
+                                    <to>CI list</to>
+                                  </input>
+                                  <output>
+                                    <from>success status</from>
+                                    <to>CI association success status</to>
+                                  </output>
+                                  <output>
+                                    <from>status message</from>
+                                    <to>CI association status message</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>success status</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string(.)='success']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <call-process>
+                                <process-name>:AutoPilot-OA-Task_Management:Searches:Get Task by Task ID</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>change platform</from>
+                                    <to>configuration name</to>
+                                  </input>
+                                  <input>
+                                    <from>task ID</from>
+                                    <to>task id</to>
+                                  </input>
+                                  <output>
+                                    <from>tasks</from>
+                                    <to>change tasks</to>
+                                  </output>
+                                  <output>
+                                    <from>success status</from>
+                                    <to>success status</to>
+                                  </output>
+                                  <output>
+                                    <from>status message</from>
+                                    <to>status message</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[2]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[2]</location>
+                        </switch>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>success status</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string(.)='success']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <for-each>
+                                <document>
+                                  <input>
+                                    <from>change tasks</from>
+                                  </input>
+                                </document>
+                                <result>
+                                  <output>
+                                    <to>single task</to>
+                                  </output>
+                                </result>
+                                <xpath-expression>
+                                  <xpath-replacement-tokens />
+                                  <xpath><![CDATA[//Task]]></xpath>
+                                </xpath-expression>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>true</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <sequence>
+                                  <call-process>
+                                    <process-name>:AutoPilot-OA-Task_Management:Searches:Get Task by Task ID</process-name>
+                                    <parameters>
+                                      <input>
+                                        <from>task platform</from>
+                                        <to>configuration name</to>
+                                      </input>
+                                      <input>
+                                        <from>single task</from>
+                                        <to>task id</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[string(//task-id)]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <output>
+                                        <from>tasks</from>
+                                        <to>retrieved tasks</to>
+                                      </output>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <after-execution>
+                                      <console-output>
+                                        <type>INFO</type>
+                                        <summary>
+                                          <concat>
+                                            <input>
+                                              <value></value>
+                                            </input>
+                                          </concat>
+                                        </summary>
+                                        <detail>
+                                          <concat>
+                                            <input>
+                                              <value></value>
+                                            </input>
+                                          </concat>
+                                        </detail>
+                                      </console-output>
+                                    </after-execution>
+                                    <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[3]:sequence[2]:call-process[1]</location>
+                                  </call-process>
+                                  <assign>
+                                    <assignment>
+                                      <input>
+                                        <from>task ID</from>
+                                      </input>
+                                      <output>
+                                        <to>task</to>
+                                        <concept type="AutoPilot-OA-Task_Management:Task">
+                                          <attribute>task-id</attribute>
+                                        </concept>
+                                      </output>
+                                    </assignment>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>targets</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>task</to>
+                                          <concept type="AutoPilot-OA-Task_Management:Task">
+                                            <attribute>notes</attribute>
+                                          </concept>
+                                        </output>
+                                      </result>
+                                      <xslt-stylesheet>
+                                        <stylesheet-replacement-tokens />
+                                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="string-length(.)&gt;0">
+        <xsl:text disable-output-escaping="no">
+----------------------------------------------------------------------------------------------------------
+</xsl:text>
+        <xsl:text disable-output-escaping="no">List of targets not mapped to CMDB:
+
+</xsl:text>
+        <xsl:call-template name="tokenize">
+          <xsl:with-param name="targets" select="." />
+        </xsl:call-template>
+      </xsl:if>
+    </value>
+  </xsl:template>
+  <xsl:template name="tokenize">
+    <xsl:param name="targets" />
+    <xsl:choose>
+      <xsl:when test="contains($targets, ',')">
+        <xsl:value-of select="substring-before($targets, ',')" disable-output-escaping="no" />
+        <xsl:text disable-output-escaping="no">
+</xsl:text>
+        <xsl:call-template name="tokenize">
+          <xsl:with-param name="targets" select="substring-after($targets, ',')" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$targets" disable-output-escaping="no" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                      </xslt-stylesheet>
+                                    </assignment>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>task</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>tasks</to>
+                                        </output>
+                                      </result>
+                                      <xslt-stylesheet>
+                                        <stylesheet-replacement-tokens />
+                                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:copy-of select="*" />
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                      </xslt-stylesheet>
+                                    </assignment>
+                                    <removal>
+                                      <input>
+                                        <from>task</from>
+                                      </input>
+                                    </removal>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <before-execution>
+                                      <log>
+                                        <level>debug</level>
+                                        <parameters>
+                                          <input>
+                                            <from>retrieved tasks</from>
+                                          </input>
+                                        </parameters>
+                                      </log>
+                                    </before-execution>
+                                    <after-execution>
+                                      <log>
+                                        <level>debug</level>
+                                        <parameters>
+                                          <input>
+                                            <from>task</from>
+                                          </input>
+                                        </parameters>
+                                      </log>
+                                    </after-execution>
+                                    <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[3]:sequence[2]:assign[1]</location>
+                                  </assign>
+                                  <call-process>
+                                    <process-name>:AutoPilot-OA-Task_Management:Update Tasks</process-name>
+                                    <parameters>
+                                      <input>
+                                        <from>task platform</from>
+                                        <to>configuration name</to>
+                                      </input>
+                                      <input>
+                                        <from>tasks</from>
+                                        <to>tasks</to>
+                                      </input>
+                                      <output>
+                                        <from>success status</from>
+                                        <to>success status</to>
+                                      </output>
+                                      <output>
+                                        <from>status message</from>
+                                        <to>status message</to>
+                                      </output>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <after-execution>
+                                      <console-output>
+                                        <type>INFO</type>
+                                        <summary>
+                                          <concat>
+                                            <input>
+                                              <value></value>
+                                            </input>
+                                          </concat>
+                                        </summary>
+                                        <detail>
+                                          <concat>
+                                            <input>
+                                              <value></value>
+                                            </input>
+                                          </concat>
+                                        </detail>
+                                      </console-output>
+                                    </after-execution>
+                                    <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[3]:sequence[2]:call-process[2]</location>
+                                  </call-process>
+                                  <switch>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>true</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                                    <default>
+                                      <sequence />
+                                    </default>
+                                    <case>
+                                      <condition>
+                                        <document>
+                                          <input>
+                                            <from>success status</from>
+                                          </input>
+                                        </document>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[string(.) = 'success']]></xpath>
+                                        </xpath-expression>
+                                      </condition>
+                                      <sequence>
+                                        <console-output>
+                                          <type>INFO</type>
+                                          <summary>
+                                            <concat>
+                                              <input>
+                                                <value></value>
+                                              </input>
+                                            </concat>
+                                          </summary>
+                                          <detail>
+                                            <concat>
+                                              <input>
+                                                <value></value>
+                                              </input>
+                                            </concat>
+                                          </detail>
+                                        </console-output>
+                                        <assign>
+                                          <assignment>
+                                            <input>
+                                              <from>task ID</from>
+                                            </input>
+                                            <output>
+                                              <to>task</to>
+                                              <concept type="AutoPilot-OA-Task_Management:Task">
+                                                <attribute>task-id</attribute>
+                                              </concept>
+                                            </output>
+                                          </assignment>
+                                          <assignment>
+                                            <output>
+                                              <to>task</to>
+                                              <value>Job parameters</value>
+                                              <concept type="AutoPilot-OA-Task_Management:Task">
+                                                <attribute>summary</attribute>
+                                              </concept>
+                                            </output>
+                                          </assignment>
+                                          <assignment>
+                                            <document>
+                                              <input>
+                                                <from>job ID</from>
+                                              </input>
+                                            </document>
+                                            <result>
+                                              <output>
+                                                <to>task</to>
+                                                <concept type="AutoPilot-OA-Task_Management:Task">
+                                                  <attribute>notes</attribute>
+                                                </concept>
+                                              </output>
+                                            </result>
+                                            <xslt-stylesheet>
+                                              <stylesheet-replacement-tokens>
+                                                <replacement-token name="ID">
+                                                  <input global="false">
+                                                    <from>job ID</from>
+                                                  </input>
+                                                </replacement-token>
+                                                <replacement-token name="name">
+                                                  <input global="false">
+                                                    <from>job name</from>
+                                                  </input>
+                                                </replacement-token>
+                                                <replacement-token name="type">
+                                                  <input global="false">
+                                                    <from>job type</from>
+                                                  </input>
+                                                </replacement-token>
+                                                <replacement-token name="desc">
+                                                  <input global="false">
+                                                    <from>job description</from>
+                                                  </input>
+                                                </replacement-token>
+                                                <replacement-token name="schedule time">
+                                                  <input global="false">
+                                                    <from>schedule time</from>
+                                                  </input>
+                                                </replacement-token>
+                                                <replacement-token name="schedule ID">
+                                                  <input global="false">
+                                                    <from>schedule ID</from>
+                                                  </input>
+                                                </replacement-token>
+                                              </stylesheet-replacement-tokens>
+                                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">Job ID: ${ID}
+Job Name: ${name}
+Job Type: ${type}
+Job Description: ${desc}
+Schedule ID: ${schedule ID}
+Schedule Time: ${schedule time}</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                            </xslt-stylesheet>
+                                          </assignment>
+                                          <assignment>
+                                            <document>
+                                              <input>
+                                                <from>task</from>
+                                              </input>
+                                            </document>
+                                            <result>
+                                              <output>
+                                                <to>workinfo tasks</to>
+                                              </output>
+                                            </result>
+                                            <xslt-stylesheet>
+                                              <stylesheet-replacement-tokens>
+                                                <replacement-token name="task">
+                                                  <input global="false">
+                                                    <from>task</from>
+                                                  </input>
+                                                </replacement-token>
+                                              </stylesheet-replacement-tokens>
+                                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//task) &gt; 0">
+          <xsl:copy-of select="//task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                            </xslt-stylesheet>
+                                          </assignment>
+                                          <assignment>
+                                            <input>
+                                              <from>change ID</from>
+                                            </input>
+                                            <output>
+                                              <to>task</to>
+                                              <concept type="AutoPilot-OA-Task_Management:Task">
+                                                <attribute>parent</attribute>
+                                              </concept>
+                                            </output>
+                                          </assignment>
+                                          <removal>
+                                            <input>
+                                              <from>task</from>
+                                            </input>
+                                          </removal>
+                                          <meta>
+                                            <documentation />
+                                            <checkpoint>false</checkpoint>
+                                          </meta>
+                                          <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[3]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                                        </assign>
+                                        <call-process>
+                                          <process-name>:AutoPilot-OA-Task_Management:Update Tasks</process-name>
+                                          <parameters>
+                                            <input>
+                                              <from>task platform</from>
+                                              <to>configuration name</to>
+                                            </input>
+                                            <input>
+                                              <from>workinfo tasks</from>
+                                              <to>tasks</to>
+                                            </input>
+                                            <output>
+                                              <from>success status</from>
+                                              <to>success status</to>
+                                            </output>
+                                            <output>
+                                              <from>status message</from>
+                                              <to>status message</to>
+                                            </output>
+                                          </parameters>
+                                          <meta>
+                                            <documentation />
+                                            <run-mode-handling>
+                                              <run-mode>OCP</run-mode>
+                                              <allow-step-into>false</allow-step-into>
+                                            </run-mode-handling>
+                                            <checkpoint>false</checkpoint>
+                                          </meta>
+                                          <after-execution>
+                                            <console-output>
+                                              <type>INFO</type>
+                                              <summary>
+                                                <concat>
+                                                  <input>
+                                                    <value></value>
+                                                  </input>
+                                                </concat>
+                                              </summary>
+                                              <detail>
+                                                <concat>
+                                                  <input>
+                                                    <value></value>
+                                                  </input>
+                                                </concat>
+                                              </detail>
+                                            </console-output>
+                                          </after-execution>
+                                          <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[3]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                                        </call-process>
+                                      </sequence>
+                                    </case>
+                                    <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[3]:sequence[2]:switch[1]</location>
+                                  </switch>
+                                </sequence>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[3]:sequence[2]:for-each[1]</location>
+                              </for-each>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[3]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>CI association success status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="CI assoc status message">
+                      <input global="false">
+                        <from>CI association status message</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="success status">
+                      <input global="false">
+                        <from>success status</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="status message">
+                      <input global="false">
+                        <from>status message</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(.)='failure'">
+          <xsl:text disable-output-escaping="no">CI Association error: ${CI assoc status message}
+</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="'${success status}'='success'">
+              <xsl:text disable-output-escaping="no">ITSM ticket updated successfully</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no">${status message}</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>success status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>success status</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(.)!='success' and string(.)!='failure'">
+          <xsl:choose>
+            <xsl:when test="string(.)='true'">
+              <xsl:text disable-output-escaping="no">0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no">1</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="string(.)='success'">
+              <xsl:text disable-output-escaping="no">0</xsl:text>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no">1</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[2]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>change ID</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[starts-with(., "AO")]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:BladeLogic-SA-ITSM_Integration:Utilities:Extract Configuration Data</process-name>
+              <parameters>
+                <input>
+                  <value>BLADELOGIC</value>
+                  <to>configuration name</to>
+                </input>
+                <output>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </output>
+                <output>
+                  <from>date format</from>
+                  <to>date format</to>
+                </output>
+                <output>
+                  <from>bl task closed reason mappings</from>
+                  <to>bl task closed reason mappings</to>
+                </output>
+                <output>
+                  <from>change platform</from>
+                  <to>change platform</to>
+                </output>
+                <output>
+                  <from>task platform</from>
+                  <to>task platform</to>
+                </output>
+                <output>
+                  <from>authentication platform</from>
+                  <to>authentication platform</to>
+                </output>
+                <output>
+                  <from>configuration platform</from>
+                  <to>configuration platform</to>
+                </output>
+                <output>
+                  <from>bl server class name</from>
+                  <to>bl server class name</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:Service-SA-Provisioning:Task_Processing:Common:Process Locally Stored Change Tasks</process-name>
+              <parameters>
+                <input>
+                  <from>job ID</from>
+                  <to>job id</to>
+                </input>
+                <input>
+                  <from>job name</from>
+                  <to>job name</to>
+                </input>
+                <input>
+                  <from>job description</from>
+                  <to>job description</to>
+                </input>
+                <input>
+                  <from>job type</from>
+                  <to>job type</to>
+                </input>
+                <input>
+                  <from>schedule ID</from>
+                  <to>schedule id</to>
+                </input>
+                <input>
+                  <from>schedule time</from>
+                  <to>start time</to>
+                </input>
+                <input>
+                  <from>change ID</from>
+                  <to>change id</to>
+                </input>
+                <input>
+                  <from>task ID</from>
+                  <to>task id</to>
+                </input>
+                <input>
+                  <from>targets</from>
+                  <to>targets</to>
+                </input>
+                <input>
+                  <from>CI details</from>
+                  <to>ci details</to>
+                </input>
+                <input>
+                  <from>BL user ID</from>
+                  <to>bl user id</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>change ID</from>
+                  <to>change ID</to>
+                </output>
+                <output>
+                  <from>task ID</from>
+                  <to>task ID</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Updates the Task ticket with job end result related information and closes or cancels the ticket based on whether the job was successfully completed / Aborted / Cancelled /deleted /Scheduled expired.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>fa0338d8-40f2-3cea-a859-d88ed7746994</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1421823190746</last-modified>
+    </meta>
+  </process-def>
+</process>

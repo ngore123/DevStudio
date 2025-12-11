@@ -1,0 +1,771 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration:ITSM_Integration:Close Change">
+    <parameters>
+      <input global="false" required="true">
+        <from>change</from>
+        <to>change</to>
+      </input>
+      <input global="false" required="true">
+        <from>flags</from>
+        <to>flags</to>
+      </input>
+      <input global="false" required="true">
+        <from>itsm type</from>
+        <to>itsm type</to>
+      </input>
+      <input global="false" required="true">
+        <from>all configurations</from>
+        <to>all configurations</to>
+      </input>
+      <input global="false" required="true">
+        <from>authentication token</from>
+        <to>authentication token</to>
+      </input>
+      <input global="false" required="false">
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>flags</to>
+        <from>flags</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>========Update Task and Change Input=======</value>
+              </input>
+              <input>
+                <from>change</from>
+              </input>
+              <input>
+                <from>flags</from>
+              </input>
+              <input>
+                <from>itsm type</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//Adapters/RESTAdapter/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>server url</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//BMC_AR_System/WebServiceConnectionData/URL/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>create change interface</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//BMC_AR_System/WebServiceConnectionData/Change_CreateInterface/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>create change soap action</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//BMC_AR_System/WebServiceConnectionData/Change_CreateSOAPAction/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>user name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//BMC_AR_System/WebServiceConnectionData/UserName/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>password</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//BMC_AR_System/WebServiceConnectionData/Password/*[name() = 'EncryptedData'])">
+        <xsl:copy-of select="//BMC_AR_System/WebServiceConnectionData/Password/*[name() = 'EncryptedData']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <value>
+          <xsl:value-of select="//BMC_AR_System/WebServiceConnectionData/Password/text()" disable-output-escaping="no" />
+        </value>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>task workinfo</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>task status</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>change</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>change id</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//change-id/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>UserName=====Password</value>
+              </input>
+              <input>
+                <from>user name</from>
+              </input>
+              <input>
+                <from>change id</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>change update status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>change update message</to>
+                  <value>Change was not created</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>change</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>flags</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>verification status</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//status/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>verification status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task status</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">Completed</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>verification status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task status reason</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=". = 'success'">
+          <xsl:text disable-output-escaping="no">Success</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">Failed</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>verification status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task workinfo</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=". = 'success'">
+          <xsl:text disable-output-escaping="no">Service verification successful</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">Remediation failed because post-remediation verification failed</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>workinfo details</to>
+                  <value>Remediation complete!</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>change</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//change-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>change</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//task-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>-------------------change value--------------------</value>
+                    </input>
+                    <input>
+                      <from>change</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>-------------------task details-------------</value>
+                    </input>
+                    <input>
+                      <from>task status</from>
+                    </input>
+                    <input>
+                      <from>task workinfo</from>
+                    </input>
+                    <input>
+                      <from>change id</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Event_Orchestration:ITSM:Task_Management:Update Task Status</process-name>
+              <unique-id>1a476a01-a5d3-4877-9ddd-7e1849b3895e</unique-id>
+              <parameters>
+                <input>
+                  <from>itsm type</from>
+                  <to>itsm type</to>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>all configurations</to>
+                </input>
+                <input>
+                  <from>event source type</from>
+                  <to>event source type</to>
+                </input>
+                <input>
+                  <from>change id</from>
+                  <to>change id</to>
+                </input>
+                <input>
+                  <from>task id</from>
+                  <to>task id</to>
+                </input>
+                <input>
+                  <from>task status</from>
+                  <to>task status</to>
+                </input>
+                <input>
+                  <from>task status reason</from>
+                  <to>status reason</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>task update status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>task update error message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>task update status</from>
+                </input>
+                <output>
+                  <to>change update status</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>flags</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>flags</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="update status">
+                      <input global="false">
+                        <from>change update status</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="flags">
+    <flags>
+      <xsl:choose>
+        <xsl:when test="'${update status}' = 'success'">
+          <task-updated>
+            <xsl:text disable-output-escaping="no">true</xsl:text>
+          </task-updated>
+          <change-updated>
+            <xsl:text disable-output-escaping="no">true</xsl:text>
+          </change-updated>
+        </xsl:when>
+        <xsl:otherwise>
+          <task-updated>
+            <xsl:text disable-output-escaping="no">false</xsl:text>
+          </task-updated>
+          <change-updated>
+            <xsl:text disable-output-escaping="no">false</xsl:text>
+          </change-updated>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:apply-templates select="@*|node()" />
+    </flags>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>task update error message</from>
+                </input>
+                <output>
+                  <to>change update message</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>=====close change process output (Using OA)===</value>
+                    </input>
+                    <input>
+                      <from>task update status</from>
+                    </input>
+                    <input>
+                      <from>task update error message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>flags</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>flags</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="change update status">
+                <input global="false">
+                  <from>change update status</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootNode" select="name(/*)" />
+  <xsl:template match="@*|node()">
+    <xsl:apply-templates select="@*|node()" />
+  </xsl:template>
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+      <xsl:if test="name() = $rootNode">
+        <change-update-status>${change update status}</change-update-status>
+      </xsl:if>
+    </xsl:copy>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>change update status</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=". = 'success'">
+          <xsl:text disable-output-escaping="no">success</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>change update status</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error message</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="change update message">
+                <input global="false">
+                  <from>change update message</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test=". = 'failure' and string-length(normalize-space('${change update message}')) &gt; 0">
+        <xsl:value-of select="concat('Change status update error message: ', '${change update message}')" disable-output-escaping="no" />
+        <xsl:text></xsl:text>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[3]</location>
+      </assign>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==========Close Change Output========</value>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[4]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This a process template. It has a few basic things.
+1. Log Input
+2. Log Output
+3. Atleast 2 basic output parameters - status and error message.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>46fc8ccd-8e07-4ac3-a5df-58439d88665d</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration.</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1575597132099</last-modified>
+    </meta>
+  </process-def>
+</process>

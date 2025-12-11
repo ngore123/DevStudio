@@ -1,0 +1,194 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:Persistence:Purge Entries from DB">
+    <parameters />
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Status</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status_completed</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='Completed']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Status</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status_noRetry</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='NoRetry']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:INCOMINGMESSAGES:Columns</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status_column</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='STATUS']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input required="false">
+                <from>status_column</from>
+              </input>
+              <input>
+                <value> IN ('</value>
+              </input>
+              <input required="false">
+                <from>status_noRetry</from>
+              </input>
+              <input>
+                <value>','</value>
+              </input>
+              <input required="false">
+                <from>status_completed</from>
+              </input>
+              <input>
+                <value>')</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>whereCondition</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:Purge entries from db:whereCondition=&gt;</value>
+              </input>
+              <input>
+                <from>whereCondition</from>
+              </input>
+              <input>
+                <from>status_noRetry</from>
+              </input>
+              <input>
+                <from>status_completed</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:SQL:Delete</process-name>
+        <parameters>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Default_SQL_Actor_Adapter</configuration>
+            <to>adapter name</to>
+          </input>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:INCOMINGMESSAGES:Name</configuration>
+            <to>table</to>
+          </input>
+          <input>
+            <from>whereCondition</from>
+            <to>where</to>
+          </input>
+          <input>
+            <value></value>
+            <to>user name</to>
+          </input>
+          <input>
+            <value></value>
+            <to>password</to>
+          </input>
+          <input>
+            <value></value>
+            <to>driver</to>
+          </input>
+          <input>
+            <value></value>
+            <to>url</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:Purge entries from db=&gt; </value>
+              </input>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5a8dcbae-47fa-479f-8b2c-61c7c00f63d5</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1467707123781</last-modified>
+    </meta>
+  </process-def>
+</process>

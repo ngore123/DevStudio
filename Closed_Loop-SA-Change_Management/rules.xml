@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process>
+   <process-def name=":Closed_Loop-SA-Change_Management:rules">
+      <sequence>
+         <switch>
+            <meta>
+               <peer-location>
+                  <location>any</location>
+               </peer-location>
+            </meta>
+            <execute-all-applicable-cases>true</execute-all-applicable-cases>
+            <case name="BCAN SNMP Receive Trap" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[//enterprise/text()='.1.3.6.1.4.1.17192']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[//enterprise/text()]]></from>
+                     <fromKey><![CDATA[2382]]></fromKey>
+                     <to><![CDATA['.1.3.6.1.4.1.17192']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>Closed_Loop-SA-Change_Management</group>
+                     <name-prefix>BCAN SNMP Receive Trap</name-prefix>
+                     <process-name>:Closed_Loop-SA-Change_Management:Utilities:Exception Detected</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+            <case name="BMC AR System Alert" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[contains(//form-name, "CHG:Infrastructure Change") and contains(//text, "BMC Network Automation")='true']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[contains(//form-name, "CHG:Infrastructure Change") and contains(//text, "BMC Network Automation")]]></from>
+                     <fromKey><![CDATA[2114]]></fromKey>
+                     <to><![CDATA['true']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>Closed_Loop-SA-Change_Management</group>
+                     <name-prefix>BMC AR System Alert</name-prefix>
+                     <process-name>:Closed_Loop-SA-Change_Management:Utilities:Notify Change Status Update</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+         </switch>
+      </sequence>
+      <meta>
+         <peer-location>
+            <location>any</location>
+         </peer-location>
+      </meta>
+      <parameters>
+         <input>
+            <from>inputevent</from>
+            <to>inputevent</to>
+         </input>
+      </parameters>
+   </process-def>
+</process>
+

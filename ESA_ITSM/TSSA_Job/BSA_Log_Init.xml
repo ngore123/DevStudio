@@ -1,0 +1,213 @@
+<process draft="false" dev-studio-version="20.02.02">
+  <process-def name=":ESA_ITSM:TSSA_Job:BSA_Log_Init">
+    <parameters>
+      <input global="false" required="false">
+        <from>Job_Name</from>
+        <to>Job_Name</to>
+      </input>
+      <input global="false" required="false">
+        <from>Job_Group</from>
+        <to>Job_Group</to>
+      </input>
+      <output global="false" required="false">
+        <to>JobRunID</to>
+        <from>JobRunID</from>
+      </output>
+      <output global="false" required="true">
+        <to>lg_JobRunID</to>
+        <from>lg_JobRunID</from>
+      </output>
+      <output global="false" required="false">
+        <to>Connection_BBSA</to>
+        <from>Connection_BBSA</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>lg_JobRunID</to>
+            <value>0</value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>Job_Group</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>Job_Group_lg</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[string-length(.)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>Job_Name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>Job_Name_lg</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[string-length(.)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>Job_Group_lg</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>Job_Name_lg</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:ESA_ITSM:TSSA_Job:BSA_Set_Environment</process-name>
+              <unique-id>2a5f2668-27b2-4c4c-bfe2-53275463dc6a</unique-id>
+              <parameters>
+                <output>
+                  <from>Connection_BBSA</from>
+                  <to>Connection_BBSA</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:ESA_ITSM:TSSA_Job:BSA_Get_JobRunID</process-name>
+              <parameters>
+                <input>
+                  <from>Connection_BBSA</from>
+                  <to>Connection_Details</to>
+                </input>
+                <input>
+                  <from>Job_Group</from>
+                  <to>JobGroup</to>
+                </input>
+                <input>
+                  <from>Job_Name</from>
+                  <to>JobName</to>
+                </input>
+                <output>
+                  <from>JobRunID</from>
+                  <to>JobRunID</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>JobRunID</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>lg_JobRunID</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(.)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e2ca164f-5c0a-4041-8751-3565f5ebf36d</process-id>
+      <author>C. Lenz</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1680788749137</last-modified>
+    </meta>
+  </process-def>
+</process>

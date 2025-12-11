@@ -1,0 +1,228 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AO-AD-Microsoft_Exchange:Remove Items">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter used to handle the request.
+
+Default value: MicrosoftExchangeActorAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Command [Required]
+              The name of the command to execute.
+
+Valid values: 
+
+- Commands supported on Exchange versions 2007, 2010, 2013 and 2016
+
+	Remove-TransportRule
+	Remove-Message
+
+</description>
+        <from>command</from>
+        <to>command</to>
+      </input>
+      <input global="false" required="true">
+        <description>parameters [Required]   
+  
+          The Input parameters XML for the command execution. To be provided under the 'parameters' tag with individual parameter as a combination of 'name' and 'value' pair in the following format:
+
+&lt;parameters&gt;
+    &lt;parameter&gt;
+        &lt;name&gt;Name1&lt;/name&gt;
+        &lt;value&gt;Value1&lt;/value&gt;
+    &lt;/parameter&gt;
+    &lt;parameter&gt;
+        &lt;name&gt;Name2&lt;/name&gt;
+        &lt;value&gt;Value2&lt;/value&gt;
+    &lt;/parameter&gt;
+&lt;/parameters&gt;
+
+The parameters may differ according to the Exchange Server version. Please refer to the Microsoft documentation for the list of all supported parameters specific to your version.
+
+</description>
+        <from>input parameters</from>
+        <to>input parameters</to>
+      </input>
+      <input global="false" required="false">
+        <description>format option [Optional]
+           This controls the output format of the command being executed. Valid values for this are - format-list, format-custom, format-table &amp; format-wide</description>
+        <from>format option</from>
+        <to>format option</to>
+      </input>
+      <input global="false" required="false">
+        <description>verbose logging [Optional]
+           In order to get detailed logging statements for the operation being executed in the response, this parameter is needed. Valid values - true, false.</description>
+        <from>verbose logging</from>
+        <to>verbose logging</to>
+      </input>
+      <output global="false" required="false">
+        <description>The adapter response containing the results. </description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:Utilities:Invalid Command Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <from>command</from>
+                  <to>command</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Remove-TransportRule']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:Hub_Transport_Rules:Remove Transport Rule</process-name>
+              <unique-id>84fc8747-b224-37b2-9981-307cbeea38b5</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>command</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='Remove-Message']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-Microsoft_Exchange:v2007:Queue_Management:Remove Message</process-name>
+              <unique-id>2c45ccb4-fd6a-35d7-ad57-4281c57a64a7</unique-id>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>format option</from>
+                  <to>format option</to>
+                </input>
+                <input>
+                  <from>verbose logging</from>
+                  <to>verbose logging</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Create Items
+      Creates items within Amazon EC2.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>40de5626-ad1a-49a6-b006-3a53ed9bbff0</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1455173715580</last-modified>
+    </meta>
+  </process-def>
+</process>

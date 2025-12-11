@@ -1,0 +1,214 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:NSHScript:Add NSHScript Parameter by Group and Name">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Full path to the depot group containing the NSH script.</description>
+        <from>scriptGroup</from>
+        <to>scriptGroup</to>
+      </input>
+      <input global="false" required="true">
+        <description>Display name of the NSH script.</description>
+        <from>scriptName</from>
+        <to>scriptName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the parameter being added.</description>
+        <from>paramName</from>
+        <to>paramName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Description of the added parameter.</description>
+        <from>paramDesc</from>
+        <to>paramDesc</to>
+      </input>
+      <input global="false" required="false">
+        <description>Command argument to be added.</description>
+        <from>commandArg</from>
+        <to>commandArg</to>
+      </input>
+      <input global="false" required="true">
+        <description>Value for the command argument.</description>
+        <from>paramValue</from>
+        <to>paramValue</to>
+      </input>
+      <input global="false" required="true">
+        <description>Number describing the characteristics of the parameter. The possible characteristics each have a value, as follows:
+    - 1 = parameter accepts value
+    - 2 = value must not be empty at run time
+    - 4 = value is editable
+
+For paramValueFlag, add the values representing the properties you want to assign to the parameter. For example, a value of 5 sets the parameter to accept a value and be editable.</description>
+        <from>paramValueFlag</from>
+        <to>paramValueFlag</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the DB Key for the NSH Script.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>scriptGroup</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>scriptName</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>paramName</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>paramDesc</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>commandArg</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>paramValue</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>paramValueFlag</from>
+            <to>argument 7</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>NSHScript</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>addNSHScriptParameterByGroupAndName</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command adds a parameter with a command argument and a value in the default value field to an NSH script.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7f69c941-8110-3954-a471-85d771b9aa70</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179838406</last-modified>
+    </meta>
+  </process-def>
+</process>

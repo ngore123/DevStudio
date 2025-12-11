@@ -1,0 +1,528 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Event_Management:Unsuppress Event">
+    <parameters>
+      <input global="false" required="true">
+        <description>String value - The name of a configuration item defined in a configuration module.
+
+Example: Netcool_OMNIbus, HP_NNM, BMC_Event_Manager
+</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String value - The serial number of the event.
+
+Example: 10333
+
+BMC Event Manager: The Serial number corresponds to the ID of the Event in BEM.</description>
+        <from>serial number</from>
+        <to>serial number</to>
+      </input>
+      <output global="false" required="false">
+        <description>XML output that contains results returned by the adapter request. The contents of the response will vary by adapter.</description>
+        <to>events</to>
+        <from>events</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value - status success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value - verbose status message.</description>
+        <to>success message</to>
+        <from>success message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Event_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>adapter</from>
+            <to>adapter</to>
+          </output>
+          <output>
+            <from>system</from>
+            <to>system</to>
+          </output>
+          <output>
+            <from>concept template</from>
+            <to>concept template</to>
+          </output>
+          <output>
+            <from>field mappings</from>
+            <to>field mappings</to>
+          </output>
+          <output>
+            <from>severity mappings</from>
+            <to>severity mappings</to>
+          </output>
+          <output>
+            <from>log mappings</from>
+            <to>log mappings</to>
+          </output>
+          <output>
+            <from>version</from>
+            <to>version</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>success message</from>
+            <to>success message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>system</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown System ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>system</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='OMNIbus']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>serial number</from>
+                </input>
+                <output>
+                  <to>event</to>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>serial</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>event</to>
+                  <value>Escalated</value>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>escalation-level</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>event</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>events</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="event">
+                      <input global="false">
+                        <from>event</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Events>
+      <xsl:choose>
+        <xsl:when test="string-length(//event) &gt; 0">
+          <xsl:copy-of select="//event" />
+        </xsl:when>
+        <xsl:otherwise>${event}</xsl:otherwise>
+      </xsl:choose>
+    </Events>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Event_Management:Update Events</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>events</from>
+                  <to>events</to>
+                </input>
+                <output>
+                  <from>events</from>
+                  <to>events</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>success message</from>
+                  <to>success message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>system</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='HP NNM']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>event</to>
+                  <value>acknowledgeAlert</value>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>operation</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>event</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>events</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="event">
+                      <input global="false">
+                        <from>event</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Events>
+      <xsl:choose>
+        <xsl:when test="string-length(//event) &gt; 0">
+          <xsl:copy-of select="//event" />
+        </xsl:when>
+        <xsl:otherwise>${event}</xsl:otherwise>
+      </xsl:choose>
+    </Events>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>serial number</from>
+                </input>
+                <output>
+                  <to>event</to>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>serial</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Event_Management:Update Events</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>events</from>
+                  <to>events</to>
+                </input>
+                <output>
+                  <from>events</from>
+                  <to>events</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>success message</from>
+                  <to>success message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>system</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() = "BMC_Event_Manager"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <input>
+                  <from>serial number</from>
+                </input>
+                <output>
+                  <to>event</to>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>event</to>
+                  <value>open</value>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>status</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>event</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>events</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="event">
+                      <input global="false">
+                        <from>event</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Events>
+      <xsl:choose>
+        <xsl:when test="string-length(//event) &gt; 0">
+          <xsl:copy-of select="//event" />
+        </xsl:when>
+        <xsl:otherwise>${event}</xsl:otherwise>
+      </xsl:choose>
+    </Events>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Event_Management:Update Events</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>events</from>
+                  <to>events</to>
+                </input>
+                <output>
+                  <from>events</from>
+                  <to>events</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>success message</from>
+                  <to>success message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow will Unsuppress a particular event.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7c27c361-af77-3655-88d6-ef0c680fb8f0</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1475224063199</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,153 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AO-AD-Amazon_EC2:Utilities:Instance_Operations:Construct Request for Reboot Instances">
+    <parameters>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon EC2. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - 
+http://ec2.amazonaws.com/doc/2009-11-30/AmazonEC2.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon EC2 instances across different regions. Respective values for different regions are as below:
+
+    * http://us-east-1.ec2.amazonaws.com/ — Endpoint located in the US-East (Northern Virginia) Region
+    * http://us-west-1.ec2.amazonaws.com/ — Endpoint located in the US-West (Northern California) Region
+    * http://eu-west-1.ec2.amazonaws.com/ ---Endpoint located in the EU (Ireland) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>signature properties [Optional]
+
+Specify this element for including authentication credentials at request level. 
+
+Sample values that can be specified are:
+
+&lt;signature-properties mode = "key-files"&gt;
+    &lt;private-key-file&gt;&lt;/private-key-file&gt;
+    &lt;certificate-file&gt;&lt;/certificate-file&gt;
+&lt;/signature-properties&gt;
+
+OR
+
+&lt;signature-properties mode = "key-data"&gt;
+    &lt;private-key-data&gt;&lt;/private-key-data&gt;
+    &lt;certificate-data&gt;&lt;/certificate-data&gt;
+&lt;/signature-properties&gt;
+</description>
+        <from>signature properties</from>
+        <to>signature properties</to>
+      </input>
+      <input global="false" required="true">
+        <description>instances set [Mandatory]
+
+One or more instance IDs, in XML structure as below:
+
+&lt;instances-set&gt;
+    &lt;!--Zero or more repetitions:--&gt;
+    &lt;item&gt;
+        &lt;instance-id&gt;&lt;/instance-id&gt;
+    &lt;/item&gt;
+&lt;/instances-set&gt;
+</description>
+        <from>instances set</from>
+        <to>instances set</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>adapter request</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="wsdl location">
+                <input global="false">
+                  <from>wsdl location</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="endpoint address">
+                <input global="false">
+                  <from>endpoint address</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="instances set">
+                <input global="false">
+                  <from>instances set</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="signature properties">
+                <input global="false">
+                  <from>signature properties</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request-data>
+      <amazon-ec2-request>
+        <xsl:if test="string-length('${wsdl location}')&gt;0">
+          <wsdl-location>${wsdl location}</wsdl-location>
+        </xsl:if>
+        <xsl:if test="string-length('${endpoint address}')&gt;0">
+          <endpoint-address>${endpoint address}</endpoint-address>
+        </xsl:if>
+        ${signature properties}
+        <operation-name>
+          <xsl:text disable-output-escaping="no">reboot-instances</xsl:text>
+        </operation-name>
+        <parameters>${instances set}</parameters>
+      </amazon-ec2-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Requests a reboot of one or more instances. This operation is asynchronous; it only queues a request
+to reboot the specified instance(s). The operation will succeed if the instances are valid and belong to
+you. Requests to reboot terminated instances are ignored.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>774ddaf7-23da-30e5-a885-1ecc55506041</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1296730957150</last-modified>
+    </meta>
+  </process-def>
+</process>

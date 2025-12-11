@@ -1,0 +1,220 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":Closed_Loop_Compliance-SA-Servers:Utilities:Configuration_Management:Get Appropriate Configuration Item">
+    <parameters>
+      <input global="false" required="true">
+        <description>If set to true then configuration item is searched using cd machine id else configuration item is searched using ci name.</description>
+        <from>bl atrium integration enabled</from>
+        <to>bl atrium integration enabled</to>
+      </input>
+      <input global="false" required="true">
+        <description>Class name of the CI to be searched.</description>
+        <from>bl server class name</from>
+        <to>bl server class name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Data Set ID of the CI to be searched.</description>
+        <from>dataset id</from>
+        <to>dataset id</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the CI to be searched.</description>
+        <from>ci name</from>
+        <to>ci name</to>
+      </input>
+      <output global="false" required="true">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>configuration items</to>
+        <from>configuration items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:Closed_Loop_Compliance-SA-Servers:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <value>BLADELOGIC</value>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+          <output>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </output>
+          <output>
+            <from>bl atrium integration enabled</from>
+            <to>bl atrium integration enabled</to>
+          </output>
+          <output>
+            <from>bl computer system mappings</from>
+            <to>bl computer system mappings</to>
+          </output>
+          <output>
+            <from>bl computer system mappings v8</from>
+            <to>bl computer system mappings v8</to>
+          </output>
+          <output>
+            <from>bl server class name</from>
+            <to>bl server class name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:Closed_Loop_Compliance_ITSM_Integration:Utilities:Configuration_Management:Extract Configuration Item by Name and Dataset ID</process-name>
+              <parameters>
+                <input>
+                  <from>ci name</from>
+                  <to>name</to>
+                </input>
+                <input>
+                  <from>dataset id</from>
+                  <to>dataset id</to>
+                </input>
+                <output>
+                  <from>configuration items</from>
+                  <to>configuration items</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>bl atrium integration enabled</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:Closed_Loop_Compliance_ITSM_Integration:Utilities:Configuration_Management:Extract Configuration Item by CD Machine ID and Dataset ID</process-name>
+              <parameters>
+                <input>
+                  <from>bl server class name</from>
+                  <to>class name</to>
+                </input>
+                <input>
+                  <from>ci name</from>
+                  <to>cd machine id</to>
+                </input>
+                <input>
+                  <from>dataset id</from>
+                  <to>dataset id</to>
+                </input>
+                <input>
+                  <from>bl computer system mappings</from>
+                  <to>computer system mappings</to>
+                </input>
+                <input>
+                  <from>bl computer system mappings v8</from>
+                  <to>computer system mappings v8</to>
+                </input>
+                <output>
+                  <from>configuration items</from>
+                  <to>configuration items</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Retrieves appropriate configuration item based on whether the BL-Artium Integration is activated or not.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>51973e01-baa8-333e-8f2e-178db44a2318</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1414546496361</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,405 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BMC-SA-SDA_Fulfillment_Cases:Utils:Extract Event Info">
+    <parameters>
+      <input global="false" required="true">
+        <from>inputevent</from>
+        <to>inputevent</to>
+      </input>
+      <input global="false" required="true">
+        <from>delimiter</from>
+        <to>delimiter</to>
+      </input>
+      <output global="false" required="false">
+        <to>user name</to>
+        <from>user name</from>
+      </output>
+      <output global="false" required="false">
+        <to>ticket number</to>
+        <from>ticket number</from>
+      </output>
+      <output global="false" required="false">
+        <to>configuration name</to>
+        <from>configuration name</from>
+      </output>
+      <output global="false" required="false">
+        <to>ticket type</to>
+        <from>ticket type</from>
+      </output>
+      <output global="false" required="false">
+        <to>VD_TIME</to>
+        <from>VD_TIME</from>
+      </output>
+      <output global="false" required="false">
+        <to>VD_FINANCIAL</to>
+        <from>VD_FINANCIAL</from>
+      </output>
+      <output global="false" required="false">
+        <to>emailAddress</to>
+        <from>emailAddress</from>
+      </output>
+      <output global="false" required="false">
+        <to>size extension requested</to>
+        <from>size extension requested</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Common:Tokenize String</process-name>
+        <parameters>
+          <input>
+            <from>inputevent</from>
+            <to>string</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//text/text()]]></xpath>
+            </xpath-expression>
+          </input>
+          <input>
+            <from>delimiter</from>
+            <to>delimiter</to>
+          </input>
+          <output>
+            <from>tokens</from>
+            <to>tokens</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Printing Tokens:</value>
+              </input>
+              <input>
+                <from>tokens</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>user name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <tokens>
+      <xsl:choose>
+        <xsl:when test="//token/text()[contains(.,&quot;User ID&quot;)]">
+          <xsl:copy-of select="//token[contains(.,&quot;User ID&quot;)]" />
+        </xsl:when>
+        <xsl:when test="//token/text()[contains(.,&quot;UserID&quot;)]">
+          <xsl:copy-of select="//token[contains(.,&quot;UserID&quot;)]" />
+        </xsl:when>
+      </xsl:choose>
+    </tokens>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>user name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>user name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//text()]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(.)]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(., "=")]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ticket number</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <tokens>
+      <xsl:choose>
+        <xsl:when test="//token/text()[contains(.,&quot;Task Id&quot;)]">
+          <number>
+            <xsl:value-of select="normalize-space(substring-after(//token/text()[contains(.,&quot;Task Id&quot;)], &quot;=&quot;))" disable-output-escaping="no" />
+          </number>
+        </xsl:when>
+        <xsl:when test="//token/text()[contains(.,&quot;Incident Number&quot;)]">
+          <number>
+            <xsl:value-of select="normalize-space(substring-after(//token/text()[contains(.,&quot;Incident Number&quot;)], &quot;=&quot;))" disable-output-escaping="no" />
+          </number>
+        </xsl:when>
+        <xsl:when test="//token/text()[contains(.,&quot;Work Order Id&quot;)]">
+          <number>
+            <xsl:value-of select="normalize-space(substring-after(//token/text()[contains(.,&quot;Work Order Id&quot;)], &quot;=&quot;))" disable-output-escaping="no" />
+          </number>
+        </xsl:when>
+      </xsl:choose>
+    </tokens>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>configuration name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(substring-after(//token/text()[contains(.,"Configuration Name")], "="))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ticket type</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(substring-after(//token/text()[contains(.,'Ticket Type')], "="))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>VD_TIME</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <token>
+      <xsl:choose>
+        <xsl:when test="//token/text()[contains(.,&quot;VD_TIME&quot;)]">
+          <xsl:copy-of select="//token[contains(.,&quot;VD_TIME&quot;)]" />
+        </xsl:when>
+        <xsl:when test="//token/text()[contains(.,&quot;VD_TIME&quot;)]">
+          <xsl:copy-of select="//token[contains(.,&quot;VD_TIME&quot;)]" />
+        </xsl:when>
+      </xsl:choose>
+    </token>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>VD_TIME</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>VD_TIME</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//text()]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(.)]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(., "=")]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>VD_FINANCIAL</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <token>
+      <xsl:choose>
+        <xsl:when test="//token/text()[contains(.,&quot;VD_FINANCIAL&quot;)]">
+          <xsl:copy-of select="//token[contains(.,&quot;VD_FINANCIAL&quot;)]" />
+        </xsl:when>
+        <xsl:when test="//token/text()[contains(.,&quot;VD_FINANCIAL&quot;)]">
+          <xsl:copy-of select="//token[contains(.,&quot;VD_FINANCIAL&quot;)]" />
+        </xsl:when>
+      </xsl:choose>
+    </token>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>VD_FINANCIAL</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>VD_FINANCIAL</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//text()]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(.)]]></xpath>
+          </xpath-expression>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(., "=")]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>emailAddress</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(substring-after(//token/text()[contains(.,"EmailAddress")], "="))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>size extension requested</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[normalize-space(substring-after(//token/text()[contains(.,"ExtensionSize")], "="))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>user name</from>
+              </input>
+              <input>
+                <from>ticket number</from>
+              </input>
+              <input>
+                <from>ticket type</from>
+              </input>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>40d575f2-9433-4c88-893e-df871c51325f</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1467095143709</last-modified>
+    </meta>
+  </process-def>
+</process>

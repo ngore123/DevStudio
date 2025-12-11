@@ -1,0 +1,92 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-AD-Utilities:Common:Create For Loop XML">
+    <parameters>
+      <input global="false" required="true">
+        <description>A whole number indicating the number of elements the loop should have</description>
+        <from>loopcount</from>
+        <to>loopcount</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document in this format:
+
+&lt;loops&gt;
+  &lt;loop&gt;1&lt;/loop&gt;
+  &lt;loop&gt;2&lt;/loop&gt;
+  (any number of iterations)
+&lt;/loops&gt;</description>
+        <to>loop</to>
+        <from>loop</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>loopcount</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>loop</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template name="loopincrease">
+    <xsl:param name="loopcount" />
+    <xsl:choose>
+      <xsl:when test=". &gt;= $loopcount">
+        <loop>
+          <xsl:value-of select="$loopcount" disable-output-escaping="no" />
+        </loop>
+        <xsl:call-template name="loopincrease">
+          <xsl:with-param name="loopcount" select="$loopcount + 1" />
+        </xsl:call-template>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template match="/">
+    <loops>
+      <xsl:call-template name="loopincrease">
+        <xsl:with-param name="loopcount" select="1" />
+      </xsl:call-template>
+    </loops>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8b099673-07d4-4402-9aa3-a132882cd77c</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1416908996474</last-modified>
+    </meta>
+  </process-def>
+</process>

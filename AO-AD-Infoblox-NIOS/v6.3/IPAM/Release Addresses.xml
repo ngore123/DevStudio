@@ -1,0 +1,152 @@
+<process draft="false" dev-studio-version="7.6.02.04">
+  <process-def name=":AO-AD-Infoblox-NIOS:v6.3:IPAM:Release Addresses">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+Default adapter name: InfobloxNIOS.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>This wrapper will release all the ip addresses from given network or release specific ip addresses which is provided as input from given network.
+
+Release address means moving status of ip address from 'used' to 'unused'.
+
+Sample items Xml: 
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;target&gt;
+			&lt;host&gt;localhost&lt;/host&gt;
+			&lt;user-name&gt;admin&lt;/user-name&gt;
+			&lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+			&lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+		&lt;/target&gt;
+           &lt;parameters&gt;
+			 &lt;network&gt;10.0.0.0&lt;/network&gt;	                 
+			 &lt;mask&gt;24&lt;/mask&gt;
+                 &lt;network-view&gt;default&lt;/network-view&gt;
+			 &lt;ip-address&gt;10.0.0.3&lt;/ip-address&gt;                 
+           &lt;/parameters&gt;
+      &lt;/item&gt;
+&lt;/items&gt;
+
+
+Elements' Description:
+
+target[Conditional]:
+	
+		This tag can contain a dynamic target configuration. Following tags are applicable while defining a dynamic target.
+
+		host[Conditional]:
+			Host name or IP address of Infoblox Grid Manager. This tag is required while providing dynamic targets.
+
+		user-name[Conditional]:
+			Username required to connect Infoblox Grid Manager. This tag is required while providing dynamic targets.
+
+		password[Conditional]:
+			The password associated with the &lt;user-name&gt; provided. Encrypted password can be provided by providing an "encryption-type" attribute. This tag is required while providing dynamic targets. 
+			Valid values for encryption-type are: Plain, Base64
+			Default value: Plain
+
+		timeout-secs[Optional]
+			Specifies the time, in seconds, after which the attempt to connect to the Infoblox Grid Manager fails.
+			Default value in seconds: 60
+		
+	Note: If no adapter configurations are specified while configuring the adapter dynamic target need to be defined under "target" tag.
+
+
+network[required]
+	Specify the network or subnetwork.
+
+mask[required]
+	Specify the mask for the network. Must be used with network parameter.
+
+network-view[Optional]
+	Specify the network view in which the network is located. By default, the system-defined default network view are searched
+
+ip-address[Conditional]
+	if ip-address is provided then only specified ip-address will released else all the addresses from given network will be released.
+
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <description>Returned adapter response is captured in this context parameter.</description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>release-addresses</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-Infoblox-NIOS:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper will release all the ip addresses from given network or release specific ip addresses which is provided as input from given network.
+
+Release address means moving status of ip address from 'used' to 'unused'.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>3eb10a3b-023c-479e-9377-77b82b05c429</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1369656231546</last-modified>
+    </meta>
+  </process-def>
+</process>

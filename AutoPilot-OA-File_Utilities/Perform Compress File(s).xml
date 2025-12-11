@@ -1,0 +1,235 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:Perform Compress File(s)">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The file or files to compress.</description>
+        <from>file</from>
+        <to>file</to>
+      </input>
+      <input global="false" required="false">
+        <description>Utilize ASCII text mode to convert end-of-lines using local conventions?
+Not Valid on Windows O/S.
+Valid values:  true</description>
+        <from>ASCII mode</from>
+        <to>ASCII mode</to>
+      </input>
+      <input global="false" required="false">
+        <description>Force compression even if the file has multiple links or the corresponding file already exists? 
+Valid value:  true</description>
+        <from>force compression</from>
+        <to>force compression</to>
+      </input>
+      <input global="false" required="false">
+        <description>Do not save the original file name and time stamp?
+Not Valid on Windows O/S.
+Valid values:  true</description>
+        <from>drop file info</from>
+        <to>drop file info</to>
+      </input>
+      <input global="false" required="false">
+        <description>Travel the directory structure recursively? 
+
+Valid values:  true</description>
+        <from>recursive</from>
+        <to>recursive</to>
+      </input>
+      <input global="false" required="false">
+        <description>Defines a suffix other than '.gz'.
+Not Valid on Windows O/S. </description>
+        <from>suffix</from>
+        <to>suffix</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>file</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="ASCII mode">
+                  <input global="false">
+                    <from>ASCII mode</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="drop file info">
+                  <input global="false">
+                    <from>drop file info</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="file">
+                  <input global="false">
+                    <from>file</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="force compression">
+                  <input global="false">
+                    <from>force compression</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="recursive">
+                  <input global="false">
+                    <from>recursive</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="suffix">
+                  <input global="false">
+                    <from>suffix</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">gzip </xsl:text>
+        <xsl:if test="string-length('${ASCII mode}') != 0 and '${ASCII mode}' = 'true'">
+          <xsl:text>-a </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${force compression}') != 0 and '${force compression}' = 'true'">
+          <xsl:text>-f </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${drop file info}') != 0 and '${drop file info}' = 'true'">
+          <xsl:text>-n </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${recursive}') != 0 and '${recursive}' = 'true'">
+          <xsl:text>-r </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${suffix}') != 0">
+          <xsl:text>-S ${suffix} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no">${file}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">gzip </xsl:text>
+        <xsl:if test="string-length('${ASCII mode}') != 0 and '${ASCII mode}' = 'true'">
+          <xsl:text>-a </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${force compression}') != 0 and '${force compression}' = 'true'">
+          <xsl:text>-f </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${drop file info}') != 0 and '${drop file info}' = 'true'">
+          <xsl:text>-n </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${recursive}') != 0 and '${recursive}' = 'true'">
+          <xsl:text>-r </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${suffix}') != 0">
+          <xsl:text>-S ${suffix} </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no">${file}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">compact /C </xsl:text>
+        <xsl:if test="string-length('${force compression}') != 0 and '${force compression}' = 'true'">
+          <xsl:text disable-output-escaping="no">/F </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${recursive}') != 0 and '${recursive}' = 'true'">
+          <xsl:text disable-output-escaping="no">/S</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no"> ${file}</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Compress File or Directory
+    Compress a file or directory.
+
+ </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>40c33476-9ab2-31e7-8a60-bd38c9be0676</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902418189</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,197 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:Update File Permissions">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The file to modify.</description>
+        <from>file</from>
+        <to>file</to>
+      </input>
+      <input global="false" required="true">
+        <description>The new permissions mode value.
+For Sun or Linux it should be a numeric value,i.e. 777 
+For Windows valid values: H, A, R, S</description>
+        <from>mode</from>
+        <to>mode</to>
+      </input>
+      <input global="false" required="false">
+        <description>Operate on files and directories recursively? 
+Valid value:  true</description>
+        <from>recursive</from>
+        <to>recursive</to>
+      </input>
+      <input global="false" required="false">
+        <description>If no input is supplied, then a default attrib value of  + (plus) will be applied.
+Valid value: true
+Note: If an input of "true" is supplied, then the attrib value of - (minus) will be applied.</description>
+        <from>attrib value</from>
+        <to>attrib value</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>file</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="file">
+                  <input global="false">
+                    <from>file</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="mode">
+                  <input global="false">
+                    <from>mode</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="recursive">
+                  <input global="false">
+                    <from>recursive</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="attrib value">
+                  <input global="false">
+                    <from>attrib value</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">chmod </xsl:text>
+        <xsl:if test="string-length('${mode}') != 0 and '${mode}' != 'H' and '${mode}' != 'A' and '${mode}' != 'R' and '${mode}' != 'S'">
+          <xsl:text disable-output-escaping="no">$[mode] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${recursive}') != 0 and '${recursive}' = 'true'">
+          <xsl:text disable-output-escaping="no">-R </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no">${file}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">chmod </xsl:text>
+        <xsl:if test="string-length('${mode}') != 0 and '${mode}' != 'H' and '${mode}' != 'A' and '${mode}' != 'R' and '${mode}' != 'S'">
+          <xsl:text disable-output-escaping="no">$[mode] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${recursive}') != 0 and '${recursive}' = 'true'">
+          <xsl:text disable-output-escaping="no">-R </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no">${file}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">attrib </xsl:text>
+        <xsl:choose>
+          <xsl:when test="(string-length('${mode}') != 0) and ('${mode}' = 'H' or '${mode}' = 'A' or '${mode}' = 'R' or '${mode}' = 'S') and ('${attrib value}' = 'true')">
+            <xsl:text disable-output-escaping="no">-$[mode] </xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no">+$[mode] </xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:if test="string-length('${file}') != 0">
+          <xsl:text disable-output-escaping="no">${file}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${recursive}') != 0 and '${recursive}' = 'true'">
+          <xsl:text disable-output-escaping="no"> /S</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update File Permissions
+    Change the permissions mode of a given file or directory.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e7e6f03f-38a2-3dcb-b76a-9c3dd3e4d868</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902430858</last-modified>
+    </meta>
+  </process-def>
+</process>

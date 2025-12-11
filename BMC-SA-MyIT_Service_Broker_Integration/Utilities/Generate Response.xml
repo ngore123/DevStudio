@@ -1,0 +1,397 @@
+<process draft="false" dev-studio-version="7.8.01">
+  <process-def name=":BMC-SA-MyIT_Service_Broker_Integration:Utilities:Generate Response">
+    <parameters>
+      <input global="false" required="true">
+        <description>Possible values are success or failure</description>
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <input global="false" required="false">
+        <description>Conditional optional: Required when status is failure. Error message text from target system</description>
+        <from>error message</from>
+        <to>error message</to>
+      </input>
+      <input global="false" required="true">
+        <description>Possible values are:
+get service list
+get service request details
+invoke
+get service status
+
+</description>
+        <from>request type</from>
+        <to>request type</to>
+      </input>
+      <input global="false" required="false">
+        <description>Conditional optional: Any service name defined in the module configuration for list of services.
+
+This is required for request types "get service request details" and "invoke"</description>
+        <from>service name</from>
+        <to>service name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional: Any input data related to the request.</description>
+        <from>data</from>
+        <to>data</to>
+      </input>
+      <output global="false" required="false">
+        <to>json response</to>
+        <from>json response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Errors:Get Error Strings by Summary</process-name>
+              <parameters>
+                <input>
+                  <from>error message</from>
+                  <to>error summary</to>
+                </input>
+                <output>
+                  <from>error code</from>
+                  <to>error code</to>
+                </output>
+                <output>
+                  <from>error summary</from>
+                  <to>error summary</to>
+                </output>
+                <output>
+                  <from>error details</from>
+                  <to>error details</to>
+                </output>
+                <output>
+                  <from>error resolution</from>
+                  <to>error resolution</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>error message</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>bao response</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="request type">
+                      <input global="false">
+                        <from>request type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="service name">
+                      <input global="false">
+                        <from>service name</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="status">
+                      <input global="false">
+                        <from>status</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="error code">
+                      <input global="false">
+                        <from>error code</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="error details">
+                      <input global="false">
+                        <from>error details</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="error resolution">
+                      <input global="false">
+                        <from>error resolution</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <bao-response>
+      <metadata>
+        <request-type>${request type}</request-type>
+        <status>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </status>
+        <error-code>${error code}</error-code>
+        <error-message>
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </error-message>
+        <error-details>${error details}</error-details>
+        <error-resolution>${error resolution}</error-resolution>
+        <service>${service name}</service>
+      </metadata>
+    </bao-response>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>bao response</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="request type">
+                      <input global="false">
+                        <from>request type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="service name">
+                      <input global="false">
+                        <from>service name</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="data">
+                      <input global="false">
+                        <from>data</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <bao-response>
+      <metadata>
+        <status>
+          <xsl:choose>
+            <xsl:when test="string-length(normalize-space(.)) = 'success'">
+              <xsl:value-of select="." disable-output-escaping="no" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text disable-output-escaping="no">success</xsl:text>
+            </xsl:otherwise>
+          </xsl:choose>
+        </status>
+        <request-type>${request type}</request-type>
+        <xsl:if test="string-length('${service name}') !=0 ">
+          <service>${service name}</service>
+        </xsl:if>
+      </metadata>
+      <data>${data}</data>
+    </bao-response>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>*******XML Response</value>
+                    </input>
+                    <input>
+                      <from>bao response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML Attributes to Elements</process-name>
+        <parameters>
+          <input>
+            <from>bao response</from>
+            <to>xml</to>
+          </input>
+          <output>
+            <from>XMLNoAttribute</from>
+            <to>XMLNoAttribute</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Success Response. Converting XML attributes to elements.</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>XMLNoAttribute</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert XML to JSON</process-name>
+        <parameters>
+          <input>
+            <from>XMLNoAttribute</from>
+            <to>XML</to>
+          </input>
+          <output>
+            <from>JSON</from>
+            <to>json response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Converting XML response to JSON.</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Encapsulate input with BAO's standard response template.
+In the case of success:
+
+&lt;bao-response&gt;
+ &lt;metadata&gt;
+    &lt;status&gt;success&lt;/status&gt;
+    &lt;request-type&gt;get service list&lt;/request-type&gt;
+ &lt;/metadata&gt;
+ &lt;service-list&gt;
+  &lt;service&gt;Unlock Account&lt;/service&gt;
+  &lt;service&gt;Expand Mailbox Size&lt;/service&gt;
+  &lt;service&gt;Reset Password&lt;/service&gt;
+ &lt;/service-list&gt;
+&lt;/bao-response&gt;
+
+Tags in metadata section are:
+1. status - success/failure
+2. error-message (if any)
+3. request-type 
+4. service
+
+In case of failure:
+
+&lt;bao-response&gt;
+ &lt;metadata&gt;
+    &lt;status&gt;failure&lt;/status&gt;
+    &lt;error-message&gt;WE INCLUDE SPECIFIC ERROR MESSAGE RETURNED BY THE TARGET APPLICATION&lt;/error-message&gt;
+    &lt;request-type&gt;invoke&lt;/request-type&gt;
+    &lt;service&gt;Unlock Account&lt;/service&gt;
+ &lt;/metadata&gt;
+&lt;/bao-response&gt;
+</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5fb10cb8-bf1d-4dd7-a3b3-752ed8dc20ad</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1462526930776</last-modified>
+    </meta>
+  </process-def>
+</process>

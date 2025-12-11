@@ -1,0 +1,233 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:v6.0:Volume:Create Storage Volume">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is HPSEActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>1. Creates a storage volume with the specified storage pool and the storage setting ID.
+Sample Request XML:
+&lt;items&gt;
+	&lt;item&gt;
+		 &lt;command&gt;create&lt;/command&gt;
+	     &lt;category&gt;volume&lt;/category&gt;
+		 &lt;process-id&gt;create-storage-volume&lt;/process-id&gt;
+	     &lt;command-arguments&gt;
+	      &lt;pool-id&gt;1001&lt;/pool-id&gt;
+	      &lt;size&gt;10&lt;/size&gt;
+		  &lt;storage-setting-id&gt;1&lt;/storage-setting-id&gt;
+	     &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+pool-id[Required]
+	identifier for a storage system pool
+storage-setting-id[Optional]
+	identifier for the storage setting. Default value is "-default"
+size[Required]
+	size of the volume in megabytes
+
+2. Creates a storage volume on the specified storage pool with the storage settings ID and name.
+
+Sample Request XML:
+&lt;items&gt;
+	&lt;item&gt;
+		 &lt;command&gt;create&lt;/command&gt;
+	     &lt;category&gt;volume&lt;/category&gt;
+		 &lt;process-id&gt;create-storage-volume&lt;/process-id&gt;
+	     &lt;command-arguments&gt;
+	      &lt;pool-id&gt;1001&lt;/pool-id&gt;
+	      &lt;size&gt;10&lt;/size&gt;
+		  &lt;storage-setting-id&gt;1&lt;/storage-setting-id&gt;
+		  &lt;name&gt;volumename&lt;/name&gt;
+	     &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+pool-id[Required]
+	identifier for a storage system pool
+storage-setting-id[Optional]
+	identifier for the storage setting. Default value is "-default"
+size[Required]
+	size of the volume in megabytes
+name[required]
+	name of the storage volume you want to create.
+
+3. Creates a storage volume on an LSI storage system.
+
+Sample Request XML:
+&lt;items&gt;
+	&lt;item&gt;
+		 &lt;command&gt;create&lt;/command&gt;
+	    &lt;category&gt;volume&lt;/category&gt;
+		&lt;process-id&gt;create-storage-volume&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;pool-id&gt;1001&lt;/pool-id&gt;
+	      &lt;cacheahead&gt;10&lt;/cacheahead&gt;
+	      &lt;segmentsize&gt;10&lt;/segmentsize&gt;
+		  &lt;storage-setting-id&gt;1&lt;/storage-setting-id&gt;
+	      &lt;lsi/&gt;
+	      &lt;size&gt;10&lt;/size&gt;
+	      &lt;name&gt;Test&lt;/name&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+lsi[Required]
+	Indicates that volume is created on a LSI storage system
+pool-id[Required]
+	identifier for a storage system pool
+storage-setting-id[Optional]
+	identifier for the storage setting. Default value is "-default"
+size[Required]
+	size of the volume in megabytes
+name[Optional]
+	name of the storage volume you want to create.
+segmentsize[Required]
+	segment size of the volume
+cacheahead[Required]
+	cache read-ahead multiplier (0 to 65535 bytes). A cache read-ahead multiplier copies additional data blocks into the cache while it is reading and copying host-requested data blocks from disk to cache. Select the multiplier that maximizes performance for the way the volume will be utilized.
+	
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Process ID Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <value>create-storage-volume</value>
+                  <to>process id</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//items/item/process-id)='create-storage-volume']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Invoke Adapter Request</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper supports the following requirements:-
+
+1. Creates a storage volume with the specified storage pool and the storage setting ID.
+2. Creates a storage volume on the specified storage pool with the storage settings ID and name. 
+3. Creates a storage volume on an LSI storage system.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>fcb26c57-d634-376c-be5e-084ffd5e29b2</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588105948</last-modified>
+    </meta>
+  </process-def>
+</process>

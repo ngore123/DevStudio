@@ -1,0 +1,597 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":BMC_Database_Automation-SA-ITSM_Integration:Utilities:Process Existing Change">
+    <parameters>
+      <input global="false" required="false">
+        <description>Indicates the Change Platform which points to a name of a node in Module Configuration
+Valid values: BMC_AR_System</description>
+        <from>change platform</from>
+        <to>change platform</to>
+      </input>
+      <input global="false" required="false">
+        <description>Change ID to which the BDA job is associated with</description>
+        <from>change ID</from>
+        <to>change ID</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the Change template already present in ITSM
+Values: BMC Database Automation OIC Change Template
+</description>
+        <from>change template name</from>
+        <to>change template name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Task ID to which the BDA job is associated with</description>
+        <from>task ID</from>
+        <to>task ID</to>
+      </input>
+      <input global="false" required="false">
+        <description>Indicates the Task Platform which points to a name of a node in Module Configuration
+Valid values: BMC_AR_System</description>
+        <from>task platform</from>
+        <to>task platform</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specfies the target URL/Job URL which identifies a BDA Job:
+</description>
+        <from>job URL</from>
+        <to>job URL</to>
+      </input>
+      <input global="false" required="false">
+        <description>Connection details specified in Module Configuration related to the BDA Adapter</description>
+        <from>bda connection details</from>
+        <to>bda connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>BDA Job ID</description>
+        <from>job ID</from>
+        <to>job ID</to>
+      </input>
+      <input global="false" required="false">
+        <from>start date</from>
+        <to>start date</to>
+      </input>
+      <output global="false" required="false">
+        <to>process status message</to>
+        <from>process status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>process success status</to>
+        <from>process success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>retrieved tasks</to>
+        <from>retrieved tasks</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_Database_Automation-SA-ITSM_Integration:Utilities:Verify Change Template</process-name>
+        <parameters>
+          <input>
+            <from>change ID</from>
+            <to>change ID</to>
+          </input>
+          <input>
+            <from>change platform</from>
+            <to>change platform</to>
+          </input>
+          <input>
+            <from>change template name</from>
+            <to>change template name</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>process success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>process status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>process success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_Database_Automation-SA-ITSM_Integration:Utilities:Verify Task Status</process-name>
+              <parameters>
+                <input>
+                  <from>task ID</from>
+                  <to>task ID</to>
+                </input>
+                <input>
+                  <from>task platform</from>
+                  <to>task platform</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>process success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>process status message</to>
+                </output>
+                <output>
+                  <from>is approved</from>
+                  <to>is approved</to>
+                </output>
+                <output>
+                  <from>tasks</from>
+                  <to>retrieved tasks</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>###Appr status ####</value>
+                    </input>
+                    <input>
+                      <from>is approved</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>change ID</from>
+                </input>
+                <output>
+                  <to>update change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>change-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>start date</from>
+                </input>
+                <output>
+                  <to>update change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>scheduled-start-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>BDA Job : </value>
+                    </input>
+                    <input required="false">
+                      <from>job ID</from>
+                    </input>
+                    <input>
+                      <value> </value>
+                    </input>
+                    <input required="false">
+                      <from>job name</from>
+                    </input>
+                    <input>
+                      <value> execution using existing change id: </value>
+                    </input>
+                    <input required="false">
+                      <from>change ID</from>
+                    </input>
+                    <input>
+                      <value> and task id: </value>
+                    </input>
+                    <input required="false">
+                      <from>task ID</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>update change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>detailed-description</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>start date</from>
+                </input>
+                <output>
+                  <to>update change</to>
+                  <concept type="AutoPilot-OA-Change_Management:Change">
+                    <attribute>scheduled-end-date</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>update change</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>update changes</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Changes>
+      <xsl:copy-of select="." />
+    </Changes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Change_Management:Update Changes</process-name>
+              <parameters>
+                <input>
+                  <from>change platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>update changes</from>
+                  <to>changes</to>
+                </input>
+                <output>
+                  <from>changes</from>
+                  <to>retrieved changes</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>process success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) != 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <output>
+                  <to>process success status</to>
+                  <value>invalid</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <input>
+                  <from>task ID</from>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>task-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>BDA Job Id: </value>
+                    </input>
+                    <input required="false">
+                      <from>job ID</from>
+                    </input>
+                    <input>
+                      <value> execution status</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>summary</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>job ID</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task</to>
+                    <concept type="AutoPilot-OA-Task_Management:Task">
+                      <attribute>notes</attribute>
+                    </concept>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="ID">
+                      <input global="false">
+                        <from>job ID</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="change ID">
+                      <input global="false">
+                        <from>change ID</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="status message">
+                      <input global="false">
+                        <from>process status message</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">Change: ${change ID} associated with job ID: ${ID} is canceled as $[status message]</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task</to>
+                  <value>Yes</value>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>secure-log</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task</to>
+                  <value>General Information</value>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>work-info-type</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task</to>
+                  <value>Internal</value>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>view-access</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>workinfo tasks</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="task">
+                      <input global="false">
+                        <from>task</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//task) &gt; 0">
+          <xsl:copy-of select="//task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <removal>
+                <input>
+                  <from>task</from>
+                </input>
+              </removal>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:assign[2]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Task_Management:Create WorkInfo</process-name>
+              <parameters>
+                <input>
+                  <from>task platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>workinfo tasks</from>
+                  <to>tasks</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>workinfo success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>workinfo status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Check the credentials and status of the Change ID associated with the BDA Job. Display an appropriate message related to the Change/Task status</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5ebc95f0-4c03-4a56-8de4-c40b6ed52f90</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1321615627263</last-modified>
+    </meta>
+  </process-def>
+</process>

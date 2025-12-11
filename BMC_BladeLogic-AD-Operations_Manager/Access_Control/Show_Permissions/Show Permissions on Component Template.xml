@@ -1,0 +1,233 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:Access_Control:Show_Permissions:Show Permissions on Component Template">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Full path to template parent group.</description>
+        <from>parentGroup</from>
+        <to>parentGroup</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of template.</description>
+        <from>templateName</from>
+        <to>templateName</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>success</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="true">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>success message</to>
+        <from>success message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the ACL.</description>
+        <to>BlAcl</to>
+        <from>BlAcl</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Template:Get DBKey by Group and Name</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>parentGroup</from>
+            <to>parentGroup</to>
+          </input>
+          <input>
+            <from>templateName</from>
+            <to>templateName</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>success</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>DBKey</from>
+            <to>templateDBKey</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Template:Show Permissions</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>templateDBKey</from>
+                  <to>templateDbKey</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>BlAcl</from>
+                  <to>BlAcl</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Format Error message</process-name>
+        <parameters>
+          <input>
+            <from>error message</from>
+            <to>error message</to>
+          </input>
+          <input>
+            <from>success</from>
+            <to>success</to>
+          </input>
+          <input global="true">
+            <configuration>:BMC_BladeLogic-AD-Operations_Manager:CommonStrings:DefaultError</configuration>
+            <to>message text</to>
+          </input>
+          <output>
+            <from>error message</from>
+            <to>success message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process shows the current permissions on a component template.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>f4d3fc66-3898-3d37-817a-19b6549becfd</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179695115</last-modified>
+    </meta>
+  </process-def>
+</process>

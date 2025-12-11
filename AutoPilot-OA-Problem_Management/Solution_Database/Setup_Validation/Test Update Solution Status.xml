@@ -1,0 +1,176 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Problem_Management:Solution_Database:Setup_Validation:Test Update Solution Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>The name of a configuration item defined in a configuration module.
+Example: BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The solution database id number.
+</description>
+        <from>solution id</from>
+        <to>solution id</to>
+      </input>
+      <input global="false" required="true">
+        <description>The new status</description>
+        <from>new status</from>
+        <to>new status</to>
+      </input>
+      <output global="false" required="true">
+        <description>An XML document providing the data template for single or multiple Concept elements.A concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.</description>
+        <to>solutions</to>
+        <from>solutions</from>
+      </output>
+      <output global="false" required="true">
+        <description>Indicates whether or not the process completed successfully.
+Valid values: success, failure.
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>A process specific string that explains the value of success status.
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <from>solution id</from>
+          </input>
+          <output>
+            <to>solution</to>
+            <concept type="AutoPilot-OA-Problem_Management:Solution">
+              <attribute>solution-database-id</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>new status</from>
+          </input>
+          <output>
+            <to>solution</to>
+            <concept type="AutoPilot-OA-Problem_Management:Solution">
+              <attribute>solution-status</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>solution</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>solutions</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="solution">
+                <input global="false">
+                  <from>solution</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Solutions>
+      <xsl:choose>
+        <xsl:when test="string-length(//solution) &gt; 0">
+          <xsl:copy-of select="//solution" />
+        </xsl:when>
+        <xsl:otherwise>${solution}</xsl:otherwise>
+      </xsl:choose>
+    </Solutions>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>++++ Show Solutions +++++++</value>
+              </input>
+              <input>
+                <from>solutions</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Problem_Management:Solution_Database:Update Solutions</process-name>
+        <parameters>
+          <input>
+            <from>solutions</from>
+            <to>solutions</to>
+          </input>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>solutions</from>
+            <to>solutions</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow tests updating an exisiting Solution Record. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>10d340a8-01a4-3b0a-8644-af478f738600</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283164609935</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,384 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Evaluate Error">
+    <parameters>
+      <input global="false" required="true">
+        <from>remedyAdapterResponse</from>
+        <to>remedyAdapterResponse</to>
+      </input>
+      <output global="false" required="true">
+        <to>connectivityIssueFlag</to>
+        <from>connectivityIssueFlag</from>
+      </output>
+      <output global="false" required="true">
+        <to>errorMessage</to>
+        <from>errorMessage</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Utility:Strip Namespaces</process-name>
+        <parameters>
+          <input>
+            <from>remedyAdapterResponse</from>
+            <to>XML</to>
+          </input>
+          <output>
+            <from>XML</from>
+            <to>remedyAdapterResponse</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>connectivityIssueFlag</to>
+            <value>false</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>errorMessage</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>remedyAdapterResponse</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error found in response</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//faultstring/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Error_Code_For_Retry</configuration>
+          </input>
+          <output>
+            <to>standardConnectivitiyErrors</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>standardConnectivitiyErrors</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>standardConnectivityError</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//error]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>standardConnectivityError</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>standardConnectivityErrorCode</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//code/text()]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <after-execution>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>BAO-SA-ITSM_Integration:Evaluate error: looping through error code=&gt; </value>
+                  </input>
+                  <input>
+                    <from>standardConnectivityErrorCode</from>
+                  </input>
+                </parameters>
+              </log>
+            </after-execution>
+            <location>:assign[2]</location>
+          </assign>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>connectivityIssueFlag</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = "false"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>error found in response</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="errorCode">
+                      <input global="false">
+                        <from>standardConnectivityErrorCode</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[contains(., "${errorCode}")]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>standardConnectivityError</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>errorMessage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//description/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <output>
+                      <to>connectivityIssueFlag</to>
+                      <value>true</value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>BMC-SA-CLA_ITSM_Integration:Evaluate error:match found with retryable errors=&gt; </value>
+                        </input>
+                        <input>
+                          <from>connectivityIssueFlag</from>
+                        </input>
+                        <input>
+                          <from>errorMessage</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>remedyAdapterResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>errorMessage</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:variable name="errorMessage">
+      <xsl:choose>
+        <xsl:when test="//faultstring">
+          <xsl:value-of select="//faultstring/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="//error/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <xsl:variable name="trimmedMessage">
+      <xsl:choose>
+        <xsl:when test="contains($errorMessage, 'Summary:')">
+          <xsl:value-of select="substring-after(., 'Summary:')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$errorMessage" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    <value>
+      <xsl:value-of select="substring($trimmedMessage,1,200)" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>errorMessage</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>errorMessage</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  version="1.0"><xsl:output indent="no" /><xsl:template match="/"><text><xsl:variable name="result"><xsl:call-template name="string-replace-all"><xsl:with-param name="text" select="." /><xsl:with-param name="replace" select='"‘"' /><xsl:with-param name="by" select='" "' /></xsl:call-template></xsl:variable><xsl:value-of  select="$result"/></text></xsl:template><xsl:template name="string-replace-all"><xsl:param name="text"/><xsl:param name="replace"/><xsl:param name="by"/><xsl:choose><xsl:when test="contains($text, $replace)"><xsl:value-of select="substring-before($text, $replace)"/><xsl:value-of select="$by"/><xsl:call-template name="string-replace-all"><xsl:with-param name="text" select="substring-after($text, $replace)"/><xsl:with-param name="replace" select="$replace"/><xsl:with-param name="by" select="$by"/></xsl:call-template></xsl:when><xsl:otherwise><xsl:value-of select="$text"/></xsl:otherwise></xsl:choose></xsl:template></xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  version="1.0"><xsl:output indent="no" /><xsl:template match="/"><text><xsl:variable name="result"><xsl:call-template name="string-replace-all"><xsl:with-param name="text" select="." /><xsl:with-param name="replace" select='"’"' /><xsl:with-param name="by" select='" "' /></xsl:call-template></xsl:variable><xsl:value-of  select="$result"/></text></xsl:template><xsl:template name="string-replace-all"><xsl:param name="text"/><xsl:param name="replace"/><xsl:param name="by"/><xsl:choose><xsl:when test="contains($text, $replace)"><xsl:value-of select="substring-before($text, $replace)"/><xsl:value-of select="$by"/><xsl:call-template name="string-replace-all"><xsl:with-param name="text" select="substring-after($text, $replace)"/><xsl:with-param name="replace" select="$replace"/><xsl:with-param name="by" select="$by"/></xsl:call-template></xsl:when><xsl:otherwise><xsl:value-of select="$text"/></xsl:otherwise></xsl:choose></xsl:template></xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"  version="1.0"><xsl:output indent="no" /><xsl:template match="/"><text><xsl:variable name="result"><xsl:call-template name="string-replace-all"><xsl:with-param name="text" select="." /><xsl:with-param name="replace" select='"&#38;"' /><xsl:with-param name="by" select='" "' /></xsl:call-template></xsl:variable><xsl:value-of  select="$result"/></text></xsl:template><xsl:template name="string-replace-all"><xsl:param name="text"/><xsl:param name="replace"/><xsl:param name="by"/><xsl:choose><xsl:when test="contains($text, $replace)"><xsl:value-of select="substring-before($text, $replace)"/><xsl:value-of select="$by"/><xsl:call-template name="string-replace-all"><xsl:with-param name="text" select="substring-after($text, $replace)"/><xsl:with-param name="replace" select="$replace"/><xsl:with-param name="by" select="$by"/></xsl:call-template></xsl:when><xsl:otherwise><xsl:value-of select="$text"/></xsl:otherwise></xsl:choose></xsl:template></xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:Evaluate error:trimmed error message to be stored in db=&gt;  </value>
+                    </input>
+                    <input>
+                      <from>errorMessage</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>errorMessage</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(string(.))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence />
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>c3cdf39f-7a1d-435f-b8db-0e367305a548</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1474006494305</last-modified>
+    </meta>
+  </process-def>
+</process>

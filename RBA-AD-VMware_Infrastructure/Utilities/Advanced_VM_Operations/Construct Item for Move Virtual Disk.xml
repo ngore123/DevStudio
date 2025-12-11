@@ -1,0 +1,131 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:Advanced_VM_Operations:Construct Item for Move Virtual Disk">
+    <parameters>
+      <input global="false" required="true">
+        <description>virtual machine
+	Virtual machine name used to make the method call.</description>
+        <from>virtual machine</from>
+        <to>virtual machine</to>
+      </input>
+      <input global="false" required="false">
+        <description>datacenter [optional]
+	The name of the datacenter hosting the datastore.</description>
+        <from>datacenter</from>
+        <to>datacenter</to>
+      </input>
+      <input global="false" required="true">
+        <description>disk list
+      Allows specifying the datastore location for each virtual disk. 
+
+Value takes the form:
+
+&lt;disk-list&gt;
+	&lt;disk&gt;
+		&lt;datastore&gt;&lt;/datastore&gt;
+		&lt;disk-id&gt;&lt;/disk-id&gt;
+	&lt;/disk&gt;
+	&lt;disk&gt;
+		&lt;datastore&gt;&lt;/datastore&gt;
+		&lt;disk-id&gt;&lt;/disk-id&gt;
+	&lt;/disk&gt;
+	.......
+&lt;/disk-list&gt;</description>
+        <from>disk list</from>
+        <to>disk list</to>
+      </input>
+      <input global="false" required="false">
+        <description>transform [optional]  
+         Transformation to perform on the disks. The backend is free to ignore this hint if it is not valid for the current operation. This can be used by clients, for example, to create sparse disks for templates.
+
+Valid values: flat, sparse</description>
+        <from>transform</from>
+        <to>transform</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="disk list">
+                <input global="false">
+                  <from>disk list</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="transform">
+                <input global="false">
+                  <from>transform</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="virtual machine">
+                <input global="false">
+                  <from>virtual machine</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="datacenter">
+                <input global="false">
+                  <from>datacenter</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <parameters>
+          <virtual-machine>${virtual machine}</virtual-machine>
+          <datacenter>${datacenter}</datacenter>
+          <spec>
+            ${disk list}
+            <transform>$[transform]</transform>
+          </spec>
+        </parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs &lt;items&gt; for Move Virtual Disk operation</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>19e1fe52-02b1-3452-9140-d679d98a14b9</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288251410434</last-modified>
+    </meta>
+  </process-def>
+</process>

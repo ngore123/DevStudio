@@ -1,0 +1,219 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:Utilities:Parse Output">
+    <parameters>
+      <input global="false" required="false">
+        <from>script lines</from>
+        <to>script lines</to>
+      </input>
+      <output global="false" required="true">
+        <to>success</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="true">
+        <to>debug</to>
+        <from>debug</from>
+      </output>
+      <output global="false" required="false">
+        <to>error</to>
+        <from>error</from>
+      </output>
+      <output global="false" required="false">
+        <to>values</to>
+        <from>values</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>script lines</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>script results</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <output>
+      <xsl:copy-of select="//command-output/metadata/exit-code" />
+      <xsl:copy-of select="//command-output/metadata/status" />
+      <debug>
+        <xsl:value-of select="//command-output/metadata/command" disable-output-escaping="no" />
+      </debug>
+      <values>
+        <xsl:apply-templates select="//line" />
+      </values>
+    </output>
+  </xsl:template>
+  <xsl:template match="line">
+    <value>
+      <xsl:value-of select="." disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>script results</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>success</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="//status/text()='success'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>script results</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>values</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="success">
+                <input global="false">
+                  <from>success</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="'${success}'='true'">
+        <xsl:copy-of select="//values" />
+      </xsl:when>
+      <xsl:otherwise>
+        <value />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>script results</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>debug</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//debug/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>script results</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="success">
+                <input global="false">
+                  <from>success</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[//value['${success}'='false']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>*** AFTER EXTRACT VALUES ****</value>
+              </input>
+              <input>
+                <from>values</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b2400360-6ca0-3242-9b23-1d9349a6eab3</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179738283</last-modified>
+    </meta>
+  </process-def>
+</process>

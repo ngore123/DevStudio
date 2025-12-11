@@ -1,0 +1,172 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-Microsoft_System_Center_Operations_Manager:Utilities:Constructor_Utilities:Create Alert Search Criteria">
+    <parameters>
+      <input global="false" required="true">
+        <description>operator[Required]
+	The 'operator' tag specifies the operand for key and value specified.
+	Valid values - equals, not equals, like, in</description>
+        <from>operator</from>
+        <to>operator</to>
+      </input>
+      <input global="false" required="true">
+        <description>key[Required]
+	This tag contains the alert attribute by which the alerts are filtered. Valid values for this tag can be any of the alert attributes such as: name, description, id etc. You can use Find Alert By ID to get the list of all the alert attributes.</description>
+        <from>key</from>
+        <to>key</to>
+      </input>
+      <input global="false" required="true">
+        <description>value[Required]
+	This tag contains the valid search expression for the attribute specified in the key. Please refer to Criteria guide for valid search criteria expression format.
+NOTE: For help on writing regular expressions refer to 'Regular Expressions Guide.doc'
+
+Note: XML escapse characters (i.e., ", &lt;, &gt;, &amp;) must be replaced as below- 
+
+" by &amp;quot; 
+&lt; by &amp;lt; 
+&gt; by &amp;gt;
+&amp; by &amp;amp; </description>
+        <from>value</from>
+        <to>value</to>
+      </input>
+      <input global="false" required="false">
+        <description>operator[Optional]
+	This tag  specifies the operand between multiple 'criteria-expression' tags. This is only required if there are multiple 'criteria-expression' tags.
+	Valid values - and, or</description>
+        <from>criteria operator</from>
+        <to>criteria operator</to>
+      </input>
+      <output global="false" required="false">
+        <to>alert search criteria</to>
+        <from>alert search criteria</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-Microsoft_System_Center_Operations_Manager:Utilities:Constructor_Utilities:Create Criteria Expression</process-name>
+        <parameters>
+          <input>
+            <from>operator</from>
+            <to>operator</to>
+          </input>
+          <input>
+            <from>key</from>
+            <to>key</to>
+          </input>
+          <input>
+            <from>value</from>
+            <to>value</to>
+          </input>
+          <output>
+            <from>criteria expressions</from>
+            <to>criteria expressions</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>criteria expressions</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>alert search criteria</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="criteria operator">
+                <input global="false">
+                  <from>criteria operator</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <alert-search-criteria>
+      <xsl:if test="string('${criteria operator}') != ''">
+        <operator>
+          <xsl:value-of select="string('${criteria operator}')" disable-output-escaping="no" />
+        </operator>
+      </xsl:if>
+      <xsl:copy-of select="//criteria-expression" />
+    </alert-search-criteria>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Alert Search Criteria: </value>
+              </input>
+              <input>
+                <from>alert search criteria</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>20158b4d-79e9-3e07-89eb-25ba1e676dc2</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598713688</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,475 @@
+<process draft="false" dev-studio-version="7.5.02.08">
+  <process-def name=":AutoPilot-OA-Operating_System_Utilities:Service_Controller:Get SC Information">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the name of the remote server on which the service is located. The name must use the UNC format ("\\myserver"). To run SC.exe locally, ignore this parameter.</description>
+        <from>server name</from>
+        <to>server name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the service name returned by the getkeyname operation. This query parameter is not used in conjunction with other query parameters (other than ServerName).</description>
+        <from>service name</from>
+        <to>service name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the type of services or type of drivers to enumerate.Value Description ownThe service runs in its own process. It does not share an executable file with other services. This is the default. share The service runs as a shared process. It shares an executable file with other services. interact The service can interact with the desktop, receiving input from users. Interactive services must be run under the Local System account. kernel Driver. filesys File system driver.</description>
+        <from>service type</from>
+        <to>service type</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies what to enumerate. The default type is service.Value Description driver Specifies that only drivers are enumerated. service Specifies that only services are enumerated. all Specifies that both drivers and services are enumerated.</description>
+        <from>enumeration type</from>
+        <to>enumeration type</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the started state of the service for which to enumerate. The default state is active. ValueDescriptionactiveSpecifies all active services.inactiveSpecifies all paused or stopped services.allSpecifies all services.</description>
+        <from>state</from>
+        <to>state</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the size (in bytes) of the enumeration buffer. The default size is 1024 bytes. Increase the size of the enumeration buffer when the display resulting from a query exceeds 1024 bytes.</description>
+        <from>buffer size</from>
+        <to>bufsize</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the index number at which to begin or resume the enumeration. The default is 0. Use this parameter in conjunction with the bufsize= parameter when more information is returned by a query than the default buffer can display.</description>
+        <from>resume index</from>
+        <to>ri</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the service group to enumerate. The default is all groups.</description>
+        <from>group name</from>
+        <to>group</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <spawn>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>SEMI_AUTOMATIC</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>service type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='own']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>service type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='share']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>service type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. != 'kernel']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>service type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='filesys']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>service type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='rec']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>service type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='adapt']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>service type</to>
+                      <value>
+                        <empty />
+                      </value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:spawn[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:spawn[1]:sequence[1]:switch[1]</location>
+          </switch>
+        </sequence>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>SEMI_AUTOMATIC</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>state</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='active']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>state</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='inactive']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>state</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='all']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>state</to>
+                      <value>
+                        <empty />
+                      </value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:spawn[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:spawn[1]:sequence[2]:switch[1]</location>
+          </switch>
+        </sequence>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>SEMI_AUTOMATIC</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>enumeration type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[. !='driver']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>enumeration type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[.!='service']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>enumeration type</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[.!='all']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>enumeration type</to>
+                      <value>
+                        <empty />
+                      </value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:spawn[1]:sequence[3]:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:spawn[1]:sequence[3]:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:spawn[1]</location>
+      </spawn>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="server name">
+                  <input global="false">
+                    <from>server name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="service name">
+                  <input global="false">
+                    <from>service name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="type">
+                  <input global="false">
+                    <from>service type</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="enum">
+                  <input global="false">
+                    <from>enumeration type</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="state">
+                  <input global="false">
+                    <from>state</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="bufsize">
+                  <input global="false">
+                    <from>bufsize</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="group">
+                  <input global="false">
+                    <from>group</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="ri">
+                  <input global="false">
+                    <from>ri</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="group">
+                  <input global="false">
+                    <from>group</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported"</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported"</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">sc</xsl:text>
+        <xsl:if test="string-length('$[server name]')!=0">
+          <xsl:text disable-output-escaping="no"> $[server name]</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> query</xsl:text>
+        <xsl:text disable-output-escaping="no"> ${service name}</xsl:text>
+        <xsl:if test="string-length('${enum}')!=0">
+          <xsl:text disable-output-escaping="no"> type=${enum}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${type}')!=0">
+          <xsl:text disable-output-escaping="no"> type=${type}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${state}')!=0">
+          <xsl:text disable-output-escaping="no"> state=${state}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${bufsize}')!=0">
+          <xsl:text disable-output-escaping="no"> bufsize=${bufsize}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${ri}')!=0">
+          <xsl:text disable-output-escaping="no"> ri=${ri}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${group}')!=0">
+          <xsl:text disable-output-escaping="no"> group=${group}</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Obtains and displays information about the specified service, driver, type of service, or type of driver.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+    </meta>
+  </process-def>
+</process>

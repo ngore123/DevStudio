@@ -1,0 +1,233 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Task_Management:Setup_Validation:ServiceNow:Test Create Task Relationships">
+    <parameters>
+      <output global="false" required="true">
+        <description>An XML document providing the data template for single or multiple Concept elements.The task concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <to>tasks</to>
+        <from>tasks</from>
+      </output>
+      <output global="false" required="true">
+        <description>Indicates whether or not the process completed successfully.
+Valid values: success, failure.
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>A process specific string that explains the value of success status.
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>failure count</to>
+        <from>failure count</from>
+      </output>
+      <output global="false" required="false">
+        <to>failed tasks</to>
+        <from>failed tasks</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Task_Management:Setup_Validation:ServiceNow:Get Configuration Name</process-name>
+        <unique-id>19f3facd-f36a-4f3f-acb5-2cc5a716cb86</unique-id>
+        <parameters>
+          <output>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>configuration items</to>
+            <value>
+              <Configuration-Items>
+                <Configuration-Item>
+                  <name>PS LinuxApp01</name>
+                </Configuration-Item>
+                <Configuration-Item>
+                  <name>PS LinuxApp02</name>
+                </Configuration-Item>
+              </Configuration-Items>
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>task</to>
+            <value>
+              <Task>
+                <task-id>CTASK0010038</task-id>
+              </Task>
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>task</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>tasks</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:copy-of select="." />
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Input parameters</value>
+              </input>
+              <input>
+                <from>configuration items</from>
+              </input>
+              <input>
+                <from>tasks</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Task_Management:Create Task Relationships</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>tasks</from>
+            <to>tasks</to>
+          </input>
+          <input>
+            <from>configuration items</from>
+            <to>configuration items</to>
+          </input>
+          <output>
+            <from>tasks</from>
+            <to>tasks</to>
+          </output>
+          <output>
+            <from>failed tasks</from>
+            <to>failed tasks</to>
+          </output>
+          <output>
+            <from>success count</from>
+            <to>success count</to>
+          </output>
+          <output>
+            <from>failure count</from>
+            <to>failure count</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Log output</value>
+              </input>
+              <input>
+                <from>tasks</from>
+              </input>
+              <input>
+                <from>success count</from>
+              </input>
+              <input>
+                <from>failed tasks</from>
+              </input>
+              <input>
+                <from>failure count</from>
+              </input>
+              <input>
+                <from>success status</from>
+              </input>
+              <input>
+                <from>status message</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This test workflow tests relating configuration items to a given task. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>dd064fd9-1249-44d2-9ce6-0f5c0c2ee9c3</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1422526951656</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,239 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BMC-SA-Service_Desk_Automation:Work_Order_Management:Read Work Order">
+    <parameters>
+      <input global="false" required="true">
+        <description>The Configuration Name. 
+
+Currently supported value: BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The ID of the Work Order to read.
+
+Remedy Example: WO0000000000731</description>
+        <from>work order id</from>
+        <to>work order id</to>
+      </input>
+      <output global="false" required="false">
+        <to>response xml</to>
+        <from>response xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set Start Time</process-name>
+        <unique-id>c113440d-ac61-4f97-bc14-2607426fd912</unique-id>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response For Invalid Configuration</process-name>
+              <parameters>
+                <input>
+                  <value>Read Work Order</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'BMC_AR_System']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Read Sub Configuration</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <value>WorkOrderManagement</value>
+                  <to>configuration group</to>
+                </input>
+                <output>
+                  <from>configuration xml</from>
+                  <to>configuration xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:AutoPilot-OA-Work_Order_Management:Searches:Get Work Order by Work Order ID</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <concat>
+                    <input required="false">
+                      <from>work order id</from>
+                    </input>
+                  </concat>
+                  <to>work order id</to>
+                </input>
+                <output>
+                  <from>work orders</from>
+                  <to>work orders</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+              <parameters>
+                <input>
+                  <from>success status</from>
+                  <to>success status</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <input>
+                  <value>Unknown</value>
+                  <to>target name</to>
+                </input>
+                <input>
+                  <value>Read Work Order</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>work orders</from>
+                  <to>target response</to>
+                </input>
+                <input global="true">
+                  <configuration>:BMC-SA-Service_Desk_Automation:FulfillmentIntegrations:Defaults:Templates:RequestResponseTemplate</configuration>
+                  <to>fulfillment response</to>
+                </input>
+                <input>
+                  <value>xml</value>
+                  <to>data type</to>
+                </input>
+                <input>
+                  <value>Read WorkOrder failed.</value>
+                  <to>error summary</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[3]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b0159dea-e7cb-42eb-8852-428eab534035</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1443503768535</last-modified>
+    </meta>
+  </process-def>
+</process>

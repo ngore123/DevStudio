@@ -1,0 +1,302 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Operating_System_Utilities:Configuration:Update Server Services">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>The auto disconnect time in minutes. The valid value range is -1 to 65535 minutes at the command line. To disable Autodisconnect set it to -1.</description>
+        <from>auto disconnect time</from>
+        <to>auto disconnect</to>
+      </input>
+      <input global="false" required="false">
+        <description>Set the server comment text.</description>
+        <from>server comment</from>
+        <to>srvcomment</to>
+      </input>
+      <input global="false" required="false">
+        <description>To remove a machine from Network Neighbourhood.  Valid values are yes and no.</description>
+        <from>hidden</from>
+        <to>hidden</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <spawn>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>auto disconnect</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[not(.=number(.)) or ((.<-1) or (.>65536))]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>auto disconnect</to>
+                      <value>
+                        <value />
+                      </value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:spawn[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:spawn[1]:sequence[1]:switch[1]</location>
+          </switch>
+        </sequence>
+        <sequence>
+          <utility>
+            <string>
+              <lowercase>
+                <input>
+                  <from>hidden</from>
+                </input>
+              </lowercase>
+            </string>
+            <output global="false">
+              <to>hidden</to>
+            </output>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:spawn[1]:sequence[2]:utility[1]</location>
+          </utility>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>hidden</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[.!='yes']]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>hidden</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[.!='no']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>hidden</to>
+                      <value>
+                        <value />
+                      </value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:spawn[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:spawn[1]:sequence[2]:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:spawn[1]</location>
+      </spawn>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="auto disconnect">
+                  <input global="false">
+                    <from>auto disconnect</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="hidden">
+                  <input global="false">
+                    <from>hidden</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="srvcomment">
+                  <input global="false">
+                    <from>srvcomment</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">net config server</xsl:text>
+        <xsl:if test="string-length('${hidden}')!=0">
+          <xsl:text disable-output-escaping="no"> /hidden:${hidden}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('$[srvcomment]')!=0">
+          <xsl:text disable-output-escaping="no"> /srvcomment:"$[srvcomment]"</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${auto disconnect}')!=0">
+          <xsl:text disable-output-escaping="no"> /autodisconnect:${auto disconnect}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported."</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported."</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Changes settings for a Server service. The following are settings that can be changed:
+
+/AUTODISCONNECT: time  The valid value range is -1 to 65535 minutes at the command line. To disable Autodisconnect set it to -1. If an invalid value is received this parameter is ignored.
+
+/SRVCOMMENT:"text"
+
+/HIDDEN:{yes|no} If an invalid value is received this parameter is ignored.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>00ca5de8-52d9-37ec-8479-39c96e6ac009</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1291031824618</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,259 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration:Utilities:Extract Event Type">
+    <parameters>
+      <input global="false" required="true">
+        <description>&lt;event&gt;
+  &lt;metaData&gt;
+    &lt;eventModelVersion&gt;1.1.00&lt;/eventModelVersion&gt;
+    &lt;eventClass&gt;PATROL_EV&lt;/eventClass&gt;
+    &lt;reportTime&gt;1520007159&lt;/reportTime&gt;
+    &lt;reportTimeEpoch&gt;0&lt;/reportTimeEpoch&gt;
+    &lt;notes&gt;testing&lt;/notes&gt;
+  &lt;/metaData&gt;
+  &lt;sourceData&gt;
+    &lt;componentHost&gt;clm-aus-018145&lt;/componentHost&gt;
+    &lt;componentHostAddress&gt;172.22.231.209&lt;/componentHostAddress&gt;
+  &lt;/sourceData&gt;
+  &lt;situationData&gt;
+    &lt;situationCategory&gt;CAPACITY_MANAGEMENT&lt;/situationCategory&gt;
+    &lt;severity&gt;CRITICAL&lt;/severity&gt;
+    &lt;situationTimeEpoch&gt;0&lt;/situationTimeEpoch&gt;
+    &lt;messageSummary&gt;TESTEVENT02&lt;/messageSummary&gt;
+  &lt;/situationData&gt;
+  &lt;reporterData&gt;
+    &lt;componentHostAddress&gt;172.22.231.209&lt;/componentHostAddress&gt;
+    &lt;eventTime&gt;1520007159&lt;/eventTime&gt;
+  &lt;/reporterData&gt;
+  &lt;extendedData&gt;
+    &lt;nameValueList&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;cell-name&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;msend&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;pem-alert-type&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;Disk Full&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;blah-blah&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;blah&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;mc-event-sub-category&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;Disk Full&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;mc-arrival-time&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;1520007159&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;mc-origin-key&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;10&lt;/value&gt;
+      &lt;/nameValue&gt;
+    &lt;/nameValueList&gt;
+  &lt;/extendedData&gt;
+  &lt;metricsData /&gt;
+&lt;/event&gt;</description>
+        <from>action id</from>
+        <to>action id</to>
+      </input>
+      <input global="false" required="true">
+        <from>all configurations</from>
+        <to>all configurations</to>
+      </input>
+      <output global="false" required="false">
+        <to>event type</to>
+        <from>event type</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>delim</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//Defaults/SupportedActionsDelimiter/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>action id</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>event type</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="delim">
+                <input global="false">
+                  <from>delim</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="searchString" select="substring-before(substring-after(normalize-space(.), '${delim}'), '${delim}')" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length($searchString) &gt; 0">
+          <xsl:value-of select="$searchString" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">UNSUPPORTED</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>event type</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=". = 'UNSUPPORTED'">
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">success</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>event type</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error message</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=". = 'UNSUPPORTED'">
+          <xsl:text disable-output-escaping="no">Unsupported event type</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==========Output========</value>
+              </input>
+              <input>
+                <from>event type</from>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[3]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Given an event type for a given input event. Use common event model's eventCategory and eventSubCategory, like Service Down, Disk Full</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2dc25b55-cc55-40c6-b71a-277c988f4e06</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1549208168215</last-modified>
+    </meta>
+  </process-def>
+</process>

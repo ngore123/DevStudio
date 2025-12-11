@@ -1,0 +1,404 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration:ITSM_Integration:Process Incident">
+    <parameters>
+      <input global="false" required="true">
+        <description>Example: BMC_TrueSight</description>
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Example: BMC_AR_System</description>
+        <from>itsm type</from>
+        <to>itsm type</to>
+      </input>
+      <input global="false" required="true">
+        <description>For example: ServiceDown </description>
+        <from>event type</from>
+        <to>event type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Configuration XML in the format:
+&lt;Specifics&gt;
+  &lt;BMC_TrueSight&gt;
+    &lt;EventTypes&gt;
+      &lt;ServiceDown&gt;
+        &lt;EventType&gt;Service Down&lt;/EventType&gt;
+        &lt;CreateIncident&gt;false&lt;/CreateIncident&gt;
+        &lt;CreateChange&gt;true&lt;/CreateChange&gt;
+        &lt;ChangeTemplateName&gt; &lt;/ChangeTemplateName&gt;
+        &lt;CreateTask&gt;true&lt;/CreateTask&gt;
+        &lt;PerformRemediation&gt;true&lt;/PerformRemediation&gt;
+        &lt;IsITSMDataCustom&gt;true&lt;/IsITSMDataCustom&gt;
+        &lt;IncidentIDFieldName&gt;mc-incident-id&lt;/IncidentIDFieldName&gt;
+        &lt;ChangeIDFieldName&gt;mc-change-id&lt;/ChangeIDFieldName&gt;
+        &lt;TaskIDFieldName&gt;mc-task-id&lt;/TaskIDFieldName&gt;
+        &lt;ChangeType&gt;normal&lt;/ChangeType&gt;
+      &lt;/ServiceDown&gt;
+    &lt;/EventTypes&gt;
+  &lt;/BMC_TrueSight&gt;
+  &lt;Adapters&gt;
+    &lt;EventActorAdapter&gt;Truesight Actor&lt;/EventActorAdapter&gt;
+    &lt;RESTAdapter&gt;REST Adapter&lt;/RESTAdapter&gt;
+    &lt;ITSMActorAdapter&gt;ARSAdapter&lt;/ITSMActorAdapter&gt;
+  &lt;/Adapters&gt;
+  &lt;Debug&gt;
+    &lt;CallProcess&gt;
+      &lt;UpdateEventNotes&gt;false&lt;/UpdateEventNotes&gt;
+    &lt;/CallProcess&gt;
+  &lt;/Debug&gt;
+  &lt;TnR&gt;
+    &lt;EventTypes&gt;
+      &lt;ServiceDown /&gt;
+    &lt;/EventTypes&gt;
+  &lt;/TnR&gt;
+  &lt;BAO&gt;
+    &lt;URL&gt;https://clm-aus-021690.bmc.com:3020/baocdp&lt;/URL&gt;
+    &lt;UserName&gt;aoadmin&lt;/UserName&gt;
+    &lt;Password&gt;****MASKED****&lt;/Password&gt;
+  &lt;/BAO&gt;
+  &lt;BMC_AR_System /&gt;
+  &lt;ITSM&gt;
+    &lt;CreateIncidentWorkflowName&gt;:BMC-SA-Response_ITSM_Automation:Incident_Management:BMC_AR_System:Create Incident&lt;/CreateIncidentWorkflowName&gt;
+  &lt;/ITSM&gt;
+  &lt;WorkflowDefinitions&gt;
+    &lt;CommonWorkflows&gt;
+      &lt;workflows&gt;
+        &lt;workflow name="UpdateEventNotes"&gt;:BMC-OA-Event_Orchestration:Event:Update Event Notes&lt;/workflow&gt;
+        &lt;workflow name="CreateIncident"&gt;:BMC-OA-Event_Orchestration:ITSM:Create Incident&lt;/workflow&gt;
+        &lt;workflow name="CreateChange"&gt;:BMC-OA-Event_Orchestration:ITSM:Create Change&lt;/workflow&gt;
+        &lt;workflow name="AddChangeNotes"&gt;:BMC-OA-Event_Orchestration:ITSM:Update Change Notes&lt;/workflow&gt;
+        &lt;workflow name="AddIncidentNotes"&gt;:BMC-OA-Event_Orchestration:ITSM:Update Incident Notes&lt;/workflow&gt;
+        &lt;workflow name="AddTaskNotes"&gt;:BMC-OA-Event_Orchestration:ITSM:Update Task Notes&lt;/workflow&gt;
+        &lt;workflow name="AddChangeStatus"&gt;:BMC-OA-Event_Orchestration:ITSM:Update Change Status&lt;/workflow&gt;
+        &lt;workflow name="AddIncidentStatus"&gt;:BMC-OA-Event_Orchestration:ITSM:Update Incident Status&lt;/workflow&gt;
+        &lt;workflow name="AddTaskStatus"&gt;:BMC-OA-Event_Orchestration:ITSM:Update Task Status&lt;/workflow&gt;
+      &lt;/workflows&gt;
+    &lt;/CommonWorkflows&gt;
+    &lt;WorkflowsByEventType&gt;
+      &lt;workflows&gt;
+        &lt;workflow name="ServiceDown" action="triage"&gt;:BMC-OA-Event_Orchestration_Service_Down:PerformTriage&lt;/workflow&gt;
+        &lt;workflow name="ServiceDown" action="remediate"&gt;:BMC-OA-Event_Orchestration_Service_Down:PerformRemediation&lt;/workflow&gt;
+      &lt;/workflows&gt;
+    &lt;/WorkflowsByEventType&gt;
+  &lt;/WorkflowDefinitions&gt;
+  &lt;Defaults&gt;
+    &lt;UnfoundWorkflowName&gt;NOT_FOUND&lt;/UnfoundWorkflowName&gt;
+  &lt;/Defaults&gt;
+&lt;/Specifics&gt;</description>
+        <from>all configurations</from>
+        <to>all configurations</to>
+      </input>
+      <input global="false" required="true">
+        <description>Common event model based event data.
+
+&lt;event&gt;
+  &lt;metaData&gt;
+    &lt;eventModelVersion&gt;1.1.00&lt;/eventModelVersion&gt;
+    &lt;eventClass&gt;PATROL_EV&lt;/eventClass&gt;
+    &lt;reportTime&gt;1520007159&lt;/reportTime&gt;
+    &lt;reportTimeEpoch&gt;0&lt;/reportTimeEpoch&gt;
+    &lt;notes&gt;testing&lt;/notes&gt;
+	&lt;eventId&gt;Admin.bmcproactivenetperformancemanageractoradapter.47043420&lt;/eventId&gt;
+  &lt;/metaData&gt;
+  &lt;sourceData&gt;
+    &lt;componentHost&gt;clm-aus-018145&lt;/componentHost&gt;
+    &lt;componentHostAddress&gt;172.22.231.209&lt;/componentHostAddress&gt;
+  &lt;/sourceData&gt;
+  &lt;situationData&gt;
+    &lt;situationCategory&gt;CAPACITY_MANAGEMENT&lt;/situationCategory&gt;
+	&lt;situationSubCategory&gt;Service Down&lt;/situationSubCategory&gt;
+	&lt;application&gt;BAO-REPO&lt;/application&gt;
+    &lt;severity&gt;CRITICAL&lt;/severity&gt;
+    &lt;situationTimeEpoch&gt;0&lt;/situationTimeEpoch&gt;
+    &lt;messageSummary&gt;TESTEVENT02&lt;/messageSummary&gt;
+  &lt;/situationData&gt;
+  &lt;reporterData&gt;
+    &lt;componentHostAddress&gt;172.22.231.209&lt;/componentHostAddress&gt;
+    &lt;eventTime&gt;1520007159&lt;/eventTime&gt;
+  &lt;/reporterData&gt;
+  &lt;extendedData&gt;
+    &lt;nameValueList&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;cell-name&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;Admin&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;mc-incident-id&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;INC00000111112&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;pem-alert-type&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;Disk Full&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;blah-blah&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;blah&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;mc-event-sub-category&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;Disk Full&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;mc-arrival-time&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;1520007159&lt;/value&gt;
+      &lt;/nameValue&gt;
+      &lt;nameValue xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="nameValue"&gt;
+        &lt;name&gt;mc-origin-key&lt;/name&gt;
+        &lt;value xmlns:xs="http://www.w3.org/2001/XMLSchema" xsi:type="xs:string"&gt;10&lt;/value&gt;
+      &lt;/nameValue&gt;
+    &lt;/nameValueList&gt;
+  &lt;/extendedData&gt;
+  &lt;metricsData /&gt;
+&lt;/event&gt;</description>
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <input global="false" required="true">
+        <from>flags</from>
+        <to>flags</to>
+      </input>
+      <input global="false" required="false">
+        <description>Any pre-existing itsm data in the format
+
+&lt;itsm-data&gt;
+   &lt;incident-id&gt;INC11100222&lt;/incident-id&gt;
+&lt;/itsm-data&gt;
+
+If Incident ID exists, then, creation of incident is skipped.
+
+If no incident ID exists, then, enter a value as below
+
+&lt;itsm-data /&gt; or leave it empty.</description>
+        <from>itsm data</from>
+        <to>itsm data</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional: BAO's authentication token</description>
+        <from>authentication token</from>
+        <to>authentication token</to>
+      </input>
+      <input global="false" required="false">
+        <description>itsm authentication token, if any</description>
+        <from>itsm authentication token</from>
+        <to>itsm authentication token</to>
+      </input>
+      <output global="false" required="false">
+        <to>incident id</to>
+        <from>incident id</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>incident created</to>
+        <from>incident created</from>
+      </output>
+      <output global="false" required="false">
+        <to>incident updated</to>
+        <from>incident updated</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>itsm authentication token</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>itsm authentication token present</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>========Create Incident Input=======</value>
+              </input>
+              <input>
+                <from>all configurations</from>
+              </input>
+              <input>
+                <from>itsm data</from>
+              </input>
+              <input>
+                <from>itsm type</from>
+              </input>
+              <input>
+                <from>event data</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>itsm authentication token present</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Event_Orchestration:ITSM:Incident_Management:Create or Update Incident</process-name>
+        <parameters>
+          <input>
+            <from>itsm type</from>
+            <to>itsm type</to>
+          </input>
+          <input>
+            <from>all configurations</from>
+            <to>all configurations</to>
+          </input>
+          <input>
+            <from>event data</from>
+            <to>event data</to>
+          </input>
+          <input>
+            <from>flags</from>
+            <to>flags</to>
+          </input>
+          <input>
+            <from>event source type</from>
+            <to>event source type</to>
+          </input>
+          <input>
+            <from>itsm data</from>
+            <to>itsm data</to>
+          </input>
+          <input>
+            <from>itsm authentication token</from>
+            <to>itsm authentication token</to>
+          </input>
+          <output>
+            <from>incident id</from>
+            <to>incident id</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>incident created</from>
+            <to>incident created</to>
+          </output>
+          <output>
+            <from>incident updated</from>
+            <to>incident updated</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==========Process Incident Output========</value>
+              </input>
+              <input>
+                <from>incident id</from>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+              <input>
+                <from>incident created</from>
+              </input>
+              <input>
+                <from>incident updated</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This a process template. It has a few basic things.
+1. Log Input
+2. Log Output
+3. Atleast 2 basic output parameters - status and error message.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>a8858107-1a36-47c1-a92a-549705d7913c</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration.</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1575730633673</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process>
+   <process-def name=":Server_Incident-SA-Enrichment:rules">
+      <sequence>
+         <switch>
+            <meta>
+               <peer-location>
+                  <location>any</location>
+               </peer-location>
+            </meta>
+            <execute-all-applicable-cases>true</execute-all-applicable-cases>
+            <case name="Server Incident Enrichment - Receive Incident Creation Alert" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[starts-with(//text/text(), 'AOSIE:')='true']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[starts-with(//text/text(), 'AOSIE:')]]></from>
+                     <fromKey><![CDATA[3070]]></fromKey>
+                     <to><![CDATA['true']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>Server_Incident-SA-Enrichment</group>
+                     <name-prefix>Server Incident Enrichment - Receive Incident Creation Alert</name-prefix>
+                     <process-name>:Server_Incident-SA-Enrichment:Server Incident Enrichment</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+         </switch>
+      </sequence>
+      <meta>
+         <peer-location>
+            <location>any</location>
+         </peer-location>
+      </meta>
+      <parameters>
+         <input>
+            <from>inputevent</from>
+            <to>inputevent</to>
+         </input>
+      </parameters>
+   </process-def>
+</process>
+

@@ -1,0 +1,202 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:Job:Add Weekly Schedule">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Handle to the job. </description>
+        <from>jobKey</from>
+        <to>jobKey</to>
+      </input>
+      <input global="false" required="true">
+        <description>Weekly schedule to be added. The date string must be in the format YYYY-MM-DD HH:MM:SS.</description>
+        <from>dateString</from>
+        <to>dateString</to>
+      </input>
+      <input global="false" required="true">
+        <description>Days of the week when the job should execute. Each day of the week has a value, as shown below:
+    - SUNDAY=1
+    - MONDAY=2
+    - TUESDAY=4
+    - WEDNESDAY=8
+    - THURSDAY=16
+    - FRIDAY=32
+    - SATURDAY=64
+Add values representing the days when you want the job to run. For example, if you want the job to run on Monday, Wednesday, and Friday, then daysOfWeek=42. Use the frequency argument to specify an interval in weeks for the job to run (for example, 2 means the job runs every other week).</description>
+        <from>daysOfWeek</from>
+        <to>daysOfWeek</to>
+      </input>
+      <input global="false" required="true">
+        <description>Interval in weeks when the job should run. </description>
+        <from>frequency</from>
+        <to>frequency</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the returned object.</description>
+        <to>Object</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>jobKey</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>dateString</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>daysOfWeek</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>frequency</from>
+            <to>argument 4</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <value>Job</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>addWeeklySchedule</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <compensation name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:Job:Add Weekly Schedule:999999999" />
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command adds a weekly schedule to a job.
+The argument jobKey is a handle to the job being modified. To find the jobKey for a specific job type, use the SnapshotJob getDBKeyByGroupAndName command.
+This command does not send a job notification. To add a schedule that includes notifications, see the Job addWeeklyScheduleWithSNMPNotification or Job addWeeklyScheduleWithEMailNotification commands.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8d74b5f1-4024-34ae-a8f6-d3b262992485</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179824572</last-modified>
+    </meta>
+  </process-def>
+  <compensation-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:Job:Add Weekly Schedule:999999999">
+    <meta>
+      <peer-location>
+        <location>this</location>
+      </peer-location>
+    </meta>
+    <parameters />
+    <sequence />
+  </compensation-def>
+</process>

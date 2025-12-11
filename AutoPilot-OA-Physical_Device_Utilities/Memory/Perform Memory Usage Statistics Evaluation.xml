@@ -1,0 +1,578 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Physical_Device_Utilities:Memory:Perform Memory Usage Statistics Evaluation">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML document containing the value indicating the swap threshold limit.
+Note:  The value should be indicated as a numeric value.
+An example would be &lt;limit memory="swap"&gt;30.0&lt;/limit&gt;
+</description>
+        <from>swap threshold</from>
+        <to>swap threshold</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML document containing the value indicating the free threshold limit.
+Note:  The value should be indicated as a numeric value.
+An example would be &lt;limit memory="free"&gt;35.0&lt;/limit&gt;
+</description>
+        <from>free threshold</from>
+        <to>free threshold</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document containing information on the current memory usage and whether it is within the limits specified in the request.</description>
+        <to>limits</to>
+        <from>limits</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Physical_Device_Utilities:Memory:Get Memory Usage</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>memory check output</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>swap threshold</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>limits</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <limits>
+      <memory />
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>memory check output</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>limit</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//line[position() > 2 and position() < last ()]]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>limit</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>limit string</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens />
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="." disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[1]:assign[1]</location>
+                </assign>
+                <call-process>
+                  <process-name>:AutoPilot-OA-Common_Utilities:Tokenize String</process-name>
+                  <parameters>
+                    <input>
+                      <from>limit string</from>
+                      <to>string</to>
+                    </input>
+                    <input>
+                      <value>
+                        <value> </value>
+                      </value>
+                      <to>delimiter</to>
+                    </input>
+                    <output>
+                      <from>tokens</from>
+                      <to>token list</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[1]:call-process[1]</location>
+                </call-process>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>token list</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>current swap usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[number(//token[position() = 5])]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>token list</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>current free usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[number(//token[position() = 6])]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>swap threshold</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>swap memory-usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//limit[@memory = "swap"]/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>free threshold</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>free memory-usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//limit[@memory = "free"]/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>limits</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>limits</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="free memory usage">
+                          <input global="false">
+                            <from>free memory-usage</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="free">
+                          <input global="false">
+                            <from>current free usage</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="swap memory usage">
+                          <input global="false">
+                            <from>swap memory-usage</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="swap">
+                          <input global="false">
+                            <from>current swap usage</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <limits>
+      <memory>
+        <memory-type>
+          <xsl:text disable-output-escaping="no">swap</xsl:text>
+        </memory-type>
+        <usage>${swap}</usage>
+        <limit>${swap memory usage}</limit>
+        <within-limit>
+          <xsl:value-of select="${swap memory usage} &gt; ${swap}" disable-output-escaping="no" />
+        </within-limit>
+      </memory>
+      <memory>
+        <memory-type>
+          <xsl:text disable-output-escaping="no">free</xsl:text>
+        </memory-type>
+        <usage>${free}</usage>
+        <limit>${free memory usage}</limit>
+        <within-limit>
+          <xsl:value-of select="${free memory usage} &gt; ${free}" disable-output-escaping="no" />
+        </within-limit>
+      </memory>
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>Memory usage</value>
+                        </input>
+                        <input>
+                          <from>limits</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[1]:assign[2]</location>
+                </assign>
+              </sequence>
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>memory check output</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//target-metadata/os-id/text() = 'Linux']]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>limit</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>limit string</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens />
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="." disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+                <call-process>
+                  <process-name>:AutoPilot-OA-Common_Utilities:Tokenize String</process-name>
+                  <parameters>
+                    <input>
+                      <from>limit string</from>
+                      <to>string</to>
+                    </input>
+                    <input>
+                      <value>
+                        <value> </value>
+                      </value>
+                      <to>delimiter</to>
+                    </input>
+                    <output>
+                      <from>tokens</from>
+                      <to>token list</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:call-process[1]</location>
+                </call-process>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>token list</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>current swap usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[number(//token[position() = 5])]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>token list</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>current free usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[number(//token[position() = 7])]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>swap threshold</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>swap memory-usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//limit[@memory = "swap"]/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>free threshold</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>free memory-usage</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//limit[@memory = "free"]/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>limits</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>limits</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="free memory usage">
+                          <input global="false">
+                            <from>free memory-usage</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="free">
+                          <input global="false">
+                            <from>current free usage</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="swap memory usage">
+                          <input global="false">
+                            <from>swap memory-usage</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="swap">
+                          <input global="false">
+                            <from>current swap usage</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <limits>
+      <memory>
+        <memory-type>
+          <xsl:text disable-output-escaping="no">swap</xsl:text>
+        </memory-type>
+        <usage>${swap}</usage>
+        <limit>${swap memory usage}</limit>
+        <within-limit>
+          <xsl:value-of select="${swap memory usage} &gt; ${swap}" disable-output-escaping="no" />
+        </within-limit>
+      </memory>
+      <memory>
+        <memory-type>
+          <xsl:text disable-output-escaping="no">free</xsl:text>
+        </memory-type>
+        <usage>${free}</usage>
+        <limit>${free memory usage}</limit>
+        <within-limit>
+          <xsl:value-of select="${free memory usage} &gt; ${free}" disable-output-escaping="no" />
+        </within-limit>
+      </memory>
+    </limits>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>Memory usage</value>
+                        </input>
+                        <input>
+                          <from>limits</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[2]:assign[2]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Memory Usage Statistics Evaluation
+   Determines if current memory usage is within defined limits. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4001b085-0a94-3d5b-a9a5-c3d72467602b</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1292079897927</last-modified>
+    </meta>
+  </process-def>
+</process>

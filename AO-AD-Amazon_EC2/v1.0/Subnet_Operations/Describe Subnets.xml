@@ -1,0 +1,186 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":AO-AD-Amazon_EC2:v1.0:Subnet_Operations:Describe Subnets">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter to use to handle the request. 
+
+Default value: AmazonEC2ActorAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon EC2. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - http://s3.amazonaws.com/ec2-downloads/2009-10-31.ec2.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon EC2 instances across different regions. Respective values for different regions are as below:
+
+    * http://us-east-1.ec2.amazonaws.com/ — Endpoint located in the US-East (Northern Virginia) Region
+    * http://us-west-1.ec2.amazonaws.com/ — Endpoint located in the US-West (Northern California) Region
+    * http://eu-west-1.ec2.amazonaws.com/ ---Endpoint located in the EU (Ireland) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>signature properties [Optional]
+
+Specify this element for including authentication credentials at request level. 
+
+Sample values that can be specified are:
+
+&lt;signature-properties mode = "key-files"&gt;
+    &lt;private-key-file&gt;&lt;/private-key-file&gt;
+    &lt;certificate-file&gt;&lt;/certificate-file&gt;
+&lt;/signature-properties&gt;
+
+OR
+
+&lt;signature-properties mode = "key-data"&gt;
+    &lt;private-key-data&gt;&lt;/private-key-data&gt;
+    &lt;certificate-data&gt;&lt;/certificate-data&gt;
+&lt;/signature-properties&gt;
+</description>
+        <from>signature properties</from>
+        <to>signature properties</to>
+      </input>
+      <input global="false" required="true">
+        <description>items
+       The items XML used to perform "Describe Subnets" operation.
+
+Value takes the form:
+
+&lt;items&gt;
+    &lt;item&gt;
+        &lt;parameters&gt;
+            &lt;subnet-set&gt;
+                &lt;!--Zero or more repetition--&gt;
+                &lt;item&gt;
+                    &lt;subnet-id&gt;1234&lt;/subnet-id&gt;
+                &lt;/item&gt;
+            &lt;/subnet-set&gt;
+            &lt;!--Optional:--&gt;
+            &lt;filter-set&gt;
+                &lt;!--Zero or more repetition--&gt;
+                &lt;item&gt;
+                    &lt;name&gt;vpc-id&lt;/name&gt;
+                    &lt;value-set&gt;
+                        &lt;!--Zero or more repetition--&gt;
+                        &lt;item&gt;
+                            &lt;value&gt;vpc-915867f8&lt;/value&gt;
+                        &lt;/item&gt;
+                    &lt;/value-set&gt;
+                &lt;/item&gt;
+            &lt;/filter-set&gt;
+        &lt;/parameters&gt;
+    &lt;/item&gt;
+&lt;/items&gt;
+
+For description of each parameter tag, please refer corresponding Adapter Actions process.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <description>The adapter response containing the results. </description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-Amazon_EC2:Utilities:Invoke Amazon EC2 Adapter</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>describe-subnets</value>
+            <to>operation name</to>
+          </input>
+          <input>
+            <from>wsdl location</from>
+            <to>wsdl location</to>
+          </input>
+          <input>
+            <from>endpoint address</from>
+            <to>endpoint address</to>
+          </input>
+          <input>
+            <from>signature properties</from>
+            <to>signature properties</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Gives you information about your subnets. You can filter the results to return information only about subnets that match criteria you specify. For example, you could get information only about subnets whose state is available. You can specify multiple values for the filter. The subnet must match at least one of the specified values for it to be included in the results.
+
+You can specify multiple filters (e.g., the subnet is in a particular VPC, and the subnet's state is available). The result includes information for a particular subnet only if it matches all your filters. If there's no match, no special message is returned; the response is simply empty.
+
+You can use wildcards with the filter values: * matches zero or more characters, and ? matches exactly one character. You can escape special characters using a backslash before the character. For example, a value of \*amazon\?\\ searches for the literal string *amazon?\.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>cee59036-cbf5-4c0b-badc-290d655641de</process-id>
+      <author />
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1317705395548</last-modified>
+    </meta>
+  </process-def>
+</process>

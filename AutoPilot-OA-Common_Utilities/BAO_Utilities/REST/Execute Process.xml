@@ -1,0 +1,422 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Execute Process">
+    <parameters>
+      <input global="false" required="true">
+        <description>REST adapter name</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>BAO's URL - for example: 
+
+https://&lt;host&gt;:&lt;port&gt;/baocdp
+
+OR
+
+https://&lt;host&gt;:&lt;port&gt;/baoap</description>
+        <from>target url</from>
+        <to>target url</to>
+      </input>
+      <input global="false" required="true">
+        <description>user id to be used to invoke process. </description>
+        <from>user name</from>
+        <to>user name</to>
+      </input>
+      <input global="false" required="true">
+        <description>password corresponding to the user</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional: BAO's authentication token, if it already exists.</description>
+        <from>authentication token</from>
+        <to>authentication token</to>
+      </input>
+      <input global="false" required="true">
+        <description>Process name to be invoked, like
+
+ :&lt;ModuleName&gt;:&lt;ProcessDirectory&gt;:&lt;ProcessName&gt;
+
+:AutoPilot-AD-Utilites:Terminal:Command Line
+</description>
+        <from>process name</from>
+        <to>process name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional : Input parameters in the format:
+
+&lt;inputParameters&gt;
+   &lt;inputParameter&gt;
+     &lt;name&gt;p1&lt;/name&gt;
+     &lt;value&gt;v1&lt;/value&gt;
+   &lt;/inputParameter&gt;
+   &lt;inputParameter&gt;
+     &lt;name&gt;p2&lt;/name&gt;
+     &lt;value&gt;v2&lt;/value&gt;
+   &lt;/inputParameter&gt;
+&lt;/inputParameters&gt;
+
+OR
+
+&lt;inputParameters&gt;
+  &lt;inputParameter&gt;
+    &lt;name&gt;adapter name&lt;/name&gt;
+    &lt;value&gt;CommandLineAdapter&lt;/value&gt;
+  &lt;/inputParameter&gt;
+  &lt;inputParameter&gt;
+    &lt;name&gt;command&lt;/name&gt;
+    &lt;value&gt;hello&lt;/value&gt;
+  &lt;/inputParameter&gt;
+&lt;/inputParameters&gt;
+
+If process does not accept any inputs, then, no input is required.</description>
+        <from>input parameters</from>
+        <to>input parameters</to>
+      </input>
+      <input global="false" required="false">
+        <description>Optional: Possible values are sync and async. Default value is sync.</description>
+        <from>mode</from>
+        <to>mode</to>
+      </input>
+      <input global="false" required="false">
+        <description>Timeout in seconds. Used for HTTP connection timeout and socket timeout. Default is 60 seconds.</description>
+        <from>request timeout</from>
+        <to>request timeout</to>
+      </input>
+      <output global="false" required="false">
+        <description>Response from the process</description>
+        <to>process output</to>
+        <from>process output</from>
+      </output>
+      <output global="false" required="false">
+        <to>detailed process output</to>
+        <from>detailed process output</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>mode</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>mode</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">sync</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>process output</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>detailed process output</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>authentication token</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>is auth token present</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==========Log BAO-Utilities::Execute Process Input======</value>
+              </input>
+              <input>
+                <from>adapter name</from>
+              </input>
+              <input>
+                <from>target url</from>
+              </input>
+              <input>
+                <from>user name</from>
+              </input>
+              <input>
+                <from>process name</from>
+              </input>
+              <input>
+                <from>input parameters</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>is auth token present</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>authentication token</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Login</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>target url</from>
+                  <to>url</to>
+                </input>
+                <input>
+                  <from>user name</from>
+                  <to>user name</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>password</to>
+                </input>
+                <output>
+                  <from>authentication token</from>
+                  <to>authentication token</to>
+                </output>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>status reason</from>
+                  <to>status reason</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>error number</from>
+                  <to>error number</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>authentication token</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Execute Process with Auth Token</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>authentication token</from>
+                  <to>authentication token</to>
+                </input>
+                <input>
+                  <from>target url</from>
+                  <to>target url</to>
+                </input>
+                <input>
+                  <from>process name</from>
+                  <to>process name</to>
+                </input>
+                <input>
+                  <from>input parameters</from>
+                  <to>input parameters</to>
+                </input>
+                <input>
+                  <from>mode</from>
+                  <to>mode</to>
+                </input>
+                <input>
+                  <from>request timeout</from>
+                  <to>request timeout</to>
+                </input>
+                <output>
+                  <from>process output</from>
+                  <to>process output</to>
+                </output>
+                <output>
+                  <from>detailed process output</from>
+                  <to>detailed process output</to>
+                </output>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Invoke a process using REST API.
+Inputs are 
+target
+credentails
+process name
+process parameters
+</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>1d62d5b1-ca4c-47d7-b567-0af0f7671bf0</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>BAO Utils</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1551898008442</last-modified>
+    </meta>
+  </process-def>
+</process>

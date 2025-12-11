@@ -1,0 +1,192 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Errors:Get Error by Code with Tokens">
+    <parameters>
+      <input global="false" required="true">
+        <description>An error code. 
+
+If code exists, then, an XML is returned. For example:
+&lt;error&gt;
+  &lt;code&gt;100&lt;/code&gt;
+  &lt;summary&gt;Unknown error&lt;/summary&gt;
+  &lt;details&gt;Uknown error&lt;/details&gt;
+  &lt;resolution&gt;Please contact BAO administrator&lt;/resolution&gt;
+&lt;/error&gt;
+
+If code does not exist, it will return an error text indicating error with the given code does not exist. For example: 
+
+Error definition with code: '10' not found!
+</description>
+        <from>error code</from>
+        <to>error code</to>
+      </input>
+      <input global="false" required="true">
+        <description>Tokens are used to replace values present in the details part of the error message.
+Token structure is as below:
+
+&lt;tokens&gt;
+   &lt;token idx="1"&gt;replacement-value-1&lt;/token&gt;
+   &lt;token idx="2"&gt;replacement-value-2&lt;/token&gt;
+&lt;/tokens&gt;
+</description>
+        <from>token</from>
+        <to>token</to>
+      </input>
+      <output global="false" required="false">
+        <to>error</to>
+        <from>error</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:AutoPilot-OA-Errors</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="error code">
+                <input global="false">
+                  <from>error code</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="tokens">${tokens}</xsl:variable>
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//*[code/text() = '${error code}'])">
+        <xsl:copy-of select="//*[code/text() = '${error code}']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <result>
+          <xsl:text disable-output-escaping="no">Error definition with code: '${error code}' not found!</xsl:text>
+        </result>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>error</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="tokens">
+                <input global="false">
+                  <from>tokens</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="tokens">${tokens}</xsl:variable>
+  <xsl:variable name="idx" select="0" />
+  <xsl:variable name="rootNodeName" select="name(/*)" />
+  <xsl:template match="/">
+    <xsl:element name="{$rootNodeName}">
+      <xsl:apply-templates select="/*/*" />
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="/*/*">
+    <xsl:choose>
+      <xsl:when test="name(.) = 'details'">
+        <xsl:variable name="idx" select="$idx+ 1" />
+        <xsl:variable name="origText" select="." />
+        <details>
+          <xsl:for-each select="xalan:nodeset($tokens)//*">
+            <xsl:call-template name="ReplaceToken">
+              <xsl:with-param name="idx" select="$idx" />
+              <xsl:with-param name="inStr" select="$origText" />
+            </xsl:call-template>
+          </xsl:for-each>
+        </details>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="." />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="ReplaceToken">
+    <xsl:param name="idx" />
+    <xsl:param name="inStr" />
+    <xsl:variable name="origText" select="concat(concat(substring-before($inStr, &quot;{&quot;), .), substring-after($inStr, &quot;}&quot;))" />
+    <xsl:value-of select="$origText" disable-output-escaping="no" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>GetError - error</value>
+              </input>
+              <input>
+                <from>error</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility work flow to get details of an error, given an error code.
+
+If code exists, then, an XML is returned. For example:
+&lt;error&gt;
+  &lt;code&gt;100&lt;/code&gt;
+  &lt;summary&gt;Unknown error&lt;/summary&gt;
+  &lt;details&gt;Uknown error&lt;/details&gt;
+  &lt;resolution&gt;Please contact BAO administrator&lt;/resolution&gt;
+&lt;/error&gt;
+
+If code does not exist, it will return an error text indicating error with the given code does not exist. For example: 
+
+Error definition with code: '10' not found!</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ab5d8be7-ea9e-46d3-97fb-e5ee6d051e7b</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1438368692235</last-modified>
+    </meta>
+  </process-def>
+</process>

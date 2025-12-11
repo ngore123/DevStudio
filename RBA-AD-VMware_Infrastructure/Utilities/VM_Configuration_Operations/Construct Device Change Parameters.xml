@@ -1,0 +1,219 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Device Change Parameters">
+    <parameters>
+      <input global="false" required="false">
+        <description>Type attribute is optional. 
+Default value is VirtualPCNet32
+
+Supported Values: VirtualE1000, VirtualPCNet32, VirtualVmxnet
+</description>
+        <from>device type</from>
+        <to>device type</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing type [Optional]
+
+Valid values: VirtualEthernetCardDistributedVirtualPortBackingInfo, VirtualEthernetCardNetworkBackingInfo</description>
+        <from>backing type</from>
+        <to>backing type</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing device name: The name of the backing device on the host system
+</description>
+        <from>backing device name</from>
+        <to>backing device name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Information about restrictions on removing this device while a virtual machine is running
+
+Takes in boolen value either true or false</description>
+        <from>start connected</from>
+        <to>start connected</to>
+      </input>
+      <input global="false" required="false">
+        <description>Information about restrictions on removing this device while a virtual machine is running
+
+Takes in boolen value either true or false</description>
+        <from>allow guest control</from>
+        <to>allow guest control</to>
+      </input>
+      <input global="false" required="false">
+        <description>Information about restrictions on removing this device while a virtual machine is running
+
+Takes in boolen value either true or false</description>
+        <from>connected</from>
+        <to>connected</to>
+      </input>
+      <input global="false" required="false">
+        <description>MAC address type. 
+
+Valid values for address type are: manual 
+
+Statically assigned MAC address: generated 
+
+Automatically generated MAC address: assigned 
+
+MAC address assigned by VirtualCenter.
+</description>
+        <from>address type</from>
+        <to>address type</to>
+      </input>
+      <input global="false" required="false">
+        <description>MAC address assigned to the virtual network adapter. Clients can set this property to any of the allowed address types. The server might override the specified value for "Generated" or "Assigned" if it does not fall in the right ranges or is determined to be a duplicate.
+</description>
+        <from>mac address</from>
+        <to>mac address</to>
+      </input>
+      <input global="false" required="false">
+        <description>Indicates whether wake-on-LAN is enabled on this virtual network adapter. Clients can set this property to selectively enable or disable wake-on-LAN.
+</description>
+        <from>wake on lan enabled</from>
+        <to>wake on lan enabled</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing dv switch [optional]
+	The name of distributed virtual switch.</description>
+        <from>backing dv switch</from>
+        <to>backing dv switch</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing dv portgroup [optional]
+	The name of distributed virtual portgroup</description>
+        <from>backing dv portgroup</from>
+        <to>backing dv portgroup</to>
+      </input>
+      <output global="false" required="false">
+        <to>device change</to>
+        <from>device change</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>device change</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="type">
+                <input global="false">
+                  <from>device type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="device name">
+                <input global="false">
+                  <from>backing device name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="start connected">
+                <input global="false">
+                  <from>start connected</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="allow guest control">
+                <input global="false">
+                  <from>allow guest control</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="connected">
+                <input global="false">
+                  <from>connected</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="address type">
+                <input global="false">
+                  <from>address type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="mac address">
+                <input global="false">
+                  <from>mac address</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="wake on lan enabled">
+                <input global="false">
+                  <from>wake on lan enabled</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="dv switch">
+                <input global="false">
+                  <from>backing dv switch</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="dv portgroup">
+                <input global="false">
+                  <from>backing dv portgroup</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="backing type">
+                <input global="false">
+                  <from>backing type</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <device-change>
+      <device>
+        <xsl:attribute name="type">${type}</xsl:attribute>
+        <backing type="${backing type}">
+          <xsl:if test="string-length('${device name}') &gt; 0">
+            <device-name>${device name}</device-name>
+          </xsl:if>
+          <xsl:if test="string-length('${dv switch}') &gt;0  or string-length('${dv portgroup}') &gt;0">
+            <port>
+              <dv-portgroup>${dv portgroup}</dv-portgroup>
+              <dv-switch>${dv switch}</dv-switch>
+            </port>
+          </xsl:if>
+        </backing>
+        <connectable>
+          <start-connected>${start connected}</start-connected>
+          <allow-guest-control>${allow guest control}</allow-guest-control>
+          <connected>${connected}</connected>
+        </connectable>
+        <address-type>${address type}</address-type>
+        <mac-address>${mac address}</mac-address>
+        <wake-on-lan-enabled>${wake on lan enabled}</wake-on-lan-enabled>
+      </device>
+    </device-change>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs complex &lt;device-change&gt; parameter.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a004c07e-61ca-3f6f-ba95-c6531b1ca53b</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288251429241</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,178 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-NetAPP_Rapid_Cloning_Utility:v3.0:Clone_Operations:Clone VM On Existing Datastore">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter. Default Name: NetAppRCUActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>This wrapper creates clones of virtual machine on existing datastores
+
+Sample Items XML:
+
+&lt;items&gt;
+&lt;item&gt;
+	&lt;clone-details&gt;
+		&lt;source-vm-or-template&gt;sourcevm&lt;/source-vm-or-template&gt;
+		&lt;number-of-clones&gt;2&lt;/number-of-clones&gt;
+		&lt;clone-name&gt;clonevm&lt;/clone-name&gt;
+		&lt;starting-clone-number&gt;5&lt;/starting-clone-number&gt;
+		&lt;clone-number-increment&gt;10&lt;/clone-number-increment&gt;
+		&lt;power-on&gt;true&lt;/power-on&gt;
+	&lt;/clone-details&gt;
+	&lt;clone-destination-name&gt;RBA_XXX&lt;/clone-destination-name&gt;
+	&lt;clone-destination-type&gt;Datacenter&lt;/clone-destination-type&gt;
+	&lt;vm-folder-name&gt;BMCCAT&lt;/vm-folder-name&gt;
+	&lt;vm-folder-type&gt;Datacenter&lt;/vm-folder-type&gt;
+	&lt;controller-address&gt;10.10.1.1&lt;/controller-address&gt;
+	&lt;destination-datastore&gt;
+		&lt;datastore-names&gt;
+			&lt;datastore-name&gt;testds1&lt;/datastore-name&gt;
+		&lt;/datastore-names&gt;
+	&lt;/destination-datastore&gt;
+&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+clone-details[Required]
+	This tag contains details required for cloning virtual machines.
+
+source-vm-or-template[Required]
+	The name of source virtual machine or virtual machine template whose clones will be created.
+
+number-of-clones[Optional]
+	The number of clones that need to be created. Default value is 1. Valid values - Any number
+
+clone-name[Optional]
+	The prefix in the name of cloned virtual machine. Default is 'cloneVM'. Valid values - Any string
+
+starting-clone-number[Optional]
+	The suffix(numerical index) that will be appended to the name of the cloned virtual machine. Default value is 1. Valid values - Any number
+
+power-on[Optional]
+	This is a boolean value. If true, the cloned virtual machines will be powered on once the cloning is complete. Default is false. Valid value - true, false
+
+clone-destination-name[Required]
+	The destination name where cloned virtual machines will be stored.
+
+clone-destination-type[Required]
+	The managed object type of destination provided in 'clone-destination-name'. Valid values - Datacenter, HostSystem
+
+vm-folder-name[Optional]
+	VM folder the clones should be created in. If left empty, clones are created at the root VM folder.
+	
+vm-folder-type[Optional]
+	Type of the VM folder specified in "vm-folder-name". This is only required if "vm-folder-name" is provided by the user.  Valid values - Datacenter, Folder
+	
+controller-address[Required]
+	The name or IP address of the storage controller that will be used for cloning operation.
+
+destination-datastore[Optional]
+	This tag contains information of the destination datastore where the files of cloned virtual machines will be placed. This is an optional tag and should be provided only if the destination datastore is different from the datastore of the source virtual machine.
+
+Following tags are only relevant if 'destination-datastore' tag is present in the request.
+
+datastore-names[Required]
+	This tag contains the information about the destination datastores where cloned virtual machines will be stored. Valid Values - Any valid string supported by application.
+
+datastore-name[Required]
+	The name of the target datastore where clone virtual machines will be placed.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>clone-vm-on-existing-datastore</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-NetAPP_Rapid_Cloning_Utility:Utilities:Invoke Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Create a flexible volume that is a clone of a "backing" or "parent" flexible volume. A clone is a volume that is a writable snapshot of another volume.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d6ebfa87-f396-36eb-ba56-c8417a94a5f4</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290597683126</last-modified>
+    </meta>
+  </process-def>
+</process>

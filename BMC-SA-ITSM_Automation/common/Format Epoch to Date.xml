@@ -1,0 +1,274 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":BMC-SA-ITSM_Automation:common:Format Epoch to Date">
+    <parameters>
+      <input global="false" required="false">
+        <from>start date</from>
+        <to>start date</to>
+      </input>
+      <input global="false" required="false">
+        <from>end date</from>
+        <to>end date</to>
+      </input>
+      <input global="false" required="false">
+        <from>date format</from>
+        <to>date format</to>
+      </input>
+      <input global="false" required="false">
+        <from>timezone</from>
+        <to>timezone</to>
+      </input>
+      <output global="false" required="false">
+        <to>start date</to>
+        <from>start date</from>
+      </output>
+      <output global="false" required="false">
+        <to>end date</to>
+        <from>end date</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <utility>
+              <date>
+                <now />
+              </date>
+              <output global="false">
+                <to>epoch start date</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:utility[1]</location>
+            </utility>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>start date</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>start date</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>epoch start date</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <new-element>
+      <xsl:value-of select=". * 1000" disable-output-escaping="no" />
+    </new-element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Format Date</process-name>
+        <parameters>
+          <input>
+            <from>epoch start date</from>
+            <to>date</to>
+          </input>
+          <input>
+            <from>timezone</from>
+            <to>time zone</to>
+          </input>
+          <input>
+            <from>date format</from>
+            <to>format string</to>
+          </input>
+          <output>
+            <from>formatted date</from>
+            <to>start date</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <utility>
+              <number>
+                <add>
+                  <input>
+                    <from>epoch start date</from>
+                  </input>
+                  <input>
+                    <value>259200000</value>
+                  </input>
+                </add>
+              </number>
+              <output global="false">
+                <to>epoch end date</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[1]:utility[1]</location>
+            </utility>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>end date</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>end date</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>epoch end date</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <new-element>
+      <xsl:value-of select=". * 1000" disable-output-escaping="no" />
+    </new-element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Format Date</process-name>
+        <parameters>
+          <input>
+            <from>epoch end date</from>
+            <to>date</to>
+          </input>
+          <input>
+            <from>timezone</from>
+            <to>time zone</to>
+          </input>
+          <input>
+            <from>date format</from>
+            <to>format string</to>
+          </input>
+          <output>
+            <from>formatted date</from>
+            <to>end date</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0aeef32a-58fa-466b-99f2-eaf564d0fddf</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1604382139142</last-modified>
+    </meta>
+  </process-def>
+</process>

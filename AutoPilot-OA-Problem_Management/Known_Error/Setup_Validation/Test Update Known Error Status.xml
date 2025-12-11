@@ -1,0 +1,178 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Problem_Management:Known_Error:Setup_Validation:Test Update Known Error Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>String value - The name of a configuration item defined in a configuration module. 
+
+Example: BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String value - The known error id number of the incident to be updated.
+</description>
+        <from>known error id</from>
+        <to>known error id</to>
+      </input>
+      <input global="false" required="true">
+        <description>String value - The new status for the target Known Error ID.</description>
+        <from>new status</from>
+        <to>new status</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document providing the data template for single or multiple Concept elements.A concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.</description>
+        <to>known errors</to>
+        <from>known errors</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value - Indicates whether or not the process completed successfully. 
+Valid values: success, failure.
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value -  A verbose  process specific string that explains the value of success status.
+
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <from>known error id</from>
+          </input>
+          <output>
+            <to>known error</to>
+            <concept type="AutoPilot-OA-Problem_Management:KnownError">
+              <attribute>known-error-id</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>new status</from>
+          </input>
+          <output>
+            <to>known error</to>
+            <concept type="AutoPilot-OA-Problem_Management:KnownError">
+              <attribute>known-error-status</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>known error</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>known errors</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="known error">
+                <input global="false">
+                  <from>known error</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <KnownErrors>
+      <xsl:choose>
+        <xsl:when test="string-length(//knownerror) &gt; 0">
+          <xsl:copy-of select="//knownerror" />
+        </xsl:when>
+        <xsl:otherwise>${known error}</xsl:otherwise>
+      </xsl:choose>
+    </KnownErrors>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Show contents of known error</value>
+              </input>
+              <input>
+                <from>known error</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Problem_Management:Known_Error:Update Known Errors</process-name>
+        <parameters>
+          <input>
+            <from>known errors</from>
+            <to>known errors</to>
+          </input>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>known errors</from>
+            <to>known errors</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow tests the update of an exisiting Known Error Record.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>164775b0-1aae-323f-995f-88364b3272d6</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283164599467</last-modified>
+    </meta>
+  </process-def>
+</process>

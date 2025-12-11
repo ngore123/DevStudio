@@ -1,0 +1,1552 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Task_Management:Remedyforce:Transform Name to Id">
+    <parameters>
+      <input global="false" required="false">
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <from>task</from>
+        <to>task</to>
+      </input>
+      <output global="false" required="false">
+        <to>updated task</to>
+        <from>updated task</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <from>task</from>
+          </input>
+          <output>
+            <to>updated task</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>task</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>true</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//submitter)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>user</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//submitter/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>user</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="UName">
+                      <input global="false">
+                        <from>user</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from User where Name like '${UName}' and IsActive = true</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>client id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>client id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'submitter']" />
+        <submitter>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </submitter>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'submitter']" />
+        <submitter />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//change)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//change/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>change</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="IName">
+                      <input global="false">
+                        <from>change</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from BMCServiceDesk__Change_Request__c where Name = '${IName}'</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>change id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'change']" />
+        <change>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </change>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'change']" />
+        <change />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//incident)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>incident</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//incident/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>incident</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="IName">
+                      <input global="false">
+                        <from>incident</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from BMCServiceDesk__Incident__c where Name = '${IName}'</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>incident id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>incident id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'incident']" />
+        <incident>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </incident>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'incident']" />
+        <incident />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//problem)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>problem</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//problem/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>problem</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="PName">
+                      <input global="false">
+                        <from>problem</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from BMCServiceDesk__Problem__c where Name = '${PName}'</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[5]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[5]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>problem id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[5]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>problem id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'problem']" />
+        <problem>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </problem>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'problem']" />
+        <problem />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[5]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//template)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>template</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//template/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>template</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="TName">
+                      <input global="false">
+                        <from>template</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from BMCServiceDesk__SYSTemplate__c where Name = '${TName}'</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[6]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[6]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>template id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[6]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>template id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'template']" />
+        <template>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </template>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'template']" />
+        <template />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[6]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//task-id)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//task-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="Task Name">
+                      <input global="false">
+                        <from>task name</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from BMCServiceDesk__Task__c where Name = '${Task Name}'</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[7]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[7]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[7]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>task id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'task-id']" />
+        <task-id>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </task-id>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'task-id']" />
+        <task-id />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[7]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//instance-name)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>instance name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//instance-name/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>instance name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="IName">
+                      <input global="false">
+                        <from>instance name</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from BMCServiceDesk__BMC_BaseElement__c where BMCServiceDesk__Name__c = '${IName}'</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[8]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[8]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>instance id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[8]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>instance id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'instance-name']" />
+        <instance-name>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </instance-name>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'instance-name']" />
+        <instance-name />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[8]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//work-info-type)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>work info type</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//work-info-type/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>work info type</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="work-info-type">
+                      <input global="false">
+                        <from>work info type</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from BMCServiceDesk__Action__c where Name = '${work-info-type}'
+</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[9]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[9]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>work info type id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[9]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>work info type id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'work-info-type']" />
+        <work-info-type>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </work-info-type>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'work-info-type']" />
+        <work-info-type />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[9]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//release)>0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>release</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//release/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>release</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>objects</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="release">
+                      <input global="false">
+                        <from>release</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <objects>
+      <queryString>
+        <xsl:text disable-output-escaping="no">Select Id from BMCServiceDesk__Release__c where Name = '${release}'
+</xsl:text>
+      </queryString>
+    </objects>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[10]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-BMC_Remedyforce:Find Objects</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>objects</from>
+                  <to>objects</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[10]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>release id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Id[1]/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[10]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>updated task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>updated task</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="id">
+                      <input global="false">
+                        <from>release id</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Task>
+      <xsl:if test="string-length('${id}')&gt;0">
+        <xsl:copy-of select="./node()/*[local-name() != 'release']" />
+        <release>
+          <xsl:value-of select="'${id}'" disable-output-escaping="no" />
+        </release>
+      </xsl:if>
+      <xsl:if test="string-length('${id}')=0">
+        <xsl:copy-of select="./node()/*[local-name() != 'release']" />
+        <release />
+      </xsl:if>
+    </Task>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[10]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>93919386-1668-4f00-9816-8f3b24997ce7</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1392979603955</last-modified>
+    </meta>
+  </process-def>
+</process>

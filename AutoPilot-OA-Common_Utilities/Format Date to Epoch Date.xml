@@ -1,0 +1,300 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":AutoPilot-OA-Common_Utilities:Format Date to Epoch Date">
+    <parameters>
+      <input global="false" required="true">
+        <description>Date string
+
+E.g. 
+
+Tue Dec 06 16:52:24 CST 2011
+
+2011/12/29 </description>
+        <from>date</from>
+        <to>date</to>
+      </input>
+      <input global="false" required="false">
+        <description>The pattern describing the date and time format
+
+e.g.
+
+dd/mm/yyyy
+EEE MMM dd hh:mm:ss zzz yyyy</description>
+        <from>format string</from>
+        <to>format string</to>
+      </input>
+      <input global="false" required="false">
+        <description>The locale language argument is a valid ISO Language Code. These codes are the lower-case, two-letter codes as defined by ISO-639. You can find a full list of these codes at a number of sites, such as: 
+http://www.ics.uci.edu/pub/ietf/http/related/iso639.txt
+
+Some example below:
+
+el Greek
+en English
+eo Esperanto
+es Spanish
+fr French
+</description>
+        <from>locale language</from>
+        <to>locale language</to>
+      </input>
+      <input global="false" required="false">
+        <description>The locale country argument is a valid ISO Country Code. These codes are the upper-case, two-letter codes as defined by ISO-3166. You can find a full list of these codes at a number of sites, such as: 
+http://www.chemie.fu-berlin.de/diverse/doc/ISO_3166.html
+
+For example:
+
+MEXICO                                          MX 
+MALAYSIA                                        MY
+SPAIN                                           ES
+UNITED STATES                                   US 
+
+</description>
+        <from>locale country</from>
+        <to>locale country</to>
+      </input>
+      <output global="false" required="true">
+        <to>epoch date</to>
+        <from>epoch date</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint></checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>format string</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>format string</to>
+                  <value>MM/dd/yyyy</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>date</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>epoch date</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="format string">
+                      <input global="false">
+                        <from>format string</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="java" version="1.0">
+  <xsl:template match="/">
+    <xsl:variable name="dateFormat" select="java:text.SimpleDateFormat.new('${format string}')" />
+    <xsl:variable name="dateObject" select="java:parse($dateFormat, .)" />
+    <value>
+      <xsl:value-of select="java:getTime($dateObject)" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>epoch date</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>locale country</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)!=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>locale language</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)!=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>locale language</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.!="default"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>locale country</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.!="default"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>date</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>epoch date</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="format string">
+                      <input global="false">
+                        <from>format string</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="locale language">
+                      <input global="false">
+                        <from>locale language</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="locale country">
+                      <input global="false">
+                        <from>locale country</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="java" version="1.0">
+  <xsl:template match="/">
+    <xsl:variable name="dateFormat" select="java:text.SimpleDateFormat.new('${format string}', java:util.Locale.new('${locale language}', '${locale country}'))" />
+    <xsl:variable name="dateObject" select="java:parse($dateFormat, .)" />
+    <value>
+      <xsl:value-of select="java:getTime($dateObject)" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>epoch date using specified locale:</value>
+                    </input>
+                    <input>
+                      <from>epoch date</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>28f94627-4cc8-3ade-a5e6-2a3d6aac5032</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1325236201406</last-modified>
+    </meta>
+  </process-def>
+</process>

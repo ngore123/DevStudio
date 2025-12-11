@@ -1,0 +1,607 @@
+<process draft="false" dev-studio-version="7.5.02.04">
+  <process-def name=":AutoPilot-OA-Virtual_Server_Management:Utilities:BladeLogic:Create VM">
+    <parameters>
+      <input global="false" required="true">
+        <description>File adapter to use to create the input xml document file for vm creation.</description>
+        <from>file adapter name</from>
+        <to>file adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>SRM request ID</description>
+        <from>srm id</from>
+        <to>srm id</to>
+      </input>
+      <input global="false" required="true">
+        <description>ITSM Change Id corresponding to srm id</description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="true">
+        <description>ITSM Task Id corresponding to change id.</description>
+        <from>task id</from>
+        <to>task id</to>
+      </input>
+      <input global="false" required="true">
+        <description>BladeLogic's folder ID where the vm creation job will be created.</description>
+        <from>job folder ID</from>
+        <to>job folder ID</to>
+      </input>
+      <input global="false" required="true">
+        <description>Job name to be added to configuration file.</description>
+        <from>job name</from>
+        <to>job name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Details received from SRM request.
+
+Example:
+
+&lt;vm&gt;
+  &lt;vmpackage_id&gt;11111&lt;/vmpackage_id&gt;
+  &lt;virtual_center&gt;myvirtualcenter&lt;/virtual_center&gt;
+  &lt;destination type="host"&gt;myvmhost&lt;/destination&gt;
+  &lt;data_store&gt;some_datastore&lt;/data_store&gt;
+  &lt;port_group&gt;some_portgroup&lt;/port_group&gt;
+  &lt;ipconfig&gt;
+    &lt;prop name="ipaddress" value="192.168.1.100"/&gt;
+    &lt;prop name="subnet_mask" value="255.255.255.0"/&gt;
+    &lt;prop name="default_gateway" value="192.168.1.1"/&gt;
+    &lt;prop name="primary_dns" value="10.1.1.100"/&gt;
+    &lt;prop name="secondary_dns" value="10.1.1.101"/&gt;
+  &lt;/ipconfig&gt;
+  &lt;hostname&gt;myvm&lt;/hostname&gt;
+  &lt;no_of_processors&gt;2&lt;/no_of_processors&gt;
+  &lt;memory_in_MB&gt;256&lt;/memory_in_MB&gt;
+  &lt;disk_info&gt;
+    &lt;disk&gt;
+      &lt;storage_path&gt;BLProv:Storage1&lt;/storage_path&gt;
+      &lt;disk_size&gt;1&lt;/disk_size&gt;
+      &lt;use_existing_disk&gt;true&lt;/use_existing_disk&gt;
+    &lt;/disk&gt;
+    &lt;disk&gt;
+      &lt;storage_path&gt;BLProv:Storage2&lt;/storage_path&gt;
+      &lt;disk_size&gt;5&lt;/disk_size&gt;
+      &lt;use_existing_disk&gt;true&lt;/use_existing_disk&gt;
+    &lt;/disk&gt;
+  &lt;/disk_info&gt;
+  &lt;vm_property&gt;
+    &lt;prop name="expiration_date" value="05/26/2009"/&gt;
+    &lt;prop name="owner" value="win admin"/&gt;
+  &lt;/vm_property&gt;
+  &lt;system_package_id&gt;1110&lt;/system_package_id&gt;
+  &lt;system_package_dbkey&gt;1110&lt;/system_package_dbkey&gt;
+  &lt;server_property&gt;
+    &lt;prop name="servername" value="myserver"/&gt;
+  &lt;/server_property&gt;
+  &lt;syspackage_local_property&gt;
+    &lt;prop name="datastore" value="thestore"/&gt;
+  &lt;/syspackage_local_property&gt;
+  &lt;acl_template_id&gt;2222&lt;/acl_template_id&gt;
+  &lt;batch_job_dbkey&gt; 4444 &lt;/batch_job_dbkey&gt;
+&lt;/vm&gt;</description>
+        <from>vm details</from>
+        <to>vm details</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Timeout in milliseconds for BladeLogic connection details</description>
+        <from>timeout</from>
+        <to>timeout</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] User role for BladeLogic connection details</description>
+        <from>user role</from>
+        <to>user role</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+Valid values: success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status.</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+Valid values: 0 (for success), 1(for failure)
+</description>
+        <to>file maintenance success status</to>
+        <from>file maintenance success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status.</description>
+        <to>file maintenance status message</to>
+        <from>file maintenance status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <value>BladeLogic</value>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+          <output>
+            <from>adapter</from>
+            <to>adapter</to>
+          </output>
+          <output>
+            <from>system</from>
+            <to>system</to>
+          </output>
+          <output>
+            <from>default timeout</from>
+            <to>default timeout</to>
+          </output>
+          <output>
+            <from>default user role</from>
+            <to>default user role</to>
+          </output>
+          <output>
+            <from>ao hostname</from>
+            <to>ao hostname</to>
+          </output>
+          <output>
+            <from>file repository</from>
+            <to>file repository</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="adapter">
+                <input global="false">
+                  <from>adapter</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="timeout">
+                <input global="false">
+                  <from>timeout</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="user role">
+                <input global="false">
+                  <from>user role</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="default user role">
+                <input global="false">
+                  <from>default user role</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="default timeout">
+                <input global="false">
+                  <from>default timeout</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-details>
+      <adapter-name>${adapter}</adapter-name>
+      <role-name>
+        <xsl:choose>
+          <xsl:when test="string-length('${user role}') &gt; 0">${user role}</xsl:when>
+          <xsl:otherwise>${default user role}</xsl:otherwise>
+        </xsl:choose>
+      </role-name>
+      <timeout>
+        <xsl:choose>
+          <xsl:when test="string-length('${timeout}') &gt; 0">${timeout}</xsl:when>
+          <xsl:otherwise>${default timeout}</xsl:otherwise>
+        </xsl:choose>
+      </timeout>
+    </connection-details>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:BladeLogic:Create VM XML Input</process-name>
+        <parameters>
+          <input>
+            <from>file adapter name</from>
+            <to>file adapter name</to>
+          </input>
+          <input>
+            <from>srm id</from>
+            <to>srm id</to>
+          </input>
+          <input>
+            <from>change id</from>
+            <to>change id</to>
+          </input>
+          <input>
+            <from>task id</from>
+            <to>task id</to>
+          </input>
+          <input>
+            <from>file repository</from>
+            <to>file repository</to>
+          </input>
+          <input>
+            <from>job folder ID</from>
+            <to>job folder ID</to>
+          </input>
+          <input>
+            <from>job name</from>
+            <to>job name</to>
+          </input>
+          <input>
+            <from>vm details</from>
+            <to>vm details</to>
+          </input>
+          <input>
+            <from>ao hostname</from>
+            <to>ao hostname</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>bl file name</from>
+            <to>bl file name</to>
+          </output>
+          <output>
+            <from>file name</from>
+            <to>file name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>An error occured while creating the xml input file.</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v8.0:Virtualization:Create Virtual Guest from Package</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>bl file name</from>
+                  <to>propsFileURL</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>success status</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens />
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(.) = 'true'">
+          <xsl:text disable-output-escaping="no">success</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>SEMI_AUTOMATIC</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>SEMI_AUTOMATIC</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <from>status message</from>
+                      </input>
+                      <output>
+                        <to>status message</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.) = 'success']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:BladeLogic:File Maintenance</process-name>
+                    <parameters>
+                      <input>
+                        <from>file adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>file name</from>
+                        <to>file name</to>
+                      </input>
+                      <output>
+                        <from>success status</from>
+                        <to>file maintenance success status</to>
+                      </output>
+                      <output>
+                        <from>status message</from>
+                        <to>file maintenance status message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>SEMI_AUTOMATIC</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This action creates a virtual machine</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+    </meta>
+  </process-def>
+</process>

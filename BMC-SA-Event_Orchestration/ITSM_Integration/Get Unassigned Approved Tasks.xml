@@ -1,0 +1,1189 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration:ITSM_Integration:Get Unassigned Approved Tasks">
+    <parameters />
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Configuration:General:EventSourceType</configuration>
+          </input>
+          <output>
+            <to>event source type</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Configuration:General:ITSMType</configuration>
+          </input>
+          <output>
+            <to>itsm type</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Configuration:Specifics</configuration>
+          </input>
+          <output>
+            <to>all configurations</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <system>ROOT_JOB_ID</system>
+          </input>
+          <output>
+            <to>job id</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>event notes</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>no command</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//Defaults/NoCommand/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>all configurations</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//Defaults/RunSchedules/text() = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Event_Orchestration:ITSM:Task_Management:Get Unassigned Approved Tasks</process-name>
+              <unique-id>113db5b4-794c-4099-80eb-555dc2e489a4</unique-id>
+              <parameters>
+                <input>
+                  <from>itsm type</from>
+                  <to>itsm type</to>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>all configurations</to>
+                </input>
+                <input>
+                  <from>event source type</from>
+                  <to>event source type</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>changes</from>
+                  <to>changes</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>changes</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[count(//change) > 0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <for-each>
+                    <document>
+                      <input>
+                        <from>changes</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>change</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//change]]></xpath>
+                    </xpath-expression>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>=== Unassigned Approved Tasks  - Processing entry===</value>
+                          </input>
+                          <input>
+                            <from>change</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <sequence>
+                      <assign>
+                        <assignment>
+                          <output>
+                            <to>authentication token</to>
+                            <value></value>
+                          </output>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                      </assign>
+                      <call-process>
+                        <process-name>:BMC-SA-Event_Orchestration:ITSM_Integration:Retrieve Event Data From ITSM</process-name>
+                        <parameters>
+                          <input>
+                            <from>change</from>
+                            <to>change</to>
+                          </input>
+                          <input>
+                            <from>authentication token</from>
+                            <to>authentication token</to>
+                          </input>
+                          <input>
+                            <from>itsm type</from>
+                            <to>itsm type</to>
+                          </input>
+                          <input>
+                            <from>all configurations</from>
+                            <to>all configurations</to>
+                          </input>
+                          <input>
+                            <from>event source type</from>
+                            <to>event source type</to>
+                          </input>
+                          <output>
+                            <from>event data</from>
+                            <to>event data</to>
+                          </output>
+                          <output>
+                            <from>status</from>
+                            <to>status</to>
+                          </output>
+                          <output>
+                            <from>error message</from>
+                            <to>error message</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                      </call-process>
+                      <assign>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>event data</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>action id</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[/event/extendedData/nameValueList/nameValue[name="action-id"]/value/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[2]</location>
+                      </assign>
+                      <switch>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>true</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                        <default>
+                          <sequence>
+                            <assign>
+                              <assignment>
+                                <document>
+                                  <input>
+                                    <from>change</from>
+                                  </input>
+                                </document>
+                                <result>
+                                  <output>
+                                    <to>change id</to>
+                                  </output>
+                                </result>
+                                <xpath-expression>
+                                  <xpath-replacement-tokens />
+                                  <xpath><![CDATA[//change-id/text()]]></xpath>
+                                </xpath-expression>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <from>change</from>
+                                </input>
+                                <output>
+                                  <to>task id</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>Event data is not associated with change ticket [</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>change id</from>
+                                    </input>
+                                    <input>
+                                      <value>/</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>task id</from>
+                                    </input>
+                                    <input>
+                                      <value>]. Aborting remediation action.</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>error message</to>
+                                </output>
+                              </assignment>
+                              <meta>
+                                <documentation />
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <after-execution>
+                                <log>
+                                  <level>debug</level>
+                                  <parameters>
+                                    <input>
+                                      <value>========ERROR============</value>
+                                    </input>
+                                    <input>
+                                      <from>error message</from>
+                                    </input>
+                                  </parameters>
+                                </log>
+                              </after-execution>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                            </assign>
+                            <call-process>
+                              <process-name>:AutoPilot-OA-Event_Orchestration:ITSM:Task_Management:Update Task Status</process-name>
+                              <parameters>
+                                <input>
+                                  <from>itsm type</from>
+                                  <to>itsm type</to>
+                                </input>
+                                <input>
+                                  <from>all configurations</from>
+                                  <to>all configurations</to>
+                                </input>
+                                <input>
+                                  <from>event source type</from>
+                                  <to>event source type</to>
+                                </input>
+                                <input>
+                                  <from>change id</from>
+                                  <to>change id</to>
+                                </input>
+                                <input>
+                                  <from>task id</from>
+                                  <to>task id</to>
+                                </input>
+                                <input>
+                                  <value>Closed</value>
+                                  <to>task status</to>
+                                </input>
+                                <input>
+                                  <value>Failed</value>
+                                  <to>status reason</to>
+                                </input>
+                                <output>
+                                  <from>status</from>
+                                  <to>status</to>
+                                </output>
+                                <output>
+                                  <from>error message</from>
+                                  <to>error message</to>
+                                </output>
+                              </parameters>
+                              <meta>
+                                <documentation />
+                                <run-mode-handling>
+                                  <run-mode>OCP</run-mode>
+                                  <allow-step-into>false</allow-step-into>
+                                </run-mode-handling>
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                            </call-process>
+                          </sequence>
+                        </default>
+                        <case applies-if-any-condition-true="false">
+                          <condition>
+                            <document>
+                              <input>
+                                <from>status</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[. = 'success']]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <condition>
+                            <document>
+                              <input>
+                                <from>event data</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[boolean(//event) = 'true']]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <sequence>
+                            <call-process>
+                              <process-name>:BMC-SA-Event_Orchestration:Utilities:Truesight Login</process-name>
+                              <parameters>
+                                <input>
+                                  <from>all configurations</from>
+                                  <to>all configurations</to>
+                                </input>
+                                <output>
+                                  <from>authentication token</from>
+                                  <to>ts auth token</to>
+                                </output>
+                                <output>
+                                  <from>status</from>
+                                  <to>ts auth status</to>
+                                </output>
+                                <output>
+                                  <from>status code</from>
+                                  <to>ts auth status code</to>
+                                </output>
+                                <output>
+                                  <from>error message</from>
+                                  <to>ts auth error message</to>
+                                </output>
+                              </parameters>
+                              <meta>
+                                <documentation />
+                                <run-mode-handling>
+                                  <run-mode>OCP</run-mode>
+                                  <allow-step-into>false</allow-step-into>
+                                </run-mode-handling>
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                            </call-process>
+                            <call-process>
+                              <process-name>:BMC-SA-Event_Orchestration:Utilities:ITSM API Login</process-name>
+                              <parameters>
+                                <input>
+                                  <from>all configurations</from>
+                                  <to>all configurations</to>
+                                </input>
+                                <input>
+                                  <from>itsm type</from>
+                                  <to>itsm type</to>
+                                </input>
+                                <output>
+                                  <from>authentication token</from>
+                                  <to>itsm authentication token</to>
+                                </output>
+                                <output>
+                                  <from>status</from>
+                                  <to>itsm login status</to>
+                                </output>
+                                <output>
+                                  <from>status code</from>
+                                  <to>itsm login status code</to>
+                                </output>
+                                <output>
+                                  <from>error message</from>
+                                  <to>itsm login error message</to>
+                                </output>
+                              </parameters>
+                              <meta>
+                                <documentation />
+                                <run-mode-handling>
+                                  <run-mode>OCP</run-mode>
+                                  <allow-step-into>false</allow-step-into>
+                                </run-mode-handling>
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                            </call-process>
+                            <call-process>
+                              <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Login</process-name>
+                              <parameters>
+                                <input>
+                                  <from>all configurations</from>
+                                  <to>adapter name</to>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[//Adapters/RESTAdapter/text()]]></xpath>
+                                  </xpath-expression>
+                                </input>
+                                <input>
+                                  <from>all configurations</from>
+                                  <to>url</to>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[//BAO/URL/text()]]></xpath>
+                                  </xpath-expression>
+                                </input>
+                                <input>
+                                  <from>all configurations</from>
+                                  <to>user name</to>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[//BAO/UserName/text()]]></xpath>
+                                  </xpath-expression>
+                                </input>
+                                <input>
+                                  <from>all configurations</from>
+                                  <to>password</to>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens />
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="//BAO/Password/*[name()='EncryptedData']" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </input>
+                                <output>
+                                  <from>authentication token</from>
+                                  <to>authentication token</to>
+                                </output>
+                                <output>
+                                  <from>status</from>
+                                  <to>status</to>
+                                </output>
+                                <output>
+                                  <from>status code</from>
+                                  <to>status code</to>
+                                </output>
+                                <output>
+                                  <from>status reason</from>
+                                  <to>status reason</to>
+                                </output>
+                                <output>
+                                  <from>error message</from>
+                                  <to>error message</to>
+                                </output>
+                                <output>
+                                  <from>error number</from>
+                                  <to>error number</to>
+                                </output>
+                              </parameters>
+                              <meta>
+                                <documentation />
+                                <run-mode-handling>
+                                  <run-mode>OCP</run-mode>
+                                  <allow-step-into>false</allow-step-into>
+                                </run-mode-handling>
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[3]</location>
+                            </call-process>
+                            <switch>
+                              <meta>
+                                <documentation />
+                                <run-mode-handling>
+                                  <run-mode>OCP</run-mode>
+                                  <allow-step-into>true</allow-step-into>
+                                </run-mode-handling>
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                              <default>
+                                <sequence>
+                                  <assign>
+                                    <assignment>
+                                      <output>
+                                        <to>notes</to>
+                                        <value>Authentication Errors:</value>
+                                      </output>
+                                    </assignment>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>notes</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>error message</to>
+                                        </output>
+                                      </result>
+                                      <xslt-stylesheet>
+                                        <stylesheet-replacement-tokens>
+                                          <replacement-token name="status reason">
+                                            <input global="false">
+                                              <from>status reason</from>
+                                            </input>
+                                          </replacement-token>
+                                          <replacement-token name="error message">
+                                            <input global="false">
+                                              <from>error message</from>
+                                            </input>
+                                          </replacement-token>
+                                          <replacement-token name="ts error message">
+                                            <input global="false">
+                                              <from>ts auth error message</from>
+                                            </input>
+                                          </replacement-token>
+                                          <replacement-token name="itsm error message">
+                                            <input global="false">
+                                              <from>itsm login error message</from>
+                                            </input>
+                                          </replacement-token>
+                                        </stylesheet-replacement-tokens>
+                                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value " />
+  <xsl:variable name="tsoErrorReason">${status reason}</xsl:variable>
+  <xsl:variable name="tsoErrorMessage">${error message}</xsl:variable>
+  <xsl:variable name="tsErrorMessage">${ts error message}</xsl:variable>
+  <xsl:variable name="itsmErrorMessage">${itsm error message}</xsl:variable>
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="." disable-output-escaping="no" />
+      <xsl:if test="string-length(normalize-space($tsoErrorReason)) &gt; 0">
+        <xsl:value-of select="concat('TSO login error reason: ', $tsoErrorReason, '. ')" disable-output-escaping="no" />
+      </xsl:if>
+      <xsl:if test="string-length(normalize-space($tsoErrorMessage)) &gt; 0">
+        <xsl:value-of select="concat('TSO login error message: ',  $tsoErrorMessage, '. ')" disable-output-escaping="no" />
+      </xsl:if>
+      <xsl:if test="string-length(normalize-space($tsErrorMessage)) &gt; 0">
+        <xsl:value-of select="concat('Event source login error message: ', $tsErrorMessage, '. ')" disable-output-escaping="no" />
+      </xsl:if>
+      <xsl:if test="string-length(normalize-space($itsmErrorMessage)) &gt; 0">
+        <xsl:value-of select="concat('ITSM login error message: ', $itsmErrorMessage, '. ')" disable-output-escaping="no" />
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                      </xslt-stylesheet>
+                                    </assignment>
+                                    <assignment>
+                                      <output>
+                                        <to>status</to>
+                                        <value>failure</value>
+                                      </output>
+                                    </assignment>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <after-execution>
+                                      <log>
+                                        <level>debug</level>
+                                        <parameters>
+                                          <input>
+                                            <value>=== Authentication error(s)===</value>
+                                          </input>
+                                          <input>
+                                            <from>error message</from>
+                                          </input>
+                                        </parameters>
+                                      </log>
+                                    </after-execution>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                                  </assign>
+                                </sequence>
+                              </default>
+                              <case applies-if-any-condition-true="false">
+                                <condition>
+                                  <document>
+                                    <input>
+                                      <from>authentication token</from>
+                                    </input>
+                                  </document>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+                                  </xpath-expression>
+                                </condition>
+                                <condition>
+                                  <document>
+                                    <input>
+                                      <from>all configurations</from>
+                                    </input>
+                                  </document>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens>
+                                      <replacement-token name="auth token">
+                                        <input global="false">
+                                          <from>itsm authentication token</from>
+                                        </input>
+                                      </replacement-token>
+                                    </xpath-replacement-tokens>
+                                    <xpath><![CDATA[//Defaults/UseRemedyJavaAPI/text() = 'true' or (//Defaults/UseRemedyJavaAPI/text() = 'false' and string-length(normalize-space('${auth token}')) > 0)]]></xpath>
+                                  </xpath-expression>
+                                </condition>
+                                <condition>
+                                  <document>
+                                    <input>
+                                      <from>all configurations</from>
+                                    </input>
+                                  </document>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens>
+                                      <replacement-token name="auth token">
+                                        <input global="false">
+                                          <from>ts auth token</from>
+                                        </input>
+                                      </replacement-token>
+                                    </xpath-replacement-tokens>
+                                    <xpath><![CDATA[//Defaults/BypassEventNotes/text() = 'true' or (//Defaults/BypassEventNotes/text() = 'false' and string-length(normalize-space('${auth token}')) > 0)]]></xpath>
+                                  </xpath-expression>
+                                </condition>
+                                <sequence>
+                                  <call-process>
+                                    <process-name>:BMC-SA-Event_Orchestration:Event_Integration:Create Related Event</process-name>
+                                    <parameters>
+                                      <input>
+                                        <from>all configurations</from>
+                                        <to>all configurations</to>
+                                      </input>
+                                      <input>
+                                        <from>event data</from>
+                                        <to>event data</to>
+                                      </input>
+                                      <input>
+                                        <from>ts auth token</from>
+                                        <to>auth token</to>
+                                      </input>
+                                      <input>
+                                        <from>change</from>
+                                        <to>notes</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[concat('Launching remediation process for task : ', //task-id/text())]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <input>
+                                        <value>Fetch Event Data From ITSM</value>
+                                        <to>action name</to>
+                                      </input>
+                                      <input>
+                                        <from>change</from>
+                                        <to>message</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[concat('Launching remediation process for task : ', //task-id/text())]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <input>
+                                        <value>INFO</value>
+                                        <to>severity</to>
+                                      </input>
+                                      <input>
+                                        <from>no command</from>
+                                        <to>command</to>
+                                      </input>
+                                      <input>
+                                        <value>0</value>
+                                        <to>exit code</to>
+                                      </input>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                                  </call-process>
+                                  <call-process>
+                                    <process-name>:BMC-SA-Event_Orchestration:Utilities:Get Common Workflow Name by Action</process-name>
+                                    <unique-id>25eb2410-26dd-442f-8035-2f1bac223f43</unique-id>
+                                    <parameters>
+                                      <input global="true">
+                                        <configuration>:BMC-SA-Event_Orchestration_Configuration</configuration>
+                                        <to>workflow definitions</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[//WorkflowDefinitions]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <input>
+                                        <value>PerformRemediationOnTaskApproval</value>
+                                        <to>action</to>
+                                      </input>
+                                      <input global="true">
+                                        <configuration>:BMC-SA-Event_Orchestration_Configuration</configuration>
+                                        <to>default workflow name</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[//Defaults/UnfoundWorkflowName/text()]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <output>
+                                        <from>workflow name</from>
+                                        <to>workflow name</to>
+                                      </output>
+                                      <output>
+                                        <from>status</from>
+                                        <to>status</to>
+                                      </output>
+                                      <output>
+                                        <from>error message</from>
+                                        <to>error message</to>
+                                      </output>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <after-execution>
+                                      <log>
+                                        <level>debug</level>
+                                        <parameters>
+                                          <input>
+                                            <value>=== Get Workflowname ouptut===</value>
+                                          </input>
+                                          <input>
+                                            <from>workflow name</from>
+                                          </input>
+                                          <input>
+                                            <from>status</from>
+                                          </input>
+                                          <input>
+                                            <from>error message</from>
+                                          </input>
+                                        </parameters>
+                                      </log>
+                                    </after-execution>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                                  </call-process>
+                                  <call-process>
+                                    <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Execute Process</process-name>
+                                    <parameters>
+                                      <input>
+                                        <from>all configurations</from>
+                                        <to>adapter name</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[//Adapters/RESTAdapter/text()]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <input>
+                                        <from>all configurations</from>
+                                        <to>target url</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[//BAO/URL/text()]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <input>
+                                        <from>all configurations</from>
+                                        <to>user name</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[//BAO/UserName/text()]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <input>
+                                        <from>all configurations</from>
+                                        <to>password</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[//BAO/Password/text()]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <input>
+                                        <from>authentication token</from>
+                                        <to>authentication token</to>
+                                      </input>
+                                      <input>
+                                        <from>workflow name</from>
+                                        <to>process name</to>
+                                      </input>
+                                      <input>
+                                        <from>change</from>
+                                        <to>input parameters</to>
+                                        <xslt-stylesheet>
+                                          <stylesheet-replacement-tokens>
+                                            <replacement-token name="event data">
+                                              <input global="false">
+                                                <from>event data</from>
+                                              </input>
+                                            </replacement-token>
+                                            <replacement-token name="itsm type">
+                                              <input global="false">
+                                                <from>itsm type</from>
+                                              </input>
+                                            </replacement-token>
+                                            <replacement-token name="all configurations">
+                                              <input global="false">
+                                                <from>all configurations</from>
+                                              </input>
+                                            </replacement-token>
+                                            <replacement-token name="event source type">
+                                              <input global="false">
+                                                <from>event source type</from>
+                                              </input>
+                                            </replacement-token>
+                                            <replacement-token name="itsm authentication token">
+                                              <input global="false">
+                                                <from>itsm authentication token</from>
+                                              </input>
+                                            </replacement-token>
+                                          </stylesheet-replacement-tokens>
+                                          <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <inputParameters>
+      <inputParameter>
+        <name>
+          <xsl:text disable-output-escaping="no">event data</xsl:text>
+        </name>
+        <value>${event data}</value>
+      </inputParameter>
+      <inputParameter>
+        <name>
+          <xsl:text disable-output-escaping="no">change data</xsl:text>
+        </name>
+        <value>
+          <xsl:copy-of select="." />
+        </value>
+      </inputParameter>
+      <inputParameter>
+        <name>
+          <xsl:text disable-output-escaping="no">itsm type</xsl:text>
+        </name>
+        <value>${itsm type}</value>
+      </inputParameter>
+      <inputParameter>
+        <name>
+          <xsl:text disable-output-escaping="no">all configurations</xsl:text>
+        </name>
+        <value>${all configurations}</value>
+      </inputParameter>
+      <inputParameter>
+        <name>
+          <xsl:text disable-output-escaping="no">event source type</xsl:text>
+        </name>
+        <value>${event source type}</value>
+      </inputParameter>
+      <inputParameter>
+        <name>
+          <xsl:text disable-output-escaping="no">itsm authentication token</xsl:text>
+        </name>
+        <value>${itsm authentication token}</value>
+      </inputParameter>
+    </inputParameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                        </xslt-stylesheet>
+                                      </input>
+                                      <input>
+                                        <value>async</value>
+                                        <to>mode</to>
+                                      </input>
+                                      <input>
+                                        <from>all configurations</from>
+                                        <to>request timeout</to>
+                                        <xpath-expression>
+                                          <xpath-replacement-tokens />
+                                          <xpath><![CDATA[//Defaults/RESTRequestTimeout/text()]]></xpath>
+                                        </xpath-expression>
+                                      </input>
+                                      <output>
+                                        <from>process output</from>
+                                        <to>process output</to>
+                                      </output>
+                                      <output>
+                                        <from>detailed process output</from>
+                                        <to>detailed process output</to>
+                                      </output>
+                                      <output>
+                                        <from>status</from>
+                                        <to>status</to>
+                                      </output>
+                                      <output>
+                                        <from>error message</from>
+                                        <to>error message</to>
+                                      </output>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[3]</location>
+                                  </call-process>
+                                  <assign>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>process output</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>releated event msg</to>
+                                        </output>
+                                      </result>
+                                      <xslt-stylesheet>
+                                        <stylesheet-replacement-tokens />
+                                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="concat('Remediation job ID: ', //jobId/text(), ' started asynchronously')" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                      </xslt-stylesheet>
+                                    </assignment>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                                  </assign>
+                                  <call-process>
+                                    <process-name>:BMC-SA-Event_Orchestration:Event_Integration:Create Related Event</process-name>
+                                    <parameters>
+                                      <input>
+                                        <from>all configurations</from>
+                                        <to>all configurations</to>
+                                      </input>
+                                      <input>
+                                        <from>event data</from>
+                                        <to>event data</to>
+                                      </input>
+                                      <input>
+                                        <from>ts auth token</from>
+                                        <to>auth token</to>
+                                      </input>
+                                      <input>
+                                        <from>process output</from>
+                                        <to>notes</to>
+                                        <xslt-stylesheet>
+                                          <stylesheet-replacement-tokens />
+                                          <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="concat('Remediation job ID: ', //jobId/text(), ' started asynchronously')" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                        </xslt-stylesheet>
+                                      </input>
+                                      <input>
+                                        <value>Remediate ITSM Event Data</value>
+                                        <to>action name</to>
+                                      </input>
+                                      <input>
+                                        <from>releated event msg</from>
+                                        <to>message</to>
+                                      </input>
+                                      <input>
+                                        <value>INFO</value>
+                                        <to>severity</to>
+                                      </input>
+                                      <input>
+                                        <from>no command</from>
+                                        <to>command</to>
+                                      </input>
+                                      <input>
+                                        <value>0</value>
+                                        <to>exit code</to>
+                                      </input>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[4]</location>
+                                  </call-process>
+                                  <assign>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <before-execution>
+                                      <log>
+                                        <level>debug</level>
+                                        <parameters>
+                                          <input>
+                                            <value>=====Performing aysnc processing for change====</value>
+                                          </input>
+                                          <input>
+                                            <from>change</from>
+                                          </input>
+                                        </parameters>
+                                      </log>
+                                    </before-execution>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[2]</location>
+                                  </assign>
+                                </sequence>
+                              </case>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                            </switch>
+                            <assign>
+                              <meta>
+                                <documentation />
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                            </assign>
+                          </sequence>
+                        </case>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                      </switch>
+                    </sequence>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:for-each[1]</location>
+                  </for-each>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>true</is-enabled>
+        <log-file-name>Get-Unassigned-Approved-Tasks.log</log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2cb1fd7d-f0c0-4fff-be29-f4232f5d080e</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1576146815239</last-modified>
+    </meta>
+  </process-def>
+</process>

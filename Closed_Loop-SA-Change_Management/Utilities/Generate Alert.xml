@@ -1,0 +1,772 @@
+<process draft="false" dev-studio-version="7.7.00.00">
+  <process-def name=":Closed_Loop-SA-Change_Management:Utilities:Generate Alert">
+    <parameters>
+      <input global="false" required="false">
+        <from>changes</from>
+        <to>changes</to>
+      </input>
+      <output global="false" required="false">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access>
+      <execute>
+        <role>ANALYST1</role>
+      </execute>
+    </access>
+    <sequence>
+      <call-process>
+        <process-name>:Closed_Loop-SA-Change_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <value>BCAN</value>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>web services</from>
+            <to>web services</to>
+          </output>
+          <output>
+            <from>pause count</from>
+            <to>pause count</to>
+          </output>
+          <output>
+            <from>date format</from>
+            <to>date format</to>
+          </output>
+          <output>
+            <from>time zone</from>
+            <to>time zone</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <utility>
+              <date>
+                <now />
+              </date>
+              <output global="false">
+                <to>time now</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:utility[1]</location>
+            </utility>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:Format Date</process-name>
+              <parameters>
+                <input>
+                  <from>time now</from>
+                  <to>date</to>
+                </input>
+                <input>
+                  <from>time zone</from>
+                  <to>time zone</to>
+                </input>
+                <input>
+                  <from>date format</from>
+                  <to>format string</to>
+                </input>
+                <output>
+                  <from>formatted date</from>
+                  <to>time stamp</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>+++ Show time stamp ++++</value>
+                    </input>
+                    <input>
+                      <from>time stamp</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>web services</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>web services user name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//user-name/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>web services</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>web services password</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//password/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>web services</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>workflow name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//workflow-name/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>web services</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>grid name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//grid/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>web services</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>workflow input name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//workflow-input-name/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>changes</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//change-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>web services</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>ao host name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//ao-host-name/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>time stamp</from>
+                </input>
+                <output>
+                  <to>timestamp</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>workflow name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>soap message</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="change id">
+                      <input global="false">
+                        <from>change id</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="web services user name">
+                      <input global="false">
+                        <from>web services user name</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="web services password">
+                      <input global="false">
+                        <from>web services password</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="grid name">
+                      <input global="false">
+                        <from>grid name</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="workflow name">
+                      <input global="false">
+                        <from>workflow name</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="workflow input name">
+                      <input global="false">
+                        <from>workflow input name</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="ao host name">
+                      <input global="false">
+                        <from>ao host name</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="timestamp">
+                      <input global="false">
+                        <from>timestamp</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" version="1.0">
+  <xsl:output indent="yes" encoding="XML" cdata-section-elements="Envelope alert-message " />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Header>
+        <wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soapenv:mustUnderstand="1">
+          <xsl:element name="wsse:UsernameToken">
+            <xsl:element name="wsse:Username">$[web services user name]</xsl:element>
+            <xsl:element name="wsse:Password">
+              <xsl:attribute name="Type">
+                <xsl:text>http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText</xsl:text>
+              </xsl:attribute>
+              <xsl:text disable-output-escaping="no">${web services password}</xsl:text>
+            </xsl:element>
+          </xsl:element>
+        </wsse:Security>
+      </soapenv:Header>
+      <soapenv:Body>
+        <ns1:executeProcessAsync xmlns:ns1="http://bmc.com/ao/xsd/2008/09/soa">
+          <xsl:element name="ns1:gridName">${grid name}</xsl:element>
+          <xsl:element name="ns1:processName">$[workflow name]</xsl:element>
+          <xsl:element name="ns1:parameters">
+            <xsl:element name="ns1:Input">
+              <xsl:element name="ns1:Parameter">
+                <xsl:element name="ns1:Name">
+                  <xsl:attribute name="required">
+                    <xsl:text>false</xsl:text>
+                  </xsl:attribute>
+                  <xsl:text disable-output-escaping="no">${workflow input name}</xsl:text>
+                </xsl:element>
+                <xsl:element name="ns1:Value">
+                  <xsl:element name="ns1:XmlDoc">
+                    <alert-message alert-id="${change id}">
+                      <server-name>
+                        <xsl:text disable-output-escaping="no">${ao host name}</xsl:text>
+                      </server-name>
+                      <form-name>
+                        <xsl:text disable-output-escaping="no">AO:Notifier</xsl:text>
+                      </form-name>
+                      <object-id>${change id}</object-id>
+                      <source>
+                        <xsl:text disable-output-escaping="no">AO</xsl:text>
+                      </source>
+                      <timestamp>${timestamp}</timestamp>
+                      <priority>
+                        <xsl:text disable-output-escaping="no">0</xsl:text>
+                      </priority>
+                      <text>
+                        <xsl:text disable-output-escaping="no">Change ID: ${change id} Status: Scheduled Configuration Name: BCAN</xsl:text>
+                      </text>
+                    </alert-message>
+                  </xsl:element>
+                </xsl:element>
+              </xsl:element>
+            </xsl:element>
+          </xsl:element>
+        </ns1:executeProcessAsync>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>**** Show Soap Message *******</value>
+                    </input>
+                    <input>
+                      <from>soap message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[2]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+              <parameters>
+                <input>
+                  <from>web services</from>
+                  <to>adapter name</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//adapter/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>web services</from>
+                  <to>transport</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//transport/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>web services</from>
+                  <to>soap url</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//url/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>soap message</from>
+                  <to>soap message</to>
+                </input>
+                <input>
+                  <from>web services</from>
+                  <to>use ssl certificate</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//use-ssl-certificate/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>web services</from>
+                  <to>install certificate</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//install-certificate/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>web services</from>
+                  <to>allow unsigned certificate</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//allow-unsigned-certificate/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[2]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>response</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" encoding="XML" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="//metadata/status/text()" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>response value</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//value/text() = "success"]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>**** Show response *****</value>
+                    </input>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                    <input>
+                      <from>response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[3]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>1</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>Unable to Generate an Alert for Change ID: </value>
+                          </input>
+                          <input required="false">
+                            <from>change id</from>
+                          </input>
+                          <input>
+                            <value>.</value>
+                          </input>
+                        </concat>
+                      </input>
+                      <output>
+                        <to>status message</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//status/text() = 'success']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>0</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>Alert Generated Successfully for Change ID: </value>
+                          </input>
+                          <input required="false">
+                            <from>change id</from>
+                          </input>
+                          <input>
+                            <value>.</value>
+                          </input>
+                        </concat>
+                      </input>
+                      <output>
+                        <to>status message</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='1']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>Unable to Extract Configuration data.</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>add0b3fa-1d87-3315-b072-fb5ae9bb005b</process-id>
+      <author>aotest</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aotest</last-modified-by>
+      <last-modified>1362387732528</last-modified>
+    </meta>
+  </process-def>
+</process>

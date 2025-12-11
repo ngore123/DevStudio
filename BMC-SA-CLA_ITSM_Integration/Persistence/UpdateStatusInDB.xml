@@ -1,0 +1,401 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:Persistence:UpdateStatusInDB">
+    <parameters>
+      <input global="false" required="true">
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <input global="false" required="true">
+        <from>persistenceIDs</from>
+        <to>persistenceIDs</to>
+      </input>
+      <input global="false" required="false">
+        <from>errorMessage</from>
+        <to>errorMessage</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:INCOMINGMESSAGES:Columns</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status_column</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='STATUS']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:INCOMINGMESSAGES:Columns</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>id_column</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='ID']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:INCOMINGMESSAGES:Columns</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>updateTime_column</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name='UPDATETIME']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:INCOMINGMESSAGES:Name</configuration>
+          </input>
+          <output>
+            <to>tablename</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>updateQuery</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:In UpdateStatusInDB=&gt;</value>
+              </input>
+              <input>
+                <from>persistenceIDs</from>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>errorMessage</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>persistenceIDs</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(string(.))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <utility>
+              <date>
+                <now />
+              </date>
+              <output global="false">
+                <to>currTime</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:utility[1]</location>
+            </utility>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>UPDATE </value>
+                          </input>
+                          <input required="false">
+                            <from>tablename</from>
+                          </input>
+                          <input>
+                            <value> SET </value>
+                          </input>
+                          <input required="false">
+                            <from>updateTime_column</from>
+                          </input>
+                          <input>
+                            <value>=</value>
+                          </input>
+                          <input required="false">
+                            <from>currTime</from>
+                          </input>
+                          <input>
+                            <value>, </value>
+                          </input>
+                          <input required="false">
+                            <from>status_column</from>
+                          </input>
+                          <input>
+                            <value>='</value>
+                          </input>
+                          <input required="false">
+                            <from>status</from>
+                          </input>
+                          <input>
+                            <value>'  where </value>
+                          </input>
+                          <input required="false">
+                            <from>id_column</from>
+                          </input>
+                          <input>
+                            <value> in (</value>
+                          </input>
+                          <input required="false">
+                            <from>persistenceIDs</from>
+                          </input>
+                          <input>
+                            <value>)</value>
+                          </input>
+                        </concat>
+                      </input>
+                      <output>
+                        <to>updateQuery</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>errorMessage</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[boolean(string(.))]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input global="true">
+                          <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Tables:INCOMINGMESSAGES:Columns</configuration>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>error_column</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//mapping[@name='ERROR']/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>UPDATE </value>
+                          </input>
+                          <input required="false">
+                            <from>tablename</from>
+                          </input>
+                          <input>
+                            <value> SET </value>
+                          </input>
+                          <input required="false">
+                            <from>updateTime_column</from>
+                          </input>
+                          <input>
+                            <value>=</value>
+                          </input>
+                          <input required="false">
+                            <from>currTime</from>
+                          </input>
+                          <input>
+                            <value>, </value>
+                          </input>
+                          <input required="false">
+                            <from>status_column</from>
+                          </input>
+                          <input>
+                            <value>='</value>
+                          </input>
+                          <input required="false">
+                            <from>status</from>
+                          </input>
+                          <input>
+                            <value>',</value>
+                          </input>
+                          <input required="false">
+                            <from>error_column</from>
+                          </input>
+                          <input>
+                            <value>='</value>
+                          </input>
+                          <input required="false">
+                            <from>errorMessage</from>
+                          </input>
+                          <input>
+                            <value>' where </value>
+                          </input>
+                          <input required="false">
+                            <from>id_column</from>
+                          </input>
+                          <input>
+                            <value> in (</value>
+                          </input>
+                          <input required="false">
+                            <from>persistenceIDs</from>
+                          </input>
+                          <input>
+                            <value>)</value>
+                          </input>
+                        </concat>
+                      </input>
+                      <output>
+                        <to>updateQuery</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+            <call-process>
+              <process-name>:AutoPilot-AD-Utilities:SQL:Ad Hoc Update</process-name>
+              <parameters>
+                <input global="true">
+                  <configuration>:BMC-SA-CLA_ITSM_Integration:Persistence:Default_SQL_Actor_Adapter</configuration>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>updateQuery</from>
+                  <to>sql</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:Update  Status in DB=&gt; </value>
+                    </input>
+                    <input>
+                      <from>updateQuery</from>
+                    </input>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>9f2f1a9d-9c94-40b0-a730-18687741e53a</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1470823806313</last-modified>
+    </meta>
+  </process-def>
+</process>

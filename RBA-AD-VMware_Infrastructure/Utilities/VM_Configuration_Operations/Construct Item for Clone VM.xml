@@ -1,0 +1,205 @@
+<process draft="false" dev-studio-version="7.6.02.04">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Item for Clone VM">
+    <parameters>
+      <input global="false" required="true">
+        <description>virtual machine
+             VirtualMachine used to make the method call</description>
+        <from>virtual machine</from>
+        <to>virtual machine</to>
+      </input>
+      <input global="false" required="false">
+        <description>folder [optional]
+        Folder of the new virtual machine. </description>
+        <from>folder</from>
+        <to>folder</to>
+      </input>
+      <input global="false" required="true">
+        <description>datacenter                
+		Datacenter name</description>
+        <from>datacenter</from>
+        <to>datacenter</to>
+      </input>
+      <input global="false" required="true">
+        <description>name
+             The name for the cloned virtual machine.</description>
+        <from>name</from>
+        <to>name</to>
+      </input>
+      <input global="false" required="true">
+        <description>template
+              Specifies whether or not the new virtual machine should be marked as a template. 
+
+valid values: true, false</description>
+        <from>template</from>
+        <to>template</to>
+      </input>
+      <input global="false" required="true">
+        <description>power on
+                Specifies whether or not the new VirtualMachine should be powered on after creation. As part of a customization, this flag is normally set to true, since the first power-on operation completes the customization process. This flag is ignored if a template is being created. 
+
+valid values: true, false</description>
+        <from>power on</from>
+        <to>power on</to>
+      </input>
+      <input global="false" required="false">
+        <description>Datastore [optional]
+
+The datastore where the virtual machine should be located. If not specified, the current datastore is used. </description>
+        <from>location datastore</from>
+        <to>location datastore</to>
+      </input>
+      <input global="false" required="false">
+        <description>pool [conditional]
+
+The resource pool to which this virtual machine should be attached. 
+
+- For a clone operation to a virtual machine, if the argument is not supplied, the current resource pool of virtual machine is used. 
+- For a clone operation to a template, this argument is ignored. 
+- For a clone operation from a template to a virtual machine, this argument is required. </description>
+        <from>location pool</from>
+        <to>location pool</to>
+      </input>
+      <input global="false" required="false">
+        <description>cluster [conditional]
+
+The cluster whereh this virtual machine should be created. This input is not required by the API and is used by the adapter internally if the resource pool is not specified.</description>
+        <from>location cluster compute resource</from>
+        <to>cluster compute resource</to>
+      </input>
+      <input global="false" required="false">
+        <description>host[optional]
+
+The target host for the virtual machine. 
+
+If not specified then:
+-  if resource pool is not specified, current host is used.
+-  if resource pool is specified, and the target pool represents a stand-alone host, the host is used. </description>
+        <from>location host</from>
+        <to>location host</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="template">
+                <input global="false">
+                  <from>template</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="power on">
+                <input global="false">
+                  <from>power on</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="virtual machine">
+                <input global="false">
+                  <from>virtual machine</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="folder">
+                <input global="false">
+                  <from>folder</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="datacenter">
+                <input global="false">
+                  <from>datacenter</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="clone name">
+                <input global="false">
+                  <from>name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="datastore">
+                <input global="false">
+                  <from>location datastore</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="pool">
+                <input global="false">
+                  <from>location pool</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="host">
+                <input global="false">
+                  <from>location host</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="cluster">
+                <input global="false">
+                  <from>cluster compute resource</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <parameters>
+          <virtual-machine>${virtual machine}</virtual-machine>
+          <folder>${folder}</folder>
+          <datacenter>${datacenter}</datacenter>
+          <name>${clone name}</name>
+          <spec>
+            <location>
+              <datastore>${datastore}</datastore>
+              <resource-pool>${pool}</resource-pool>
+              <cluster-compute-resource>${cluster}</cluster-compute-resource>
+              <host-system>${host}</host-system>
+            </location>
+            <template>${template}</template>
+            <power-on>${power on}</power-on>
+          </spec>
+        </parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs &lt;items&gt; for Clone VM operation</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>dab58ed9-e6ab-3d67-acfd-cbd46b4e073e</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1345792857650</last-modified>
+    </meta>
+  </process-def>
+</process>

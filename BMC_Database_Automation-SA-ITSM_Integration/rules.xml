@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process>
+   <process-def name=":BMC_Database_Automation-SA-ITSM_Integration:rules">
+      <sequence>
+         <switch>
+            <meta>
+               <peer-location>
+                  <location>any</location>
+               </peer-location>
+            </meta>
+            <execute-all-applicable-cases>true</execute-all-applicable-cases>
+            <case name="OIC Change Status - BMC AR System Alert" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[contains(//text, "BMC Database Automation") and contains(//text, "Rejected")='true']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[contains(//text, "BMC Database Automation") and contains(//text, "Rejected")]]></from>
+                     <fromKey><![CDATA[5517]]></fromKey>
+                     <to><![CDATA['true']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>BMC_Database_Automation-SA-ITSM_Integration</group>
+                     <name-prefix>OIC Change Status - BMC AR System Alert</name-prefix>
+                     <process-name>:BMC_Database_Automation-SA-ITSM_Integration:BMC_Database_Automation:Reject BDA Job</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+            <case name="Operator Initiated Change - BMC AR System Alert" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[contains(//form-name, "TMS:Task") and contains(//text, "BMC Database Automation")='true']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[contains(//form-name, "TMS:Task") and contains(//text, "BMC Database Automation")]]></from>
+                     <fromKey><![CDATA[3303]]></fromKey>
+                     <to><![CDATA['true']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>BMC_Database_Automation-SA-ITSM_Integration</group>
+                     <name-prefix>Operator Initiated Change - BMC AR System Alert</name-prefix>
+                     <process-name>:BMC_Database_Automation-SA-ITSM_Integration:BMC_Database_Automation:Approve BDA Job</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+         </switch>
+      </sequence>
+      <meta>
+         <peer-location>
+            <location>any</location>
+         </peer-location>
+      </meta>
+      <parameters>
+         <input>
+            <from>inputevent</from>
+            <to>inputevent</to>
+         </input>
+      </parameters>
+   </process-def>
+</process>
+

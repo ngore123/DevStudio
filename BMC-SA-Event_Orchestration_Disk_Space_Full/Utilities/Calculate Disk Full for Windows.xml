@@ -1,0 +1,201 @@
+<process draft="false" dev-studio-version="8.2.01">
+  <process-def name=":BMC-SA-Event_Orchestration_Disk_Space_Full:Utilities:Calculate Disk Full for Windows">
+    <parameters>
+      <input global="false" required="true">
+        <from>command output</from>
+        <to>command output</to>
+      </input>
+      <output global="false" required="false">
+        <to>result</to>
+        <from>result</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <for-each>
+        <document>
+          <input>
+            <from>command output</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>token</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//line]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>token</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[contains(., "Total # of free bytes")]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>token</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>free bytes</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(substring-after(., ":"))]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>token</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[contains(., "Total # of bytes")]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>token</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>total bytes</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[normalize-space(substring-after(., ":"))]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[3]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <assign>
+        <assignment>
+          <output>
+            <to>result</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="free bytes">
+                <input global="false">
+                  <from>free bytes</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="total bytes">
+                <input global="false">
+                  <from>total bytes</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[ceiling(100 - ((${free bytes}  div ${total bytes}) * 100))]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>result</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>fafa4f18-3c8e-4e55-b440-50cc00509295</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1576227039437</last-modified>
+    </meta>
+  </process-def>
+</process>

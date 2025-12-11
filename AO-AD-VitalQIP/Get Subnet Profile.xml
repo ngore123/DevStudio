@@ -1,0 +1,361 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AO-AD-VitalQIP:Get Subnet Profile">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the Adapter to use for this Process. </description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The user name name that will be used to execute the command on QIP.</description>
+        <from>user name</from>
+        <to>user name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The password for the user name that will be used to execute the command on the QIP.</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="true">
+        <description>The QIP organization name that will be used while executing the command on the QIP.</description>
+        <from>organization</from>
+        <to>organization</to>
+      </input>
+      <input global="false" required="true">
+        <description>Subnet address or which information to be fetched.</description>
+        <from>subnet address</from>
+        <to>subnet address</to>
+      </input>
+      <input global="false" required="false">
+        <description>Scope can have twos possible values
+1. Any string : It is a organization name same as pod name. 
+2. null : in this case we will use default organization.</description>
+        <from>scope</from>
+        <to>scope</to>
+      </input>
+      <output global="false" required="false">
+        <description>incase of any error, error message goes here.  </description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>command status.
+valid values: true, false.</description>
+        <to>success</to>
+        <from>Success</from>
+      </output>
+      <output global="false" required="false">
+        <description>Subnet address of the subnet.</description>
+        <to>subnet-address</to>
+        <from>subnet-address</from>
+      </output>
+      <output global="false" required="false">
+        <description>Network address of the subnet.</description>
+        <to>network-address</to>
+        <from>network-address</from>
+      </output>
+      <output global="false" required="false">
+        <description>Subnet mask of the subnet.</description>
+        <to>subnet-mask</to>
+        <from>subnet-mask</from>
+      </output>
+      <output global="false" required="false">
+        <description>subnet name of the subnet.</description>
+        <to>subnet-name</to>
+        <from>subnet-name</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>user name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>Adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="user">
+                <input global="false">
+                  <from>user name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="pass">
+                <input global="false">
+                  <from>password</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="org">
+                <input global="false">
+                  <from>organization</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="address">
+                <input global="false">
+                  <from>subnet address</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="scope">
+                <input global="false">
+                  <from>scope</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <command-request>
+        <xsl:if test="string-length(&quot;${scope}&quot;) &gt; 0">
+          <commands>
+            <command>
+              <xsl:text disable-output-escaping="no">qip-getsubnetprof -u "${user}" -p "${pass}" -o "${scope}" -a ${address}</xsl:text>
+            </command>
+          </commands>
+        </xsl:if>
+        <xsl:if test="string-length(&quot;${scope}&quot;) = 0">
+          <commands>
+            <command>
+              <xsl:text disable-output-escaping="no">qip-getsubnetprof -u "${user}" -p "${pass}" -o "${org}" -a ${address}</xsl:text>
+            </command>
+          </commands>
+        </xsl:if>
+      </command-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>Adapter request</from>
+          </input>
+          <input global="false">
+            <from>Adapter request</from>
+          </input>
+          <output global="false">
+            <to>Adapter Response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>Adapter Response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>subnet-address</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(//line[starts-with(., "SubnetAddress=")], "SubnetAddress=")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>Adapter Response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>network-address</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(//line[starts-with(., "NetworkAddress=")], "NetworkAddress=")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>Adapter Response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>subnet-name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(//line[starts-with(., "SubnetName=")], "SubnetName=")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>Adapter Response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>subnet-mask</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(//line[starts-with(., "SubnetMask=")], "SubnetMask=")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Success</to>
+                  <value>true</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="true">
+          <condition>
+            <document>
+              <input>
+                <from>Adapter Response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(//error/text())]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>Adapter Response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[lower-case(string(//command-output/metadata/status)) = "error"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <output>
+                  <to>Success</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>Adapter Response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//line/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Get Subnet Profile:
+Retrieves the Subnet Profile of a specific subnet from the VitalQIP database.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0aefc7ca-316f-48fd-94bb-a14a7b4a0322</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1299136447413</last-modified>
+    </meta>
+  </process-def>
+</process>

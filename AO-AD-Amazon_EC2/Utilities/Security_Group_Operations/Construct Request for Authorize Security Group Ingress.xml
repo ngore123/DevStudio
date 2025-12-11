@@ -1,0 +1,215 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AO-AD-Amazon_EC2:Utilities:Security_Group_Operations:Construct Request for Authorize Security Group Ingress">
+    <parameters>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon EC2. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - 
+http://ec2.amazonaws.com/doc/2009-11-30/AmazonEC2.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon EC2 instances across different regions. Respective values for different regions are as below:
+
+    * http://us-east-1.ec2.amazonaws.com/ — Endpoint located in the US-East (Northern Virginia) Region
+    * http://us-west-1.ec2.amazonaws.com/ — Endpoint located in the US-West (Northern California) Region
+    * http://eu-west-1.ec2.amazonaws.com/ ---Endpoint located in the EU (Ireland) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>signature properties [Optional]
+
+Specify this element for including authentication credentials at request level. 
+
+Sample values that can be specified are:
+
+&lt;signature-properties mode = "key-files"&gt;
+    &lt;private-key-file&gt;&lt;/private-key-file&gt;
+    &lt;certificate-file&gt;&lt;/certificate-file&gt;
+&lt;/signature-properties&gt;
+
+OR
+
+&lt;signature-properties mode = "key-data"&gt;
+    &lt;private-key-data&gt;&lt;/private-key-data&gt;
+    &lt;certificate-data&gt;&lt;/certificate-data&gt;
+&lt;/signature-properties&gt;
+</description>
+        <from>signature properties</from>
+        <to>signature properties</to>
+      </input>
+      <input global="false" required="false">
+        <description>user id [Optional]
+
+AWS Access Key ID.
+
+</description>
+        <from>user id</from>
+        <to>user id</to>
+      </input>
+      <input global="false" required="true">
+        <description>group name [Mandatory]
+
+Name of the group to modify. The name must be valid and belong to the account
+
+</description>
+        <from>group name</from>
+        <to>group name</to>
+      </input>
+      <input global="false" required="false">
+        <description>ip permissions[Optional]
+
+Set of permissions for the security group.
+
+Description of different parameters in this is as below:
+
+ip-protocol - Valid Values: tcp,udp,icmp
+from-port - Start of port range for the TCP and UDP protocols, or an ICMP type number. 
+to-port - End of port range for the TCP and UDP protocols, or an ICMP code.
+groups - List of security group and user ID pairs.
+ip-ranges - Contains list of CIDR IP ranges
+
+Sample ip permissions structure:
+
+&lt;ip-permissions&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;ip-protocol&gt;&lt;/ip-protocol&gt;
+        &lt;from-port&gt;&lt;/from-port&gt;
+        &lt;to-port&gt;&lt;/to-port&gt;
+        &lt;groups&gt;
+            &lt;!--Zero or more repetition--&gt;
+            &lt;item&gt;
+                &lt;user-id&gt;&lt;/user-id&gt;
+                &lt;group-name&gt;&lt;/group-name&gt;
+            &lt;/item&gt;
+        &lt;/groups&gt;
+        &lt;ip-ranges&gt;
+            &lt;!--Zero or more repetition--&gt;
+            &lt;item&gt;
+                &lt;cidr-ip&gt;&lt;/cidr-ip&gt;
+            &lt;/item&gt;
+        &lt;/ip-ranges&gt;
+    &lt;/item&gt;
+&lt;/ip-permissions&gt;
+</description>
+        <from>ip permissions</from>
+        <to>ip permissions</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>adapter request</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="wsdl location">
+                <input global="false">
+                  <from>wsdl location</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="endpoint address">
+                <input global="false">
+                  <from>endpoint address</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="user id">
+                <input global="false">
+                  <from>user id</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="group name">
+                <input global="false">
+                  <from>group name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="ip permissions">
+                <input global="false">
+                  <from>ip permissions</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="signature properties">
+                <input global="false">
+                  <from>signature properties</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request-data>
+      <amazon-ec2-request>
+        <xsl:if test="string-length('${wsdl location}')&gt;0">
+          <wsdl-location>${wsdl location}</wsdl-location>
+        </xsl:if>
+        <xsl:if test="string-length('${endpoint address}')&gt;0">
+          <endpoint-address>${endpoint address}</endpoint-address>
+        </xsl:if>
+        ${signature properties}
+        <operation-name>
+          <xsl:text disable-output-escaping="no">authorize-security-group-ingress</xsl:text>
+        </operation-name>
+        <parameters>
+          <xsl:if test="string-length('${user id}')&gt;0">
+            <user-id>${user id}</user-id>
+          </xsl:if>
+          <group-name>${group name}</group-name>
+          ${ip permissions}
+        </parameters>
+      </amazon-ec2-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Adds permissions to a security group.
+
+Permissions are specified by the IP protocol (TCP, UDP or ICMP), the source of the request (by IP
+range or an Amazon EC2 user-group pair), the source and destination port ranges (for TCP and UDP),
+and the ICMP codes and types (for ICMP). When authorizing ICMP, -1 can be used as a wildcard in
+the type and code fields.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ada4b011-17b7-3b3d-972b-326a3baba584</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1296731881125</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,213 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AutoPilot-OA-Directory_Services_Utilities:Groups:Get Group Policy">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the name or IP address of the remote computer. If no input is provided the information is provided for the local computer.</description>
+        <from>target computer</from>
+        <to>target computer</to>
+      </input>
+      <input global="false" required="false">
+        <description>Runs the command with the account permissions of this specified User. The default is the permissions of the current logged-on user on the computer that issues the command. The input should contain the full name of the user in the form of "domain\username" e.g. 
+
+testdomain\testuser</description>
+        <from>run as user</from>
+        <to>run as user</to>
+      </input>
+      <input global="false" required="false">
+        <description>The password of the user account that is specified in the run as user entry.</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the user name whose RSOP data is to be displayed.</description>
+        <from>target user</from>
+        <to>target user</to>
+      </input>
+      <input global="false" required="false">
+        <description>Displays either user or computer results. If the scope is ommited both user and computer settings will be returned.
+Valid values: user or computer. 
+</description>
+        <from>scope</from>
+        <to>scope</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>target computer</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="target computer">
+                  <input global="false">
+                    <from>target computer</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="run as user">
+                  <input global="false">
+                    <from>run as user</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="password">
+                  <input global="false">
+                    <from>password</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="target user">
+                  <input global="false">
+                    <from>target user</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="scope">
+                  <input global="false">
+                    <from>scope</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">gpresult</xsl:text>
+        <xsl:if test="string-length('${target computer}') != 0">
+          <xsl:text disable-output-escaping="no"> /s ${target computer}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${run as user}') != 0">
+          <xsl:text disable-output-escaping="no"> /u ${run as user}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${password}') != 0">
+          <xsl:text disable-output-escaping="no"> /p ${password}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${target user}') != 0">
+          <xsl:text disable-output-escaping="no"> /user ${target user}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${scope}') != 0 and '${scope}' = 'user'">
+          <xsl:text disable-output-escaping="no"> /scope ${scope}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${scope}') != 0 and '${scope}' = 'computer'">
+          <xsl:text disable-output-escaping="no"> /scope ${scope}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows Server 2008">
+        <xsl:text disable-output-escaping="no">gpresult</xsl:text>
+        <xsl:if test="string-length('${target computer}') != 0">
+          <xsl:text disable-output-escaping="no"> /s ${target computer}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${run as user}') != 0">
+          <xsl:text disable-output-escaping="no"> /u ${run as user}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${password}') != 0">
+          <xsl:text disable-output-escaping="no"> /p ${password}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${target user}') != 0">
+          <xsl:text disable-output-escaping="no"> /user ${target user}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${scope}') != 0 and '${scope}' = 'user'">
+          <xsl:text disable-output-escaping="no"> /scope ${scope} /v </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${scope}') != 0 and '${scope}' = 'computer'">
+          <xsl:text disable-output-escaping="no"> /scope ${scope} /v </xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Get Group Policy
+    Displays Group Policy settings and Resultant Set of Policy (RSoP) for a user or a computer.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>3520c145-556b-3062-95da-21c15cebb397</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1302256642762</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,384 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_ServiceManager:v7.1:Configuration_Management:Update Department">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. Default adapter name: HPSMActor.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The items for the adapter request. This should be an XML document with a root element named "items" having a children "item" (to support multiple item support, we give "item" multiple times), which should contain the data necessary to execute the specific request. 
+
+
+Update Department
+
+This wrapper updates a 'Department'. 
+
+Sample Item Xml:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;operation-name&gt;update-department&lt;/operation-name&gt;
+		&lt;model&gt;
+		  &lt;keys&gt;
+			&lt;department&gt;
+				&lt;value&gt;C-0001/D-0001&lt;/value&gt;
+				&lt;type&gt;String&lt;/type&gt;
+			&lt;/department&gt;
+			&lt;company&gt;
+				&lt;value&gt;C-0001&lt;/value&gt;
+				&lt;type&gt;String&lt;/type&gt;
+			&lt;/company&gt;
+		  &lt;/keys&gt;
+		  &lt;instance&gt;
+		  
+			&lt;department-name&gt;
+			  &lt;value&gt;D-0001&lt;/value&gt;
+			  &lt;type&gt;String&lt;/type&gt;
+			&lt;/department-name&gt;
+			&lt;company&gt;
+				&lt;value&gt;C-0001&lt;/value&gt;
+				&lt;type&gt;String&lt;/type&gt;
+			&lt;/company&gt;
+			
+			&lt;department-i-d&gt;
+			  &lt;value&gt;department i d&lt;/value&gt;
+			  &lt;type&gt;String&lt;/type&gt;
+			&lt;/department-i-d&gt;
+			&lt;department-s-l-a&gt;
+			  &lt;value&gt;155&lt;/value&gt;
+			  &lt;type&gt;Decimal&lt;/type&gt;
+			&lt;/department-s-l-a&gt;
+			&lt;parent-department&gt;
+			  &lt;value&gt;parent department&lt;/value&gt;
+			  &lt;type&gt;String&lt;/type&gt;
+			&lt;/parent-department&gt;
+			&lt;cost-center&gt;
+			  &lt;value&gt;cost center&lt;/value&gt;
+			  &lt;type&gt;String&lt;/type&gt;
+			&lt;/cost-center&gt;
+		  &lt;/instance&gt;
+		&lt;/model&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Elements’ Description: 
+
+Update Process takes place in following manner-
+
+The record is first selected (located) by the information provided in the &lt;keys&gt; element. Essentially, you populate &lt;keys&gt; element with valid key elements otherwise the record wouldn’t be located. 
+
+Once the record is located, the fields are updated by the information provided in &lt;instance&gt; element. That is, the respective fields of located record are replaced by the elements’ values that are provided in &lt;instance&gt; element.
+
+Modification/Update in located record is done in following manner-
+
+Suppose an random element with name &lt;random-element&gt; which has an 'fieldValue1'. i.e. on retrieving, we'll get.
+
+&lt;instance&gt;
+	...
+	...
+	
+	&lt;random-element&gt;
+		&lt;value&gt;fieldValue1&lt;/value&gt;
+		&lt;type&gt;fieldType&lt;type&gt;
+	&lt;/random-element&gt;
+	...
+	...
+&lt;/instance&gt;
+
+Now see following cases of updation-
+
+
+Case-1:
+&lt;instance&gt;
+&lt;/instance&gt;
+
+i.e., we don't provide even the element &lt;random-element&gt;
+Result: the field get ignored, i.e. not updated.
+
+Case-2:
+&lt;instance&gt;
+	&lt;random-element&gt;
+		&lt;value&gt;&lt;/value&gt;
+		&lt;type&gt;fieldType&lt;type&gt;
+	&lt;/random-element&gt;
+&lt;/instance&gt;
+
+i.e., we don't provide anything inside &lt;value&gt; element (child of element &lt;random-element&gt;.)
+Result: the field get ignored, i.e. not updated.
+
+Case-3:
+&lt;instance&gt;
+	&lt;random-element&gt;
+		&lt;value&gt; &lt;/value&gt;
+		&lt;type&gt;fieldType&lt;type&gt;
+	&lt;/random-element&gt;
+&lt;/instance&gt;
+
+i.e., we provide an space character " " (or more contiguous space characters, like "   ") inside &lt;value&gt; element (child of element &lt;random-element&gt;.)
+Result: the field get's updated, and the field &lt;random-elements&gt; is set to blank ""(compare with space character " ".)
+
+
+Case-4:
+&lt;instance&gt;
+	&lt;random-element&gt;
+		&lt;value&gt;fieldValue2&lt;/value&gt;
+		&lt;type&gt;fieldType&lt;type&gt;
+	&lt;/random-element&gt;
+&lt;/instance&gt;
+
+i.e., we provide "fieldValue2" inside &lt;value&gt; element (child of element &lt;random-element&gt;.)
+Result: the value "fieldValue2" is set to field of &lt;random-element&gt;. 
+
+NOTE: One can update the key elements too.
+
+Complete Elements’ Description: 
+
+item [Required]:
+	This is a child of &lt;items&gt;. This &lt;item&gt; tag can be multiple times to support "multiple items support". 
+
+operation-name [Required]: 
+
+	This is used to specify the operation that needs to be performed.
+
+	Valid values:
+&lt;operation-name&gt;update-department&lt;/operation-name&gt; is valid operation name 	element.
+	 
+model [Required]: It is the parent tag for containing all other tags.
+
+keys [Required]: Specifies the unique identifier of a record. 
+
+Instance [Required] :
+
+It can have many child elements. The children of this element describe fields of a record.
+
+department[Required]: it is used to locate 'Department' to be updated.
+
+Valid values: value of 'Company' followed by forward slash followed by value of 'Dept Name'. i.e., "Company"/"Dept Name". 
+
+Department-name[Optional]: Name of the department. 
+
+Name of this field in the application: General &gt; Dept Name. 
+
+Valid Values: Any string. The pair (&lt;department&gt;, &lt;company&gt;) must be unique.  
+
+Default Value: Ignored.
+
+company[Optional]: The company name.
+
+Name of this element in the application: General &gt; Company.
+
+Valid Values: Any string. The pair (&lt;department&gt;, &lt;company&gt;) must be unique.
+
+Default Value: Ignored.
+
+Note: this tag can be child of 'keys' and 'instance' both. We provide it in key when tag 'department' alone is not able to uniquely locate the 'Department' to be updated. We provide it &lt;instance&gt; to specify the new desired value of 'company' tag to be updated. 
+
+Department-i-d[Optional]: The department ID. 
+
+	Name of this element in the application: Dept Code
+
+	Valid Values: Any string. 
+	
+	Default Value: Ignored.
+
+Department-s-l-a [Optional] : The SLA associated with department. 
+
+	Name of this element in the application: General &gt; SLA
+
+	Valid Values: 
+
+	Default Value: Ignored.
+
+Parent-department [Optional]: The parent department. 
+	
+	Name of this element in the application: General &gt; Parent Department. 
+
+Valid Values: Any valid department value
+
+	Default Value: Ignored.
+
+
+Cost-center [Optional]: The cost center.
+
+	Name of this element in the application: General &gt; Cost Center. 
+
+	Valid Values: Any string. 
+	
+	Default Value: Ignored.
+
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="false">
+        <description>Provide username/password in form of xml. 
+
+This input parameter is required when the user wants to override the default values for username and password provided in the adapter configuration. This is required for cases where an operation cannot be executed with the default username/password provided in the adapter configuration and only user with special permissions can execute the operation. Examples of such operations can be - 'approve-change', 'deny-change', 'close-change', 'approve-task'
+
+Sample XML Format: 
+
+&lt;connection-parameters&gt;
+	&lt;alternate-username&gt;USERNAME&lt;/alternate-username&gt;
+	&lt;alternate-password&gt;PASSWORD&lt;/alternate-password&gt;
+&lt;/connection-parameters&gt;</description>
+        <from>connection parameters</from>
+        <to>connection parameters</to>
+      </input>
+      <output global="false" required="false">
+        <description>The adapter response containing the results. </description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_ServiceManager:Utilities:Operation Name Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <value>update-department</value>
+                  <to>operation name</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[(//operation-name)[1]/text() = 'update-department']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>items</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>items</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <xsl:for-each select="//item">
+        <item>
+          <entity-type>
+            <xsl:text disable-output-escaping="no">department</xsl:text>
+          </entity-type>
+          <xsl:copy-of select="./*" />
+        </item>
+      </xsl:for-each>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AO-AD-HP_ServiceManager:Utilities:Configuration_Management:Update Configuration Item Utility</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+                <input>
+                  <from>connection parameters</from>
+                  <to>connection parameters</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>
+Update Department
+
+This wrapper updates a Department
+</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1845b51c-65e7-383a-b9c8-4d60d115a9a1</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290594385518</last-modified>
+    </meta>
+  </process-def>
+</process>

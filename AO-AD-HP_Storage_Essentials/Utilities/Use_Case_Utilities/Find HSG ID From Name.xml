@@ -1,0 +1,150 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Find HSG ID From Name">
+    <parameters>
+      <input global="false" required="true">
+        <from>storage system id</from>
+        <to>storage system id</to>
+      </input>
+      <input global="false" required="true">
+        <from>hsg name</from>
+        <to>hsg name</to>
+      </input>
+      <output global="false" required="false">
+        <to>hsg id</to>
+        <from>hsg id</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>storage system id</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>find hsg request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="hsg name">
+                <input global="false">
+                  <from>hsg name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="ss id">
+                <input global="false">
+                  <from>storage system id</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <command>
+          <xsl:text disable-output-escaping="no">show</xsl:text>
+        </command>
+        <category>
+          <xsl:text disable-output-escaping="no">storagesystem</xsl:text>
+        </category>
+        <process-id>
+          <xsl:text disable-output-escaping="no">find-storage-system-details</xsl:text>
+        </process-id>
+        <command-arguments>
+          <storage-system-id>${ss id}</storage-system-id>
+          <hostsecuritygroup />
+        </command-arguments>
+        <filter-by>
+          <Name>${hsg name}</Name>
+        </filter-by>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-HP_Storage_Essentials:v6.0:Storage_System:Find Storage System Details</process-name>
+        <parameters>
+          <input>
+            <from>hpse adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>find hsg request</from>
+            <to>items</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>hsg id</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//command-response/ID)]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a9ea0915-74c9-3c9a-afaf-bf4e825d1a51</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588068057</last-modified>
+    </meta>
+  </process-def>
+</process>

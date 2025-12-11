@@ -1,0 +1,399 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:Compliance:Create Remediation Job for Compliance Result">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the package.</description>
+        <from>remediationName</from>
+        <to>remediationName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the group that should contain the new Remediation Job(s).</description>
+        <from>jobGroupName</from>
+        <to>jobGroupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the group that should contain the new package(s).</description>
+        <from>depotGroupName</from>
+        <to>depotGroupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Parent group name of the compliance job.</description>
+        <from>compJobParentGroup</from>
+        <to>compJobParentGroup</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the Compliance Job whose job run result you want to package.</description>
+        <from>compJobName</from>
+        <to>compJobName</to>
+      </input>
+      <input global="false" required="true">
+        <description>ID of the Compliance Job run whose result you want to package.</description>
+        <from>compJobRunId</from>
+        <to>compJobRunId</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the target server.</description>
+        <from>targetServer</from>
+        <to>targetServer</to>
+      </input>
+      <input global="false" required="true">
+        <description>Group name of the template used in the Compliance Job run.</description>
+        <from>templateGroupName</from>
+        <to>templateGroupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the template used in the Compliance Job run.</description>
+        <from>templateName</from>
+        <to>templateName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the target component.</description>
+        <from>targetComponent</from>
+        <to>targetComponent</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the template rule group used in the Compliance Job run.</description>
+        <from>ruleGrpName</from>
+        <to>ruleGrpName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the template rule used in the Compliance Job run.</description>
+        <from>ruleName</from>
+        <to>ruleName</to>
+      </input>
+      <output global="false" required="true">
+        <to>success</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="false">
+        <to>success message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>DBKey</to>
+        <from>DBKey</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <to>adapter response</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:ComplianceJob:Get DBKey by Group and Name</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>compJobParentGroup</from>
+            <to>parentGroup</to>
+          </input>
+          <input>
+            <from>compJobName</from>
+            <to>jobName</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>success</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>DBKey</from>
+            <to>compJobKey</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:ComplianceJob:Create Remediation Job from Compliance Result by Server</process-name>
+                    <parameters>
+                      <input>
+                        <from>connection details</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>remediationName</from>
+                        <to>remediationName</to>
+                      </input>
+                      <input>
+                        <from>jobGroupName</from>
+                        <to>jobGroupName</to>
+                      </input>
+                      <input>
+                        <from>depotGroupName</from>
+                        <to>depotGroupName</to>
+                      </input>
+                      <input>
+                        <from>compJobKey</from>
+                        <to>compJobKey</to>
+                      </input>
+                      <input>
+                        <from>compJobRunId</from>
+                        <to>compJobRunId</to>
+                      </input>
+                      <input>
+                        <from>targetServer</from>
+                        <to>targetServer</to>
+                      </input>
+                      <input>
+                        <from>templateGroupName</from>
+                        <to>templateGroupName</to>
+                      </input>
+                      <input>
+                        <from>templateName</from>
+                        <to>templateName</to>
+                      </input>
+                      <input>
+                        <from>targetComponent</from>
+                        <to>targetComponent</to>
+                      </input>
+                      <input>
+                        <from>ruleGrpName</from>
+                        <to>ruleGrpName</to>
+                      </input>
+                      <input>
+                        <from>ruleName</from>
+                        <to>ruleName</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>success</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>DBKey</from>
+                        <to>DBKey</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>targetServer</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(.)='0']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:ComplianceJob:Create Remediation Job from Compliance Result by Rule</process-name>
+                    <parameters>
+                      <input>
+                        <from>connection details</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>remediationName</from>
+                        <to>remediationName</to>
+                      </input>
+                      <input>
+                        <from>jobGroupName</from>
+                        <to>jobGroupName</to>
+                      </input>
+                      <input>
+                        <from>depotGroupName</from>
+                        <to>depotGroupName</to>
+                      </input>
+                      <input>
+                        <from>compJobKey</from>
+                        <to>compJobKey</to>
+                      </input>
+                      <input>
+                        <from>compJobRunId</from>
+                        <to>compJobRunId</to>
+                      </input>
+                      <input>
+                        <from>templateGroupName</from>
+                        <to>templateGroupName</to>
+                      </input>
+                      <input>
+                        <from>templateName</from>
+                        <to>templateName</to>
+                      </input>
+                      <input>
+                        <from>ruleGrpName</from>
+                        <to>ruleGrpName</to>
+                      </input>
+                      <input>
+                        <from>ruleName</from>
+                        <to>ruleName</to>
+                      </input>
+                      <input>
+                        <from>targetComponent</from>
+                        <to>targetComponent</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>success</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>DBKey</from>
+                        <to>DBKey</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command creates a Remediation Job based on all the information collected from a Compliance Job result.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>134f2468-587e-3da9-9ee4-6d19d6f14a23</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179710703</last-modified>
+    </meta>
+  </process-def>
+</process>

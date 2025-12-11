@@ -1,0 +1,150 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:v6.0:Storage_System:Update Storage System">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is HPSEActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>1. Sets the custom name of the specified storage system.
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;set&lt;/command&gt;
+	    &lt;category&gt;storagesystem&lt;/category&gt;
+		&lt;process-id&gt;update-storage-system&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;storage-system-id&gt;1001&lt;/storage-system-id&gt;
+		  &lt;customname&gt;newname&lt;/customname&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+storage-system-id[Required]
+	Storage System identifier.
+customname[Required]
+	New name of the storage system.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Process ID Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <value>update-storage-system</value>
+                  <to>process id</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//items/item/process-id)='update-storage-system']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Invoke Adapter Request</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper supports the following requirements:-
+
+1. Sets the custom name of the specified storage system.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>bd27bf60-c304-3c6d-a6ff-f20ad4a46bca</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588103398</last-modified>
+    </meta>
+  </process-def>
+</process>

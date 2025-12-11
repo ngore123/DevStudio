@@ -1,0 +1,343 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-NetAPP_Storage:Utilities:Use_Case_Utilities:Provision_Storage_Use_Case:Provision Storage From New SAN Dataset">
+    <parameters>
+      <input global="false" required="false">
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <from>storage size</from>
+        <to>storage size</to>
+      </input>
+      <input global="false" required="true">
+        <from>storage name</from>
+        <to>storage name</to>
+      </input>
+      <input global="false" required="true">
+        <from>dataset id</from>
+        <to>dataset id</to>
+      </input>
+      <input global="false" required="true">
+        <from>storage size unit</from>
+        <to>storage size unit</to>
+      </input>
+      <input global="false" required="true">
+        <from>converted storage size</from>
+        <to>converted storage size</to>
+      </input>
+      <input global="false" required="true">
+        <from>initiator id</from>
+        <to>initiator id</to>
+      </input>
+      <output global="false" required="false">
+        <to>find job status response</to>
+        <from>find job status response</from>
+      </output>
+      <output global="false" required="false">
+        <to>error</to>
+        <from>error</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>storage size</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>provision dataset items</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="storage">
+                <input global="false">
+                  <from>storage name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="size">
+                <input global="false">
+                  <from>storage size</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="ds id">
+                <input global="false">
+                  <from>dataset id</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="size unit">
+                <input global="false">
+                  <from>storage size unit</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="conv size">
+                <input global="false">
+                  <from>converted storage size</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="initiator id">
+                <input global="false">
+                  <from>initiator id</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <dataset-name-or-id>
+          <xsl:value-of select="'${ds id}'" disable-output-escaping="no" />
+        </dataset-name-or-id>
+        <size>
+          <xsl:value-of select="number(${conv size})" disable-output-escaping="no" />
+        </size>
+        <name>
+          <xsl:value-of select="'${storage}'" disable-output-escaping="no" />
+        </name>
+        <description>
+          <xsl:text disable-output-escaping="no">Storage '</xsl:text>
+          <xsl:value-of select="'${storage}'" disable-output-escaping="no" />
+          <xsl:text disable-output-escaping="no">' provisioned with a size of </xsl:text>
+          <xsl:value-of select="'${size}'" disable-output-escaping="no" />
+          <xsl:text disable-output-escaping="no">
+</xsl:text>
+          <xsl:value-of select="'${size unit}'" disable-output-escaping="no" />
+        </description>
+        <maximum-snapshot-space>
+          <xsl:text disable-output-escaping="no">2000000</xsl:text>
+        </maximum-snapshot-space>
+        <dataset-export-info>
+          <dataset-export-protocol>
+            <xsl:text disable-output-escaping="no">iscsi</xsl:text>
+          </dataset-export-protocol>
+          <dataset-lun-mapping-info>
+            <igroup-os-type>
+              <xsl:text disable-output-escaping="no">windows</xsl:text>
+            </igroup-os-type>
+            <lun-mapping-initiators>
+              <lun-mapping-initiator>
+                <initiator-id>
+                  <xsl:value-of select="string('${initiator id}')" disable-output-escaping="no" />
+                </initiator-id>
+              </lun-mapping-initiator>
+            </lun-mapping-initiators>
+          </dataset-lun-mapping-info>
+        </dataset-export-info>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>provision dataset items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-NetAPP_Storage:v4.0:Data_Set:Provision Member Of Data Set</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>provision dataset items</from>
+            <to>items</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>provision dataset response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-NetAPP_Storage:Utilities:Use_Case_Utilities:Provision_Storage_Use_Case:Find Job Response</process-name>
+              <parameters>
+                <input>
+                  <from>provision dataset response</from>
+                  <to>provision dataset response</to>
+                </input>
+                <output>
+                  <from>find job status response</from>
+                  <to>find job status response</to>
+                </output>
+                <output>
+                  <from>error</from>
+                  <to>error</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>provision dataset response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//response/metadata/status)='error']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>An error occurred while provisioning dataset. Error: </value>
+                      </input>
+                    </concat>
+                  </input>
+                  <input>
+                    <from>provision dataset response</from>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[string(//error)]]></xpath>
+                    </xpath-expression>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>error</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:utility[1]</location>
+            </utility>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7dea3ac5-8dee-33e6-b460-9694e9eca793</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598180969</last-modified>
+    </meta>
+  </process-def>
+</process>

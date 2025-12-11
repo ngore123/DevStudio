@@ -1,0 +1,913 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-Event_Orchestration:ITSM:Change_Management:Create Change">
+    <parameters>
+      <input global="false" required="true">
+        <description>For example: BMC_AR_System</description>
+        <from>itsm type</from>
+        <to>itsm type</to>
+      </input>
+      <input global="false" required="true">
+        <description>All specific configurations from module BMC-SA-Event_Orchestration_Configuration</description>
+        <from>all configurations</from>
+        <to>configuration</to>
+      </input>
+      <input global="false" required="true">
+        <description>Current event data</description>
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <input global="false" required="true">
+        <description>Flags like:
+
+&lt;flags&gt;
+  &lt;continue-processing&gt;true&lt;/continue-processing&gt;
+  &lt;status&gt;success&lt;/status&gt;
+  &lt;change-enabled&gt;true&lt;/change-enabled&gt;
+  &lt;incident-enabled&gt;true&lt;/incident-enabled&gt;
+  &lt;remediation-enabled&gt;true&lt;/remediation-enabled&gt;
+  &lt;remediation-required&gt;true&lt;/remediation-required&gt;
+  &lt;incident-created&gt;false&lt;/incident-created&gt;
+  &lt;incident-updated&gt;true&lt;/incident-updated&gt;
+&lt;/flags&gt;</description>
+        <from>flags</from>
+        <to>flags</to>
+      </input>
+      <input global="false" required="true">
+        <description>For example:
+&lt;itsm-data&gt;
+  &lt;itsm-incident-id&gt;INC000000000469&lt;/itsm-incident-id&gt;
+&lt;/itsm-data&gt; </description>
+        <from>itsm data</from>
+        <to>itsm data</to>
+      </input>
+      <input global="false" required="true">
+        <description>For exampleL: BMC_TrueSight</description>
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <input global="false" required="true">
+        <description>For example: BMC_TrueSight-ServiceDown-1
+
+[event source type]-[event type]-[configuration id]</description>
+        <from>action id</from>
+        <to>action id</to>
+      </input>
+      <output global="false" required="false">
+        <to>change</to>
+        <from>change</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Unsupported ITSM type: </value>
+                    </input>
+                    <input required="false">
+                      <from>itsm type</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>error message</to>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>change</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>itsm type</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'BMC_AR_System']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>========Create Change Input=======</value>
+                    </input>
+                    <input>
+                      <from>action id</from>
+                    </input>
+                    <input>
+                      <from>configuration</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>change</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>return data format</to>
+                  <value>XML</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>action id</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>config id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-after(substring-after(., '-'), '-')]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>event data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>summary</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//event/situationData/messageSummary/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>event data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>urgency</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//event/situationData/severity/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[3]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Convert XML to String</process-name>
+              <parameters>
+                <input>
+                  <from>event data</from>
+                  <to>input xml</to>
+                </input>
+                <output>
+                  <from>string output</from>
+                  <to>notes</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>urgency</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="urgency">
+                      <input global="false">
+                        <from>urgency</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//*[name() = '${itsm type}']/Mappings/UrgencyMappings/mappings/mapping[@ key='${urgency}']/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>adapter name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Adapters/ITSMWebServiceAdapter/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>server url</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//*[name() = '${itsm type}']/WebServiceConnectionData/URL/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>create change interface</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//*[name() = '${itsm type}']/WebServiceConnectionData/Change_CreateInterface/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>create change soap action</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//*[name() = '${itsm type}']/WebServiceConnectionData/Change_CreateSOAPAction/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>user name</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//*[name() = '${itsm type}']/WebServiceConnectionData/UserName/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>password</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//*[name() = '${itsm type}']/WebServiceConnectionData/Password/*[name() = 'EncryptedData'])">
+        <xsl:copy-of select="//*[name() = '${itsm type}']/WebServiceConnectionData/Password/*[name() = 'EncryptedData']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <value>
+          <xsl:value-of select="//*[name() = '${itsm type}']/WebServiceConnectionData/Password/text()" disable-output-escaping="no" />
+        </value>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change type</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="event source type">
+                      <input global="false">
+                        <from>event source type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="event type">
+                      <input global="false">
+                        <from>event type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="config id">
+                      <input global="false">
+                        <from>config id</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[translate(//*[name() = '${event source type}']/EventTypes/*[name() = '${event type}']/Configurations/configurations/configuration[id = '${config id}']/change-type/text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',  'abcdefghijklmnopqrstuvwxyz')]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change class</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="change type">
+                      <input global="false">
+                        <from>change type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//*[name() = '${itsm type}']/Mappings/ChangeClassMappings/*/mapping[translate(@name, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz') = '${change type}']/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status reason</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change template name</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="event type">
+                      <input global="false">
+                        <from>event type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="boolean(//*[name() = '${itsm type}']/Templates/ChangeTemplates/templates/template[@eventType='${event type}'])">
+          <xsl:value-of select="//*[name() = '${itsm type}']/Templates/ChangeTemplates/templates/template[@eventType='${event type}']/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="//*[name() = '${itsm type}']/Templates/ChangeTemplates/templates/template[@eventType='Default']/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>reported source</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//*[name() = '${itsm type}']/ChangeManagementDefaults/ReportedSource/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>=====Create Change - configuration extract=====</value>
+                    </input>
+                    <input>
+                      <from>user name</from>
+                    </input>
+                    <input>
+                      <from>change type</from>
+                    </input>
+                    <input>
+                      <from>change class</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[4]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>urgency</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="urgency">
+                      <input global="false">
+                        <from>urgency</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="itsm type">
+                      <input global="false">
+                        <from>itsm type</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <new-element>
+      <xsl:choose>
+        <xsl:when test="string-length('${urgency}')&lt;=0">
+          <xsl:value-of select="//*[name() = '${itsm type}']/ChangeManagementDefaults/DefaultUrgency" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${urgency}</xsl:otherwise>
+      </xsl:choose>
+    </new-element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[5]</location>
+            </assign>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[6]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Change_Management:Do Create Change</process-name>
+              <parameters>
+                <input>
+                  <from>itsm type</from>
+                  <to>ITSMPlatform</to>
+                </input>
+                <input>
+                  <from>adapter name</from>
+                  <to>AdapterName</to>
+                </input>
+                <input>
+                  <from>create change interface</from>
+                  <to>CreateChangeInterface</to>
+                </input>
+                <input>
+                  <from>reported source</from>
+                  <to>HostName</to>
+                </input>
+                <input>
+                  <from>server url</from>
+                  <to>ServerURL</to>
+                </input>
+                <input>
+                  <from>create change soap action</from>
+                  <to>CreateChangeSOAPAction</to>
+                </input>
+                <input>
+                  <from>user name</from>
+                  <to>UserName</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>Password</to>
+                </input>
+                <input>
+                  <from>summary</from>
+                  <to>Summary</to>
+                </input>
+                <input>
+                  <from>change template name</from>
+                  <to>ChangeTemplateName</to>
+                </input>
+                <input>
+                  <from>status</from>
+                  <to>Status</to>
+                </input>
+                <input>
+                  <from>status reason</from>
+                  <to>StatusReason</to>
+                </input>
+                <input>
+                  <from>urgency</from>
+                  <to>Urgency</to>
+                </input>
+                <input>
+                  <from>change class</from>
+                  <to>ChangeClass</to>
+                </input>
+                <input>
+                  <from>event data</from>
+                  <to>JobName</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//situationData/messageSummary/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>notes</from>
+                  <to>JobDetailedDescription</to>
+                </input>
+                <input>
+                  <from>return data format</from>
+                  <to>ReturnDataFormat</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+                <output>
+                  <from>xml response</from>
+                  <to>xml response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>xml response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="status">
+                      <input global="false">
+                        <from>status</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="'${status}' = //metadata/status/text()">${status}</xsl:when>
+        <xsl:otherwise>
+          <xsl:choose>
+            <xsl:when test="'${status}' = 'failure'">${status}</xsl:when>
+            <xsl:when test="//metadata/status/text() = 'failure'">
+              <xsl:value-of select="//metadata/status/text()" disable-output-escaping="no" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="//metadata/status/text()" disable-output-escaping="no" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>xml response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//metadata/error/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>xml response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="status">
+                      <input global="false">
+                        <from>status</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="'${status}' = 'success'">
+        <xsl:copy-of select="//change[1]" />
+      </xsl:when>
+      <xsl:otherwise>
+        <change />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==========Create Change Raw Data========</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>error message</from>
+                    </input>
+                    <input>
+                      <from>json response</from>
+                    </input>
+                    <input>
+                      <from>xml response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==========Create Change Output========</value>
+                    </input>
+                    <input>
+                      <from>change</from>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>error message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[7]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This a process template. It has a few basic things.
+1. Log Input
+2. Log Output
+3. Atleast 2 basic output parameters - status and error message.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>f889f17b-d7ba-411b-bed4-4994b4e99648</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration.</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1574351130410</last-modified>
+    </meta>
+  </process-def>
+</process>

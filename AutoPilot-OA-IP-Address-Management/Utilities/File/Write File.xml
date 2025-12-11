@@ -1,0 +1,340 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AutoPilot-OA-IP-Address-Management:Utilities:File:Write File">
+    <parameters>
+      <input global="false" required="false">
+        <description>Adapter Name</description>
+        <from>Adapter Name</from>
+        <to>Adapter Name</to>
+      </input>
+      <input global="false" required="true">
+        <description>File Name</description>
+        <from>File Name</from>
+        <to>File Name</to>
+      </input>
+      <input global="false" required="true">
+        <description>XML Structure describing the file contents.
+
+XML should look like:
+
+&lt;lines&gt;
+  &lt;line&gt;first line&lt;/line&gt;
+  &lt;line&gt;second line&lt;/line&gt;
+  &lt;line&gt;third line&lt;/line&gt;
+&lt;/lines&gt;</description>
+        <from>File Contents</from>
+        <to>File Contents</to>
+      </input>
+      <output global="false" required="false">
+        <description>Success; true or false [string]</description>
+        <to>Success</to>
+        <from>Success</from>
+      </output>
+      <output global="false" required="false">
+        <description>Adapter Response</description>
+        <to>Adapter Response</to>
+        <from>Adapter Response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>Adapter Name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = ""]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:QIP:Config:CLI:Adapter_File</configuration>
+                </input>
+                <output>
+                  <to>Adapter Name</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>File Contents</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(//lines/line) = false]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <output>
+                  <to>File Contents</to>
+                  <value>
+                    <lines>
+                      <line />
+                    </lines>
+                  </value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <output>
+            <to>Adapter Request</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="File Name">
+                <input global="false">
+                  <from>File Name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="File Contents">
+                <input global="false">
+                  <from>File Contents</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <fileRequest>
+        <filename>$[File Name]</filename>
+        <filetype>
+          <xsl:text disable-output-escaping="no">text</xsl:text>
+        </filetype>
+        ${File Contents}
+      </fileRequest>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>Adapter Name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+                <request-action>write</request-action>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>Adapter Request</from>
+          </input>
+          <input global="false">
+            <from>Adapter Request</from>
+          </input>
+          <output global="false">
+            <to>Adapter Response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>Success</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[3]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>Adapter Response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//meta-data/status) = "success"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <output>
+                  <to>Success</to>
+                  <value>true</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[3]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[3]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Write File
+
+Writes to a specified file. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>276aa5ea-1db8-455a-a2e6-efff25748f39</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1297757722448</last-modified>
+    </meta>
+  </process-def>
+</process>

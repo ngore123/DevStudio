@@ -1,0 +1,1227 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":BMC_Database_Automation-SA-ITSM_Integration:BMC_Database_Automation:Approve BDA Job">
+    <parameters>
+      <input global="false" required="false">
+        <description>inputevent
+
+This is the BMC AR System alert depicting a Task assignment.
+
+Sample:
+&lt;alert-message alert-id="000000000000286"&gt;
+ &lt;server-name&gt;vm-w23-rds856&lt;/server-name&gt;
+ &lt;form-name&gt;TMS:Task&lt;/form-name&gt;
+ &lt;object-id&gt;TAS000000000039&lt;/object-id&gt;
+ &lt;source&gt;AR&lt;/source&gt;
+ &lt;timestamp&gt;1242308953&lt;/timestamp&gt;
+ &lt;priority&gt;1&lt;/priority&gt;
+ &lt;text&gt;Operator Initiated Change:BMC Database Automation:TAS000000000039:CRQ000000000022&lt;/text&gt;
+&lt;/alert-message&gt;</description>
+        <from>inputevent</from>
+        <to>inputevent</to>
+      </input>
+      <input global="false" required="false">
+        <description>The task id associated with the Change ID</description>
+        <from>task ID</from>
+        <to>task ID</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_Database_Automation-SA-ITSM_Integration:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <value>BMC_Database_Automation</value>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+          <output>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </output>
+          <output>
+            <from>bda connection details</from>
+            <to>bda connection details</to>
+          </output>
+          <output>
+            <from>bda task closed reason mappings</from>
+            <to>bda task closed reason mappings</to>
+          </output>
+          <output>
+            <from>change platform</from>
+            <to>change platform</to>
+          </output>
+          <output>
+            <from>change template name</from>
+            <to>change template name</to>
+          </output>
+          <output>
+            <from>change default status</from>
+            <to>change default status</to>
+          </output>
+          <output>
+            <from>change default change type</from>
+            <to>change default change type</to>
+          </output>
+          <output>
+            <from>change default impact</from>
+            <to>change default impact</to>
+          </output>
+          <output>
+            <from>change default urgency</from>
+            <to>change default urgency</to>
+          </output>
+          <output>
+            <from>change default risk level</from>
+            <to>change default risk level</to>
+          </output>
+          <output>
+            <from>change default timing</from>
+            <to>change default timing</to>
+          </output>
+          <output>
+            <from>change default summary</from>
+            <to>change default summary</to>
+          </output>
+          <output>
+            <from>task platform</from>
+            <to>task platform</to>
+          </output>
+          <output>
+            <from>task oic operational catergorization tier1</from>
+            <to>task oic operational catergorization tier1</to>
+          </output>
+          <output>
+            <from>task operational catergorization tier2</from>
+            <to>task operational catergorization tier2</to>
+          </output>
+          <output>
+            <from>authentication platform</from>
+            <to>authentication platform</to>
+          </output>
+          <output>
+            <from>authentication schema</from>
+            <to>authentication schema</to>
+          </output>
+          <output>
+            <from>authentication adapter</from>
+            <to>authentication adapter</to>
+          </output>
+          <output>
+            <from>authentication query mappings</from>
+            <to>authentication query mappings</to>
+          </output>
+          <output>
+            <from>authentication version</from>
+            <to>authentication version</to>
+          </output>
+          <output>
+            <from>authentication username</from>
+            <to>authentication username</to>
+          </output>
+          <output>
+            <from>date format</from>
+            <to>date format</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>task ID</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="task id">
+                  <input global="false">
+                    <from>task ID</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[string-length(.) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>inputevent</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task ID</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[substring-before(substring-after(substring-after(//text, ":"), ":"), ":")]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:AutoPilot-OA-Task_Management:Searches:Get Task by Task ID</process-name>
+        <parameters>
+          <input>
+            <from>task platform</from>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>task ID</from>
+            <to>task id</to>
+          </input>
+          <output>
+            <from>tasks</from>
+            <to>tasks</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Task_Management:Update Task Status</process-name>
+        <parameters>
+          <input>
+            <from>task platform</from>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>task ID</from>
+            <to>task id</to>
+          </input>
+          <input>
+            <value>Work In Progress</value>
+            <to>new status</to>
+          </input>
+          <output>
+            <from>tasks</from>
+            <to>tasks</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[3]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>tasks</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>job name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//character03/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tasks</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>task status</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//status/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tasks</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>task status reason</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//status-reason-selection/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tasks</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>target</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//character04/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>tasks</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>details</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//character06]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>rewritten details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <result>
+      <xsl:choose>
+        <xsl:when test="count(node()/node()//*) &gt; 1">
+          <xsl:copy-of select="node()/node()/*" />
+        </xsl:when>
+        <xsl:otherwise>
+          <empty>
+            <xsl:value-of select="." disable-output-escaping="yes" />
+          </empty>
+        </xsl:otherwise>
+      </xsl:choose>
+    </result>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>rewritten details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="count(.) &gt; 0 and (string-length(node())!=0 or  count(/node()/node()/*) &gt;0)">
+        <xsl:copy-of select="node()/node()[1]" />
+      </xsl:when>
+      <xsl:otherwise>
+        <EmptyInfo />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>certificate file</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/certificate-file/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>private key file</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/private-key-file/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>use ssl certificate</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/use-ssl-certificate/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>allow unsigned certificate</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/allow-unsigned-certificate/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>install certificate</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/install-certificate/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>passphrase</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/passphrase/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>private key data</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/private-key-data/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>certificate data</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/certificate-data/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>keystore file</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/keystore-file/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>keystore password</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/keystore-password/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>alias</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/alias/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>details</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>signature mode</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ssl-parameters/signature-mode/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>### Updated Task concept</value>
+              </input>
+              <input>
+                <from>tasks</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>##rerawrawrew####</value>
+              </input>
+              <input>
+                <from>certificate file</from>
+              </input>
+              <input>
+                <from>target</from>
+              </input>
+              <input>
+                <from>details</from>
+              </input>
+              <input>
+                <from>private key file</from>
+              </input>
+              <input>
+                <from>keystore file</from>
+              </input>
+              <input>
+                <from>keystore password</from>
+              </input>
+              <input>
+                <from>rewritten details</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>mutual authentication param request</to>
+                  <value>
+                    <empty />
+                  </value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>connection param request</to>
+                  <value>
+                    <empty />
+                  </value>
+                </output>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="ssl certificate">
+                      <input global="false">
+                        <from>use ssl certificate</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="unsigned certificate">
+                      <input global="false">
+                        <from>allow unsigned certificate</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="install certificate">
+                      <input global="false">
+                        <from>install certificate</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="passphrase">
+                      <input global="false">
+                        <from>passphrase</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-parameters>
+      <xsl:if test="string-length(&quot;${ssl certificate}&quot;) &gt; 0">
+        <use-ssl-certificate>${ssl certificate}</use-ssl-certificate>
+      </xsl:if>
+      <xsl:if test="string-length(&quot;${unsigned certificate}&quot;) &gt; 0">
+        <allow-unsigned-certificate>${unsigned certificate}</allow-unsigned-certificate>
+      </xsl:if>
+      <xsl:if test="string-length(&quot;${install certificate}&quot;) &gt; 0">
+        <install-certificate>${install certificate}</install-certificate>
+      </xsl:if>
+      <xsl:if test="string-length(&quot;${passphrase}&quot;) &gt; 0">
+        <passphrase>${passphrase}</passphrase>
+      </xsl:if>
+    </connection-parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>###REquestsssssss#############</value>
+                    </input>
+                    <input>
+                      <from>mutual authentication param request</from>
+                    </input>
+                    <input>
+                      <from>connection param request</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>target</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[substring-before(.,':') ="https" ]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>mutual authentication param request</to>
+                  <value>
+                    <empty />
+                  </value>
+                </output>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="signature mode">
+                      <input global="false">
+                        <from>signature mode</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="key store file">
+                      <input global="false">
+                        <from>keystore file</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="keystore-password">
+                      <input global="false">
+                        <from>keystore password</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="alias">
+                      <input global="false">
+                        <from>alias</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="certificate data">
+                      <input global="false">
+                        <from>certificate data</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="private key data">
+                      <input global="false">
+                        <from>private key data</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="private key file">
+                      <input global="false">
+                        <from>private key file</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="certificate file">
+                      <input global="false">
+                        <from>certificate file</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <mutual-authentication-parameters>
+      <xsl:if test="'${signature mode}' != ''  and ( '${signature mode}' = 'keystore'  or '${signature mode}' = 'key-files' or '${signature mode}' = 'key-data')">
+        <signature-properties>
+          <xsl:attribute name="mode">${signature mode}</xsl:attribute>
+          <xsl:if test="'${signature mode}' = 'keystore'">
+            <keystore-file>${key store file}</keystore-file>
+            <keystore-password>${keystore-password}</keystore-password>
+            <alias>${alias}</alias>
+          </xsl:if>
+          <xsl:if test="'${signature mode}' = 'key-data'">
+            <certificate-data>${certificate data}</certificate-data>
+            <private-key-data>${private key data}</private-key-data>
+          </xsl:if>
+          <xsl:if test="'${signature mode}' = 'key-files'">
+            <private-key-file>${private key file}</private-key-file>
+            <certificate-file>${certificate file}</certificate-file>
+          </xsl:if>
+        </signature-properties>
+      </xsl:if>
+    </mutual-authentication-parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>connection param request</to>
+                  <value>
+                    <empty />
+                  </value>
+                </output>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="ssl certificate">
+                      <input global="false">
+                        <from>use ssl certificate</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="unsigned certificate">
+                      <input global="false">
+                        <from>allow unsigned certificate</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="install certificate">
+                      <input global="false">
+                        <from>install certificate</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="passphrase">
+                      <input global="false">
+                        <from>passphrase</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-parameters>
+      <xsl:if test="string-length(&quot;${ssl certificate}&quot;) &gt; 0">
+        <use-ssl-certificate>${ssl certificate}</use-ssl-certificate>
+      </xsl:if>
+      <xsl:if test="string-length(&quot;${unsigned certificate}&quot;) &gt; 0">
+        <allow-unsigned-certificate>${unsigned certificate}</allow-unsigned-certificate>
+      </xsl:if>
+      <xsl:if test="string-length(&quot;${install certificate}&quot;) &gt; 0">
+        <install-certificate>${install certificate}</install-certificate>
+      </xsl:if>
+      <xsl:if test="string-length(&quot;${passphrase}&quot;) &gt; 0">
+        <passphrase>${passphrase}</passphrase>
+      </xsl:if>
+    </connection-parameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>###REquestsssssss#############</value>
+                    </input>
+                    <input>
+                      <from>mutual authentication param request</from>
+                    </input>
+                    <input>
+                      <from>connection param request</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_Database_Automation-SA-ITSM_Integration:Utilities:Approve Job</process-name>
+        <parameters>
+          <input>
+            <from>bda connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>target</from>
+            <to>target</to>
+          </input>
+          <input>
+            <value>approved</value>
+            <to>job status</to>
+          </input>
+          <input>
+            <concat>
+              <input>
+                <value>BMC Database Automation : </value>
+              </input>
+              <input required="false">
+                <from>target</from>
+              </input>
+            </concat>
+            <to>details</to>
+          </input>
+          <input>
+            <from>connection param request</from>
+            <to>connection parameters</to>
+          </input>
+          <input>
+            <from>mutual authentication param request</from>
+            <to>mutual authentication parameters</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+          <output>
+            <from>target</from>
+            <to>target</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[4]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'false']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <input>
+                  <from>task ID</from>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>task-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>BDA job status update failed:</value>
+                    </input>
+                    <input required="false">
+                      <from>target</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>summary</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>status message</from>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>notes</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task</to>
+                  <value>Yes</value>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>secure-log</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task</to>
+                  <value>Internal</value>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>view-access</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>task</to>
+                  <value>General Information</value>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>work-info-type</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>workinfo tasks</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="task">
+                      <input global="false">
+                        <from>task</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//task) &gt; 0">
+          <xsl:copy-of select="//task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <removal>
+                <input>
+                  <from>task</from>
+                </input>
+              </removal>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[3]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Task_Management:Create WorkInfo</process-name>
+              <parameters>
+                <input>
+                  <from>task platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>workinfo tasks</from>
+                  <to>tasks</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[3]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[3]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow is triggered by Remedy alert depiciting approval of a task Ticket. The workflow unblocks the job in BDA which is linked with the given Task ticket. </description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2563da6c-fe8f-4737-a374-68caea962f97</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1321615652357</last-modified>
+    </meta>
+  </process-def>
+</process>

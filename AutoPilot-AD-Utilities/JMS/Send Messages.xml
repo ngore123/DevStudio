@@ -1,0 +1,458 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-AD-Utilities:JMS:Send Messages">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the Adapter to use for this Process.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <description>A text messages to send.
+This must be in
+XML format with a root element of
+&lt;messages&gt;and one or more child
+elements of &lt;text&gt; containing
+the content to be sent.</description>
+        <from>text messages</from>
+        <to>text messages</to>
+      </input>
+      <input global="false" required="false">
+        <description>A map messages to send.
+This must be in
+XML format with a root element of
+&lt;messages&gt;and one or more child
+elements of &lt;map&gt; containing
+key value elements.
+See below sample example:
+&lt;messages&gt;
+ &lt;map&gt;
+    &lt;entry&gt;
+          &lt;name&gt;Emp Name&lt;/name&gt;
+           &lt;value type="String"&gt;Mr Bean.&lt;/value&gt;
+    &lt;/entry&gt;
+     &lt;entry&gt;
+            &lt;name&gt;Emp id&lt;/name&gt;
+            &lt;value type="Integer"&gt;1234&lt;/value&gt;
+      &lt;/entry&gt;
+             .
+             .
+      &lt;entry&gt;
+           &lt;name&gt;Work Hours&lt;/name&gt;
+            &lt;value type="Float"&gt;23.45&lt;/value&gt;
+       &lt;/entry&gt;
+ &lt;/map&gt;
+&lt;/messages&gt;</description>
+        <from>map messages</from>
+        <to>map messages</to>
+      </input>
+      <input global="false" required="false">
+        <description>A bytes messages to send.
+This must be in
+XML format with a root element of
+&lt;messages&gt;and one or more child
+elements of &lt;bytes&gt; containing
+the Base64 encoded content to be sent.
+</description>
+        <from>bytes messages</from>
+        <to>bytes messages</to>
+      </input>
+      <input global="false" required="true">
+        <description>The JMS destination queue for the message(s).</description>
+        <from>destination</from>
+        <to>destination</to>
+      </input>
+      <input global="false" required="false">
+        <description>The JMS destination for the sending reply.</description>
+        <from>reply to</from>
+        <to>reply to</to>
+      </input>
+      <input global="false" required="false">
+        <description>JMSCorrelationID header property.</description>
+        <from>correlation id</from>
+        <to>correlation id</to>
+      </input>
+      <input global="false" required="false">
+        <description>JMSExpiration header property.
+Expiration value is in miliseconds.</description>
+        <from>jms expiration</from>
+        <to>expiration</to>
+      </input>
+      <input global="false" required="false">
+        <description>JMSPriority header property.
+Priority value must be in between 0-9.</description>
+        <from>jms priority</from>
+        <to>priority</to>
+      </input>
+      <input global="false" required="false">
+        <description>JMSType header property.</description>
+        <from>jms type</from>
+        <to>jms type</to>
+      </input>
+      <input global="false" required="false">
+        <description>JMS DeliveryMode header property.
+Valid values for delivery mode are: PERSISTENT, NON_PERSISTENT.</description>
+        <from>delivery mode</from>
+        <to>delivery mode</to>
+      </input>
+      <input global="false" required="false">
+        <description>Contains the properties list for the command.
+This must be in XML format with a root element of
+&lt;properties&gt;and one or more child
+elements of &lt;property&gt; containing
+the content to be sent.
+See below sample example:
+&lt;properties&gt;
+       &lt;property&gt;
+          &lt;name&gt;Emp id&lt;/name&gt;
+          &lt;value type="Integer"&gt;31100&lt;/value&gt;
+       &lt;/property&gt;
+       &lt;property&gt;
+          &lt;name&gt;Emp Nmae&lt;/name&gt;
+          &lt;value type="String"&gt;Mr. Bean&lt;/value&gt;
+       &lt;/property&gt;
+            .
+            .
+       &lt;property&gt;
+          &lt;name&gt;Work hours&lt;/name&gt;
+          &lt;value type="Float"&gt;38.87&lt;/value&gt;
+       &lt;/property&gt;
+    &lt;/properties&gt;
+</description>
+        <from>properties</from>
+        <to>properties</to>
+      </input>
+      <input global="false" required="false">
+        <description>Actor adapter will wait for this much amount of time for reply to message. If message comes before than this timeout adapter will proceeds with sending next message. Value would be in mili-seconds. Adapter synchronous request/response behavior will be depending on this tag. If this tag is present in adapter request then adapter will send messages synchronously.</description>
+        <from>request response wait timeout</from>
+        <to>request response wait timeout</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specify the character set to encode bytes messages</description>
+        <from>character set</from>
+        <to>character set</to>
+      </input>
+      <output global="false" required="false">
+        <description>An adapter response contains the result returned from an adapter request. The contents of the response will vary by adapter.</description>
+        <to>Adapter response</to>
+        <from>Adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>message0</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="text">
+                <input global="false">
+                  <from>text messages</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="map">
+                <input global="false">
+                  <from>map messages</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="bytes">
+                <input global="false">
+                  <from>bytes messages</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <message>${text}${map}${bytes}</message>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>message0</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>body</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="msg0">
+                <input global="false">
+                  <from>message0</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <body>
+      <xsl:if test="//message">
+        <xsl:copy-of select="//message/messages/*" />
+      </xsl:if>
+    </body>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>header</to>
+                  <value>
+                    <empty />
+                  </value>
+                </output>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="correlation id">
+                      <input global="false">
+                        <from>correlation id</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="expiration">
+                      <input global="false">
+                        <from>expiration</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="type">
+                      <input global="false">
+                        <from>jms type</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="priority">
+                      <input global="false">
+                        <from>priority</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="reply to">
+                      <input global="false">
+                        <from>reply to</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="delivery">
+                      <input global="false">
+                        <from>delivery mode</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:template match="/">
+    <header>
+      <xsl:if test="string-length('${reply to}')!=0">
+        <reply-to>${reply to}</reply-to>
+      </xsl:if>
+      <xsl:if test="string-length('${correlation id}')!=0">
+        <correlation-id>${correlation id}</correlation-id>
+      </xsl:if>
+      <xsl:if test="string-length('${expiration}')!=0">
+        <expiration>${expiration}</expiration>
+      </xsl:if>
+      <xsl:if test="string-length('${type}')!=0">
+        <jms-type>${type}</jms-type>
+      </xsl:if>
+      <xsl:if test="string-length('${priority}')!=0">
+        <priority>${priority}</priority>
+      </xsl:if>
+      <xsl:if test="string-length('${delivery}')!=0">
+        <delivery-mode>${delivery}</delivery-mode>
+      </xsl:if>
+    </header>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-AD-Utilities:JMS:Send Body</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>destination</from>
+                  <to>destination</to>
+                </input>
+                <input>
+                  <from>body</from>
+                  <to>body</to>
+                </input>
+                <input>
+                  <from>header</from>
+                  <to>header</to>
+                </input>
+                <input>
+                  <from>properties</from>
+                  <to>properties</to>
+                </input>
+                <input>
+                  <from>request response wait timeout</from>
+                  <to>request response wait timeout</to>
+                </input>
+                <input>
+                  <from>character set</from>
+                  <to>character set</to>
+                </input>
+                <output>
+                  <from>Adapter response</from>
+                  <to>Adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>message0</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>Please provide atleast one message</value>
+                      </input>
+                    </concat>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>error</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Error string: </value>
+                    </input>
+                    <input>
+                      <from>error</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:utility[1]</location>
+            </utility>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Send Messages  
+       Sends a set of JMS messages to a designated JMS destination. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d2196ff8-0373-309c-aa58-14299ee60d82</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1282140719901</last-modified>
+    </meta>
+  </process-def>
+</process>

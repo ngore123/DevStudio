@@ -1,0 +1,172 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Operating_System_Utilities:Configuration:Perform Boot Config EMS OFF">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the COM port to be used for redirection. BIOSSET directs Emergency Management Services to get the BIOS settings to determine which port should be used for redirection. Do not use the /port parameter if remotely administered output is being disabled.</description>
+        <from>port</from>
+        <to>port</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the baud rate to be used for redirection. Do not use the /baud parameter if remotely administered output is being disabled.</description>
+        <from>baud</from>
+        <to>baud</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the operating system entry line number in the [operating systems] section of the Boot.ini file to copy. The first line after the [operating systems] section header is 1.</description>
+        <from>os entry line num</from>
+        <to>id</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="port">
+                  <input global="false">
+                    <from>port</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="id">
+                  <input global="false">
+                    <from>id</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="baud">
+                  <input global="false">
+                    <from>baud</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Windows Server 2008">
+        <xsl:text disable-output-escaping="no">bcdedit /ems </xsl:text>
+        <xsl:if test="string-length('${id}')!=0">
+          <xsl:text disable-output-escaping="no">{${id}}</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> OFF</xsl:text>
+      </command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">bootcfg /ems OFF</xsl:text>
+        <xsl:if test="string-length('${baud}')!=0">
+          <xsl:text disable-output-escaping="no"> /baud ${baud}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${port}')!=0">
+          <xsl:text disable-output-escaping="no"> /port ${port}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${id}')!=0">
+          <xsl:text disable-output-escaping="no"> /id ${id}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported."</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported."</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Enables the user to add or change the settings for redirection of the Emergency Management Services console to a remote computer. By enabling Emergency Management Services, you add a "redirect=Port#" line to the [boot loader] section of the Boot.ini file and a /redirect option to the specified operating system entry line. The Emergency Management Services feature is enabled only on servers.
+
+OFF: Disables output to a remote computer. Removes the /redirect option from the specified OSEntryLineNum and the redirect=comX setting from the [boot loader] section.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e711a0e0-18e5-337b-8b1b-91f5001905a0</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1291031809783</last-modified>
+    </meta>
+  </process-def>
+</process>

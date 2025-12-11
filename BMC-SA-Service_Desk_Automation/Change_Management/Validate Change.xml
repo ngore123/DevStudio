@@ -1,0 +1,754 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BMC-SA-Service_Desk_Automation:Change_Management:Validate Change">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of the configuration item defined in the configuration module. 
+
+Currently supported value:  BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The format to specify the input:
+
+&lt;bao-process-data&gt;
+  &lt;response-data&gt;
+    &lt;response&gt;
+      &lt;Changes&gt;
+        &lt;Change&gt;
+		&lt;!-- The Complete Change XML --&gt; 
+          &lt;change-id&gt;CRQ000000000539&lt;/change-id&gt;
+          &lt;first-name&gt;BAO&lt;/first-name&gt;
+          &lt;last-name&gt;CCS&lt;/last-name&gt;
+           ................
+       &lt;/Change&gt;
+      &lt;/Changes&gt;
+    &lt;/response&gt;
+  &lt;/response-data&gt;
+&lt;/bao-process-data&gt;</description>
+        <from>bao process data</from>
+        <to>bao process data</to>
+      </input>
+      <output global="false" required="false">
+        <to>response xml</to>
+        <from>response xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set Start Time</process-name>
+        <unique-id>c113440d-ac61-4f97-bc14-2607426fd912</unique-id>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response For Invalid Configuration</process-name>
+              <parameters>
+                <input>
+                  <value>Validate Change</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='BMC_AR_System']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Extract Configuration Data</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <output>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </output>
+                <output>
+                  <from>incident default impact</from>
+                  <to>incident default impact</to>
+                </output>
+                <output>
+                  <from>incident default reported source</from>
+                  <to>incident default reported source</to>
+                </output>
+                <output>
+                  <from>incident default service type</from>
+                  <to>incident default service type</to>
+                </output>
+                <output>
+                  <from>incident default status</from>
+                  <to>incident default status</to>
+                </output>
+                <output>
+                  <from>incident default status reason</from>
+                  <to>incident default status reason</to>
+                </output>
+                <output>
+                  <from>incident default urgency</from>
+                  <to>incident default urgency</to>
+                </output>
+                <output>
+                  <from>incident enabled</from>
+                  <to>incident enabled</to>
+                </output>
+                <output>
+                  <from>incident template name</from>
+                  <to>incident template name</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>change default status</from>
+                  <to>change default status</to>
+                </output>
+                <output>
+                  <from>change template name</from>
+                  <to>valid change template name</to>
+                </output>
+                <output>
+                  <from>validate change template</from>
+                  <to>validate template</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>bao process data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change template id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[/bao-process-data/response-data/response/Changes/Change/template-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>bao process data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change status</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[/bao-process-data/response-data/response/Changes/Change/status/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>bao process data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change number</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[/bao-process-data/response-data/response/Changes/Change/change-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Values Extracted from the Input XML:</value>
+                    </input>
+                    <input>
+                      <from>change number</from>
+                    </input>
+                    <input>
+                      <from>change status</from>
+                    </input>
+                    <input>
+                      <from>change template id</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Change_Management:Utilities:Get Template Name from Template Instance ID</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>change template id</from>
+                  <to>template id</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>change template name</from>
+                  <to>template name</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Template Name used in the Change:</value>
+                    </input>
+                    <input>
+                      <from>template name</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <output>
+                  <to>check status</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>check status</to>
+                        <value>true</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>validate template</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = "true"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <call-process>
+                          <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+                          <parameters>
+                            <input>
+                              <value>failure</value>
+                              <to>success status</to>
+                            </input>
+                            <input>
+                              <from>start time</from>
+                              <to>start time</to>
+                            </input>
+                            <input>
+                              <value>Unknown</value>
+                              <to>target name</to>
+                            </input>
+                            <input>
+                              <value>Validate Change</value>
+                              <to>request type</to>
+                            </input>
+                            <input>
+                              <value>Invalid Change.</value>
+                              <to>target response</to>
+                            </input>
+                            <input>
+                              <from>bao process data</from>
+                              <to>fulfillment response</to>
+                            </input>
+                            <input>
+                              <value>Template Name for the Change Template not found.</value>
+                              <to>error summary</to>
+                            </input>
+                            <output>
+                              <from>response xml</from>
+                              <to>response xml</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>Change Template Name not Found.</value>
+                                </input>
+                                <input>
+                                  <value></value>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                        </call-process>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>template name</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string-length(.)!=0]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence>
+                              <call-process>
+                                <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+                                <parameters>
+                                  <input>
+                                    <value>failure</value>
+                                    <to>success status</to>
+                                  </input>
+                                  <input>
+                                    <from>start time</from>
+                                    <to>start time</to>
+                                  </input>
+                                  <input>
+                                    <value>Unknown</value>
+                                    <to>target name</to>
+                                  </input>
+                                  <input>
+                                    <value>Validate Change</value>
+                                    <to>request type</to>
+                                  </input>
+                                  <input>
+                                    <from>bao process data</from>
+                                    <to>fulfillment response</to>
+                                  </input>
+                                  <input>
+                                    <value>Incorrect Template Used in the Change.</value>
+                                    <to>error summary</to>
+                                  </input>
+                                  <output>
+                                    <from>response xml</from>
+                                    <to>response xml</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <before-execution>
+                                  <log>
+                                    <level>debug</level>
+                                    <parameters>
+                                      <input>
+                                        <value>Invalid Change Template Used.</value>
+                                      </input>
+                                      <input>
+                                        <value></value>
+                                      </input>
+                                    </parameters>
+                                  </log>
+                                </before-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>template name</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens>
+                                  <replacement-token name="template">
+                                    <input global="false">
+                                      <from>valid change template name</from>
+                                    </input>
+                                  </replacement-token>
+                                </xpath-replacement-tokens>
+                                <xpath><![CDATA[string(.)='${template}']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <output>
+                                    <to>check status</to>
+                                    <value>true</value>
+                                  </output>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                              </assign>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>check status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = "true"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <call-process>
+                          <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+                          <parameters>
+                            <input>
+                              <value>failure</value>
+                              <to>success status</to>
+                            </input>
+                            <input>
+                              <from>start time</from>
+                              <to>start time</to>
+                            </input>
+                            <input>
+                              <value>Unknown</value>
+                              <to>target name</to>
+                            </input>
+                            <input>
+                              <value>Validate Change</value>
+                              <to>request type</to>
+                            </input>
+                            <input>
+                              <from>bao process data</from>
+                              <to>fulfillment response</to>
+                            </input>
+                            <input>
+                              <value>Unexpected Change Status.</value>
+                              <to>error summary</to>
+                            </input>
+                            <output>
+                              <from>response xml</from>
+                              <to>response xml</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>Unexpected Change Status.</value>
+                                </input>
+                                <input>
+                                  <value></value>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <location>:switch[1]:sequence[2]:switch[2]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                        </call-process>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>change status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens>
+                            <replacement-token name="valid status">
+                              <input global="false">
+                                <from>change default status</from>
+                              </input>
+                            </replacement-token>
+                          </xpath-replacement-tokens>
+                          <xpath><![CDATA[string(.)='${valid status}']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <call-process>
+                          <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+                          <parameters>
+                            <input>
+                              <value>success</value>
+                              <to>success status</to>
+                            </input>
+                            <input>
+                              <from>start time</from>
+                              <to>start time</to>
+                            </input>
+                            <input>
+                              <value>Unknown</value>
+                              <to>target name</to>
+                            </input>
+                            <input>
+                              <value>Validate Change</value>
+                              <to>request type</to>
+                            </input>
+                            <input>
+                              <from>bao process data</from>
+                              <to>target response</to>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[//Changes]]></xpath>
+                              </xpath-expression>
+                            </input>
+                            <input>
+                              <from>bao process data</from>
+                              <to>fulfillment response</to>
+                            </input>
+                            <output>
+                              <from>response xml</from>
+                              <to>response xml</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[2]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[2]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[2]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4097548a-b195-4a20-91e1-34a26c9a6e5d</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1443500867108</last-modified>
+    </meta>
+  </process-def>
+</process>

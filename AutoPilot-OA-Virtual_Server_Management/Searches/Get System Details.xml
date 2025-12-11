@@ -1,0 +1,319 @@
+<process draft="false" dev-studio-version="7.5.02.04">
+  <process-def name=":AutoPilot-OA-Virtual_Server_Management:Searches:Get System Details">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration entry defined in a configuration module. </description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Virtual server name</description>
+        <from>vm name</from>
+        <to>vm name</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Timeout in milliseconds for BladeLogic connection details
+</description>
+        <from>timeout</from>
+        <to>timeout</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] User role for BladeLogic connection details</description>
+        <from>user role</from>
+        <to>user role</to>
+      </input>
+      <output global="false" required="true">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>cpu speed</to>
+        <from>cpu speed</from>
+      </output>
+      <output global="false" required="false">
+        <to>memory size</to>
+        <from>memory size</from>
+      </output>
+      <output global="false" required="false">
+        <to>number of cpus</to>
+        <from>number of cpus</from>
+      </output>
+      <output global="false" required="false">
+        <to>os type</to>
+        <from>os type</from>
+      </output>
+      <output global="false" required="false">
+        <to>total disk space</to>
+        <from>total disk space</from>
+      </output>
+      <output global="false" required="false">
+        <to>disk used</to>
+        <from>disk used</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>SEMI_AUTOMATIC</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failed</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>Given system is not supported</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'BladeLogic']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:Extract Configuration Data</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <output>
+                  <from>adapter</from>
+                  <to>adapter</to>
+                </output>
+                <output>
+                  <from>default timeout</from>
+                  <to>default timeout</to>
+                </output>
+                <output>
+                  <from>default user role</from>
+                  <to>default user role</to>
+                </output>
+                <output>
+                  <from>host alive delay</from>
+                  <to>host alive delay</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>SEMI_AUTOMATIC</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:BladeLogic:Get System Details</process-name>
+              <parameters>
+                <input>
+                  <from>adapter</from>
+                  <to>connection details</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens>
+                      <replacement-token name="default timeout">
+                        <input global="false">
+                          <from>default timeout</from>
+                        </input>
+                      </replacement-token>
+                      <replacement-token name="default user role">
+                        <input global="false">
+                          <from>default user role</from>
+                        </input>
+                      </replacement-token>
+                      <replacement-token name="timeout">
+                        <input global="false">
+                          <from>timeout</from>
+                        </input>
+                      </replacement-token>
+                      <replacement-token name="user role">
+                        <input global="false">
+                          <from>user role</from>
+                        </input>
+                      </replacement-token>
+                    </stylesheet-replacement-tokens>
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-details>
+      <adapter-name>
+        <xsl:value-of select="." disable-output-escaping="no" />
+      </adapter-name>
+      <timeout>
+        <xsl:choose>
+          <xsl:when test="string-length('${timeout}')&gt;0">${timeout}</xsl:when>
+          <xsl:otherwise>${default timeout}</xsl:otherwise>
+        </xsl:choose>
+      </timeout>
+      <role-name>
+        <xsl:choose>
+          <xsl:when test="string-length('${user role}')&gt;0">${user role}</xsl:when>
+          <xsl:otherwise>${default user role}</xsl:otherwise>
+        </xsl:choose>
+      </role-name>
+    </connection-details>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </input>
+                <input>
+                  <from>vm name</from>
+                  <to>hostname</to>
+                </input>
+                <input>
+                  <from>host alive delay</from>
+                  <to>delay</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>cpu speed</from>
+                  <to>cpu speed</to>
+                </output>
+                <output>
+                  <from>os type</from>
+                  <to>os type</to>
+                </output>
+                <output>
+                  <from>system size</from>
+                  <to>total disk space</to>
+                </output>
+                <output>
+                  <from>system size cpu</from>
+                  <to>number of cpus</to>
+                </output>
+                <output>
+                  <from>system size memory</from>
+                  <to>memory size</to>
+                </output>
+                <output>
+                  <from>disk used</from>
+                  <to>disk used</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>SEMI_AUTOMATIC</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This action returns the power status of a virtual server</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+    </meta>
+  </process-def>
+</process>

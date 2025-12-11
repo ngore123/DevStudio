@@ -1,0 +1,818 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":Closed_Loop_Server-SA-Audit:Utilities:Verify Remediation">
+    <parameters>
+      <input global="false" required="false">
+        <description>[Optional] </description>
+        <from>bl connection details</from>
+        <to>bl connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Connection details for reading exported file from file system.</description>
+        <from>file connection details</from>
+        <to>file connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the audit job to execute to verify the remediation.</description>
+        <from>verification job name</from>
+        <to>verification job name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the audit job group.</description>
+        <from>verification job group</from>
+        <to>verification job group</to>
+      </input>
+      <input global="false" required="true">
+        <description>Destination folder where the verifyJob will be place after copy job from the sample audit job</description>
+        <from>destination verify job group</from>
+        <to>destination verify job group</to>
+      </input>
+      <input global="false" required="true">
+        <description>Target server against which the audit job is to run for verfication of remediation.</description>
+        <from>target server</from>
+        <to>target servers</to>
+      </input>
+      <input global="false" required="true">
+        <description>Job to be verified.
+
+Structure:
+&lt;job&gt;
+  &lt;job-name/&gt;
+  &lt;job-group/&gt;
+  &lt;templates&gt;
+    &lt;template&gt;
+      &lt;group/&gt;
+      &lt;name/&gt;
+    &lt;/template&gt;
+  &lt;/templates&gt;
+&lt;/job&gt;</description>
+        <from>job</from>
+        <to>job</to>
+      </input>
+      <input global="false" required="true">
+        <description>Folder path on file system where to export the audit results.</description>
+        <from>export file path</from>
+        <to>export file path</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] 
+Change id for the audit run
+e.g. CHG0000000987</description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] 
+ Job delimiter
+e.g. -AO- or :</description>
+        <from>job delimiter</from>
+        <to>job delimiter</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] 
+Bladelogic version to which CLSA is connecting to.
+e.g 8.1 or 8.0 or 7.42.</description>
+        <from>bl version</from>
+        <to>bl version</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] 
+BL connection details used only when "blcli tunnelling" flag is "true".</description>
+        <from>bl connection details instance 2</from>
+        <to>bl connection details instance 2</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] 
+This flag is set to "true" when one has to use the BL adapter in blcli tunneling mode.  
+
+Valid values: true, false
+Default value: false</description>
+        <from>blcli tunnelling</from>
+        <to>blcli tunnelling</to>
+      </input>
+      <output global="false" required="true">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>audit run</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>$$$$ CLSA - BL version 8.0 or below. Following non-copyJob path</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>bl version</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) >= 8.1]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:Closed_Loop_Server-SA-Audit:Utilities:Bladelogic:Execute CopyJob for VerifyJob</process-name>
+              <parameters>
+                <input>
+                  <from>bl connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <value>AuditJob</value>
+                  <to>job type</to>
+                </input>
+                <input>
+                  <from>verification job name</from>
+                  <to>jobName</to>
+                </input>
+                <input>
+                  <from>verification job group</from>
+                  <to>groupName</to>
+                </input>
+                <input>
+                  <from>destination verify job group</from>
+                  <to>copyJob group name</to>
+                </input>
+                <input>
+                  <from>target servers</from>
+                  <to>target</to>
+                </input>
+                <input>
+                  <from>change id</from>
+                  <to>change id</to>
+                </input>
+                <input>
+                  <from>job delimiter</from>
+                  <to>job delimiter</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>verify copy job id</from>
+                  <to>verify copy job id</to>
+                </output>
+                <output>
+                  <from>copy job name</from>
+                  <to>verification job name</to>
+                </output>
+                <output>
+                  <from>copyJob group name</from>
+                  <to>verification job group</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>job</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>job</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="dest verify job group">
+                      <input global="false">
+                        <from>destination verify job group</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <job>
+      <xsl:for-each select="job/*">
+        <xsl:choose>
+          <xsl:when test="local-name()='job-group'">
+            <job-group>${dest verify job group}</job-group>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:copy-of select="." />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </job>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Job_Management:Clear Servers from Job Target</process-name>
+        <parameters>
+          <input>
+            <from>bl connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>AuditJob</value>
+            <to>job type</to>
+          </input>
+          <input>
+            <from>verification job group</from>
+            <to>groupName</to>
+          </input>
+          <input>
+            <from>verification job name</from>
+            <to>jobName</to>
+          </input>
+          <output>
+            <from>success</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>success message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Job_Management:Clear Groups from Job Target</process-name>
+              <parameters>
+                <input>
+                  <from>bl connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <value>AuditJob</value>
+                  <to>job type</to>
+                </input>
+                <input>
+                  <from>verification job group</from>
+                  <to>groupName</to>
+                </input>
+                <input>
+                  <from>verification job name</from>
+                  <to>jobName</to>
+                </input>
+                <output>
+                  <from>success</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>success message</from>
+                  <to>success message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>DBKey</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Job_Management:Add Servers to Job Target</process-name>
+              <parameters>
+                <input>
+                  <from>bl connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <value>AuditJob</value>
+                  <to>job type</to>
+                </input>
+                <input>
+                  <from>verification job group</from>
+                  <to>groupName</to>
+                </input>
+                <input>
+                  <from>verification job name</from>
+                  <to>jobName</to>
+                </input>
+                <input>
+                  <from>target servers</from>
+                  <to>serverNames</to>
+                </input>
+                <output>
+                  <from>success</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>success message</from>
+                  <to>status message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>verification job key</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[3]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.)='true']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:AuditJob:Execute Job and Wait</process-name>
+                    <parameters>
+                      <input>
+                        <from>bl connection details</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>verification job key</from>
+                        <to>jobKey</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>success status</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>status message</to>
+                      </output>
+                      <output>
+                        <from>DBKey</from>
+                        <to>verification job run key</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>success status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(.)='true']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <call-process>
+                          <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:JobRun:Job Run Key to Job Run ID</process-name>
+                          <parameters>
+                            <input>
+                              <from>bl connection details</from>
+                              <to>connection details</to>
+                            </input>
+                            <input>
+                              <from>verification job run key</from>
+                              <to>jobRunKey</to>
+                            </input>
+                            <output>
+                              <from>status</from>
+                              <to>success status</to>
+                            </output>
+                            <output>
+                              <from>error message</from>
+                              <to>status message</to>
+                            </output>
+                            <output>
+                              <from>ID</from>
+                              <to>verification run id</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>success status</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string(.)='true']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <input>
+                                    <from>verification job name</from>
+                                  </input>
+                                  <output>
+                                    <to>bladelogic alert</to>
+                                    <concept type="Closed_Loop_Server-SA-Audit:BladeLogicNotification">
+                                      <attribute>jc-job-name</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <input>
+                                    <from>verification run id</from>
+                                  </input>
+                                  <output>
+                                    <to>bladelogic alert</to>
+                                    <concept type="Closed_Loop_Server-SA-Audit:BladeLogicNotification">
+                                      <attribute>jc-run-id</attribute>
+                                    </concept>
+                                  </output>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                              </assign>
+                              <call-process>
+                                <process-name>:Closed_Loop_Server-SA-Audit:Utilities:Get Audit Job Results</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>bl connection details</from>
+                                    <to>bl connection details</to>
+                                  </input>
+                                  <input>
+                                    <from>bl connection details instance 2</from>
+                                    <to>bl connection details instance 2</to>
+                                  </input>
+                                  <input>
+                                    <from>blcli tunnelling</from>
+                                    <to>blcli tunnelling</to>
+                                  </input>
+                                  <input>
+                                    <from>file connection details</from>
+                                    <to>file connection details</to>
+                                  </input>
+                                  <input>
+                                    <from>bladelogic alert</from>
+                                    <to>bladelogic alert</to>
+                                  </input>
+                                  <input>
+                                    <from>job</from>
+                                    <to>job</to>
+                                  </input>
+                                  <input>
+                                    <from>export file path</from>
+                                    <to>export path</to>
+                                  </input>
+                                  <input>
+                                    <value>CSV</value>
+                                    <to>export file type</to>
+                                  </input>
+                                  <input>
+                                    <value>Verify</value>
+                                    <to>purpose</to>
+                                  </input>
+                                  <output>
+                                    <from>success status</from>
+                                    <to>success status</to>
+                                  </output>
+                                  <output>
+                                    <from>audit run</from>
+                                    <to>audit run</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                              <assign>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>audit run</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>success status</to>
+                                    </output>
+                                  </result>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens>
+                                      <replacement-token name="server">
+                                        <input global="false">
+                                          <from>target servers</from>
+                                        </input>
+                                      </replacement-token>
+                                    </xpath-replacement-tokens>
+                                    <xpath><![CDATA[count(//bladelogic-audit-exports/targets/target[@server-name='${server}']) = 0]]></xpath>
+                                  </xpath-expression>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>success status</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>status message</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens>
+                                      <replacement-token name="server">
+                                        <input global="false">
+                                          <from>target servers</from>
+                                        </input>
+                                      </replacement-token>
+                                    </stylesheet-replacement-tokens>
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <result>
+      <xsl:choose>
+        <xsl:when test=".='true'">
+          <xsl:value-of select="concat('Remediation was successful for ', '${server}')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat('Remediation failed for ', '${server}')" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </result>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[2]</location>
+                              </assign>
+                            </sequence>
+                          </case>
+                          <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[3]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[3]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[3]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process verifies whether the given remediation was successful or not.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b948ee33-2f84-3584-97a4-97482d69804e</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1320398562935</last-modified>
+    </meta>
+  </process-def>
+</process>

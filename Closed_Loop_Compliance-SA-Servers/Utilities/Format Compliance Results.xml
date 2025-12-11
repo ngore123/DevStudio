@@ -1,0 +1,444 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":Closed_Loop_Compliance-SA-Servers:Utilities:Format Compliance Results">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The CSV file path on the machine where CDP is installed.
+For example:
+c:\tmp\2iexport2.csv</description>
+        <from>csv file path</from>
+        <to>csv file path</to>
+      </input>
+      <output global="false" required="false">
+        <to>compliance run</to>
+        <from>compliance run</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Terminal:File:Read</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>adapter name</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//adapter-name/text()]]></xpath>
+            </xpath-expression>
+          </input>
+          <input>
+            <from>csv file path</from>
+            <to>file name</to>
+          </input>
+          <input>
+            <value>text</value>
+            <to>file type</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>file content</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>file content</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>compliance run</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="separator" select="'&quot;,'" />
+  <xsl:variable name="another-separator" select="',&quot;'" />
+  <xsl:variable name="record-length" select="30000" />
+  <xsl:template match="/">
+    <bladelogic-compliance-export>
+      <xsl:apply-templates select="//line" mode="base" />
+    </bladelogic-compliance-export>
+  </xsl:template>
+  <xsl:template match="line" mode="base">
+    <xsl:choose>
+      <xsl:when test="starts-with(text(), 'Mapping:')">
+        <mapping>
+          <xsl:variable name="mapping-var" select="substring-after(text(), 'Mapping: ')" />
+          <name>
+            <xsl:value-of select="substring-before($mapping-var, '-&gt;')" disable-output-escaping="no" />
+          </name>
+          <value>
+            <xsl:value-of select="substring-after($mapping-var, '-&gt;')" disable-output-escaping="no" />
+          </value>
+        </mapping>
+      </xsl:when>
+      <xsl:when test="contains(text(), 'Template,Target Server,Target Component,Rule Group,Rule,Rule Reference Number,Rule Definition,Mismatched Conditions,Result,Documented Exception,Compliant,Exception Name,Exception Reference,Expiration Date,')">
+        <!--Do apply templates only for lines which start with a double quote ("), this depicts that the line is a value new record in CSV-->
+        <xsl:apply-templates select="following-sibling::line[starts-with(text(), '&quot;')]" mode="compliance-job-results" />
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template match="line" mode="compliance-job-results">
+    <xsl:choose>
+      <xsl:when test="starts-with(text(), '&quot;') and substring(text(), string-length(text()) - 1)='&quot;,'">
+        <!--If this line is a complete record-->
+        <xsl:call-template name="compliance-job-results">
+          <xsl:with-param name="line" select="text()" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <!--This line is a multi line record-->
+        <xsl:variable name="record">
+          <!--Collect complete record into one variable-->
+          <xsl:variable name="record-end-indicator" select="number(following-sibling::line[substring(text(), string-length(text()) - 1)='&quot;,']/@number)" />
+          <xsl:value-of select="text()" disable-output-escaping="no" />
+          <xsl:text disable-output-escaping="no">
+</xsl:text>
+          <xsl:for-each select="following-sibling::line[number(@number) &lt;= $record-end-indicator]">
+            <xsl:value-of select="text()" disable-output-escaping="no" />
+            <xsl:if test="position()&lt;last()">
+              <xsl:text disable-output-escaping="no">
+</xsl:text>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:call-template name="compliance-job-results">
+          <xsl:with-param name="line" select="substring($record,0,$record-length)" />
+        </xsl:call-template>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+  <xsl:template name="compliance-job-results">
+    <xsl:param name="line" />
+    <xsl:if test="string-length($line)&gt;0">
+      <compliance-job-results>
+        <xsl:variable name="template-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$line" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="target-server-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$template-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="target-component-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$target-server-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="rule-group-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$target-component-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="rule-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$rule-group-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="rule-ref-number-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$rule-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="rule-definition-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$rule-ref-number-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="mismatch-conditions-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$rule-definition-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="result-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$mismatch-conditions-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="documented-exception-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$result-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="compliant-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$documented-exception-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="exception-name-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$compliant-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="exception-ref-removed">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="$exception-name-removed" />
+          </xsl:call-template>
+        </xsl:variable>
+        <template>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$line" />
+          </xsl:call-template>
+        </template>
+        <target>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$template-removed" />
+          </xsl:call-template>
+        </target>
+        <target-component>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$target-server-removed" />
+          </xsl:call-template>
+        </target-component>
+        <rule-group>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$target-component-removed" />
+          </xsl:call-template>
+        </rule-group>
+        <rule>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$rule-group-removed" />
+          </xsl:call-template>
+        </rule>
+        <rule-ref-number>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$rule-removed" />
+          </xsl:call-template>
+        </rule-ref-number>
+        <rule-definition>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$rule-ref-number-removed" />
+          </xsl:call-template>
+        </rule-definition>
+        <mismatch-conditions>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$rule-definition-removed" />
+          </xsl:call-template>
+        </mismatch-conditions>
+        <result>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$mismatch-conditions-removed" />
+          </xsl:call-template>
+        </result>
+        <documented-exception>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$result-removed" />
+          </xsl:call-template>
+        </documented-exception>
+        <compliant>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$documented-exception-removed" />
+          </xsl:call-template>
+        </compliant>
+        <exception-name>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$compliant-removed" />
+          </xsl:call-template>
+        </exception-name>
+        <exception-ref>
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="$exception-name-removed" />
+          </xsl:call-template>
+        </exception-ref>
+        <expiration-date>
+          <xsl:value-of select="substring($exception-ref-removed, 1, string-length($exception-ref-removed) - 1)" disable-output-escaping="no" />
+        </expiration-date>
+      </compliance-job-results>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="get-remaining-field-value">
+    <xsl:param name="input" />
+    <xsl:param name="incomplete-fragment" />
+    <xsl:if test="string-length($input)&gt;0">
+      <!--get the fragment till the first (",)-->
+      <xsl:variable name="fragment" select="concat(substring-before($input, '&quot;,'), '&quot;,')" />
+      <xsl:variable name="field" select="concat($incomplete-fragment, substring-before($input, '&quot;,'), '&quot;,')" />
+      <xsl:choose>
+        <xsl:when test="((string-length($field) - string-length(translate($field, '&quot;', ''))) mod 2) != 0">
+          <xsl:call-template name="get-remaining-field-value">
+            <xsl:with-param name="input" select="substring-after($input, $fragment)" />
+            <xsl:with-param name="incomplete-fragment" select="$field" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-after($input, $fragment)" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="get-field-value">
+    <xsl:param name="input" />
+    <xsl:param name="incomplete-fragment" />
+    <xsl:if test="string-length($input)&gt;2">
+      <!--get the fragment till the first (",)-->
+      <xsl:variable name="fragment" select="concat(substring-before($input, '&quot;,'), '&quot;,')" />
+      <xsl:variable name="field" select="concat($incomplete-fragment, substring-before($input, '&quot;,'), '&quot;,')" />
+      <xsl:choose>
+        <xsl:when test="((string-length($field) - string-length(translate($field, '&quot;', ''))) mod 2) != 0">
+          <xsl:call-template name="get-field-value">
+            <xsl:with-param name="input" select="substring-after($input, $fragment)" />
+            <xsl:with-param name="incomplete-fragment" select="$field" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:variable name="field-value-with-quotes">
+            <xsl:call-template name="remove-extra-quotes">
+              <xsl:with-param name="input" select="substring($field, 1, string-length($field) - 1)" />
+            </xsl:call-template>
+          </xsl:variable>
+          <!--Remove surrounding double quotes-->
+          <xsl:value-of select="substring($field-value-with-quotes, 2, string-length($field-value-with-quotes) - 2)" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="remove-extra-quotes">
+    <xsl:param name="input" />
+    <xsl:if test="string-length($input)&gt;0 and $input!='&quot;&quot;'">
+      <xsl:choose>
+        <xsl:when test="contains($input, '&quot;&quot;')">
+          <xsl:value-of select="concat(substring-before($input, '&quot;&quot;'), '&quot;')" disable-output-escaping="no" />
+          <xsl:call-template name="remove-extra-quotes">
+            <xsl:with-param name="input" select="substring-after($input, '&quot;&quot;')" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$input" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>compliance run</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>compliance run</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <bladelogic-compliance-export>
+      <xsl:for-each select="//mapping">
+        <xsl:variable name="name" select="name/text()" />
+        <xsl:if test="count(//compliance-job-results[target/text()=$name and compliant/text()='N']) &gt; 0">
+          <mapping>
+            <xsl:attribute name="name">
+              <xsl:value-of select="$name" disable-output-escaping="no" />
+            </xsl:attribute>
+            <xsl:attribute name="value">
+              <xsl:value-of select="value/text()" disable-output-escaping="no" />
+            </xsl:attribute>
+            <xsl:if test="false">
+              <!--This code snippet is not being used now. Remove it in future if we don't use templates and components to remediate-->
+              <templates>
+                <xsl:apply-templates select="//compliance-job-results[./target/text()=$name and compliant/text()='N']">
+                  <xsl:with-param name="type" select="'templates'" />
+                </xsl:apply-templates>
+              </templates>
+              <components>
+                <xsl:apply-templates select="//compliance-job-results[./target/text()=$name and compliant/text()='N']">
+                  <xsl:with-param name="type" select="'components'" />
+                </xsl:apply-templates>
+              </components>
+            </xsl:if>
+            <rules>
+              <xsl:apply-templates select="//compliance-job-results[./target/text()=$name and compliant/text()='N']">
+                <xsl:with-param name="type" select="'rules'" />
+              </xsl:apply-templates>
+            </rules>
+          </mapping>
+        </xsl:if>
+      </xsl:for-each>
+      <xsl:for-each select="//compliance-job-results[compliant/text()='N']">
+        <xsl:copy-of select="." />
+      </xsl:for-each>
+    </bladelogic-compliance-export>
+  </xsl:template>
+  <xsl:template match="compliance-job-results">
+    <xsl:param name="type" />
+    <xsl:choose>
+      <xsl:when test="$type='templates'">
+        <template>
+          <xsl:value-of select="template/text()" disable-output-escaping="no" />
+        </template>
+      </xsl:when>
+      <xsl:when test="$type='components'">
+        <component>
+          <xsl:value-of select="target-component/text()" disable-output-escaping="no" />
+        </component>
+      </xsl:when>
+      <xsl:when test="$type='rules'">
+        <rule>
+          <xsl:if test="string-length(rule-group/text())&gt;1 and rule-group/text()!='/'">
+            <xsl:value-of select="rule-group/text()" disable-output-escaping="no" />
+          </xsl:if>
+          <xsl:value-of select="concat('/', rule/text())" disable-output-escaping="no" />
+        </rule>
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow outputs a well formated xml document for the input exported compliance results.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1f44c96d-9b0e-3a2f-b96c-4d5352be6d93</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1404293750969</last-modified>
+    </meta>
+  </process-def>
+</process>

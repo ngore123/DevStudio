@@ -1,0 +1,195 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-NetAPP_Storage:v4.0:Job:Find Job Status">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter. Default Name: NetAppActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Finds the details of all the jobs that match the filter criteria specified.
+
+Sample Items XML:
+
+&lt;items&gt;
+&lt;item&gt;
+		&lt;targets&gt;
+			&lt;target&gt;
+				&lt;host&gt;10.10.10.10&lt;/host&gt;
+				&lt;user-name&gt;userName&lt;/user-name&gt;
+				&lt;password&gt;password&lt;/password&gt;
+				&lt;protocol&gt;http&lt;/protocol&gt;
+				&lt;port&gt;8088&lt;/port&gt;                                
+			&lt;/target&gt;
+		&lt;/targets&gt;
+	&lt;target&gt;server1&lt;/target&gt;
+	&lt;job-id&gt;123456&lt;/job-id&gt;
+	&lt;object-name-or-id&gt;testds2&lt;/object-name-or-id&gt;
+	&lt;job-state&gt;completed&lt;/job-state&gt;
+	&lt;job-type&gt;provision_member&lt;/job-type&gt;
+	&lt;max-jobs&gt;0&lt;/max-jobs&gt;
+&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+targets [Conditional] 
+
+        It is parent XML element for &lt;target&gt; XML element. 
+        The &lt;target&gt; XML element is used to specify dynamic targets at request level. 
+        Note: The &lt;targets&gt; XML element is required if the adapter configuration is empty in Grid Manager. 
+
+target [Conditional] 
+        It is child XML element of &lt;targets&gt; XML element. This element is used to specify dynamic targets at request level. 
+
+        Using dynamic targets you can define connection information for a remote host within an adapter request. This allows you to configure an adapter in Grid Manager, by specifying configuration information in an adapter request. 
+
+        Note: (1) Adapter configuration specified using request level dynamic targets takes precedence over Grid Manager level configuration information. (2) If request level dynamic target is specified using &lt;targets&gt; XML element, then the &lt;target&gt; element which is child of &lt;item&gt; element is ignored. (3) This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+host [Conditional] 
+Host name or IP address of server on which NetApp DataFabric Manager is running. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+user-name [Conditional] 
+NetApp DataFabric Manager login username. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+password [Conditional] 
+NetApp DataFabric Manager login password. 
+
+You can encrypt the password by specifying the encryption type attribute. 
+For example: &lt;password encryption-type = "Base64"&gt;cGFzc3dvcmQ=&lt;/password&gt;. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+protocol [Optional] 
+Communication protocol used by adapter. Valid value is http or https. Default value is http. 
+
+port [Optional] 
+Port on which NetApp DataFabric Manager is enabled. Default value is 8088 for http protocol and 8488 for https protocol. 
+
+target [Optional] 
+It is child XML element of &lt;item&gt; XML element. 
+You can use this element to specify the connection information for a DFM Server. For this a comma separated list of configuration names can be specified. This executes the request simultaneously on all DFM servers identified by the configuration names. 
+Valid values: 
+1. The values specified for &lt;target&gt; XML element must be same as the values that have been specified for the name attribute of &lt;config&gt; element in Grid Manager adapter configuration. 
+2. You can provide "ALL" as the value. In this case the request will get executed on all the DFM servers defined in Grid Manager adapter configuration. 
+3. You can specify multiple comma separated names to allow simultaneous execution of requests across multiple DFM servers. 
+4. You can skip this element. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+You can leave this element empty. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+
+Note: This element is ignored if request level dynamic target is specified using &lt;targets&gt; XML element.
+
+
+
+job-id[Optional]
+	Identifier of a job to list. If unspecified, all jobs are listed. Range: [1..2^31-1].
+
+job-state[Optional]
+	State of the jobs to list. If specified, only the jobs which are in this state are listed.
+
+job-type[Optional]
+	If specified, only jobs of specified type are listed.
+
+max-jobs[Optional]
+	If specified, this is the maximum number of jobs that the client wishes to receive at once. If set to zero, return all jobs. The default value of this parameter is 50,000. Range: [0..2^31-1]
+
+object-name-or-id[Optional]
+	Name or ID of the dataset or a group. Range: [1..2^31-1] if Id is specified.
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>find-job-status</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-NetAPP_Storage:Utilities:Invoke Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Finds the details of all the jobs that match the filter criteria specified.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>72a087e3-136b-36d7-b312-c25c24353179</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598207594</last-modified>
+    </meta>
+  </process-def>
+</process>

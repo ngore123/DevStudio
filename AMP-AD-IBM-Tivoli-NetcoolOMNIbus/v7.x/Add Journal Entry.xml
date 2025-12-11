@@ -1,0 +1,222 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AMP-AD-IBM-Tivoli-NetcoolOMNIbus:v7.x:Add Journal Entry">
+    <parameters>
+      <input global="false" required="false">
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <from>uid</from>
+        <to>uid</to>
+      </input>
+      <input global="false" required="true">
+        <from>serial</from>
+        <to>serial</to>
+      </input>
+      <input global="false" required="true">
+        <from>journal entry</from>
+        <to>journal entry</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>adapter name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>adapter name</to>
+                  <value>OMNIbusAdapter</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Done assigning adapter name</value>
+                    </input>
+                    <input>
+                      <from>adapter name</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>uid</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="uid">
+                <input global="false">
+                  <from>uid</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="serial">
+                <input global="false">
+                  <from>serial</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="journal entry">
+                <input global="false">
+                  <from>journal entry</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet version="1.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:output indent="yes" cdata-section-elements="Text"/>
+  <xsl:template match="/">
+    <request-data>
+      <OmnibusAdapterRequest>
+      <UID>${uid}</UID>
+      <Serial>${serial}</Serial>
+      <Text>${journal entry}</Text>
+    </OmnibusAdapterRequest>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+                <request-action>insert_journal</request-action>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>before call</value>
+              </input>
+              <input>
+                <from>adapter request</from>
+              </input>
+              <input>
+                <from>adapter name</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>EMS Event created</value>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Add Journal Entry
+    Adds an OMNIbus alert journal entry.
+
+    Inputs
+        adapter name    [Optional]
+            The adapter to be used to handle the request. If not provided, "EMSAdapter" will be used.
+        uid
+            The uid.
+        serial
+            Identifies the alert.
+        journal entry
+            The journal entry to be added.
+
+</description>
+        <version>1.0</version>
+      </documentation>
+      <time-to-live>60000</time-to-live>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>78a55b6d-8bca-3579-808d-b8db3b3b5b4c</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1282115245791</last-modified>
+    </meta>
+  </process-def>
+</process>

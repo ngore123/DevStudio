@@ -1,0 +1,478 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Process task template">
+    <parameters>
+      <input global="false" required="true">
+        <from>ProductCode</from>
+        <to>ProductCode</to>
+      </input>
+      <input global="false" required="true">
+        <from>Source</from>
+        <to>Source</to>
+      </input>
+      <input global="false" required="true">
+        <from>JobID</from>
+        <to>JobID</to>
+      </input>
+      <input global="false" required="false">
+        <from>JobType</from>
+        <to>JobType</to>
+      </input>
+      <input global="false" required="true">
+        <from>JobName</from>
+        <to>JobName</to>
+      </input>
+      <input global="false" required="true">
+        <from>JobDescription</from>
+        <to>JobDescription</to>
+      </input>
+      <input global="false" required="true">
+        <from>JobDetailedDescription</from>
+        <to>JobDetailedDescription</to>
+      </input>
+      <input global="false" required="true">
+        <from>JobVersion</from>
+        <to>JobVersion</to>
+      </input>
+      <input global="false" required="false">
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <output global="false" required="true">
+        <to>status</to>
+        <from>remedyStatus</from>
+      </output>
+      <output global="false" required="true">
+        <to>statusReason</to>
+        <from>statusReason</from>
+      </output>
+      <output global="false" required="false">
+        <to>taskTemplateID</to>
+        <from>taskTemplateID</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <from>ARTaskTemplateUrl</from>
+          </input>
+          <output>
+            <to>soapurl</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <from>ARUsername</from>
+          </input>
+          <output>
+            <to>remedyUsername</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <from>ARPassword</from>
+          </input>
+          <output>
+            <to>remedyPassword</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Connection_Details:transport</configuration>
+          </input>
+          <output>
+            <to>transport</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>soapurl</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>req</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="username">
+                <input global="false">
+                  <from>remedyUsername</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="password">
+                <input global="false">
+                  <from>remedyPassword</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="Source">
+                <input global="false">
+                  <from>Source</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="JobID">
+                <input global="false">
+                  <from>JobID</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="JobType">
+                <input global="false">
+                  <from>JobType</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="JobName">
+                <input global="false">
+                  <from>JobName</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="desc">
+                <input global="false">
+                  <from>JobDescription</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="detailedDesc">
+                <input global="false">
+                  <from>JobDetailedDescription</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="version">
+                <input global="false">
+                  <from>JobVersion</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="status">
+                <input global="false">
+                  <from>status</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tem="http://tempuri.org" xmlns:urn="CHG_ChangeServiceInterface" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" version="1.0">
+  <xsl:output indent="yes" encoding="XML" />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Header>
+        <xsl:element name="urn:AuthenticationInfo">
+          <xsl:element name="urn:userName">${username}</xsl:element>
+          <xsl:element name="urn:password">${password}</xsl:element>
+        </xsl:element>
+      </soapenv:Header>
+      <soapenv:Body>
+        <xsl:element name="urn:TaskTemplate_ProcessInterfaceData">
+          <xsl:element name="urn:SourceID">
+            <xsl:text disable-output-escaping="no">${Source}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobID">
+            <xsl:text disable-output-escaping="no">${JobID}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobType">
+            <xsl:text disable-output-escaping="no">${JobType}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobName">
+            <xsl:text disable-output-escaping="no">${JobName}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobDescription">
+            <xsl:text disable-output-escaping="no">$[desc]</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobDetailedDescription">
+            <xsl:text disable-output-escaping="no">$[detailedDesc]</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:JobVersion">
+            <xsl:text disable-output-escaping="no">${version}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Status">
+            <xsl:text disable-output-escaping="no">${status}</xsl:text>
+          </xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:WebServiceAdapterSync</configuration>
+          </input>
+          <output>
+            <to>wsAdapter</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>remedyStatus</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>statusReason</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>taskTemplateID</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:SendMessageToRemedy:remedyRequest=&gt;</value>
+              </input>
+              <input>
+                <from>req</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+        <parameters>
+          <input>
+            <from>wsAdapter</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>transport</from>
+            <to>transport</to>
+          </input>
+          <input>
+            <from>soapurl</from>
+            <to>soap url</to>
+          </input>
+          <input>
+            <from>req</from>
+            <to>soap message</to>
+          </input>
+          <input>
+            <value>urn:TMS_TaskTemplateServiceInterface/TaskTemplate_ProcessInterfaceData</value>
+            <to>soap action</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>remedyResponse</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>BMC-SA-CLA_ITSM_Integration:SendMessageToRemedy:remedyResponse=&gt;</value>
+              </input>
+              <input>
+                <from>remedyResponse</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Utility:Strip Namespaces</process-name>
+        <parameters>
+          <input>
+            <from>remedyResponse</from>
+            <to>XML</to>
+          </input>
+          <output>
+            <from>XML</from>
+            <to>remedyResponse</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>remedyResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>statusReason</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="not(//faultstring)">
+          <xsl:value-of select="//error/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="//faultstring/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>remedyStatus</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>remedyResponse</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(//faultstring) and not(//error)]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>remedyResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>remedyStatus</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//ReturnValue/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>remedyResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>statusReason</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//ReturnMessage/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>remedyResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>taskTemplateID</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//TemplateID/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Task template create/update. It needs to be synchronous call, request is sent to Remedy and response is sent back to Automation system. No store and forward in this scenario.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d56df71b-0c8f-4434-b992-e64a63da6915</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1470828571657</last-modified>
+    </meta>
+  </process-def>
+</process>

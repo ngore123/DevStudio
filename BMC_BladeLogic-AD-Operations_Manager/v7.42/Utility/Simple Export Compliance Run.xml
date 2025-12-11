@@ -1,0 +1,202 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:Utility:Simple Export Compliance Run">
+    <parameters>
+      <input global="false" required="false">
+        <description>The Connection details for the Adatpater.
+Ezample:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified component template group containing the template that is the basis of the Compliance Job.</description>
+        <from>templateGroupName</from>
+        <to>templateGroupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the template used in the Snapshot job.</description>
+        <from>templateName</from>
+        <to>templateName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified path of the rule of the Compliance Job results to be exported.</description>
+        <from>ruleName</from>
+        <to>ruleName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified job group where the Audit Job is stored.</description>
+        <from>jobGroupName</from>
+        <to>jobGroupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the Audit Job to export.</description>
+        <from>jobName</from>
+        <to>jobName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Number of the Compliance Job run to export.</description>
+        <from>runIndex</from>
+        <to>runIndex</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the file that holds the export.</description>
+        <from>exportFileName</from>
+        <to>exportFileName</to>
+      </input>
+      <output global="false" required="false">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>This commands returns Void.</description>
+        <to>void</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>templateGroupName</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>templateName</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>ruleName</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>jobGroupName</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>jobName</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>runIndex</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>exportFileName</from>
+            <to>argument 7</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>updated list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>Utility</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>simpleExportComplianceRun</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>updated list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command exports the results of a Compliance Job run to a file and gives you more control over the resulting output than other similar commands. You must identify the job run by its run number. The result is in a CSV format.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a1d25881-324b-38d1-b691-8f436440c846</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179962268</last-modified>
+    </meta>
+  </process-def>
+</process>

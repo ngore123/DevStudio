@@ -1,0 +1,1629 @@
+<process draft="false" dev-studio-version="7.6.02.01">
+  <process-def name=":AutoPilot-OA-Storage_Management:Utilities:Get Job Response">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module. 
+
+Example: NetApp</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>XML - adapter response  which contains jod id
+Example:
+&lt;job-id&gt;123456&lt;/job-id&gt;</description>
+        <from>adapter response</from>
+        <to>adapter response</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp: 
+[required if dynamic targeting is used otherwise optional] 
+
+Designates a specific target (name of the DFM server where the operation will be performed) that has been defined in the adapter configuration. Valid value- Same value that has been specified for the name attribute of 'config' element in the adapter configuration . If this tag is left empty the request will be executed on the first defined adapter configuration.
+
+for e.g for the  adapter config below , target would be 02.
+&lt;configs&gt;
+   &lt;config name="02"&gt;
+          &lt;target&gt;172.19.224.103&lt;/target&gt;
+          &lt;user-name&gt;root&lt;/user-name&gt;
+          &lt;password&gt;bmcbmc&lt;/password&gt;
+          &lt;protocol&gt;http&lt;/protocol&gt;
+          &lt;port&gt;8088&lt;/port&gt;
+   &lt;/config&gt;
+&lt;/configs&gt;
+
+Dynamic targeting: Host name or IP address of DFM.
+
+
+EMC:
+[optional]
+- Specifies the connection information for EMC SMI-S Provider.
+	- Valid value: The value specified for &lt;target&gt; element must be same as the value that has been specified for the name attribute of &lt;config&gt; element in the adapter configuration. You can leave this tag empty. In this case the request will be executed on all the defined adapter configuration.
+	- Default value: All defined adapter configuration.
+</description>
+        <from>target</from>
+        <to>target</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp:
+[required only if dynamic targeting is used]
+NetApp DataFabric Manager login username.
+
+EMC -
+[optional ]
+Specifies the login name used to connect to  EMC SMI-S Provider. The 'username' specified in adapter request overrides the value specified in adapter configuration.
+	- Valid value: None.
+	- Default Value: None.
+	
+</description>
+        <from>username</from>
+        <to>username</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp:
+[required only if dynamic targeting is used]
+NetApp DataFabric Manager login password.
+
+EMC-
+[optional ] 
+Specifies the password used to connect to  EMC SMI-S Provider. The 'password' specified in adapter request overrides the value specified in adapter configuration.
+	- Valid value: None.
+	- Default Value: None.
+	</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp: [Conditional]  specified only when password parameter is mentioned .
+You can encrypt the password by specifying the encryption type .
+Valid values:  Base64,Plain.</description>
+        <from>encryption type</from>
+        <to>encryption type</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp:
+[Optional and used when dynamic targeting] 
+Communication protocol used by adapter. Valid value is http or https. Default value is http.
+
+EMC- 
+[optional] 
+Specifies the protocol used to connect to  EMC SMI-S Provider. The 'protocol' specified in adapter request overrides the value specified in adapter configuration.
+	- Valid value: HTTPS or HTTP
+	- Default Value: None.
+	</description>
+        <from>protocol</from>
+        <to>protocol</to>
+      </input>
+      <input global="false" required="false">
+        <description>NetApp: 
+[Optional and used when dynamic targeting]
+Port on which NetApp DataFabric Manager is enabled. Default value is 8088 for http protocol and 8488 for https protocol.
+
+EMC-
+[optional ] 
+Specifies the port number used to connect to  EMC SMI-S Provider. The 'port' specified in adapter request overrides the value specified in adapter configuration.
+	- Valid value: A valid numeric value. 
+	- Default Value: None.
+	</description>
+        <from>port</from>
+        <to>port</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] EMC - Specifies the time in seconds after which the attempt to connect to EMC SMI-S provider times out. The 'timeout-secs' specified in adapter request overrides the value specified in adapter configuration.
+	- Valid value: A numeric value which specifies the time in seconds. 
+	- Default Value: 180, if no 'timeout-secs' is provided in adapter configuration. </description>
+        <from>time out secs</from>
+        <to>time out secs</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status.</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>find job status response</to>
+        <from>find job status response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Storage_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+          <output>
+            <from>adapter</from>
+            <to>adapter</to>
+          </output>
+          <output>
+            <from>version</from>
+            <to>version</to>
+          </output>
+          <output>
+            <from>module configuration items</from>
+            <to>module configuration items</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="NetApp"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>module configuration items</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>configured delay</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="configuration name">
+                      <input global="false">
+                        <from>configuration name</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//$[configuration name]/Configured_Delay/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>false</value>
+                      </input>
+                    </concat>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task closed</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="configured delay">
+                      <input global="false">
+                        <from>configured delay</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(.) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${configured delay}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>configured delay</from>
+                </input>
+                <output>
+                  <to>count</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>count</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>iterator</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:variable name="elements">
+      <root />
+    </xsl:variable>
+    <xsl:call-template name="create-xml">
+      <xsl:with-param name="count" select="." />
+      <xsl:with-param name="xml" select="$elements" />
+    </xsl:call-template>
+  </xsl:template>
+  <xsl:template name="create-xml">
+    <xsl:param name="count" />
+    <xsl:param name="xml" />
+    <xsl:choose>
+      <xsl:when test="count(xalan:nodeset($xml)/root/element)&lt;$count">
+        <xsl:variable name="new-xml">
+          <root>
+            <xsl:copy-of select="xalan:nodeset($xml)/root/element" />
+            <element />
+          </root>
+        </xsl:variable>
+        <xsl:call-template name="create-xml">
+          <xsl:with-param name="count" select="$count" />
+          <xsl:with-param name="xml" select="$new-xml" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="$xml" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>iterator</from>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status message</to>
+                        <value>Job id not present.</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(//job-id/text()) > 0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>adapter response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>find job status items</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="target">
+                            <input global="false">
+                              <from>target</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="username">
+                            <input global="false">
+                              <from>username</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="password">
+                            <input global="false">
+                              <from>password</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="encryption type">
+                            <input global="false">
+                              <from>encryption type</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="protocol">
+                            <input global="false">
+                              <from>protocol</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="port">
+                            <input global="false">
+                              <from>port</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <xsl:if test="string-length('${target}') &gt; 0 and string-length('${username}') =0">
+          <target>${target}</target>
+        </xsl:if>
+        <job-id>
+          <xsl:value-of select="//job-id" disable-output-escaping="no" />
+        </job-id>
+        <xsl:if test="string-length('${target}')&gt;0 and string-length('${username}') &gt; 0">
+          <targets>
+            <target>
+              <host>
+                <xsl:value-of select="'${target}'" disable-output-escaping="no" />
+              </host>
+              <user-name>${username}</user-name>
+              <password>
+                <xsl:attribute name="encryption-type">
+                  <xsl:value-of select="'${encryption type}'" disable-output-escaping="no" />
+                </xsl:attribute>
+                <xsl:value-of select="'${password}'" disable-output-escaping="no" />
+              </password>
+              <xsl:if test="string-length('${protocol}') &gt;0">
+                <protocol>${protocol}</protocol>
+              </xsl:if>
+              <xsl:if test="string-length('${port}') &gt;0">
+                <port>${port}</port>
+              </xsl:if>
+            </target>
+          </targets>
+        </xsl:if>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AO-AD-NetAPP_Storage:v4.0:Job:Find Job Status</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>find job status items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>find job status response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>find job status response</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(//job-overall-status/text()) = "running" or string(//job-overall-status/text()) = "queued"]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <for-each>
+                          <document>
+                            <input>
+                              <from>iterator</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>element</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//element]]></xpath>
+                          </xpath-expression>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <from>element</from>
+                                </input>
+                                <input>
+                                  <value>element</value>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <sequence>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                            <switch>
+                              <meta>
+                                <documentation />
+                                <run-mode-handling>
+                                  <run-mode>OCP</run-mode>
+                                  <allow-step-into>true</allow-step-into>
+                                </run-mode-handling>
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                              <default>
+                                <sequence />
+                              </default>
+                              <case>
+                                <condition>
+                                  <document>
+                                    <input>
+                                      <from>task closed</from>
+                                    </input>
+                                  </document>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[string(.)='false']]></xpath>
+                                  </xpath-expression>
+                                </condition>
+                                <sequence>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                  <pause>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <duration>10000</duration>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:pause[1]</location>
+                                  </pause>
+                                  <call-process>
+                                    <process-name>:AO-AD-NetAPP_Storage:v4.0:Job:Find Job Status</process-name>
+                                    <parameters>
+                                      <input>
+                                        <from>adapter</from>
+                                        <to>adapter name</to>
+                                      </input>
+                                      <input>
+                                        <from>find job status items</from>
+                                        <to>items</to>
+                                      </input>
+                                      <output>
+                                        <from>adapter response</from>
+                                        <to>find job status response</to>
+                                      </output>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <after-execution>
+                                      <console-output>
+                                        <type>INFO</type>
+                                        <summary>
+                                          <concat>
+                                            <input>
+                                              <value></value>
+                                            </input>
+                                          </concat>
+                                        </summary>
+                                        <detail>
+                                          <concat>
+                                            <input>
+                                              <value></value>
+                                            </input>
+                                          </concat>
+                                        </detail>
+                                      </console-output>
+                                    </after-execution>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                                  </call-process>
+                                  <assign>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>find job status response</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>task closed</to>
+                                        </output>
+                                      </result>
+                                      <xslt-stylesheet>
+                                        <stylesheet-replacement-tokens />
+                                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(//job-overall-status/text()) = 'succeeded' and string(//job-progress/text()) = 'success'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:when test="string-length(//error) &gt; 0">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:when test="string(//job-overall-status/text()) = 'failed' and string(//job-progress/text()) = 'failure'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                      </xslt-stylesheet>
+                                    </assignment>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                                  </assign>
+                                </sequence>
+                              </case>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                            </switch>
+                          </sequence>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:for-each[1]</location>
+                        </for-each>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>success status</to>
+                              <value>success</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>find job status response</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>status message</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens />
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(//job-state/text()) = 'queued'">
+          <xsl:text disable-output-escaping="no">Job is still queued</xsl:text>
+        </xsl:when>
+        <xsl:when test="string(//job-state/text()) = 'running'">
+          <xsl:text disable-output-escaping="no">Job is still running</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>find job status response</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(//responses//status/text()) = 'error' or string(//job-overall-status/text()) = 'failed']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>success status</to>
+                              <value>failure</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>find job status response</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>status message</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens />
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="//error" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='EMC']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>module configuration items</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>configured delay</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="configuration name">
+                      <input global="false">
+                        <from>configuration name</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[//$[configuration name]/Configured_Delay/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>false</value>
+                      </input>
+                    </concat>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task closed</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="configured delay">
+                      <input global="false">
+                        <from>configured delay</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(.) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${configured delay}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>configured delay</from>
+                </input>
+                <output>
+                  <to>count</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>count</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>iterator</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:variable name="elements">
+      <root />
+    </xsl:variable>
+    <xsl:call-template name="create-xml">
+      <xsl:with-param name="count" select="." />
+      <xsl:with-param name="xml" select="$elements" />
+    </xsl:call-template>
+  </xsl:template>
+  <xsl:template name="create-xml">
+    <xsl:param name="count" />
+    <xsl:param name="xml" />
+    <xsl:choose>
+      <xsl:when test="count(xalan:nodeset($xml)/root/element)&lt;$count">
+        <xsl:variable name="new-xml">
+          <root>
+            <xsl:copy-of select="xalan:nodeset($xml)/root/element" />
+            <element />
+          </root>
+        </xsl:variable>
+        <xsl:call-template name="create-xml">
+          <xsl:with-param name="count" select="$count" />
+          <xsl:with-param name="xml" select="$new-xml" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="$xml" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status message</to>
+                        <value>job id is not present</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(//job-id)>0 ]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>adapter response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>items</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="target">
+                            <input global="false">
+                              <from>target</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="username">
+                            <input global="false">
+                              <from>username</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="password">
+                            <input global="false">
+                              <from>password</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="protocol">
+                            <input global="false">
+                              <from>protocol</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="port">
+                            <input global="false">
+                              <from>port</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="time out secs">
+                            <input global="false">
+                              <from>time out secs</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <xsl:if test="string-length('${target}')&gt;0">
+          <target>
+            <xsl:value-of select="'${target}'" disable-output-escaping="no" />
+          </target>
+        </xsl:if>
+        <xsl:if test="string-length('${username}')&gt;0">
+          <username>
+            <xsl:value-of select="'${username}'" disable-output-escaping="no" />
+          </username>
+        </xsl:if>
+        <xsl:if test="string-length('${password}')&gt;0">
+          <password>
+            <xsl:value-of select="'${password}'" disable-output-escaping="no" />
+          </password>
+        </xsl:if>
+        <xsl:if test="string-length('${protocol}')&gt;0">
+          <protocol>
+            <xsl:value-of select="'${protocol}'" disable-output-escaping="no" />
+          </protocol>
+        </xsl:if>
+        <xsl:if test="string-length('${port}')&gt;0">
+          <port>
+            <xsl:value-of select="'${port}'" disable-output-escaping="no" />
+          </port>
+        </xsl:if>
+        <job-id>
+          <xsl:value-of select="//job-id/text()" disable-output-escaping="no" />
+        </job-id>
+        <xsl:if test="string-length('${target}')&gt;0 and string-length('${time out secs}')&gt;0 ">
+          <timeout-secs>
+            <xsl:value-of select="'${time out secs}'" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AO-AD-EMC_Storage:Find Items</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>version</from>
+                        <to>version</to>
+                      </input>
+                      <input>
+                        <value>get-job</value>
+                        <to>item type</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>find job status response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>find job status response</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[contains(//output/jobs/job/job-status, "Running") or contains(//output/jobs/job/job-status, "New") or  contains(//output/jobs/job/job-status, "Starting")]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <for-each>
+                          <document>
+                            <input>
+                              <from>iterator</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>element</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//element]]></xpath>
+                          </xpath-expression>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <sequence>
+                            <switch>
+                              <meta>
+                                <documentation />
+                                <run-mode-handling>
+                                  <run-mode>OCP</run-mode>
+                                  <allow-step-into>true</allow-step-into>
+                                </run-mode-handling>
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                              <default>
+                                <sequence />
+                              </default>
+                              <case>
+                                <condition>
+                                  <document>
+                                    <input>
+                                      <from>task closed</from>
+                                    </input>
+                                  </document>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[string(.) ='false']]></xpath>
+                                  </xpath-expression>
+                                </condition>
+                                <sequence>
+                                  <pause>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <duration>10000</duration>
+                                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:pause[1]</location>
+                                  </pause>
+                                  <call-process>
+                                    <process-name>:AO-AD-EMC_Storage:Find Items</process-name>
+                                    <parameters>
+                                      <input>
+                                        <from>adapter</from>
+                                        <to>adapter name</to>
+                                      </input>
+                                      <input>
+                                        <from>version</from>
+                                        <to>version</to>
+                                      </input>
+                                      <input>
+                                        <value>get-job</value>
+                                        <to>item type</to>
+                                      </input>
+                                      <input>
+                                        <from>items</from>
+                                        <to>items</to>
+                                      </input>
+                                      <output>
+                                        <from>adapter response</from>
+                                        <to>find job status response</to>
+                                      </output>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                                  </call-process>
+                                  <assign>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>find job status response</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>task closed</to>
+                                        </output>
+                                      </result>
+                                      <xslt-stylesheet>
+                                        <stylesheet-replacement-tokens />
+                                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="contains(//job-status, &quot;Completed&quot;)">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:when test="contains(//job-status, &quot;Failed&quot;) or contains(//job-status, &quot;Exception&quot;) or contains(//job-status, &quot;Killed&quot;) ">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                      </xslt-stylesheet>
+                                    </assignment>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                                  </assign>
+                                </sequence>
+                              </case>
+                              <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                            </switch>
+                          </sequence>
+                          <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]:sequence[2]:for-each[1]</location>
+                        </for-each>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>success status</to>
+                              <value>success</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>find job status response</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>status message</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[string(//job-status)]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[2]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>find job status response</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(//response/metadata/status/text())!='success' and  string-length(//responses/response)>0]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>success status</to>
+                              <value>failure</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>find job status response</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>status message</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//job-status-description/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[2]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[3]:switch[1]:sequence[2]:switch[2]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[3]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description> Finds the list of storage services matching the search criteria provided.
+
+NetApp:
+
+Dynamic targeting:Ability to communicate with multiple DFM servers which are not configured under the adapter configuration. NetApp action can be invoked using dynamic targeting / without dynamic targeting.
+
+When Dynamic targeting is used : target would be Host name or IP address of server on which NetApp DataFabric Manager is running. It is mandatory send all the required parameters:
+username, 
+ password , 
+ encyption type  when using dynamic targeting.
+
+When Dynamic targeting is not used : Designates a specific target (name of the DFM server where the operation will be performed) that has been defined in the adapter configuration. Valid value- Same value that has been specified for the name attribute of 'config' element in the adapter configuration . If this tag is left empty the request will be executed on the first defined adapter configuration.
+
+for e.g for the  adapter config below , target would be 02.
+&lt;configs&gt;
+  &lt;config name="02"&gt;
+    &lt;target&gt;172.19.224.103&lt;/target&gt;
+    &lt;user-name&gt;root&lt;/user-name&gt;
+    &lt;password&gt;bmcbmc&lt;/password&gt;
+    &lt;protocol&gt;http&lt;/protocol&gt;
+    &lt;port&gt;8088&lt;/port&gt;
+  &lt;/config&gt;
+&lt;/configs&gt;
+
+EMC:
+Dynamic targeting: Ability to communicate with multiple SMIS-providers which are not configured under the adapter configuration. EMC action can be invoked using dynamic targeting / without dynamic targeting.
+
+When Dynamic targeting is used : target would be Host name or IP address of server on which EMC SMIS provider is running. It is mandatory send all the required parameters:
+username, 
+ password , 
+ protocol
+port  when using dynamic targeting.
+
+When Dynamic targeting is not used :  target specifies the connection information for EMC SMI-S Provider.
+- Valid value: The value specified for &lt;target&gt; element must be same as the value that has been specified for the name attribute of &lt;config&gt; element in the adapter configuration. You can leave this    tag empty. In this case the request will be executed on all the defined adapter configuration.
+                       - Default value: All defined adapter configuration. 
+For e.g for the  adapter config below , target would be 03.
+&lt;configs&gt;
+  &lt;config name="03"&gt;
+    &lt;target&gt; 10.128.28.59&lt;/target&gt;
+    &lt;user-name&gt;emcuser&lt;/user-name&gt;
+    &lt;password&gt;bmcbmc&lt;/password&gt;
+    &lt;protocol&gt;https&lt;/protocol&gt;
+    &lt;port&gt; 5989&lt;/port&gt;
+  &lt;/config&gt;
+&lt;/configs&gt;
+</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>50ebf532-dfd6-3e55-941c-4e0a44c66d0d</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1311227850725</last-modified>
+    </meta>
+  </process-def>
+</process>

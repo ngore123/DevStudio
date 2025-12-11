@@ -1,0 +1,571 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-ITSM_Automation:Utilities:BMC_AR_System:REST:Update Incident Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>ARS Actor Adapter name.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <input global="false" required="true">
+        <from>authorization token</from>
+        <to>authorization token</to>
+      </input>
+      <input global="false" required="true">
+        <from>incident number</from>
+        <to>incident number</to>
+      </input>
+      <input global="false" required="true">
+        <from>incident status</from>
+        <to>incident status</to>
+      </input>
+      <input global="false" required="true">
+        <from>incident status reason</from>
+        <to>incident status reason</to>
+      </input>
+      <input global="false" required="false">
+        <from>resolution</from>
+        <to>resolution</to>
+      </input>
+      <input global="false" required="false">
+        <from>work info summary</from>
+        <to>work info summary</to>
+      </input>
+      <input global="false" required="false">
+        <from>work info notes</from>
+        <to>work info notes</to>
+      </input>
+      <input global="false" required="false">
+        <from>work info view access</from>
+        <to>work info view access</to>
+      </input>
+      <input global="false" required="false">
+        <from>work info type</from>
+        <to>work info type</to>
+      </input>
+      <input global="false" required="false">
+        <from>work info locked</from>
+        <to>work info locked</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>update response</to>
+        <from>update response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>form name</to>
+            <value>HPD:IncidentInterface</value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident number</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>items</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="incident status">
+                <input global="false">
+                  <from>incident status</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="status reason">
+                <input global="false">
+                  <from>incident status reason</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo summary">
+                <input global="false">
+                  <from>work info summary</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo notes">
+                <input global="false">
+                  <from>work info notes</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="view access">
+                <input global="false">
+                  <from>work info view access</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo locked">
+                <input global="false">
+                  <from>work info locked</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="workinfo type">
+                <input global="false">
+                  <from>work info type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="form name">
+                <input global="false">
+                  <from>form name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <schema>${form name}</schema>
+        <query>
+          <xsl:value-of select="concat(&quot;'Incident Number'&quot;,  '=  &quot;', ., '&quot;')" disable-output-escaping="no" />
+        </query>
+        <fields>
+          <field name="Status">${incident status}</field>
+          <field name="Status_Reason">${status reason}</field>
+          <field name="z1D_WorklogDetails">$[workinfo summary]</field>
+          <field name="z1D_Details">$[workinfo notes]</field>
+          <field name="z1D_View_Access">${view access}</field>
+          <field name="z1D_Secure_Log">${workinfo locked}</field>
+          <field name="z1D_Activity_Type">${workinfo type}</field>
+        </fields>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>version</to>
+            <value>v9.0</value>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input>
+                <value>'Incident Number' = "</value>
+              </input>
+              <input required="false">
+                <from>incident number</from>
+              </input>
+              <input>
+                <value>"</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>query</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input>
+                <value>{
+  "values":{
+    "Status":"</value>
+              </input>
+              <input required="false">
+                <from>incident status</from>
+              </input>
+              <input>
+                <value>",
+    "Status_Reason":"</value>
+              </input>
+              <input required="false">
+                <from>incident status reason</from>
+              </input>
+              <input>
+                <value>",
+    "z1D_WorklogDetails" : "</value>
+              </input>
+              <input required="false">
+                <from>work info summary</from>
+              </input>
+              <input>
+                <value>",
+    "z1D_Details" : "</value>
+              </input>
+              <input required="false">
+                <from>work info notes</from>
+              </input>
+              <input>
+                <value>",
+    "z1D_View_Access" : "</value>
+              </input>
+              <input required="false">
+                <from>work info view access</from>
+              </input>
+              <input>
+                <value>",
+    "z1D_Secure_Log" : "</value>
+              </input>
+              <input required="false">
+                <from>work info locked</from>
+              </input>
+              <input>
+                <value>",
+    "z1D_Activity_Type" : "</value>
+              </input>
+              <input required="false">
+                <from>work info type</from>
+              </input>
+              <input>
+                <value>"
+    
+  }
+}</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>values</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>fields</to>
+            <value>values(Request ID, Incident Number, Entry ID)</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-AD-Remedy_REST:Find Items</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>url</from>
+            <to>url</to>
+          </input>
+          <input>
+            <from>authorization token</from>
+            <to>authorization token</to>
+          </input>
+          <input>
+            <from>form name</from>
+            <to>form name</to>
+          </input>
+          <input>
+            <from>query</from>
+            <to>query</to>
+          </input>
+          <input>
+            <value>xml</value>
+            <to>return data format</to>
+          </input>
+          <input>
+            <from>fields</from>
+            <to>fields</to>
+          </input>
+          <output>
+            <from>response headers</from>
+            <to>response headers</to>
+          </output>
+          <output>
+            <from>response body</from>
+            <to>response body</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>status code</from>
+            <to>status code</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>response body</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>request id</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="status">
+                      <input global="false">
+                        <from>status</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:Encoder="java.net.URLEncoder" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="'${status}' = 'success'">
+        <xsl:value-of select="Encoder:encode(//Request-ID/text(), 'utf-8')" disable-output-escaping="no" />
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:BMC-AD-Remedy_REST:Update Item</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>url</from>
+                  <to>url</to>
+                </input>
+                <input>
+                  <from>authorization token</from>
+                  <to>authorization token</to>
+                </input>
+                <input>
+                  <from>form name</from>
+                  <to>form name</to>
+                </input>
+                <input>
+                  <from>request id</from>
+                  <to>entry id</to>
+                </input>
+                <input>
+                  <from>values</from>
+                  <to>values</to>
+                </input>
+                <input>
+                  <value>xml</value>
+                  <to>return data format</to>
+                </input>
+                <output>
+                  <from>response headers</from>
+                  <to>response headers</to>
+                </output>
+                <output>
+                  <from>response body</from>
+                  <to>response body</to>
+                </output>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>status code</from>
+                  <to>status code</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>=====update item output====</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>status code</from>
+                    </input>
+                    <input>
+                      <from>error message</from>
+                    </input>
+                    <input>
+                      <from>response headers</from>
+                    </input>
+                    <input>
+                      <from>response body</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>status</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>update response</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="error message">
+                <input global="false">
+                  <from>error message</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <update-response>
+      <status>
+        <xsl:value-of select="." disable-output-escaping="no" />
+      </status>
+      <error-message>${error message}</error-message>
+    </update-response>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==Update Incident Status Output===</value>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+              <input>
+                <from>update response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update Job ID of the task with the input information provided.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>46271891-8204-4dc9-a999-7abeb88eea9f</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>ITSM Automation</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1569723602337</last-modified>
+    </meta>
+  </process-def>
+</process>

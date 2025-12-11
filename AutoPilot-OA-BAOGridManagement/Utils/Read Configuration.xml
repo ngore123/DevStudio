@@ -1,0 +1,234 @@
+<process draft="false" dev-studio-version="7.7.02">
+  <process-def name=":AutoPilot-OA-BAOGridManagement:Utils:Read Configuration">
+    <parameters>
+      <input global="false" required="false">
+        <from>configuration group</from>
+        <to>configuration group</to>
+      </input>
+      <output global="false" required="false">
+        <to>configuration xml</to>
+        <from>configuration xml</from>
+      </output>
+      <output global="false" required="false">
+        <to>ConfigUserName</to>
+        <from>ConfigUsername</from>
+      </output>
+      <output global="false" required="false">
+        <to>ConfigPassword</to>
+        <from>ConfigSecurePassowrd</from>
+      </output>
+      <output global="false" required="false">
+        <to>ConfigURL</to>
+        <from>ConfigURL</from>
+      </output>
+      <output global="false" required="false">
+        <to>adapter name</to>
+        <from>adapter name</from>
+      </output>
+      <output global="false" required="false">
+        <to>Plaintext Password</to>
+        <from>Plaintext Password</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:AutoPilot-OA-BAOGridManagement</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>configuration xml</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="name">
+                <input global="false">
+                  <from>configuration group</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="elemName" select="'${name}'" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="string-length(normalize-space($elemName)) &gt; 0  and boolean(//*[name()=$elemName])">
+        <xsl:copy-of select="//*[name()=$elemName]" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="." />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ConfigURL</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ConnectionDetails/URL/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ConfigUsername</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ConnectionDetails/UserName/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ConfigSecurePassowrd</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:es="http://www.w3.org/2001/04/xmlenc#" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="//es:EncryptedData" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//Adapters/RESTAdapterName/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration xml</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>Plaintext Password</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//ConnectionDetails/Password/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Read Configuration Input</value>
+              </input>
+              <input>
+                <from>configuration group</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>configuration xml</value>
+              </input>
+              <input>
+                <from>configuration xml</from>
+              </input>
+              <input>
+                <value>configURL</value>
+              </input>
+              <input>
+                <from>ConfigURL</from>
+              </input>
+              <input>
+                <value>password:</value>
+              </input>
+              <input>
+                <from>ConfigSecurePassowrd</from>
+              </input>
+              <input>
+                <value>Username:</value>
+              </input>
+              <input>
+                <from>ConfigUsername</from>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Given a configuration group, return configuration group in the form of an XML.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0d2407e7-94ea-467a-bf5c-c2117f5807f6</process-id>
+      <author>Reads a sub configuration</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1505798580087</last-modified>
+    </meta>
+  </process-def>
+</process>

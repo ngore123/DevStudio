@@ -1,0 +1,236 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:CustomCmd:Create Local Custom Cmd">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the custom command.</description>
+        <from>Name</from>
+        <to>Name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The type of server object that this command can run against (SERVER - 5004, DIRECTORY - 8, FILE - 7).</description>
+        <from>objectType</from>
+        <to>objectType</to>
+      </input>
+      <input global="false" required="true">
+        <description>ID of the operating system you want to add to this command (Unknown - 51, AIX - 35, HPUX - 5, LINUX - 3, SOLARIS - 2, WINDOWS - 1).</description>
+        <from>OS</from>
+        <to>OS</to>
+      </input>
+      <input global="false" required="true">
+        <description>Command string.</description>
+        <from>Command</from>
+        <to>Command</to>
+      </input>
+      <input global="false" required="true">
+        <description>Whether or not the user can enter additonal arguments at execution time.</description>
+        <from>runtimeArgs</from>
+        <to>runtimeArgs</to>
+      </input>
+      <input global="false" required="true">
+        <description>Whether or not to close the command window after the command executes.</description>
+        <from>autoClose</from>
+        <to>autoClose</to>
+      </input>
+      <input global="false" required="true">
+        <description>If you want to run this command once against all hosts, set this variable to 0. If you want to run this command separately against each host, set this variable to 1.</description>
+        <from>executeType</from>
+        <to>executeType</to>
+      </input>
+      <input global="false" required="true">
+        <description>If you want to open a separate window for each host this command runs on, set this variable to 1. If you want to use the same window for all hosts, set this variable to 2.</description>
+        <from>windowType</from>
+        <to>windowType</to>
+      </input>
+      <input global="false" required="true">
+        <description>If this command is designed to execute against just one host, set this variable to true. If this command is designed to let the user choose additional hosts after specifying the initial target host, set this variable to false.</description>
+        <from>quickLaunch</from>
+        <to>quickLaunch</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains DBKey of custom command.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the Adapter response for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>Name</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>objectType</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>OS</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>Command</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>runtimeArgs</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>autoClose</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>executeType</from>
+            <to>argument 7</to>
+          </input>
+          <input>
+            <from>windowType</from>
+            <to>argument 8</to>
+          </input>
+          <input>
+            <from>quickLaunch</from>
+            <to>argument 9</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>CustomCmd</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>createLocalCustomCmd</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <compensation name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:CustomCmd:Create Local Custom Cmd:999999999" />
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command creates a custom command line interface command that can run on a local host. This command returns a handle to newly created custom command.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>99525341-d26a-3331-8783-4d952b015d7f</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179786859</last-modified>
+    </meta>
+  </process-def>
+  <compensation-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:CustomCmd:Create Local Custom Cmd:999999999">
+    <meta>
+      <peer-location>
+        <location>this</location>
+      </peer-location>
+    </meta>
+    <parameters />
+    <sequence />
+  </compensation-def>
+</process>

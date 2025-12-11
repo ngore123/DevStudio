@@ -1,0 +1,193 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:JobRun:Get Start Time by Run Key">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Handle identifying a particular job run.</description>
+        <from>jobRunKey</from>
+        <to>jobRunKey</to>
+      </input>
+      <input global="false" required="false">
+        <description>Format for presenting time. The start time is formatted using Java's SimpleDateFormat patterns. (See getEndTimeByRunKey for a similar command that provides the start time in Java date format.) The following list briefly describes SimpleDateFormat patterns. The first item in the list labels components of subsequent items in the list.
+    - Letter--date piece--example
+    - y--year--05,2005
+    - M--month--Aug,August,08
+    - d--day of month--15
+    - H--hour of day (24h format,0-23)--16
+    - m--minute of hour--35
+    - s--second of minute--21
+
+Other possible patterns are:
+    - Letter--date piece--example
+    - z--time zone (general)--EDT
+    - Z--time zone (RFC822)-- -0400
+    - E--day of week--Wed,Wednesday
+    - G--era--AD
+    - w--week of year--35
+    - D--day of year--156
+    - W--week of month--3
+    - F--day of week of month--2
+    - a--am/pm-- PM
+    - k--hour of day(1-24)--
+    - K--hour of AM/PM(0-11)--
+    - h--hour of AM/PM(1-12)--
+    - S--Millisecond--
+
+For example, for the date of 5 Aug 2005, 2:40:56 PM on a client in the Eastern time zone, a format string of "yyyy/MM/dd HH:mm:ss" produces the output 2005/08/05 14:40:56.</description>
+        <from>format</from>
+        <to>format</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successful, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains formatted start time for a job run.</description>
+        <to>time</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the output part of the adapter response.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>jobRunKey</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>format</from>
+            <to>argument 2</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>JobRun</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>getStartTimeByRunKey</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command gets the start time for a job run. You must provide the handle for the job run.
+If the format parameter is not provided then this command provides the start time in Java date format. For example, a job start time of 8:41:11 AM on 5 Aug 2005 for a client located in the Eastern time zone is displayed as -- Fri Aug 05 08:41:11 EDT 2005. See getEndTimeByRunKey for a similar command that provides the start time in Java's SimpleDateFormat.
+You can use any of the following to get the jobRunKey:
+JobRun findLastRunKeyByJobKey
+JobRun findRunKeyById</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2d01cbfb-a805-3a4f-a816-c8be805ca633</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179837705</last-modified>
+    </meta>
+  </process-def>
+</process>

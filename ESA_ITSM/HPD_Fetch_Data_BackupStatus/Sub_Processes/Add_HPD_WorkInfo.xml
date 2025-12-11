@@ -1,0 +1,176 @@
+<process draft="false" dev-studio-version="20.02.02">
+  <process-def name=":ESA_ITSM:HPD_Fetch_Data_BackupStatus:Sub_Processes:Add_HPD_WorkInfo">
+    <parameters>
+      <input global="false" required="true">
+        <from>INC_Number</from>
+        <to>INC_Number</to>
+      </input>
+      <input global="false" required="true">
+        <from>WI_Summary</from>
+        <to>WI_Summary</to>
+      </input>
+      <input global="false" required="true">
+        <from>WI_Details</from>
+        <to>WI_Details</to>
+      </input>
+      <output global="false" required="false">
+        <to>Adapter_Count</to>
+        <from>Adapter_Count</from>
+      </output>
+      <output global="false" required="false">
+        <to>Adapter_Error</to>
+        <from>Adapter_Error</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <utility>
+        <date>
+          <now />
+        </date>
+        <output global="false">
+          <to>now</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[1]</location>
+      </utility>
+      <call-process>
+        <process-name>:DateTime_Utilities:Epoch to Date</process-name>
+        <parameters>
+          <input>
+            <from>now</from>
+            <to>Epoch Date</to>
+          </input>
+          <input>
+            <value>yyyy-MM-dd,HH:mm:ss</value>
+            <to>Date / Time Format</to>
+          </input>
+          <input>
+            <value>UTC</value>
+            <to>Time Zone</to>
+          </input>
+          <input>
+            <value>false</value>
+            <to>Use Seconds instead of Milliseconds</to>
+          </input>
+          <output>
+            <from>Date</from>
+            <to>Date</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AMP-AD-BMC-Remedy-ARS:v7.5:Insert Entry</process-name>
+        <parameters>
+          <input global="true">
+            <configuration>:ESA_ITSM:Adapter:ITSM9</configuration>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>HPD:WorkLog</value>
+            <to>schema name</to>
+          </input>
+          <input>
+            <compose-xml>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;values&gt;
+&lt;field name="Incident Number"&gt;</value>
+                </input>
+              </fragment>
+              <fragment type="string" encode="true">
+                <input required="false">
+                  <from>INC_Number</from>
+                </input>
+              </fragment>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;/field&gt;
+&lt;field name="Description"&gt;</value>
+                </input>
+              </fragment>
+              <fragment type="string" encode="true">
+                <input required="false">
+                  <from>WI_Summary</from>
+                </input>
+              </fragment>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;/field&gt;
+&lt;field name="Detailed Description"&gt;</value>
+                </input>
+              </fragment>
+              <fragment type="string" encode="true">
+                <input required="false">
+                  <from>WI_Details</from>
+                </input>
+              </fragment>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;/field&gt;
+&lt;field name="Work Log Type"&gt;9000&lt;/field&gt;
+&lt;field name="View Access"&gt;1&lt;/field&gt;
+&lt;field name="Secure Work Log"&gt;0&lt;/field&gt;
+&lt;/values&gt;
+</value>
+                </input>
+              </fragment>
+            </compose-xml>
+            <to>field list</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>credits to Christoph Lenz as per ITSM_Incidents_AI Process "Inc_Add_WorkInfo"</description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>104c6ac3-e1bc-49c8-b331-10bec8723a72</process-id>
+      <author>Yannic Legermann</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1662446942309</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,267 @@
+<process draft="false" dev-studio-version="7.9.00">
+  <process-def name=":AutoPilot-OA-IP-Address-Management:Reserve Pool Wrapper">
+    <parameters>
+      <input global="false" required="true">
+        <description>Configuration name from module configuration.
+Valid values: VitalQIP.</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <from>pool address</from>
+        <to>pool address</to>
+      </input>
+      <input global="false" required="true">
+        <from>pool mask</from>
+        <to>pool mask</to>
+      </input>
+      <input global="false" required="false">
+        <description>Scope can have twos possible values
+1. Any string : It is a organization name same as pod name. 
+2. null : in this case we will use default organization.</description>
+        <from>scope</from>
+        <to>scope</to>
+      </input>
+      <input global="false" required="false">
+        <from>range address</from>
+        <to>range address</to>
+      </input>
+      <input global="false" required="false">
+        <description>Network bits is used for create Network command</description>
+        <from>network bits</from>
+        <to>network bits</to>
+      </input>
+      <input global="false" required="false">
+        <description>This paramtere is to identify that if this process is called from Reserve Address Pool SA process.</description>
+        <from>pool operation</from>
+        <to>pool operation</to>
+      </input>
+      <output global="false" required="false">
+        <description>operation status.
+valid values: true, false.</description>
+        <to>success status</to>
+        <from>success</from>
+      </output>
+      <output global="false" required="false">
+        <description>incase of any error, error message goes here.  </description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Pool id.</description>
+        <to>pool id</to>
+        <from>pool id</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-BBNA-IP-Address-Management:IP_Address_Management:ExpandSubnetInIPAM</configuration>
+          </input>
+          <output>
+            <to>expandSubnetInIPAM</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-BBNA-IP-Address-Management:IP_Address_Management:Configuration_Name</configuration>
+          </input>
+          <output>
+            <to>configuration name</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value>This IPAM solution s not supported</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>success</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="expandInIPAM">
+                  <input global="false">
+                    <from>expandSubnetInIPAM</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[text()="VitalQIP"  and '${expandInIPAM}'='false']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>pool address</from>
+                </input>
+                <output>
+                  <to>pool id</to>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>success</to>
+                  <value>true</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="expandInIPAM">
+                  <input global="false">
+                    <from>expandSubnetInIPAM</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[text()="VitalQIP"  and '${expandInIPAM}'='true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-IP-Address-Management:Reserve Pool</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>pool address</from>
+                  <to>pool address</to>
+                </input>
+                <input>
+                  <from>pool mask</from>
+                  <to>pool mask</to>
+                </input>
+                <input>
+                  <from>scope</from>
+                  <to>scope</to>
+                </input>
+                <input>
+                  <from>range address</from>
+                  <to>range address</to>
+                </input>
+                <input>
+                  <from>network bits</from>
+                  <to>network bits</to>
+                </input>
+                <input>
+                  <from>pool operation</from>
+                  <to>pool operation</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>pool id</from>
+                  <to>pool id</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>96993623-af5b-42d1-aa9f-c989f25df844</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1477047470615</last-modified>
+    </meta>
+  </process-def>
+</process>

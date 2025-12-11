@@ -1,0 +1,239 @@
+<process draft="false" dev-studio-version="8.0.00">
+  <process-def name=":BMC-SA-Event_Orchestration:Utilities:Get Workflow Name by Action">
+    <parameters>
+      <input global="false" required="true">
+        <description>List of workflow definitions of the format:
+</description>
+        <from>workflow definitions</from>
+        <to>workflow definitions</to>
+      </input>
+      <input global="false" required="true">
+        <description>Possible values are:
+
+UpdateEventNotes
+CreateIncident
+CreateChange
+AddChangeNotes
+AddIncidentNotes
+AddTaskNotes
+AddChangeStatus
+AddIncidentStatus
+AddTaskStatus
+
+These values are specified in the module configuration under WorkflowDefinitions:CommonWorkflows</description>
+        <from>action</from>
+        <to>action</to>
+      </input>
+      <input global="false" required="false">
+        <description>Normally set to value as defined in module configuration for not found scenarios, like NOT_FOUND.
+Note: The parameter is optional, but using a non-null string is recommended because this will help in the logic downstream</description>
+        <from>default workflow name</from>
+        <to>default workflow name</to>
+      </input>
+      <output global="false" required="false">
+        <to>workflow name</to>
+        <from>workflow name</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>========Input=======</value>
+              </input>
+              <input>
+                <from>action</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>workflow definitions</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>workflow name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="action">
+                <input global="false">
+                  <from>action</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="default name">
+                <input global="false">
+                  <from>default workflow name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="expr" select="//CommonWorkflows/workflows/workflow[@action='${action}']/text()" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space($expr)) &gt; 0">
+          <xsl:value-of select="$expr" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">${default name}</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>workflow name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>status</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) = 0 or . = 'NOT_FOUND'">
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">success</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>workflow name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error message</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="action">
+                <input global="false">
+                  <from>action</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) = 0 or . = 'NOT_FOUND'">
+          <xsl:text disable-output-escaping="no">No workflow definition found for action: '${action}'</xsl:text>
+        </xsl:when>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==========Output========</value>
+              </input>
+              <input>
+                <from>workflow name</from>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[3]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This a process template. It has a few basic things.
+1. Log Input
+2. Log Output
+3. Atleast 2 basic output parameters - status and error message.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>25eb2410-26dd-442f-8035-2f1bac223f43</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration.</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1525666220524</last-modified>
+    </meta>
+  </process-def>
+</process>

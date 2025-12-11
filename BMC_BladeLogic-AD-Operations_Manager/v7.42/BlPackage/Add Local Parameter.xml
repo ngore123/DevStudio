@@ -1,0 +1,211 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:BlPackage:Add Local Parameter">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the BLPackage.</description>
+        <from>blPackageName</from>
+        <to>blPackageName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the group that contains the BlPackage.</description>
+        <from>groupName</from>
+        <to>groupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the property to add.</description>
+        <from>propertyName</from>
+        <to>propertyName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Description of the property.</description>
+        <from>propertyDescription</from>
+        <to>propertyDescription</to>
+      </input>
+      <input global="false" required="true">
+        <description>The fully qualified syntax of the property's type.</description>
+        <from>propertyType</from>
+        <to>propertyType</to>
+      </input>
+      <input global="false" required="true">
+        <description>True if editable during Deploy Jobs, false otherwise.</description>
+        <from>editable</from>
+        <to>editable</to>
+      </input>
+      <input global="false" required="true">
+        <description>True if a value is required at deploy time, false otherwise.</description>
+        <from>required</from>
+        <to>required</to>
+      </input>
+      <input global="false" required="true">
+        <description>String representation of the default value.</description>
+        <from>defaultValueString</from>
+        <to>defaultValueString</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the returned void.</description>
+        <to>void</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="true">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>blPackageName</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>groupName</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>propertyName</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>propertyDescription</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>propertyType</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>editable</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>required</from>
+            <to>argument 7</to>
+          </input>
+          <input>
+            <from>defaultValueString</from>
+            <to>argument 8</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>BlPackage</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>addLocalParameter</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command adds a local property to a BLPackage. It finds the BLPackage by group name and package name as two separate arguments. The command takes arguments for the new property's name, description, type, and default value. It also takes boolean arguments that indicate whether the property is editable and whether it is required.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8c05abd5-a09a-3630-b9af-efea314b97d6</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179761527</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,177 @@
+<process draft="false" dev-studio-version="8.0.00">
+  <process-def name=":AutoPilot-OA-ITSM_Automation:Utilities:Build Search Query">
+    <parameters>
+      <input global="false" required="true">
+        <description>comma (,) separated list of Change IDs</description>
+        <from>ChangeIDs</from>
+        <to>ChangeIDs</to>
+      </input>
+      <output global="false" required="false">
+        <to>query</to>
+        <from>query</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Tokenize String</process-name>
+        <parameters>
+          <input>
+            <from>ChangeIDs</from>
+            <to>string</to>
+          </input>
+          <input>
+            <value>,</value>
+            <to>delimiter</to>
+          </input>
+          <output>
+            <from>tokens</from>
+            <to>tokens</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>query</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>tokens</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>ChangeID</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//token]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <utility>
+            <string>
+              <concat>
+                <input>
+                  <from>query</from>
+                </input>
+                <input>
+                  <concat>
+                    <input>
+                      <value>'InfrastructureChangeID'="</value>
+                    </input>
+                  </concat>
+                </input>
+                <input>
+                  <from>ChangeID</from>
+                </input>
+                <input>
+                  <concat>
+                    <input>
+                      <value>" || </value>
+                    </input>
+                  </concat>
+                </input>
+              </concat>
+            </string>
+            <output global="false">
+              <to>query</to>
+            </output>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:utility[1]</location>
+          </utility>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>query</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>query</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring(., 0, string-length(.)-3)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>query</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>true</is-enabled>
+        <log-file-name>Build-Search-Query</log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ed2af68e-85ec-45f5-9ca9-11c73db1dbc0</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1521705246420</last-modified>
+    </meta>
+  </process-def>
+</process>

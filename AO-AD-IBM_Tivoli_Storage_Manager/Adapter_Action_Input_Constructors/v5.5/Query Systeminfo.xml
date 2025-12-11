@@ -1,0 +1,199 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Adapter_Action_Input_Constructors:v5.5:Query Systeminfo">
+    <parameters>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies one or more items from which you want to gather information and output the information to the file name that you specify with the filename option or to the console.
+
+Details of items:
+For Windows:
+
+*  DSMOPTFILE - The contents of dsm.opt file.
+*  ENV - Environment variables.
+*  ERRORLOG - The Tivoli Storage Manager error log file.
+*  FILE - Attributes for the file name that you specify.
+*  FILESNOTTOBACKUP - Enumeration of Windows Registry key:
+   HKEY_LOCAL_MACHINE\
+      SYSTEM\
+         CurrentControlSet\
+            BackupRestore\
+               FilesNotToBackup
+
+   This key specifies those files that backup products should not back up. The query inclexcl command will indicate that these files are excluded per the operating system.
+*  INCLEXCL - Compiles a list of include-exclude in the order in which they are processed during backup and archive operations.
+*  KEYSNOTTORESTORE - Enumeration of Windows Registry key:
+   HKEY_LOCAL_MACHINE\
+      SYSTEM\
+         ControlSet001\
+            BackupRestore\
+               KeysNotToRestore
+
+   This key specifies those Windows Registry keys that backup products should not restore.
+*  MSINFO - Windows system information (output from MSINFO32.EXE).
+*  OPTIONS - Compiled options.
+*  OSINFO - Name and version of the client operating system
+*  POLICY - Policy set dump.
+*  REGISTRY - Windows Tivoli Storage Manager-related Windows Registry entries.
+*  SCHEDLOG - The contents of the Tivoli Storage Manager schedule log (usually dsmsched.log).
+*  SFP - The list of files protected by Windows System File Protection, and for each file, indicates whether that file exists. These files are backed up as part of the SYSFILES
+   system object.
+*  SFP=&lt;filename&gt; - Indicates whether the specified file (filename) is protected by Windows System File Protection. For example:
+   SFP=C:\WINNT\SYSTEM32\MSVCRT.DLL
+
+*  SYSTEMOBJECT - Windows system object information.
+*  CLUSTER - Windows cluster information.
+*  ENCRYPT - Available encryption methods.
+
+For Unix:
+
+*  DB2UDB -DATABase=dbconfigname - Verifies that the Configuration Wizard successfully transferred the DB2 UDB, Tivoli Storage Manager, and storage subsystem settings to the master backup node. Replace dbconfigname with the DB2 UDB configuration name provided in the Configuration Wizard. Note that this item is         only valid for AIX when both the DB2 Integration Module and Hardware Devices Snapshot Integration Module are installed.
+      *  DSMOPTFILE - The contents of dsm.opt file.
+      *  DSMSYSFILE - The contents of the dsm.sys file.
+      *  ENV - Environment variables.
+      *  ERRORLOG - The Tivoli Storage Manager error log file.
+      *  FILE - Attributes for the file name that you specify.
+      *  INCLEXCL - Compiles a list of include-exclude in the order in which they are processed during backup and archive operations.
+      *  OPTIONS - Compiled options.
+      *  OSINFO - Name and version of the client operating system (includes ULIMIT information for UNIX).
+      *  POLICY - Policy set dump.
+      *  SCHEDLOG - The contents of the Tivoli Storage Manager schedule log (usually dsmsched.log).
+      *  CLUSTER - AIX cluster information.
+      *  ENCRYPT - Available encryption methods.</description>
+        <from>item list</from>
+        <to>item list</to>
+      </input>
+      <input global="false" required="false">
+        <description>Use the console option with the query systeminfo command to output information gathered from one or more of the items to the console.</description>
+        <from>console</from>
+        <to>console</to>
+      </input>
+      <input global="false" required="false">
+        <description>Use the filename option with the query systeminfo command to specify a file name in which to store information gathered from one or more items.
+NOTE:  The tags ‘filename’ and ‘console’ can not be provided together. If provided, ‘console’ takes precedence over the ‘filename’.</description>
+        <from>filename</from>
+        <to>filename</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>final items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>final items</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="item list">
+                <input global="false">
+                  <from>item list</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="console">
+                <input global="false">
+                  <from>console</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="filename">
+                <input global="false">
+                  <from>filename</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" omit-xml-declaration="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">query-systeminfo</xsl:text>
+        </operation-name>
+        <xsl:if test="string('${timeout secs}')!=''">
+          <timeout-secs>
+            <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+        <command-options>
+          <xsl:if test="string('${console}')!=''">
+            <console>
+              <xsl:value-of select="'${console}'" disable-output-escaping="no" />
+            </console>
+          </xsl:if>
+          <xsl:if test="string('${filename}')!=''">
+            <filename>
+              <xsl:value-of select="'${filename}'" disable-output-escaping="no" />
+            </filename>
+          </xsl:if>
+        </command-options>
+        <command-arguments>
+          <xsl:if test="string('${item list}')!=''">
+            <item-list>
+              <xsl:value-of select="'${item list}'" disable-output-escaping="no" />
+            </item-list>
+          </xsl:if>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>FINAL ITEMS: </value>
+              </input>
+              <input>
+                <from>final items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for Query Systeminfo process.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>6bbb81c3-a53b-3499-bc74-1db880ae5222</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290596965244</last-modified>
+    </meta>
+  </process-def>
+</process>

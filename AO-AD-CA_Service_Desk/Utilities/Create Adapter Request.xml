@@ -1,0 +1,113 @@
+<process draft="false" dev-studio-version="7.6.02.01">
+  <process-def name=":AO-AD-CA_Service_Desk:Utilities:Create Adapter Request">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML Sample of Items for the wrapper:  
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;operation&gt;find-incident&lt;/operation&gt;
+		&lt;incident-id&gt;110&lt;/incident-id&gt;
+		&lt;num-incidents&gt;5&lt;/num-incidents&gt;
+	&lt;/item&gt;
+	&lt;item&gt;
+		&lt;operation&gt;find-incident&lt;/operation&gt;
+		&lt;assignee-last-name&gt;ServiceDesk&lt;/assignee-last-name&gt;
+		&lt;incident-id&gt;49&lt;/incident-id&gt;
+		&lt;num-incidents&gt;-1&lt;/num-incidents&gt;
+	&lt;/item&gt;
+&lt;/items&gt;</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="true">
+        <from>operation name</from>
+        <to>operation name</to>
+      </input>
+      <output global="false" required="true">
+        <to>request</to>
+        <from>formed request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>items</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>formed request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="operation name">
+                <input global="false">
+                  <from>operation name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <casd-request>
+        <operation-name>${operation name}</operation-name>
+        <xsl:for-each select="//items/item">
+          <arguments>
+            <xsl:copy-of select="./*" />
+          </arguments>
+        </xsl:for-each>
+      </casd-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Adapter request: </value>
+              </input>
+              <input>
+                <from>formed request</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Creates Adapter Request</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>efad13cb-4912-4a06-a1d9-99ab4aaff732</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1320403586169</last-modified>
+    </meta>
+  </process-def>
+</process>

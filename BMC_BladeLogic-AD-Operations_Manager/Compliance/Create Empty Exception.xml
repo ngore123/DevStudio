@@ -1,0 +1,474 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:Compliance:Create Empty Exception">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.
+Example:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the exception</description>
+        <from>Name</from>
+        <to>Name</to>
+      </input>
+      <input global="false" required="true">
+        <description>RBAC role of user.</description>
+        <from>Role</from>
+        <to>Role</to>
+      </input>
+      <input global="false" required="true">
+        <description>RBAC user name.</description>
+        <from>User</from>
+        <to>User</to>
+      </input>
+      <input global="false" required="true">
+        <description>RBAC user name.</description>
+        <from>Comment</from>
+        <to>Comment</to>
+      </input>
+      <input global="false" required="true">
+        <description>Description of the exception.</description>
+        <from>Description</from>
+        <to>Description</to>
+      </input>
+      <input global="false" required="true">
+        <description>Fully qualified template group name.</description>
+        <from>templateGroupName</from>
+        <to>templateGroupName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the template.</description>
+        <from>templateName</from>
+        <to>templateName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the server.</description>
+        <from>serverName</from>
+        <to>serverName</to>
+      </input>
+      <input global="false" required="true">
+        <description>The index (typically 0) of component for which you want a handle.</description>
+        <from>index</from>
+        <to>index</to>
+      </input>
+      <output global="false" required="false">
+        <to>success</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>success message</to>
+        <from>success message</from>
+      </output>
+      <output global="false" required="false">
+        <to>DBKey</to>
+        <from>DBKey</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>script lines</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Server:Get Server ID by Name</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>serverName</from>
+            <to>serverName</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>success</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>ID</from>
+            <to>deviceId</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="true"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Template:Get DBKey by Group and Name</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>templateGroupName</from>
+                  <to>parentGroup</to>
+                </input>
+                <input>
+                  <from>templateName</from>
+                  <to>templateName</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>success</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>templateKey</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="true"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Component:Get Component Key by Template Key and Server Id</process-name>
+                    <parameters>
+                      <input>
+                        <from>connection details</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>templateKey</from>
+                        <to>templateKey</to>
+                      </input>
+                      <input>
+                        <from>deviceId</from>
+                        <to>deviceId</to>
+                      </input>
+                      <input>
+                        <from>index</from>
+                        <to>index</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>success</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>DBKey</from>
+                        <to>componentKey</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>*** AFTER COMPONENT KEY ***</value>
+                          </input>
+                          <input>
+                            <from>componentKey</from>
+                          </input>
+                          <input>
+                            <from>success</from>
+                          </input>
+                          <input>
+                            <from>Name</from>
+                          </input>
+                          <input>
+                            <from>templateGroupName</from>
+                          </input>
+                          <input>
+                            <from>templateName</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>success</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[text()="true"]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <call-process>
+                          <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:ComponentException:Create Empty Component Exception</process-name>
+                          <parameters>
+                            <input>
+                              <from>connection details</from>
+                              <to>connection details</to>
+                            </input>
+                            <input>
+                              <from>componentKey</from>
+                              <to>componentKey</to>
+                            </input>
+                            <input>
+                              <from>Name</from>
+                              <to>Name</to>
+                            </input>
+                            <input>
+                              <from>Description</from>
+                              <to>Description</to>
+                            </input>
+                            <input>
+                              <from>Role</from>
+                              <to>Role</to>
+                            </input>
+                            <input>
+                              <from>User</from>
+                              <to>User</to>
+                            </input>
+                            <input>
+                              <from>Comment</from>
+                              <to>Comment</to>
+                            </input>
+                            <output>
+                              <from>status</from>
+                              <to>success</to>
+                            </output>
+                            <output>
+                              <from>error message</from>
+                              <to>error message</to>
+                            </output>
+                            <output>
+                              <from>DBKey</from>
+                              <to>DBKey</to>
+                            </output>
+                            <output>
+                              <from>debug message</from>
+                              <to>debug message</to>
+                            </output>
+                            <output>
+                              <from>output</from>
+                              <to>output</to>
+                            </output>
+                            <output>
+                              <from>script lines</from>
+                              <to>script lines</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Format Error message</process-name>
+        <parameters>
+          <input>
+            <from>error message</from>
+            <to>error message</to>
+          </input>
+          <input>
+            <from>success</from>
+            <to>success</to>
+          </input>
+          <input global="true">
+            <configuration>:BMC_BladeLogic-AD-Operations_Manager:CommonStrings:DefaultError</configuration>
+            <to>message text</to>
+          </input>
+          <output>
+            <from>error message</from>
+            <to>success message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process creates a compliance exception without any rules and sets it on a component.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d035dc37-9f5f-3faa-a5ef-4e434a701df1</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179708433</last-modified>
+    </meta>
+  </process-def>
+</process>

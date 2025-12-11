@@ -1,0 +1,305 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BMC-SA-Service_Desk_Automation:Change_Management:Read Change">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of the configuration item defined in the configuration module. 
+
+Currently supported value:  BMC_AR_System
+
+TBD:
+ServiceNow, RemedyForce.</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The ID of the Change to read.
+
+Remedy Example: CRQ000000000829</description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <output global="false" required="false">
+        <to>response xml</to>
+        <from>response xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set Start Time</process-name>
+        <unique-id>c113440d-ac61-4f97-bc14-2607426fd912</unique-id>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response For Invalid Configuration</process-name>
+              <parameters>
+                <input>
+                  <value>Read Change</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'BMC_AR_System']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Change_Management:Searches:Get Change by Change ID</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>change id</from>
+                  <to>change id</to>
+                </input>
+                <output>
+                  <from>changes</from>
+                  <to>changes</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+                    <parameters>
+                      <input>
+                        <from>success status</from>
+                        <to>success status</to>
+                      </input>
+                      <input>
+                        <from>start time</from>
+                        <to>start time</to>
+                      </input>
+                      <input>
+                        <value>Unknown</value>
+                        <to>target name</to>
+                      </input>
+                      <input>
+                        <value>Read Change</value>
+                        <to>request type</to>
+                      </input>
+                      <input>
+                        <from>status message</from>
+                        <to>target response</to>
+                      </input>
+                      <input>
+                        <from>changes</from>
+                        <to>fulfillment response</to>
+                      </input>
+                      <input>
+                        <value>xml</value>
+                        <to>data type</to>
+                      </input>
+                      <input>
+                        <value>Read Change failed.</value>
+                        <to>error summary</to>
+                      </input>
+                      <output>
+                        <from>response xml</from>
+                        <to>response xml</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>Read Change failed.</value>
+                          </input>
+                          <input>
+                            <from>status message</from>
+                          </input>
+                          <input>
+                            <from>success status</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[.='success']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+                    <parameters>
+                      <input>
+                        <from>success status</from>
+                        <to>success status</to>
+                      </input>
+                      <input>
+                        <from>start time</from>
+                        <to>start time</to>
+                      </input>
+                      <input>
+                        <value>Unknown</value>
+                        <to>target name</to>
+                      </input>
+                      <input>
+                        <value>Read Change</value>
+                        <to>request type</to>
+                      </input>
+                      <input>
+                        <from>changes</from>
+                        <to>target response</to>
+                      </input>
+                      <input global="true">
+                        <configuration>:BMC-SA-Service_Desk_Automation:FulfillmentIntegrations:Defaults:Templates:RequestResponseTemplate</configuration>
+                        <to>fulfillment response</to>
+                      </input>
+                      <input>
+                        <value>xml</value>
+                        <to>data type</to>
+                      </input>
+                      <output>
+                        <from>response xml</from>
+                        <to>response xml</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>86ba0577-d5f4-4191-a028-e7a69a7d3239</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1444302993854</last-modified>
+    </meta>
+  </process-def>
+</process>

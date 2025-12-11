@@ -1,0 +1,986 @@
+<process draft="false" dev-studio-version="8.3.00">
+  <process-def name=":BMC-SA-Event_Orchestration_PatrolAgent_Down:Perform Validation">
+    <parameters>
+      <input global="false" required="true">
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <input global="false" required="true">
+        <from>target connection data</from>
+        <to>target connection data</to>
+      </input>
+      <output global="false" required="false">
+        <to>validation output</to>
+        <from>validation output</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <utility>
+        <date>
+          <now />
+        </date>
+        <output global="false">
+          <to>start time</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[1]</location>
+      </utility>
+      <call-process>
+        <process-name>:BMC-SA-Event_Orchestration_PatrolAgent_Down:Utilities:Extract Service name and Port</process-name>
+        <parameters>
+          <input>
+            <from>event data</from>
+            <to>event data</to>
+          </input>
+          <input>
+            <from>target connection data</from>
+            <to>target connection data</to>
+          </input>
+          <output>
+            <from>service name</from>
+            <to>service name</to>
+          </output>
+          <output>
+            <from>port</from>
+            <to>port</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>event data</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="service name">
+                <input global="false">
+                  <from>service name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="port">
+                <input global="false">
+                  <from>port</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="//situationData/service">
+    <xsl:variable name="nodeName" select="name()" />
+    <xsl:element name="{$nodeName}">${service name}</xsl:element>
+  </xsl:template>
+  <xsl:template match="//situationData/port">
+    <xsl:variable name="nodeName" select="name()" />
+    <xsl:element name="{$nodeName}">${port}</xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=============Event data================</value>
+              </input>
+              <input>
+                <from>event data</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>service validation string</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//situationData//service/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>validation status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>notes</to>
+            <value>Validation output:</value>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_PatrolAgent_Down:Service_Actions_Aliasing:Aliases</configuration>
+          </input>
+          <output>
+            <to>service aliasing configuration</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>service validation string</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//situationData//service/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>target connection data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>os type</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//component/@type]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>target connection data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>host name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//component/@name]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>host name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>domain</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(substring-after(., '.'))) &gt; 0">
+          <xsl:value-of select="translate(substring-after(., '.'), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">*</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>service aliasing configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>service validation string</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="service validation string">
+                <input global="false">
+                  <from>service validation string</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="os type">
+                <input global="false">
+                  <from>os type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="host name">
+                <input global="false">
+                  <from>host name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="domain">
+                <input global="false">
+                  <from>domain</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="domain">
+    <xsl:choose>
+      <xsl:when test="//domain/@name = '${domain}'">${domain}</xsl:when>
+      <xsl:when test="contains('${domain}', //domain/@name)">
+        <xsl:value-of select="//domain/@name" disable-output-escaping="no" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">*</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="host">
+    <xsl:choose>
+      <xsl:when test="//domain[@name = $domain]/hosts/host[@os-type = '${os type}']/@name = '${host name}'">${host name}</xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">*</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="service">
+    <xsl:choose>
+      <xsl:when test="//domain[@name = $domain]/hosts/host[@name = $host and @os-type = '${os type}']/services/service/@name = '${service validation string}'">${service validation string}</xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">*</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="boolean(//domain[@name = $domain]/hosts/host[@os-type = '${os type}' and @name = $host])">
+          <xsl:choose>
+            <xsl:when test="boolean(//domain[@name = $domain]/hosts/host[@os-type = '${os type}' and @name = $host]/services/service[@name = $service]/search-string)">
+              <xsl:value-of select="//domain[@name = $domain]/hosts/host[@os-type = '${os type}' and @name = $host]/services/service[@name = $service]/search-string/text()" disable-output-escaping="no" />
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="'${service validation string}'" disable-output-escaping="no" />
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>port number</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//situationData//port/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>target connection data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-details>
+      <xsl:copy-of select="//invocation-mechanism" />
+      <xsl:copy-of select="//adapter-name" />
+      <hostname>
+        <xsl:value-of select="//component/@name" disable-output-escaping="no" />
+      </hostname>
+      <xsl:copy-of select="//username" />
+      <xsl:copy-of select="//password" />
+      <xsl:apply-templates select="//adapter-options/*" mode="adapter-options" />
+      <xsl:apply-templates select="//command-options/*" mode="command-options" />
+    </connection-details>
+  </xsl:template>
+  <xsl:template match="@*|node()" mode="adapter-options">
+    <xsl:copy-of select="." />
+  </xsl:template>
+  <xsl:template match="@*|node()" mode="command-options">
+    <xsl:copy-of select="." />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== incoming connection-details = target connection data===</value>
+              </input>
+              <input>
+                <from>target connection data</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== translated connection details=====</value>
+              </input>
+              <input>
+                <from>connection details</from>
+              </input>
+              <input>
+                <from>domain</from>
+              </input>
+              <input>
+                <from>host name</from>
+              </input>
+              <input>
+                <from>os type</from>
+              </input>
+              <input>
+                <from>service validation string</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[3]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="validationstring">
+                  <input global="false">
+                    <from>service validation string</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="port number">
+                  <input global="false">
+                    <from>port number</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">ps -eaf |grep "${validationstring} -p ${port number}" | grep -v grep</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">sc query "${validationstring}" | findStr /i "state"</xsl:text>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">ps -eaf |grep "${validationstring} -p ${port number}" | grep -v grep</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">ps -eaf |grep "${validationstring} -p ${port number}" | grep -v grep</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>discard</to>
+          </output>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+          </console-output>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==== Is Service Running Output=====</value>
+              </input>
+              <input>
+                <from>command output</from>
+              </input>
+              <input>
+                <from>discard</from>
+              </input>
+              <input>
+                <from>adapter response</from>
+              </input>
+              <input>
+                <from>command output</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>os type</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[translate(//os-id/text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>discard</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>exit code</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//exit-code/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>command output</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>service status</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="os type">
+                <input global="false">
+                  <from>os type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="service name">
+                <input global="false">
+                  <from>service validation string</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="exit code">
+                <input global="false">
+                  <from>exit code</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="'${exit code}' = '0'">
+          <xsl:choose>
+            <xsl:when test="contains('${os type}', 'windows')">
+              <xsl:choose>
+                <xsl:when test="contains(., &quot;STATE&quot;)">
+                  <xsl:choose>
+                    <xsl:when test="contains(., &quot;STOPPED&quot;)">
+                      <xsl:value-of select="'stopped'" disable-output-escaping="no" />
+                    </xsl:when>
+                    <xsl:when test="contains(., &quot;RUNNING&quot;)">
+                      <xsl:value-of select="'running'" disable-output-escaping="no" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="'unknown'" disable-output-escaping="no" />
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'notfound'" disable-output-escaping="no" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="contains(., '${service name}')">
+                  <xsl:value-of select="'running'" disable-output-escaping="no" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'stopped'" disable-output-escaping="no" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:when test="'${exit code}' = '1'">
+          <xsl:choose>
+            <xsl:when test="contains('${os type}', 'windows')">
+              <xsl:choose>
+                <xsl:when test="contains(., &quot;STATE&quot;)">
+                  <xsl:choose>
+                    <xsl:when test="contains(., &quot;STOPPED&quot;)">
+                      <xsl:value-of select="'stopped'" disable-output-escaping="no" />
+                    </xsl:when>
+                    <xsl:when test="contains(., &quot;RUNNING&quot;)">
+                      <xsl:value-of select="'running'" disable-output-escaping="no" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="'unknown'" disable-output-escaping="no" />
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'notfound'" disable-output-escaping="no" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:choose>
+                <xsl:when test="contains(., '${service name}')">
+                  <xsl:value-of select="'running'" disable-output-escaping="no" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="'stopped'" disable-output-escaping="no" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">error</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>command output</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>pid</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="os type">
+                <input global="false">
+                  <from>os type</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="java.lang.String" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="str1" select="substring-after(., ' ')" />
+  <xsl:variable name="str2" select="java:trim(java:new($str1))" />
+  <xsl:variable name="str3" select="substring-before($str2, ' ')" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="'${os type}'  ='linux'">
+          <xsl:value-of select="$str3" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text></xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>command output</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>command output</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:apply-templates select="//line" />
+    </value>
+  </xsl:template>
+  <xsl:template match="line">
+    <xsl:value-of select="." disable-output-escaping="no" />
+    <xsl:text disable-output-escaping="no">
+</xsl:text>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>notes</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//command-output/metadata]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>--------------Service validation output--------------</value>
+              </input>
+              <input>
+                <from>command output</from>
+              </input>
+              <input>
+                <from>discard</from>
+              </input>
+              <input>
+                <from>pid</from>
+              </input>
+              <input>
+                <from>notes</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[4]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>validation status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>service status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'error' or . = 'notfound' or . = 'unknown']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>validation status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>service status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'running']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>validation status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <utility>
+        <date>
+          <now />
+        </date>
+        <output global="false">
+          <to>end time</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[2]</location>
+      </utility>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>command</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//command/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>command output</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>validation output</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="status">
+                <input global="false">
+                  <from>validation status</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="command">
+                <input global="false">
+                  <from>command</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="end time">
+                <input global="false">
+                  <from>end time</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="start time">
+                <input global="false">
+                  <from>start time</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <validation-output>
+      <status>${status}</status>
+      <command>${command}</command>
+      <command-output>
+        <xsl:value-of select="." disable-output-escaping="no" />
+      </command-output>
+      <start-time>${start time}</start-time>
+      <end-time>${end time}</end-time>
+    </validation-output>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>-----------validatoin output</value>
+              </input>
+              <input>
+                <from>validation output</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[5]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>bc62f149-7448-4a49-a0fd-42ce1eae9872</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1571228971169</last-modified>
+    </meta>
+  </process-def>
+</process>

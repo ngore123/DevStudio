@@ -1,0 +1,253 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:Utility:DateConverter">
+    <parameters>
+      <input global="false" required="true">
+        <from>inputdate</from>
+        <to>inputdate</to>
+      </input>
+      <input global="false" required="true">
+        <from>convertTo</from>
+        <to>convertTo</to>
+      </input>
+      <output global="false" required="true">
+        <to>datePostConversion</to>
+        <from>datePostConversion</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:UTCFormat</configuration>
+                </input>
+                <output>
+                  <to>format</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>inputdate</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>inputdate</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[number(.) * 1000]]></xpath>
+                </xpath-expression>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="java" version="1.0"><xsl:output indent="no" /><xsl:template match="/"><xsl:variable name="formatterIn"  select="java:text.NumberFormat.getInstance(  )"/><xsl:variable name="numericIn"  select="java:parse($formatterIn,string(.))"/><xsl:variable name="formatterOut"  select="java:text.DecimalFormat.new(  )"/><xsl:variable name="patternOut"  select='"#.##########"'/><xsl:variable name="emptyOut"  select="java:applyPattern($formatterOut,$patternOut)"/><xsl:variable name="numericOut"  select="java:format($formatterOut,$numericIn)"/><value><xsl:value-of select="$numericOut"/></value></xsl:template> </xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>inputdate</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>datePostConversion</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="format">
+                      <input global="false">
+                        <from>format</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="epochDate">
+                      <input global="false">
+                        <from>inputdate</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dateClass="java.util.Date" xmlns:simpleDateFormatClass="java.text.SimpleDateFormat" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:variable name="simpleDateFormatObject" select="simpleDateFormatClass:new('${format}')" />
+    <xsl:variable name="dateObject" select="dateClass:new(${epochDate})" />
+    <output>
+      <xsl:value-of select="simpleDateFormatClass:format($simpleDateFormatObject, $dateObject)" disable-output-escaping="no" />
+    </output>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:UTC-&gt;Epoch</value>
+                    </input>
+                    <input>
+                      <from>inputdate</from>
+                    </input>
+                    <input>
+                      <from>datePostConversion</from>
+                    </input>
+                    <input>
+                      <from>convertTo</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>convertTo</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "epoch"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:UTCFormat</configuration>
+                </input>
+                <output>
+                  <to>format</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>inputdate</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>datePostConversion</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="format">
+                      <input global="false">
+                        <from>format</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:dateClass="java.util.Date" xmlns:simpleDateFormatClass="java.text.SimpleDateFormat" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:variable name="simpleDateFormatObject" select="simpleDateFormatClass:new('${format}')" />
+    <xsl:variable name="dateObject" select="simpleDateFormatClass:parse($simpleDateFormatObject, .)" />
+    <output>
+      <xsl:value-of select="dateClass:getTime($dateObject)" disable-output-escaping="no" />
+    </output>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>datePostConversion</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>datePostConversion</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[number(.) div 1000]]></xpath>
+                </xpath-expression>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:java="java" version="1.0"><xsl:output indent="no" /><xsl:template match="/"><xsl:variable name="formatterIn"  select="java:text.NumberFormat.getInstance(  )"/><xsl:variable name="numericIn"  select="java:parse($formatterIn,string(.))"/><xsl:variable name="formatterOut"  select="java:text.DecimalFormat.new(  )"/><xsl:variable name="patternOut"  select='"#.##########"'/><xsl:variable name="emptyOut"  select="java:applyPattern($formatterOut,$patternOut)"/><xsl:variable name="numericOut"  select="java:format($formatterOut,$numericIn)"/><value><xsl:value-of select="$numericOut"/></value></xsl:template> </xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>BMC-SA-CLA_ITSM_Integration:UTC-&gt;Epoch</value>
+                    </input>
+                    <input>
+                      <from>inputdate</from>
+                    </input>
+                    <input>
+                      <from>datePostConversion</from>
+                    </input>
+                    <input>
+                      <from>convertTo</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>bb7ff020-1f72-4c21-895c-56d3aef6d873</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1476692321450</last-modified>
+    </meta>
+  </process-def>
+</process>

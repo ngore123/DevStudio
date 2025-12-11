@@ -1,0 +1,138 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-Microsoft_System_Center_Operations_Manager:Adapter_Action_Input_Constructors:v2007:Management_Pack:Uninstall Management Pack">
+    <parameters>
+      <input global="false" required="false">
+        <description>
+timeout-secs[Optional]
+	Time in seconds after which the request will time-out of not completed. Default is: 60 secs</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="true">
+        <description>managementpack-name[Required]
+	The name of the managment pack that will be uninstalled.
+</description>
+        <from>managementpack name</from>
+        <to>managementpack name</to>
+      </input>
+      <input global="false" required="false">
+        <description>
+preview[Optional]
+	This tag indicates that user wants to preview the operation.
+	Valid values -  
+	true
+		Indicates that preview the result of the operation
+	false
+		Operation is executed without previewing the result of the execution
+	Default value - false
+
+NOTE: There are a few discrepencies in the naming between SCOM application and API.
+		 1. In the SCOM application, the value provided in ID is actually mapped to 'Name' attribute of management pack in SCOM API.
+		 2. In the SCOM application, the value provided in Name is actually mapped to 'DisplayName' attribute of management pack in SCOM API.</description>
+        <from>preview</from>
+        <to>preview</to>
+      </input>
+      <output global="false" required="false">
+        <to>items xml</to>
+        <from>items xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items xml</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok1">
+                <input global="false">
+                  <from>managementpack name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok2">
+                <input global="false">
+                  <from>preview</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">uninstall-managementpack</xsl:text>
+        </operation-name>
+        <timeout-secs>
+          <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+        </timeout-secs>
+        <command-parameters>
+          <managementpack>
+            <managementpack-name>
+              <xsl:value-of select="'${tok1}'" disable-output-escaping="no" />
+            </managementpack-name>
+          </managementpack>
+          <preview>
+            <xsl:value-of select="'${tok2}'" disable-output-escaping="no" />
+          </preview>
+        </command-parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Item Xml:</value>
+              </input>
+              <input>
+                <from>items xml</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for the process - "Uninstall Management Pack"</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>25af2a53-3ed6-369a-ac65-9727e5f381b7</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598686719</last-modified>
+    </meta>
+  </process-def>
+</process>

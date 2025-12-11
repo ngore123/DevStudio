@@ -1,0 +1,256 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AutoPilot-OA-IP-Address-Management:Free Range">
+    <parameters>
+      <input global="false" required="true">
+        <description>Pool ids to be free
+&lt;pool-ids&gt;
+           &lt; pool-id&gt;xxxx&lt;/ pool-id&gt;
+           &lt; pool-id&gt;yyyy&lt;/ pool-id&gt;
+           &lt; pool-id&gt;zzzz&lt;/ pool-id&gt;
+&lt;/pool-ids&gt;
+</description>
+        <from>Pool ids</from>
+        <to>pool ids</to>
+      </input>
+      <input global="false" required="true">
+        <description>Configuration name from module configuration.
+Valid values: VitalQIP.</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Scope can have twos possible values
+1. Any string : It is a organization name same as pod name. 
+2. null : in this case we will use default organization.</description>
+        <from>scope</from>
+        <to>scope</to>
+      </input>
+      <output global="false" required="false">
+        <description>operation status.
+valid values: true, false.</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>incase of any error, error message goes here.  </description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>in case of any pool fails to free, ifo message will be added for that pool.</description>
+        <to>info message</to>
+        <from>info-message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-IP-Address-Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>user name</from>
+            <to>user name</to>
+          </output>
+          <output>
+            <from>password</from>
+            <to>password</to>
+          </output>
+          <output>
+            <from>organization</from>
+            <to>organization</to>
+          </output>
+          <output>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>info-message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>success status</to>
+            <value>false</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>pool ids</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>pool id</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//pool-id]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <call-process>
+            <process-name>:AutoPilot-OA-IP-Address-Management:Free Pool</process-name>
+            <parameters>
+              <input>
+                <from>pool id</from>
+                <to>Subnet Address</to>
+              </input>
+              <input>
+                <from>configuration name</from>
+                <to>configuration name</to>
+              </input>
+              <input>
+                <from>scope</from>
+                <to>scope</to>
+              </input>
+              <output>
+                <from>success status</from>
+                <to>free pool sucess status</to>
+              </output>
+              <output>
+                <from>error message</from>
+                <to>free pool error message</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:call-process[2]</location>
+          </call-process>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <output>
+                      <to>info-message</to>
+                      <value></value>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <output>
+                      <to>success status</to>
+                      <value>true</value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[1]:assign[1]</location>
+                </assign>
+              </sequence>
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>free pool sucess status</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[text()="false"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <input>
+                      <from>free pool error message</from>
+                    </input>
+                    <output>
+                      <to>error message</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <output>
+                      <to>success status</to>
+                      <value>false</value>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>f1bb2f8b-cf88-4459-92ca-6fe7e648238b</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1299238225993</last-modified>
+    </meta>
+  </process-def>
+</process>

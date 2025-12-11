@@ -1,0 +1,783 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":Closed_Loop_Server-SA-Audit:Utilities:Get Audit Job Results">
+    <parameters>
+      <input global="false" required="false">
+        <description>Connection details concept for connection to BL server.</description>
+        <from>bl connection details</from>
+        <to>bl connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>connection details to BL sever when blcli tunnelling is on. This is requried only when blcli tunnelling is enabled.</description>
+        <from>bl connection details instance 2</from>
+        <to>bl connection details instance 2</to>
+      </input>
+      <input global="false" required="false">
+        <description>flag which tells whether blcli tunnelling is on or not 
+valid values : true , false</description>
+        <from>blcli tunnelling</from>
+        <to>blcli tunnelling</to>
+      </input>
+      <input global="false" required="true">
+        <description>Connection details for getting exported job results from file.</description>
+        <from>file connection details</from>
+        <to>file connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Bladelogic alert concept xml containing information as found in SNMP trap with specific-job-type=1001.</description>
+        <from>bladelogic alert</from>
+        <to>bladelogic alert</to>
+      </input>
+      <input global="false" required="true">
+        <description>job to be processed.
+
+Structure :
+
+&lt;job&gt;
+  &lt;job-name/&gt;
+  &lt;job-group/&gt;
+  &lt;templates&gt;
+    &lt;template&gt;
+       &lt;group/&gt;
+       &lt;name/&gt;
+    &lt;/template&gt;
+  &lt;/templates&gt;
+&lt;/job&gt;</description>
+        <from>job</from>
+        <to>job</to>
+      </input>
+      <input global="false" required="true">
+        <description>Folder path in which to export the job results.</description>
+        <from>export path</from>
+        <to>export path</to>
+      </input>
+      <input global="false" required="true">
+        <description>Type of file export required.
+
+Allowed values:
+CSV and HTML</description>
+        <from>export file type</from>
+        <to>export file type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Purpose for which the results are being exported.
+Allowed values:
+Run and Verfy</description>
+        <from>purpose</from>
+        <to>purpose</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status depicting if the all template based exports worked or not for a give job. Values: true or false.</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>Results of a job run containing all template involved in the run.</description>
+        <to>audit run</to>
+        <from>exported results</from>
+      </output>
+      <output global="false" required="false">
+        <description>audit job name that has been processed.</description>
+        <to>audit job name</to>
+        <from>audit job name</from>
+      </output>
+      <output global="false" required="false">
+        <description>job key of the audit job processed.</description>
+        <to>audit job key</to>
+        <from>audit job key</from>
+      </output>
+      <output global="false" required="false">
+        <description>run key of the audit job processed.</description>
+        <to>audit job run key</to>
+        <from>audit job run key</from>
+      </output>
+      <output global="false" required="false">
+        <description>job run index of audit job processed.</description>
+        <to>audit job run index</to>
+        <from>audit job run index</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>bladelogic alert</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>job name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//jc-job-name/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>exported results</to>
+            <value>
+              <exported-results />
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>success status</to>
+            <value>false</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>blcli tunnelling</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) != 'false']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>bl connection details instance 2</from>
+                </input>
+                <output>
+                  <to>bl connection details</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <for-each>
+        <document>
+          <input>
+            <from>job</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>current template</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//template]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>bladelogic alert</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>audit job runId</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//jc-run-id/text()]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <assignment>
+              <document>
+                <input>
+                  <from>current template</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>current template name</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//name/text()]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <assignment>
+              <document>
+                <input>
+                  <from>export path</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>export file name</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="export file type">
+                    <input global="false">
+                      <from>export file type</from>
+                    </input>
+                  </replacement-token>
+                  <replacement-token name="run-id">
+                    <input global="false">
+                      <from>audit job runId</from>
+                    </input>
+                  </replacement-token>
+                  <replacement-token name="template name">
+                    <input global="false">
+                      <from>current template name</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:variable name="seperator">
+        <xsl:choose>
+          <xsl:when test="contains(., '\')">
+            <xsl:text disable-output-escaping="no">\\</xsl:text>
+          </xsl:when>
+          <xsl:when test="contains(., '/')">
+            <xsl:text disable-output-escaping="no">/</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="file-type">
+        <xsl:choose>
+          <xsl:when test="'${export file type}'='CSV'">
+            <xsl:text disable-output-escaping="no">csv</xsl:text>
+          </xsl:when>
+          <xsl:when test="'${export file type}'='HTML'">
+            <xsl:text disable-output-escaping="no">html</xsl:text>
+          </xsl:when>
+        </xsl:choose>
+      </xsl:variable>
+      <xsl:value-of select="concat(., $seperator, '${run-id}-${template name}.', $file-type)" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[2]</location>
+          </assign>
+          <call-process>
+            <process-name>:BMC_BladeLogic-AD-Operations_Manager:Compliance:Export Audit Results by Run ID</process-name>
+            <parameters>
+              <input>
+                <from>bl connection details</from>
+                <to>connection details</to>
+              </input>
+              <input>
+                <from>job</from>
+                <to>auditJobGroup</to>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//job-group/text()]]></xpath>
+                </xpath-expression>
+              </input>
+              <input>
+                <from>job name</from>
+                <to>auditJobName</to>
+              </input>
+              <input>
+                <from>current template</from>
+                <to>templateGroupName</to>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//group/text()]]></xpath>
+                </xpath-expression>
+              </input>
+              <input>
+                <from>current template name</from>
+                <to>templateName</to>
+              </input>
+              <input>
+                <from>audit job runId</from>
+                <to>runIndex</to>
+              </input>
+              <input>
+                <from>export file name</from>
+                <to>exportFileName</to>
+              </input>
+              <input>
+                <from>export file type</from>
+                <to>exportType</to>
+              </input>
+              <output>
+                <from>success</from>
+                <to>success status</to>
+              </output>
+              <output>
+                <from>error message</from>
+                <to>status message</to>
+              </output>
+              <output>
+                <from>exportFileName</from>
+                <to>export file name</to>
+              </output>
+              <output>
+                <from>audit job name</from>
+                <to>audit job name</to>
+              </output>
+              <output>
+                <from>audit job key</from>
+                <to>audit job key</to>
+              </output>
+              <output>
+                <from>audit job run key</from>
+                <to>audit job run key</to>
+              </output>
+              <output>
+                <from>audit job run index</from>
+                <to>audit job run index</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:call-process[1]</location>
+          </call-process>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>success status</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.)="true"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <call-process>
+                  <process-name>:Closed_Loop_Server-SA-Audit:Utilities:Format Audit Results</process-name>
+                  <parameters>
+                    <input>
+                      <from>file connection details</from>
+                      <to>connection details</to>
+                    </input>
+                    <input>
+                      <from>export file name</from>
+                      <to>csv file path</to>
+                    </input>
+                    <output>
+                      <from>audit run</from>
+                      <to>audit run</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[2]:sequence[2]:call-process[1]</location>
+                </call-process>
+              </sequence>
+            </case>
+            <location>:switch[2]</location>
+          </switch>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>audit run</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>audit run</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="template">
+                    <input global="false">
+                      <from>current template name</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <bladelogic-audit-export>
+      <xsl:attribute name="template">
+        <xsl:value-of select="'${template}'" disable-output-escaping="no" />
+      </xsl:attribute>
+      <xsl:copy-of select="//bladelogic-audit-export/*" />
+    </bladelogic-audit-export>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <assignment>
+              <document>
+                <input>
+                  <from>exported results</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>exported results</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="audit run">
+                    <input global="false">
+                      <from>audit run</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <exported-results>
+      <xsl:copy-of select="//exported-results/*" />
+      ${audit run}
+    </exported-results>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:assign[3]</location>
+          </assign>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>exported results</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>inconsistent targets</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//inconsistent-targets/*]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>inconsistent targets</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>inconsistent targets</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="seperator" select="' ('" />
+  <xsl:template match="/">
+    <targets>
+      <xsl:apply-templates select="//target" />
+    </targets>
+  </xsl:template>
+  <xsl:template match="target">
+    <xsl:variable name="server-name">
+      <xsl:call-template name="get-server-name">
+        <xsl:with-param name="component-name" select="text()" />
+      </xsl:call-template>
+    </xsl:variable>
+    <xsl:variable name="process">
+      <xsl:for-each select="preceding-sibling::target">
+        <xsl:if test="contains(text(), $server-name)">
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:if test="$process != 'false'">
+      <target>
+        <xsl:attribute name="server-name">
+          <xsl:value-of select="$server-name" disable-output-escaping="no" />
+        </xsl:attribute>
+        <templates>
+          <template>
+            <xsl:call-template name="get-template-name">
+              <xsl:with-param name="component-name" select="text()" />
+            </xsl:call-template>
+          </template>
+          <xsl:for-each select="following-sibling::target[contains(text(), $server-name)]">
+            <template>
+              <xsl:call-template name="get-template-name">
+                <xsl:with-param name="component-name" select="text()" />
+              </xsl:call-template>
+            </template>
+          </xsl:for-each>
+        </templates>
+        <components>
+          <component>
+            <xsl:value-of select="text()" disable-output-escaping="no" />
+          </component>
+          <xsl:for-each select="following-sibling::target[contains(text(), $server-name)]">
+            <component>
+              <xsl:value-of select="text()" disable-output-escaping="no" />
+            </component>
+          </xsl:for-each>
+        </components>
+      </target>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="get-server-name">
+    <xsl:param name="component-name" />
+    <xsl:if test="string-length($component-name) &gt; 0">
+      <xsl:variable name="starting-paranthesis-removed" select="substring-after($component-name, $seperator)" />
+      <xsl:choose>
+        <xsl:when test="contains($starting-paranthesis-removed, $seperator)">
+          <xsl:call-template name="get-server-name">
+            <xsl:with-param name="component-name" select="$starting-paranthesis-removed" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-before($starting-paranthesis-removed, ')')" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+  <xsl:template name="get-template-name">
+    <xsl:param name="component-name" />
+    <xsl:if test="string-length($component-name) &gt; 0 and contains($component-name, $seperator)">
+      <xsl:variable name="starting-paranthesis-removed" select="substring-after($component-name, $seperator)" />
+      <xsl:value-of select="substring-before($component-name, $seperator)" disable-output-escaping="no" />
+      <xsl:if test="contains($starting-paranthesis-removed, $seperator)">
+        <xsl:value-of select="$seperator" disable-output-escaping="no" />
+        <xsl:call-template name="get-template-name">
+          <xsl:with-param name="component-name" select="$starting-paranthesis-removed" />
+        </xsl:call-template>
+      </xsl:if>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>exported results</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>failed targets</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//failed-servers/*]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>failed targets</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>failed targets</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <failed-targets>
+      <xsl:for-each select="//server">
+        <xsl:variable name="server-name">
+          <xsl:call-template name="get-server-name">
+            <xsl:with-param name="component-name" select="text()" />
+          </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="process">
+          <xsl:for-each select="preceding-sibling::server">
+            <xsl:if test="contains(text(), $server-name)">
+              <xsl:text disable-output-escaping="no">false</xsl:text>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:variable>
+        <xsl:if test="not(contains($process, 'false'))">
+          <target>
+            <xsl:value-of select="$server-name" disable-output-escaping="no" />
+          </target>
+        </xsl:if>
+      </xsl:for-each>
+    </failed-targets>
+  </xsl:template>
+  <xsl:template name="get-server-name">
+    <xsl:param name="component-name" />
+    <xsl:if test="string-length($component-name)&gt;0">
+      <xsl:variable name="starting-paranthesis-removed" select="substring-after($component-name, ' (')" />
+      <xsl:choose>
+        <xsl:when test="contains($component-name, ' (')">
+          <xsl:call-template name="get-server-name">
+            <xsl:with-param name="component-name" select="$starting-paranthesis-removed" />
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="substring-before($component-name, ')')" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>exported results</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>exported results</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="inconsistent targets">
+                <input global="false">
+                  <from>inconsistent targets</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="failed targets">
+                <input global="false">
+                  <from>failed targets</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <bladelogic-audit-exports>
+      <job-name>
+        <xsl:value-of select="//bladelogic-audit-export[position()=1]/job-name/text()" disable-output-escaping="no" />
+      </job-name>
+      <date>
+        <xsl:value-of select="//bladelogic-audit-export[position()=1]/date/text()" disable-output-escaping="no" />
+      </date>
+      ${inconsistent targets}${failed targets}
+      <xsl:for-each select="//bladelogic-audit-export">
+        <bladelogic-audit-export>
+          <xsl:attribute name="template">
+            <xsl:value-of select="@template" disable-output-escaping="no" />
+          </xsl:attribute>
+          <xsl:for-each select="*[local-name()!='date' and local-name()!='job-name']">
+            <xsl:copy-of select="." />
+          </xsl:for-each>
+        </bladelogic-audit-export>
+      </xsl:for-each>
+    </bladelogic-audit-exports>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[4]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Returns a consolidated job result for all templates implemented by the given audit job.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d40f2374-09e0-3196-98a7-63a6372993a8</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1318923040622</last-modified>
+    </meta>
+  </process-def>
+</process>

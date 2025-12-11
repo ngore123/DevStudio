@@ -1,0 +1,494 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Use_Case_1:Provision Storage Create Incident">
+    <parameters>
+      <input global="false" required="false">
+        <from>hpsc adapter name</from>
+        <to>hpsc adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <from>hpse adapter name</from>
+        <to>hpse adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <from>storage system name</from>
+        <to>storage system name</to>
+      </input>
+      <input global="false" required="true">
+        <from>pool threshold</from>
+        <to>pool threshold</to>
+      </input>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>storage system name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>find ss id request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="ss name">
+                <input global="false">
+                  <from>storage system name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <command>
+          <xsl:text disable-output-escaping="no">show</xsl:text>
+        </command>
+        <category>
+          <xsl:text disable-output-escaping="no">storagesystem</xsl:text>
+        </category>
+        <process-id>
+          <xsl:text disable-output-escaping="no">find-storage-system-details</xsl:text>
+        </process-id>
+        <command-arguments>
+          <all />
+        </command-arguments>
+        <filter-by>
+          <Name>${ss name}</Name>
+        </filter-by>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-HP_Storage_Essentials:v6.0:Storage_System:Find Storage System Details</process-name>
+        <parameters>
+          <input>
+            <from>hpse adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>find ss id request</from>
+            <to>items</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>storage system id</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//command-response/ID)]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>storage system id</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>find pool request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="ss id">
+                <input global="false">
+                  <from>storage system id</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <command>
+          <xsl:text disable-output-escaping="no">show</xsl:text>
+        </command>
+        <category>
+          <xsl:text disable-output-escaping="no">storagesystem</xsl:text>
+        </category>
+        <process-id>
+          <xsl:text disable-output-escaping="no">find-storage-system-details</xsl:text>
+        </process-id>
+        <command-arguments>
+          <storage-system-id>${ss id}</storage-system-id>
+          <pool />
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-HP_Storage_Essentials:v6.0:Storage_System:Find Storage System Details</process-name>
+        <parameters>
+          <input>
+            <from>hpse adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>find pool request</from>
+            <to>items</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>find pool response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+      <for-each>
+        <document>
+          <input>
+            <from>find pool response</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>pool command response</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens>
+            <replacement-token name="threshold">
+              <input global="false">
+                <from>pool threshold</from>
+              </input>
+            </replacement-token>
+          </xpath-replacement-tokens>
+          <xpath><![CDATA[//command-response]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>pool command response</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens>
+                    <replacement-token name="threshold">
+                      <input global="false">
+                        <from>pool threshold</from>
+                      </input>
+                    </replacement-token>
+                  </xpath-replacement-tokens>
+                  <xpath><![CDATA[string(number(translate(//AvailableSpace_MBytes, ",","")) div number(translate(//TotalSpace_MBytes, ",",""))) != 'NaN' and (number(translate(//AvailableSpace_MBytes, ",","")) div number(translate(//TotalSpace_MBytes, ",","")) < (number(${threshold}) div 100))]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+                <assign>
+                  <assignment>
+                    <input>
+                      <from>hpsc adapter name</from>
+                    </input>
+                    <output>
+                      <to>adapter name</to>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>pool command response</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>items</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens />
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <Incidents>
+      <Incident xmlns="AutoPilot-OA-Incident_Management">
+        <category xmlns="">
+          <xsl:text disable-output-escaping="no">client system</xsl:text>
+        </category>
+        <urgency xmlns="">
+          <xsl:text disable-output-escaping="no">1 - Critical</xsl:text>
+        </urgency>
+        <assigned-group xmlns="">
+          <xsl:text disable-output-escaping="no">CLIENT SECURITY</xsl:text>
+        </assigned-group>
+        <short-description xmlns="">
+          <xsl:text disable-output-escaping="no">Available space is below the threshold specified for Storage Pool - "</xsl:text>
+          <xsl:value-of select="//Name" disable-output-escaping="no" />
+          <xsl:text disable-output-escaping="no">" for Storage System - "</xsl:text>
+          <xsl:value-of select="substring-after(substring-after(//Device, &quot;:&quot;), &quot;:&quot;)" disable-output-escaping="no" />
+          <xsl:text disable-output-escaping="no">".</xsl:text>
+        </short-description>
+        <contact xmlns="">
+          <xsl:text disable-output-escaping="no">THOMPSON, TERESA</xsl:text>
+        </contact>
+        <categorization-tier1 xmlns="">
+          <xsl:text disable-output-escaping="no">software</xsl:text>
+        </categorization-tier1>
+        <site-group xmlns="">
+          <xsl:text disable-output-escaping="no">B - Major Site</xsl:text>
+        </site-group>
+        <product-cat-tier1 xmlns="">
+          <xsl:text disable-output-escaping="no">Email client</xsl:text>
+        </product-cat-tier1>
+        <service-type xmlns="">
+          <xsl:text disable-output-escaping="no">Exchange</xsl:text>
+        </service-type>
+        <impact xmlns="">
+          <xsl:text disable-output-escaping="no">3 - Multiple Users</xsl:text>
+        </impact>
+      </Incident>
+    </Incidents>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>Creating Incident</value>
+                        </input>
+                        <input>
+                          <value></value>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+                <call-process>
+                  <process-name>:AutoPilot-OA-Incident_Management:Create Incidents</process-name>
+                  <parameters>
+                    <input>
+                      <from>configuration name</from>
+                      <to>configuration name</to>
+                    </input>
+                    <input>
+                      <from>items</from>
+                      <to>incidents</to>
+                    </input>
+                    <output>
+                      <from>success status</from>
+                      <to>success status</to>
+                    </output>
+                    <output>
+                      <from>status message</from>
+                      <to>status message</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <console-output>
+                      <type>INFO</type>
+                      <summary>
+                        <concat>
+                          <input>
+                            <value></value>
+                          </input>
+                        </concat>
+                      </summary>
+                      <detail>
+                        <concat>
+                          <input>
+                            <value></value>
+                          </input>
+                        </concat>
+                      </detail>
+                    </console-output>
+                  </after-execution>
+                  <location>:switch[1]:sequence[2]:call-process[1]</location>
+                </call-process>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>3d51926f-27c9-3065-ad45-4bd2deb9bb4e</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588073419</last-modified>
+    </meta>
+  </process-def>
+</process>

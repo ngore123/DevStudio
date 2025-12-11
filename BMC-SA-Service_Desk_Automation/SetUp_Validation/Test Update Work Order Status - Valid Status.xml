@@ -1,0 +1,120 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BMC-SA-Service_Desk_Automation:SetUp_Validation:Test Update Work Order Status - Valid Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>Example: WO0000000006130</description>
+        <from>work order number</from>
+        <to>work order number</to>
+      </input>
+      <input global="false" required="true">
+        <description>Valid values: In Progress, Completed or Rejected</description>
+        <from>status</from>
+        <to>status</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <compose-xml>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;bao-process-data&gt;
+  &lt;metadata&gt;
+    &lt;target-name&gt;server1.somecompany.com&lt;/target-name&gt;
+    &lt;request-type&gt;A Service&lt;/request-type&gt;
+    &lt;data-type /&gt;
+    &lt;status&gt;success&lt;/status&gt;
+    &lt;error-code /&gt;
+    &lt;error-summary /&gt;
+    &lt;error-detail /&gt;
+    &lt;resolution-steps /&gt;
+    &lt;time-taken-seconds /&gt;
+    &lt;log-info /&gt;
+  &lt;/metadata&gt;
+  &lt;request-data&gt;
+     &lt;status&gt;</value>
+                </input>
+              </fragment>
+              <fragment type="string" encode="true">
+                <input required="false">
+                  <from>status</from>
+                </input>
+              </fragment>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;/status&gt;
+  &lt;/request-data&gt;
+  &lt;response-data/&gt;
+&lt;/bao-process-data&gt;</value>
+                </input>
+              </fragment>
+            </compose-xml>
+          </input>
+          <output>
+            <to>process data</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Work_Order_Management:Update Work Order Status</process-name>
+        <parameters>
+          <input>
+            <value>BMC_AR_System</value>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>work order number</from>
+            <to>work order number</to>
+          </input>
+          <input>
+            <from>process data</from>
+            <to>bao process data</to>
+          </input>
+          <output>
+            <from>response xml</from>
+            <to>response xml</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Test Update Work Order Status</description>
+        <version />
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e4a74c5a-24e3-418e-806b-925f7cc9de06</process-id>
+      <author>Ranganath Samudrala</author>
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1441313796504</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,149 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AO-AD-Microsoft_Exchange:v2010:Mailbox_Management:New Mailbox Export Request">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter use to handle the request.
+
+Default value: MicrosoftExchangeActorAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>input parameters [Required]     
+
+Input parameters XML for the command execution, to be provided under the 'parameters' tag with individual parameter as a combination of 'name' and 'value' pair. 
+		  
+The parameters may differ according to the Exchange Server version. Please refer to the Microsoft documentation for the list of all supported parameters specific to your version.
+		  
+Sample input parameters for this process corresponding to Exchange version 2016:
+
+&lt;parameters&gt;
+    &lt;parameter&gt;
+        &lt;name&gt;Mailbox&lt;/name&gt;
+        &lt;value&gt;MailboxToExport&lt;/value&gt;
+    &lt;/parameter&gt;
+    &lt;parameter&gt;
+        &lt;name&gt;FilePath&lt;/name&gt;
+        &lt;value&gt;\\backup-server.bmc.com\ExchangeTest\MyMailbox.pst&lt;/value&gt;
+    &lt;/parameter&gt;
+&lt;/parameters&gt;
+
+Note: This command is supported on Exchange versions 2010 SP1 and later, 2013 and 2016.</description>
+        <from>input parameters</from>
+        <to>input parameters</to>
+      </input>
+      <input global="false" required="false">
+        <description>format option [Optional]
+           This controls the output format of the command being executed. Valid values for this are - format-list, format-custom, format-table &amp; format-wide</description>
+        <from>format option</from>
+        <to>format option</to>
+      </input>
+      <input global="false" required="false">
+        <description>verbose logging [Optional]
+           In order to get detailed logging statements for the operation being executed in the response, this parameter is needed. Valid values - true, false.</description>
+        <from>verbose logging</from>
+        <to>verbose logging</to>
+      </input>
+      <output global="false" required="false">
+        <description>adapter response
+        The adapter response containing the results. </description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-Microsoft_Exchange:Utilities:Set Default Adapter Name</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <output>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AO-AD-Microsoft_Exchange:Utilities:Execute Exchange Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>New-MailboxExportRequest</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>input parameters</from>
+            <to>input parameters</to>
+          </input>
+          <input>
+            <from>format option</from>
+            <to>format option</to>
+          </input>
+          <input>
+            <from>verbose logging</from>
+            <to>verbose logging</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Exports mailbox data to a .pst file or to a specified mailbox folder.
+
+Important 
+------------- 
+1) This operation can only be performed using 32 bit Exchange Management tools &amp; Outlook 2003 SP2 (or above) installation. It is not directly supported on the 64 bit Microsoft Exchange 2007 server.
+
+2) In order to execute this, the AOUser should have appropriate access on the mailbox, which can also be provided using the cmdlet, as below:
+
+Add-MailboxPermission -Identity ExportMailbox -AccessRights FULLACCESS -User AOUser</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>65627b90-e3d8-360f-8e99-5b06089f5f4f</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1455171884575</last-modified>
+    </meta>
+  </process-def>
+</process>

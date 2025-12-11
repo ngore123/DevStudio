@@ -1,0 +1,286 @@
+<process draft="false" dev-studio-version="8.1.00">
+  <process-def name=":BMC-SA-Event_Orchestration_Host_Down:Utilities:Extract IP Address">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line, SSH or telnet.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The network host to trace.</description>
+        <from>destination</from>
+        <to>destination</to>
+      </input>
+      <input global="false" required="false">
+        <description>A network interface to obtain the source IP address for outgoing probe packets.</description>
+        <from>source</from>
+        <to>source</to>
+      </input>
+      <input global="false" required="false">
+        <description>The time, in seconds, to wait for a response to a probe.</description>
+        <from>probe timeout</from>
+        <to>probe timeout</to>
+      </input>
+      <input global="false" required="false">
+        <description>The maximum number of hops used in outgoing probe packets.</description>
+        <from>max hops</from>
+        <to>max hops</to>
+      </input>
+      <input global="false" required="false">
+        <description>The probe packet size, in bytes.</description>
+        <from>packet size</from>
+        <to>packet size</to>
+      </input>
+      <input global="false" required="false">
+        <description>The time, in milliseconds, to pause between probes.</description>
+        <from>pause between probes</from>
+        <to>pause between probes</to>
+      </input>
+      <output global="false" required="true">
+        <to>traceroute output</to>
+        <from>traceroute output</from>
+      </output>
+      <output global="false" required="true">
+        <description>List of IP addresses</description>
+        <to>address list</to>
+        <from>ips</from>
+      </output>
+      <output global="false" required="true">
+        <description>IP address pinged</description>
+        <to>ip address pinged</to>
+        <from>ip address pinged</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>ips</to>
+            <value>
+              <ips />
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>ip address pinged</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Network_Utilities:Perform Traceroute</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>destination</from>
+            <to>destination</to>
+          </input>
+          <input>
+            <value>10</value>
+            <to>max hops</to>
+          </input>
+          <output>
+            <from>output</from>
+            <to>traceroute output</to>
+          </output>
+          <output>
+            <from>success</from>
+            <to>traceroute success status</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>b4 calling traceroute : TR TR TR TR</value>
+              </input>
+              <input>
+                <from>connection details</from>
+              </input>
+              <input>
+                <from>destination</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>traceroute success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+            </console-output>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>traceroute output</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>ips</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <ips>
+      <xsl:apply-templates select="//line[number(substring-before(normalize-space(text()), ' ')) and not(contains(text(), '*')) and position()&lt;last()]" />
+    </ips>
+  </xsl:template>
+  <xsl:template match="line">
+    <xsl:variable name="line-var" select="normalize-space(text())" />
+    <ip>
+      <xsl:choose>
+        <xsl:when test="contains($line-var, '(')">
+          <xsl:value-of select="substring-before(substring-after($line-var, '('), ')')" />
+        </xsl:when>
+        <xsl:when test="contains($line-var, '[')">
+          <xsl:value-of select="substring-before(substring-after($line-var, '['), ']')" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="normalize-space(substring-after(substring-after(substring-after($line-var, 'ms'), 'ms'), 'ms'))" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </ip>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>traceroute output</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>ip address pinged</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:apply-templates select="//line[starts-with(text(), 'traceroute to') or starts-with(text(), 'Tracing route to')]" />
+    </value>
+  </xsl:template>
+  <xsl:template match="//line">
+    <xsl:choose>
+      <xsl:when test="contains(text(), '[')">
+        <xsl:value-of select="substring-before(substring-after(., '['), ']')" disable-output-escaping="no" />
+      </xsl:when>
+      <xsl:when test="contains(text(), '(')">
+        <xsl:value-of select="substring-before(substring-after(., '('), ')')" disable-output-escaping="no" />
+      </xsl:when>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>manp &lt;ips&gt;</value>
+                    </input>
+                    <input>
+                      <from>ips</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Trace Route
+    Print the route that packets take to a specified network host.</description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>c841e9cc-f14e-4046-81d7-be49dd2f918b</process-id>
+      <author>rsamudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1543899316451</last-modified>
+    </meta>
+  </process-def>
+</process>

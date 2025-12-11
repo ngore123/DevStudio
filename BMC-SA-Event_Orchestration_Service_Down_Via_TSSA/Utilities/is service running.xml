@@ -1,0 +1,291 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":BMC-SA-Event_Orchestration_Service_Down_Via_TSSA:Utilities:is service running">
+    <parameters>
+      <input global="false" required="true">
+        <description>name of the adapter
+Ex. BladeLogic Adapter_EO</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>name of the server on which service is monitoring</description>
+        <from>server name</from>
+        <to>server name</to>
+      </input>
+      <input global="false" required="true">
+        <description>name of the service which is going to check</description>
+        <from>service name</from>
+        <to>service name</to>
+      </input>
+      <input global="false" required="false">
+        <description>windows/ linux</description>
+        <from>host type</from>
+        <to>host type</to>
+      </input>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug messages</to>
+        <from>debug messages</from>
+      </output>
+      <output global="false" required="false">
+        <to>return values</to>
+        <from>return values</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>host type</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Server:Print Property Value</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>connection details</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens />
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-details>
+      <adapter-name>
+        <xsl:value-of select="string(.)" disable-output-escaping="no" />
+      </adapter-name>
+    </connection-details>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </input>
+                <input>
+                  <from>server name</from>
+                  <to>serverName</to>
+                </input>
+                <input>
+                  <value>OS</value>
+                  <to>propertyName</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>propertyValue</from>
+                  <to>host type</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>server name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>command</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="serverName">
+                <input global="false">
+                  <from>server name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="hosttype">
+                <input global="false">
+                  <from>host type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="service name">
+                <input global="false">
+                  <from>service name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <command>
+      <xsl:choose>
+        <xsl:when test="'${hosttype}' = 'windows'">
+          <xsl:text disable-output-escaping="no">nexec -i ${serverName} sc query ${service name} | sed -n '/STATE/p'</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">nexec -i ${serverName} service ${service name} status | grep Active</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-SA-Event_Orchestration_Service_Down_Via_TSSA:Utilities:construct connection details</process-name>
+        <unique-id>d212417d-8148-480e-ad52-9b2cdfd680ee</unique-id>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <output>
+            <from>connection details</from>
+            <to>connection details</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform NSH command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>command</from>
+            <to>command name</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//command/text()]]></xpath>
+            </xpath-expression>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug messages</from>
+            <to>debug messages</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>43429b81-a34d-44ca-ab2c-e09c5e5b693e</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1597310212047</last-modified>
+    </meta>
+  </process-def>
+</process>

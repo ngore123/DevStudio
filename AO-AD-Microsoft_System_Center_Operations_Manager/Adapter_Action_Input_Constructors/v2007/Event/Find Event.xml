@@ -1,0 +1,171 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-Microsoft_System_Center_Operations_Manager:Adapter_Action_Input_Constructors:v2007:Event:Find Event">
+    <parameters>
+      <input global="false" required="false">
+        <description>
+timeout-secs[Optional]
+	Time in seconds after which the request will time-out of not completed. Default is: 60 secs
+</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="true">
+        <description>
+key[Required]
+	This tag contains the event attribute by which the events are filtered.
+	Valid values - Id,OriginalId,MonitoringObjectId,MonitoringClassId,MonitoringObjectName,MonitoringObjectDisplayName,MonitoringObjectPath,
+MonitoringObjectFullName,MonitoringRuleId,PublisherName,Number,CategoryId,User,Channel,LevelId,LoggingComputer,EventData,ManagementGroupId
+</description>
+        <from>key</from>
+        <to>key</to>
+      </input>
+      <input global="false" required="true">
+        <description>
+value[Required]
+	This tag contains the valid search expression for the attribute specified in the key.</description>
+        <from>value</from>
+        <to>value</to>
+      </input>
+      <input global="false" required="true">
+        <description>
+operator[Required]
+	The 'operator' tag specified under 'event-search-criteria' tag specifies the operand between multiple 'criteria-expression' tags.
+	Valid values - and, or
+
+	The 'operator' tag specified under 'criteria-expression specifies the operand for key and value specified.
+	Valid values - equals, not equals, like, in
+	NOTE: 'in' operator should only be used when 'Id' is used as key
+</description>
+        <from>operator</from>
+        <to>operator</to>
+      </input>
+      <input global="false" required="false">
+        <description>
+isrecurse[Optional]
+	If true, retrieves events for contained monitoring objects in addition to current monitoring object.
+	Valid values - true, false</description>
+        <from>isrecurse</from>
+        <to>isrecurse</to>
+      </input>
+      <output global="false" required="false">
+        <to>items xml</to>
+        <from>items xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items xml</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok1">
+                <input global="false">
+                  <from>key</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok2">
+                <input global="false">
+                  <from>value</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok3">
+                <input global="false">
+                  <from>operator</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok4">
+                <input global="false">
+                  <from>isrecurse</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">get-event</xsl:text>
+        </operation-name>
+        <timeout-secs>
+          <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+        </timeout-secs>
+        <command-parameters>
+          <event-search-criteria>
+            <criteria-expression>
+              <key>
+                <xsl:value-of select="'${tok1}'" disable-output-escaping="no" />
+              </key>
+              <value>
+                <xsl:value-of select="'${tok2}'" disable-output-escaping="no" />
+              </value>
+              <operator>
+                <xsl:value-of select="'${tok3}'" disable-output-escaping="no" />
+              </operator>
+            </criteria-expression>
+          </event-search-criteria>
+          <isrecurse>
+            <xsl:value-of select="'${tok4}'" disable-output-escaping="no" />
+          </isrecurse>
+        </command-parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Item Xml:</value>
+              </input>
+              <input>
+                <from>items xml</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for the process - "Fine Event"</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>62d7d54e-dcf8-30d2-9876-766717241026</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598684532</last-modified>
+    </meta>
+  </process-def>
+</process>

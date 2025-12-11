@@ -1,0 +1,122 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Errors:Get Error by Summary">
+    <parameters>
+      <input global="false" required="true">
+        <description>An error summary. 
+
+If summary exists, then, an XML is returned. For example:
+&lt;error&gt;
+  &lt;code&gt;100&lt;/code&gt;
+  &lt;summary&gt;Unknown error&lt;/summary&gt;
+  &lt;details&gt;Uknown error&lt;/details&gt;
+  &lt;resolution&gt;Please contact BAO administrator&lt;/resolution&gt;
+&lt;/error&gt;
+
+If summary does not exist, it will return an error text indicating error with the given summary does not exist. For example: 
+
+Error definition with summary: '10' not found!
+</description>
+        <from>error summary</from>
+        <to>error summary</to>
+      </input>
+      <output global="false" required="false">
+        <to>error</to>
+        <from>error</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:AutoPilot-OA-Errors</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>error</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="error summary">
+                <input global="false">
+                  <from>error summary</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//errors/error[summary/text() = '${error summary}'])">
+        <xsl:copy-of select="(//error[summary/text() = '${error summary}'])[1]" />
+      </xsl:when>
+      <xsl:otherwise>
+        <result>
+          <xsl:text disable-output-escaping="no">Error definition with summary: '${error summary}' not found!</xsl:text>
+        </result>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>GetError - error</value>
+              </input>
+              <input>
+                <from>error</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility work flow to get details of an error, given an error code.
+
+If code exists, then, an XML is returned. For example:
+&lt;error&gt;
+  &lt;code&gt;100&lt;/code&gt;
+  &lt;summary&gt;Unknown error&lt;/summary&gt;
+  &lt;details&gt;Uknown error&lt;/details&gt;
+  &lt;resolution&gt;Please contact BAO administrator&lt;/resolution&gt;
+&lt;/error&gt;
+
+If code does not exist, it will return an error text indicating error with the given code does not exist. For example: 
+
+Error definition with code: '10' not found!</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>f20594ac-f6c6-4af2-9f26-d699207f802b</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1438614364552</last-modified>
+    </meta>
+  </process-def>
+</process>

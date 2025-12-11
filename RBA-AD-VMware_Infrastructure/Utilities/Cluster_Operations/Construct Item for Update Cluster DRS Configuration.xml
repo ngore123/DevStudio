@@ -1,0 +1,268 @@
+<process draft="false" dev-studio-version="7.6.02.06">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:Cluster_Operations:Construct Item for Update Cluster DRS Configuration">
+    <parameters>
+      <input global="false" required="true">
+        <description>Name of the cluster whose DRS configuration needs to be updated
+
+Valid value: Cluster name
+</description>
+        <from>cluster compute resource</from>
+        <to>cluster compute resource</to>
+      </input>
+      <input global="false" required="false">
+        <description>Flag indicating whether or not the DRS service is enabled.
+
+Valid values: true, false
+Default values: false
+</description>
+        <from>drs enabled</from>
+        <to>drs enabled</to>
+      </input>
+      <input global="false" required="false">
+        <description>Flag that dictates whether DRS Behavior overrides for individual virtual machines are enabled. 
+
+When this flag is true, virtual machine DRS settings override the default virtual machine behavior set by the Cluster. 
+
+When this flag is false, the default virtual machine behavior set by the Cluster applies to all virtual machines, with the following exception: in a cluster that has EVC disabled, you cannot override the virtual machine setting for Fault Tolerance virtual machines
+
+Valid values: true, false
+Default value: false
+</description>
+        <from>enabled vm behavior overrides</from>
+        <to>enabled vm behavior overrides</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the cluster-wide default DRS behavior for virtual machines. 
+
+Valid values:
+
+fullyAutomated - Specifies that VirtualCenter should automate both the migration of virtual machines and their placement with a host at power on. 
+ 
+manual - Specifies that VirtualCenter should generate recommendations for virtual machine migration and for placement with a host, but should not implement the recommendations automatically. 
+ 
+partiallyAutomated - Specifies that VirtualCenter should generate recommendations for virtual machine migration and for placement with a host, but should automatically implement only the placement at power on. 
+
+
+</description>
+        <from>default vm behavior</from>
+        <to>default vm behavior</to>
+      </input>
+      <input global="false" required="false">
+        <description>The type of operation being performed on the specified virtual device. This parameter is only applicable if virtual machine specific DRS settings needs to be updated.
+
+Valid values:
+
+add - add a configuration for the virtual machine, overwriting the existing configuration if one exists.
+
+edit - incrementally update the existing configuration; an existing configuration must exist. In the context of updating DRS settings of a virtual machine this means that 'edit' can only be provided when the 'Automation Level'  of virtual machine is set to a value other than "(Default) Manual".
+
+</description>
+        <from>operation</from>
+        <to>operation</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the virtual machine whose DRS settings needs to be modified. This parameter is only applicable if virtual machine specific DRS settings needs to be updated.
+
+Valid values: virtual machine name
+</description>
+        <from>virtual machine</from>
+        <to>virtual machine</to>
+      </input>
+      <input global="false" required="false">
+        <description>Flag to indicate whether or not VirtualCenter is allowed to perform any DRS migration or initial placement recommendations for this virtual machine. If this flag is false, the virtual machine is effectively excluded from DRS. 
+
+If no individual DRS specification exists for a virtual machine, this property defaults to true.
+
+This parameter is only applicable if virtual machine specific DRS settings needs to be updated.
+
+Valid values: true, false
+Default value: true</description>
+        <from>vm drs enabled</from>
+        <to>vm drs enabled</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the particular DRS behavior for this virtual machine. This parameter is only applicable if virtual machine specific DRS settings needs to be updated.
+
+Valid values:
+fullyAutomated - Specifies that VirtualCenter should automate both the migration of virtual machines and their placement with a host at power on. 
+ 
+manual - Specifies that VirtualCenter should generate recommendations for virtual machine migration and for placement with a host, but should not implement the recommendations automatically. 
+ 
+partiallyAutomated - Specifies that VirtualCenter should generate recommendations for virtual machine migration and for placement with a host, but should automatically implement only the placement at power on. 
+ 
+</description>
+        <from>vm drs behavior</from>
+        <to>vm drs behavior</to>
+      </input>
+      <input global="false" required="true">
+        <description>Flag to specify whether the changes should be applied incrementally. If "modify" is false and the operation succeeds, then the configuration of the cluster matches the specification exactly; in this case any unset portions of the specification will result in unset or default portions of the configuration. 
+
+Valid values: true, false</description>
+        <from>modify</from>
+        <to>modify</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the VM DRS and Host DRS group settings for this cluster. This parameter can be used to create a new VM DRS and/or a Host DRS gourp in the cluster or edit an existng VM DRS and/or Host DRS group.
+
+The format of the VM and Host DRS groups specifications:
+&lt;group-spec-list&gt;
+&lt;group-spec&gt;
+      &lt;operation&gt;add&lt;/operation&gt; 
+      &lt;info type="ClusterVmGroup"&gt;
+          &lt;name&gt;TestGroup&lt;/name&gt;
+             &lt;virtual-machine-list&gt;
+                &lt;virtual-machine&gt;vm1&lt;/virtual-machine&gt;
+		      &lt;virtual-machine&gt;vm2&lt;/virtual-machine&gt;
+		      &lt;virtual-machine&gt;vm3&lt;/virtual-machine&gt;
+		   &lt;/virtual-machine-list&gt;
+		&lt;/info&gt;
+&lt;/group-spec&gt;
+&lt;group-spec&gt;
+	&lt;operation&gt;add&lt;/operation&gt;
+	&lt;info type="ClusterHostGroup"&gt;
+		&lt;name&gt;TestHostGroup&lt;/name&gt;
+		&lt;host-system-list&gt;
+			&lt;host-system&gt;host1.bmc.com&lt;/host-system&gt;
+		     &lt;host-system&gt;host2.bmc.com&lt;/host-system&gt;
+		 &lt;/host-system-list&gt;
+	&lt;/info&gt;
+&lt;/group-spec&gt;
+&lt;/group-spec-list&gt;
+
+Note: The &lt;operation&gt; element specifies whether to 'add' or 'edit' a group.
+
+
+</description>
+        <from>drs group spec list</from>
+        <to>drs group spec list</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="cluster compute resource">
+                <input global="false">
+                  <from>cluster compute resource</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="def vm behavior">
+                <input global="false">
+                  <from>default vm behavior</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="vm drs behavior">
+                <input global="false">
+                  <from>vm drs behavior</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="drs enabled">
+                <input global="false">
+                  <from>drs enabled</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="enabled vm behavior overrides">
+                <input global="false">
+                  <from>enabled vm behavior overrides</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="modify">
+                <input global="false">
+                  <from>modify</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="operation">
+                <input global="false">
+                  <from>operation</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="vm">
+                <input global="false">
+                  <from>virtual machine</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="vm drs enabled">
+                <input global="false">
+                  <from>vm drs enabled</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="drs groups list">
+                <input global="false">
+                  <from>drs group spec list</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <parameters>
+          <cluster-compute-resource>${cluster compute resource}</cluster-compute-resource>
+          <spec>
+            <drs-config>
+              <enabled>${drs enabled}</enabled>
+              <enable-vm-behavior-overrides>${enabled vm behavior overrides}</enable-vm-behavior-overrides>
+              <default-vm-behavior>${def vm behavior}</default-vm-behavior>
+            </drs-config>
+            <drs-vm-config-spec>
+              <operation>${operation}</operation>
+              <info>
+                <virtual-machine>${vm}</virtual-machine>
+                <enabled>${vm drs enabled}</enabled>
+                <behavior>${vm drs behavior}</behavior>
+              </info>
+            </drs-vm-config-spec>
+            ${drs groups list}
+          </spec>
+          <modify>${modify}</modify>
+        </parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs &lt;items&gt; for Update Cluster DRS Configuration operation</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1c493e56-ac66-4a79-8539-73123f3cdfb4</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1379928556339</last-modified>
+    </meta>
+  </process-def>
+</process>

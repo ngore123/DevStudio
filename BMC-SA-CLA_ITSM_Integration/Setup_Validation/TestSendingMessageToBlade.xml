@@ -1,0 +1,219 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:Setup_Validation:TestSendingMessageToBlade">
+    <parameters>
+      <input global="false" required="true">
+        <from>JobID</from>
+        <to>JobID</to>
+      </input>
+      <input global="false" required="true">
+        <from>JobVersion</from>
+        <to>JobVersion</to>
+      </input>
+      <input global="false" required="true">
+        <from>ChangeID</from>
+        <to>ChangeID</to>
+      </input>
+      <input global="false" required="true">
+        <from>TaskID</from>
+        <to>TaskID</to>
+      </input>
+      <input global="false" required="true">
+        <from>ScheduleID</from>
+        <to>ScheduleID</to>
+      </input>
+      <input global="false" required="true">
+        <description>host:port</description>
+        <from>hostname</from>
+        <to>hostname</to>
+      </input>
+      <input global="false" required="false">
+        <from>commandArgs</from>
+        <to>commandArgs</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>commandArgs</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(boolean(string(.)))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>worklog</to>
+                  <value>General Information :test update of Job</value>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>{"jobId":</value>
+                    </input>
+                    <input required="false">
+                      <from>JobID</from>
+                    </input>
+                    <input>
+                      <value>,"jobVersion":</value>
+                    </input>
+                    <input required="false">
+                      <from>JobVersion</from>
+                    </input>
+                    <input>
+                      <value>,"schedules":[{"scheduleId":</value>
+                    </input>
+                    <input required="false">
+                      <from>ScheduleID</from>
+                    </input>
+                    <input>
+                      <value>,"taskId":"</value>
+                    </input>
+                    <input required="false">
+                      <from>TaskID</from>
+                    </input>
+                    <input>
+                      <value>","changeId":"</value>
+                    </input>
+                    <input required="false">
+                      <from>ChangeID</from>
+                    </input>
+                    <input>
+                      <value>","approvalStatus":"New","activityLogs":[{"user":"Allen","dateCreated":"Sun Jul 31 21:25:12 GMT-12:00 2016","msgTxt":"</value>
+                    </input>
+                    <input required="false">
+                      <from>worklog</from>
+                    </input>
+                    <input>
+                      <value>"}]}],"version":"1.0"}</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>commandArgs</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Persistence:QueryConnectionDetails</process-name>
+        <parameters>
+          <input>
+            <from>hostname</from>
+            <to>hostinfo</to>
+          </input>
+          <output>
+            <from>connectionDetailsValue</from>
+            <to>connectionDetailsValue</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Send</process-name>
+        <parameters>
+          <input>
+            <from>commandArgs</from>
+            <to>commandArgs</to>
+          </input>
+          <input>
+            <from>hostname</from>
+            <to>hostInfo</to>
+          </input>
+          <input>
+            <from>connectionDetailsValue</from>
+            <to>connectionDetails</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>connectivityIssueFoundWithBlade</from>
+            <to>connectivityIssueFoundWithBlade</to>
+          </output>
+          <output>
+            <from>errorMessage</from>
+            <to>errorMessage</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>641dd49d-222d-4e5e-a439-3a0a09413f25</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1474451813928</last-modified>
+    </meta>
+  </process-def>
+</process>

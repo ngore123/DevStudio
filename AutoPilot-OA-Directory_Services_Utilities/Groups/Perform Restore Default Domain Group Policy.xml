@@ -1,0 +1,164 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AutoPilot-OA-Directory_Services_Utilities:Groups:Perform Restore Default Domain Group Policy">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifes the target domain where you wish to restore the Group Policy Object. If no target domain is specified the default current domain will be used.</description>
+        <from>target domain</from>
+        <to>target domain</to>
+      </input>
+      <input global="false" required="false">
+        <description>Restore the Domain Controller Policy or both the Domain Controller Policy and the Domain Group Policy Object
+Valid values:  dc, both</description>
+        <from>policy</from>
+        <to>policy</to>
+      </input>
+      <input global="false" required="false">
+        <description>Ignore the Active Directory schema version number?
+Valid values:  true</description>
+        <from>ignore schema</from>
+        <to>ignore schema</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>target domain</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="ignore schema">
+                  <input global="false">
+                    <from>ignore schema</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="target domain">
+                  <input global="false">
+                    <from>target domain</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="policy">
+                  <input global="false">
+                    <from>policy</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">dcgpofix</xsl:text>
+        <xsl:if test="string-length('${ignore schema}') != 0 and '${ignore schema}' = 'true'">
+          <xsl:text disable-output-escaping="no"> /ignoreschema</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${target domain}') != 0">
+          <xsl:text disable-output-escaping="no"> /target: ${target domain}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${policy}') != 0 and '${policy}' = 'dc'">
+          <xsl:text disable-output-escaping="no"> dc</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${policy}') != 0 and '${policy}' = 'both'">
+          <xsl:text disable-output-escaping="no"> both</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Restore Default Domain Group Policy
+    Restores the default Group Policy objects to their original state.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>537d6e9e-ae83-39c9-ac11-397b862ef394</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290416894318</last-modified>
+    </meta>
+  </process-def>
+</process>

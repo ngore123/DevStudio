@@ -1,0 +1,166 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AO_AD_DNS_Integration:Operations:Delete PTR Record">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+Default adapter name: DNSAdapter.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Deletes a PTR record in DNS Adapter. Supported DNS Records are PTR.
+Generic sample item.xml
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;target&gt;
+			&lt;command-file-location&gt;/tmp&lt;/command-file-location&gt;
+			&lt;secret-key-location&gt;/etc/ddns-update.key&lt;/secret-key-location&gt;
+			&lt;dns-zone&gt;dnsbind.com&lt;/dns-zone&gt;
+			&lt;dns-server&gt;10.129.54.94&lt;/dns-server&gt;
+			&lt;reverse-dns-server&gt;10.129.54.94&lt;/reverse-dns-server&gt;
+			&lt;reverse-dns-zone&gt;54.129.10.in-addr.arpa&lt;/reverse-dns-zone&gt;
+&lt;reverse-dns-secret-key-location&gt;/etc/ddns-update.key&lt;/reverse-dns-secret-key-location&gt;
+		&lt;/target&gt;
+		&lt;parameters&gt;
+			&lt;host-name&gt;dim&lt;/host-name&gt;
+			&lt;ip-address&gt;10.129.54.112&lt;/ip-address&gt;
+			&lt;reverse-ip-address&gt;112.54.129.10&lt;/reverse-ip-address&gt;
+		&lt;/parameters&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+
+
+
+sample  item.xml for type PTR record: 
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;target&gt;
+			&lt;command-file-location&gt;/tmp&lt;/command-file-location&gt;
+			&lt;secret-key-location&gt;/etc/ddns-update.key&lt;/secret-key-location&gt;
+			&lt;dns-zone&gt;dnsbind.com&lt;/dns-zone&gt;
+			&lt;dns-server&gt;10.129.54.94&lt;/dns-server&gt;
+			&lt;reverse-dns-server&gt;10.129.54.94&lt;/reverse-dns-server&gt;
+			&lt;reverse-dns-zone&gt;54.129.10.in-addr.arpa&lt;/reverse-dns-zone&gt;
+&lt;reverse-dns-secret-key-location&gt;/etc/ddns-update.key&lt;/reverse-dns-secret-key-location&gt;
+		&lt;/target&gt;
+		&lt;parameters&gt;
+			&lt;host-name&gt;dim&lt;/host-name&gt;
+			&lt;ip-address&gt;10.129.54.112&lt;/ip-address&gt;
+			&lt;reverse-ip-address&gt;112.54.129.10&lt;/reverse-ip-address&gt;
+		&lt;/parameters&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Details of attributes:
+
+Command File Location:&lt;command-file-location&gt;
+Specifies a valid directory location on the BAO server
+This location is used to create the files, which are used to run the commands.
+Required: No
+
+Secret Key Location:&lt;secret-key-location&gt;
+Specifies the location where the secret key which is used to connect to the DNS server is located
+Required: No
+
+DNS Zone:&lt;dns-zone&gt;
+Specifies the DNS zone in which an A record is to be created
+Required: No
+
+Reverse DNS Zone:&lt;reverse-dns-zone&gt;
+Specifies the DNS zone in which a PTR record is to be created	
+Required: No
+
+DNS Server:	&lt;dns-server&gt;
+Specifies the host name or IP address of the DNS server in which an A record is to be created
+Required: No
+
+Reverse DNS Server:&lt;reverse-dns-server&gt;
+Specifies the host name or IP address of the DNS server in which a PTR record is to be created
+Required: No
+
+ip-address:
+Specifies the IP address to which you want to map the domain name
+If the &lt;record-type&gt; is A or PTR type, the &lt;ip-address&gt; is required
+Valid values: Any IPv4 or IPv6 address.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <description>Returned adapter response is captured in this context parameter.</description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>dns-delete-PTR-record</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO_AD_DNS_Integration:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Delete a DNS Record of type A,PTR,SRV,CNAME,TXT and MX from InfoBlox Grid Manager.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4e0f0f58-2477-4532-9507-8d7c9f839571</process-id>
+      <author>Amit Chauhan</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1416222537124</last-modified>
+    </meta>
+  </process-def>
+</process>

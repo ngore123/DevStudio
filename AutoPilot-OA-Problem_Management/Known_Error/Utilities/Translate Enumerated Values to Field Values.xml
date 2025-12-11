@@ -1,0 +1,592 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Problem_Management:Known_Error:Utilities:Translate Enumerated Values to Field Values">
+    <parameters>
+      <input global="false" required="true">
+        <description>The name of a configuration item defined in a configuration module. 
+
+Example: BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML document providing the data template for single or multiple Concept elements.The concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.</description>
+        <from>known errors</from>
+        <to>known errors</to>
+      </input>
+      <output global="false" required="true">
+        <description>An XML document providing the data template for single or multiple Concept elements.A concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.</description>
+        <to>known errors</to>
+        <from>known error collection</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Problem_Management:Common_Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>system</from>
+            <to>system</to>
+          </output>
+          <output>
+            <from>known error status mappings</from>
+            <to>status mappings</to>
+          </output>
+          <output>
+            <from>known error priority mappings</from>
+            <to>priority mappings</to>
+          </output>
+          <output>
+            <from>known error impact mappings</from>
+            <to>impact mappings</to>
+          </output>
+          <output>
+            <from>known error urgency mappings</from>
+            <to>urgency mappings</to>
+          </output>
+          <output>
+            <from>known error status reason mappings</from>
+            <to>status reason mappings</to>
+          </output>
+          <output>
+            <from>known error view access mappings</from>
+            <to>view access mappings</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>known error collection</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <KnownErrors />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>known errors</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>known error</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//KnownErrors/*]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>true</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>known error</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(//*[local-name()='known-error-status']/text())!=0]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>known error</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>status</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//*[local-name()='known-error-status']/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>status mappings</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>known error</to>
+                        <concept type="AutoPilot-OA-Problem_Management:KnownError">
+                          <attribute>known-error-status</attribute>
+                        </concept>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="status">
+                          <input global="false">
+                            <from>status</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//mapping[text()='${status}']/@name ]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>known error</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(//*[local-name()='impact']/text())!=0]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>known error</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>impact</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//*[local-name()='impact']/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>impact mappings</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>known error</to>
+                        <concept type="AutoPilot-OA-Problem_Management:KnownError">
+                          <attribute>impact</attribute>
+                        </concept>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="impact">
+                          <input global="false">
+                            <from>impact</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//mapping[text()='${impact}']/@name ]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[3]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>known error</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(//*[local-name()='urgency']/text())!=0]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>known error</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>urgency</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//*[local-name()='urgency']/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>urgency mappings</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>known error</to>
+                        <concept type="AutoPilot-OA-Problem_Management:KnownError">
+                          <attribute>urgency</attribute>
+                        </concept>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="urgency">
+                          <input global="false">
+                            <from>urgency</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//mapping[text()='${urgency}']/@name ]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[4]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>known error</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(//*[local-name()='priority'])!=0]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>known error</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>priority</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//*[local-name()='priority']/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>priority mappings</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>known error</to>
+                        <concept type="AutoPilot-OA-Problem_Management:KnownError">
+                          <attribute>priority</attribute>
+                        </concept>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="priority">
+                          <input global="false">
+                            <from>priority</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//mapping[text()='${priority}']/@name ]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[5]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>known error</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(//*[local-name()='status-reason'])!=0]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>known error</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>status reason</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//*[local-name()='status-reason']/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>status reason mappings</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>known error</to>
+                        <concept type="AutoPilot-OA-Problem_Management:KnownError">
+                          <attribute>status-reason</attribute>
+                        </concept>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="status reason">
+                          <input global="false">
+                            <from>status reason</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//mapping[text()='${status reason}']/@name ]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[6]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>known error</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string-length(//*[local-name()='service-type']/text())!=0]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>known error</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>view access</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//*[local-name()='view-access']/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>view access mappings</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>known error</to>
+                        <concept type="AutoPilot-OA-Problem_Management:KnownError">
+                          <attribute>view-access</attribute>
+                        </concept>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens>
+                        <replacement-token name="view access">
+                          <input global="false">
+                            <from>view access</from>
+                          </input>
+                        </replacement-token>
+                      </xpath-replacement-tokens>
+                      <xpath><![CDATA[//mapping[text()='${view access}']/@name ]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[7]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>known error collection</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>known error collection</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="known error">
+                    <input global="false">
+                      <from>known error</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <KnownErrors>
+      <xsl:copy-of select="./node()/*" />
+      ${known error}
+    </KnownErrors>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <after-execution>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>Known error collection</value>
+                  </input>
+                  <input>
+                    <from>known error collection</from>
+                  </input>
+                </parameters>
+              </log>
+            </after-execution>
+            <location>:assign[2]</location>
+          </assign>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process will translate input field values to enumerated values using the module configuration mappings. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>73ee0dff-e36a-355d-a694-b98b3aff0f78</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283164601415</last-modified>
+    </meta>
+  </process-def>
+</process>

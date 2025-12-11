@@ -1,0 +1,173 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Item for Update CD ROM Configuration">
+    <parameters>
+      <input global="false" required="true">
+        <description>Virtual machine used to make the method call.  
+
+Valid value:  String
+</description>
+        <from>virtual machine</from>
+        <to>virtual machine</to>
+      </input>
+      <input global="false" required="true">
+        <description>The display name of the virtual CD ROM device to be updated.
+
+Valid value:  String
+</description>
+        <from>cdrom</from>
+        <to>cdrom</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the datastore where the ISO file is stored. If the file is not located on a datastore, then this parameter should be empty or not specified.</description>
+        <from>datastore</from>
+        <to>datastore</to>
+      </input>
+      <input global="false" required="true">
+        <description>canonical file path for the ISO image</description>
+        <from>file name</from>
+        <to>file name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Flag to specify whether or not to connect the device when the virtual machine starts.</description>
+        <from>start connected</from>
+        <to>start connected</to>
+      </input>
+      <input global="false" required="false">
+        <description>Flag to allow the guest to control whether the connectable device is connected.</description>
+        <from>allow guest control</from>
+        <to>allow guest control</to>
+      </input>
+      <input global="false" required="false">
+        <description>Flag indicating the device is currently connected. This flag is valid only while the virtual machine is running. 
+
+This flag is optional. If you specify the connected element, it is mandatory to specify values for the three connectable parameters start-connected, allow-guest-control, and connected.
+</description>
+        <from>connected</from>
+        <to>connected</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="virtual machine">
+                <input global="false">
+                  <from>virtual machine</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="cdrom">
+                <input global="false">
+                  <from>cdrom</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="datastore">
+                <input global="false">
+                  <from>datastore</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="file name">
+                <input global="false">
+                  <from>file name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="start connected">
+                <input global="false">
+                  <from>start connected</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="allow guest control">
+                <input global="false">
+                  <from>allow guest control</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="connected">
+                <input global="false">
+                  <from>connected</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <parameters>
+          <virtual-machine>${virtual machine}</virtual-machine>
+          <spec>
+            <device-change-list>
+              <device-change>
+                <device>
+                  <cdrom>${cdrom}</cdrom>
+                  <backing>
+                    <xsl:if test="'${datastore}' != ''">
+                      <datastore>${datastore}</datastore>
+                    </xsl:if>
+                    <file-name>${file name}</file-name>
+                  </backing>
+                  <xsl:if test="('${start connected}' != '' or '${allow guest control}' != '' or '${connected}' != '')">
+                    <connectable>
+                      <xsl:if test="'${start connected}' != ''">
+                        <start-connected>${start connected}</start-connected>
+                      </xsl:if>
+                      <xsl:if test=" '${allow guest control}' != ''">
+                        <allow-guest-control>${allow guest control}</allow-guest-control>
+                      </xsl:if>
+                      <xsl:if test="'${connected}' != ''">
+                        <connected>${connected}</connected>
+                      </xsl:if>
+                    </connectable>
+                  </xsl:if>
+                </device>
+              </device-change>
+            </device-change-list>
+          </spec>
+        </parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs &lt;items&gt; for Update CD ROM operation</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>042e6824-f192-3367-95f6-413a58c1aa6f</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288594126524</last-modified>
+    </meta>
+  </process-def>
+</process>

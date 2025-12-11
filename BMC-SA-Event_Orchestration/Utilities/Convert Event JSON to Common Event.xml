@@ -1,0 +1,178 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":BMC-SA-Event_Orchestration:Utilities:Convert Event JSON to Common Event">
+    <parameters>
+      <input global="false" required="true">
+        <description>Event data in JSON format</description>
+        <from>json data</from>
+        <to>json data</to>
+      </input>
+      <input global="false" required="true">
+        <description>BMC_Truesight or Helix_Monitor</description>
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <output global="false" required="false">
+        <to>common event data</to>
+        <from>common event data</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>json data</from>
+                </input>
+                <output>
+                  <to>common event data</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==== Convert from JSON====</value>
+                    </input>
+                    <input>
+                      <value>Event data is XML and assumed to be CEM format- skipping conversion from JSON process.</value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>====== Assigned JSON data to commmon event data=====</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>json data</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[starts-with(., "{")   or starts-with(., "[")]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:BMC-SA-Event_Orchestration:Utilities:Convert Event JSON to XML</process-name>
+              <parameters>
+                <input>
+                  <from>json data</from>
+                  <to>json data</to>
+                </input>
+                <output>
+                  <from>xml data</from>
+                  <to>xml data</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC-SA-Event_Orchestration:Utilities:Convert to Common Event</process-name>
+              <parameters>
+                <input>
+                  <from>xml data</from>
+                  <to>event data</to>
+                </input>
+                <input>
+                  <from>event source type</from>
+                  <to>event source type</to>
+                </input>
+                <output>
+                  <from>common event data</from>
+                  <to>common event data</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>09811ea1-6e14-4fe3-a7bc-cafe4cd9b6a2</process-id>
+      <author>rsamudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1592065992626</last-modified>
+    </meta>
+  </process-def>
+</process>

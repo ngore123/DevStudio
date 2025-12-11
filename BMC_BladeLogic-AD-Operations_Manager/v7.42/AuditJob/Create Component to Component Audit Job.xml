@@ -1,0 +1,473 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:AuditJob:Create Component to Component Audit Job">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the Audit Job to be created.</description>
+        <from>jobName</from>
+        <to>jobName</to>
+      </input>
+      <input global="false" required="true">
+        <description>ID of the job group to which the Audit Job will be added.</description>
+        <from>groupId</from>
+        <to>groupId</to>
+      </input>
+      <input global="false" required="true">
+        <description>Handle to the component to be used as the master for the audit.</description>
+        <from>masterComponentKey</from>
+        <to>masterComponentKey</to>
+      </input>
+      <input global="false" required="false">
+        <description>Handle to the component that will be the target of the audit.</description>
+        <from>targetComponentKey</from>
+        <to>targetComponentKey</to>
+      </input>
+      <input global="false" required="false">
+        <description>Handle to the template used to discover components that are the target of the audit.</description>
+        <from>templateKey</from>
+        <to>templateKey</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the server to be audited.</description>
+        <from>serverName</from>
+        <to>serverName</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the DB Key for the newly created audit job.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the Adapter response for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <description>This attribute contains the complete adapter response.</description>
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value>Invalid Inputs</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>jobName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>groupId</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>masterComponentKey</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>targetComponentKey</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>templateKey</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) = '0']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>serverName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) = '0']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+              <parameters>
+                <input>
+                  <from>jobName</from>
+                  <to>argument 1</to>
+                </input>
+                <input>
+                  <from>groupId</from>
+                  <to>argument 2</to>
+                </input>
+                <input>
+                  <from>masterComponentKey</from>
+                  <to>argument 3</to>
+                </input>
+                <input>
+                  <from>targetComponentKey</from>
+                  <to>argument 4</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <value>AuditJob</value>
+                  <to>namespace</to>
+                </input>
+                <input>
+                  <value>createComponentToComponentAuditJob</value>
+                  <to>command name</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>argument list</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>return values</from>
+                  <to>return values</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//value/text()]]></xpath>
+                  </xpath-expression>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>jobName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>groupId</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>masterComponentKey</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>templateKey</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>serverName</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>targetComponentKey</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.) = '0']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+              <parameters>
+                <input>
+                  <from>jobName</from>
+                  <to>argument 1</to>
+                </input>
+                <input>
+                  <from>groupId</from>
+                  <to>argument 2</to>
+                </input>
+                <input>
+                  <from>masterComponentKey</from>
+                  <to>argument 3</to>
+                </input>
+                <input>
+                  <from>templateKey</from>
+                  <to>argument 4</to>
+                </input>
+                <input>
+                  <from>serverName</from>
+                  <to>argument 5</to>
+                </input>
+                <output>
+                  <from>updated list</from>
+                  <to>argument list</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+              <parameters>
+                <input>
+                  <from>connection details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <value>AuditJob</value>
+                  <to>namespace</to>
+                </input>
+                <input>
+                  <value>createComponentToComponentAuditJob</value>
+                  <to>command name</to>
+                </input>
+                <input>
+                  <from>argument list</from>
+                  <to>argument list</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>return values</from>
+                  <to>return values</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//value/text()]]></xpath>
+                  </xpath-expression>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command creates an Audit Job based on components.
+This process may be used in the following two ways:
+
+First case:
+It compares a component on a live server to a particular component on another live server. A similar command, createComponentToComponentAuditJob , compares a component to all instances of a component on a live server.
+You must provide an ID for the job group that will contain this Audit Job.
+The masterComponentKey argument provides a handle for the component that functions as the master. The targetComponentKey argument provides a handle for the particular component to be audited.
+This command returns a handle to the newly created Audit Job. This handle can be used in other commands that need to reference the Audit Job you have created.
+
+Second Case:
+It compares a component on a live server to all instances of a component on another live server.
+You must provide an ID for the job group that will contain this Audit Job.
+The masterComponentKey argument provides a handle for the component that functions as the master. The templateKey argument provides a handle identifying the template used to discover components on a server. To obtain these handles, use the command Template getDBKeyByGroupAndName .
+You must also provide the name of the server to be audited.
+This command returns a handle to the newly created Audit Job. This handle can be used in other commands that need to reference the Audit Job you have created.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>61dc5e5d-fdf9-3cc1-9a17-a81bda8c862c</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179740712</last-modified>
+    </meta>
+  </process-def>
+</process>

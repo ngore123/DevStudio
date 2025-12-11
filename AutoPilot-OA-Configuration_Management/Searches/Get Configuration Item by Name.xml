@@ -1,0 +1,299 @@
+<process draft="false" dev-studio-version="7.6.02.06">
+  <process-def name=":AutoPilot-OA-Configuration_Management:Searches:Get Configuration Item by Name">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module.
+
+Valid Values: BMC_AR_System, BMC_Atrium, HP_ServiceCenter</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - class name 
+
+BMC_AR_System and BMC_Atrium
+
+Valid Values:
+
+BMC_Account 
+BMC_Activity 
+BMC_AdminDomain 
+BMC_ApplicationService 
+BMC_ApplicationSystem 
+BMC_BusinessService 
+BMC_Cluster 
+BMC_ConnectivityCollection 
+BMC_Database 
+BMC_Document 
+BMC_Equipment 
+BMC_HarwareSystemComponent 
+BMC_LogicalSystemComponent 
+BMC_Organization 
+BMC_ProtocolEndpoint 
+BMC_Role 
+BMC_UserCommunity 
+
+HP_ServiceCenter
+
+Valid Values:
+
+HPSC_ComputerSystem
+HPSC_Contact
+HPSC_NetworkDevice
+
+</description>
+        <from>class name</from>
+        <to>class name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - CI Name 
+
+</description>
+        <from>name</from>
+        <to>name</to>
+      </input>
+      <input global="false" required="false">
+        <description>The query item is an XML document that is required by Remedy CMDB that may include parameters that are used to refine and control queries. The following is an example that include default values:
+&lt;query-item&gt;
+  &lt;soap&gt;
+    &lt;username /&gt;              
+    &lt;password /&gt;				
+  &lt;/soap&gt;
+  &lt;login-info&gt;
+    &lt;user-id&gt;Demo&lt;/user-id&gt;		
+    &lt;password&gt;Demo&lt;/password&gt;
+    &lt;lang&gt;English&lt;/lang&gt;
+  &lt;/login-info&gt;
+  &lt;class-name-id&gt;
+    &lt;namespace-name&gt;BMC.CORE&lt;/namespace-name&gt;	
+    &lt;class-name&gt;BMC_ComputerSystem&lt;/class-name&gt;	
+  &lt;/class-name-id&gt;
+  &lt;dataset-id&gt;BMC.ASSET&lt;/dataset-id&gt;			
+  &lt;get-mask&gt;GET_MASK_NONE&lt;/get-mask&gt;          
+  &lt;first-retrieve&gt;0&lt;/first-retrieve&gt;			
+  &lt;max-retrieve&gt;0&lt;/max-retrieve&gt;				
+  &lt;sort-by&gt;SerialNumber&lt;/sort-by&gt;				
+  &lt;sort-order&gt;ASCENDING&lt;/sort-order&gt;			
+&lt;/query-item&gt;</description>
+        <from>query item</from>
+        <to>query item</to>
+      </input>
+      <input global="false" required="false">
+        <from>dataset id</from>
+        <to>dataset id</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document providing detail for one or more configuration items.</description>
+        <to>configuration items</to>
+        <from>configuration items</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure 
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - A process specific string that explains the value of success status.
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Configuration_Management:Searches:Get Configuration Items</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>class name</from>
+                  <to>class name</to>
+                </input>
+                <input>
+                  <from>name</from>
+                  <to>key 1</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens>
+                      <replacement-token name="configuration name">
+                        <input global="false">
+                          <from>configuration name</from>
+                        </input>
+                      </replacement-token>
+                    </stylesheet-replacement-tokens>
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="'${configuration name}'='BMC_AR_System' or '${configuration name}'='BMC_Atrium'">
+          <xsl:text disable-output-escaping="no">name</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">configuration-item</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </input>
+                <input>
+                  <from>name</from>
+                  <to>value 1</to>
+                </input>
+                <input>
+                  <from>query item</from>
+                  <to>query item</to>
+                </input>
+                <input>
+                  <from>dataset id</from>
+                  <to>dataset id</to>
+                </input>
+                <output>
+                  <from>configuration items</from>
+                  <to>configuration items</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>class name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='HPSC_Contact']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Configuration_Management:Searches:Get Configuration Items</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>class name</from>
+                  <to>class name</to>
+                </input>
+                <input>
+                  <value>contact-name</value>
+                  <to>key 1</to>
+                </input>
+                <input>
+                  <from>name</from>
+                  <to>value 1</to>
+                </input>
+                <output>
+                  <from>configuration items</from>
+                  <to>configuration items</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow finds all configuration items by name.
+
+</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>59ec9dd7-ba17-3d88-afc0-d32e8c3b91d6</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1374820948264</last-modified>
+    </meta>
+  </process-def>
+</process>

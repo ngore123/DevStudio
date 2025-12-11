@@ -1,0 +1,154 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Location Parameters">
+    <parameters>
+      <input global="false" required="false">
+        <description>virtual machine datastore  [optional]
+         Datastore where the virtual machine should be located. If not specified, the current datastore is used.</description>
+        <from>virtual machine datastore</from>
+        <to>virtual machine datastore</to>
+      </input>
+      <input global="false" required="false">
+        <description>resource pool [optional]
+        The resource pool to which this virtual machine should be attached. If the argument is not supplied, the current resource pool of virtual machine is used.</description>
+        <from>resource pool</from>
+        <to>resource pool</to>
+      </input>
+      <input global="false" required="false">
+        <description>Cluster name to which the host-system is attached to.
+
+
+Valid value: String
+</description>
+        <from>cluster compute resource</from>
+        <to>cluster compute resource</to>
+      </input>
+      <input global="false" required="false">
+        <description>host [optional]
+      DNS name of the target host for the virtual machine. If not specified, 
+-if resource pool is not specified, current host is used. 
+-if resource pool is specified, and the target pool represents a stand-alone host, the host is used. 
+-if resource pool is specified, and the target pool represents a DRS-enabled cluster, a host selected by DRS is used. 
+-if resource pool is specified and the target pool represents a cluster without DRS enabled, an InvalidArgument exception be thrown.</description>
+        <from>host</from>
+        <to>host</to>
+      </input>
+      <input global="false" required="false">
+        <description>disk list [optional]
+           An optional list that allows specifying the datastore location for each virtual disk. Value takes the form :
+
+&lt;disk-list&gt;
+	&lt;disk&gt;
+		&lt;datastore&gt;&lt;/datastore&gt;
+		&lt;disk-id&gt;&lt;/disk-id&gt;
+	&lt;/disk&gt;
+	&lt;disk&gt;
+		&lt;datastore&gt;&lt;/datastore&gt;
+		&lt;disk-id&gt;&lt;/disk-id&gt;
+	&lt;/disk&gt;
+	.......
+&lt;/disk-list&gt;</description>
+        <from>disk list</from>
+        <to>disk list</to>
+      </input>
+      <input global="false" required="false">
+        <description>transform [optional]
+      Transformation to perform on the disks. The backend is free to ignore this hint if it is not valid for the current operation. This can be used by clients, for example, to create sparse disks for templates.
+
+valid values: flat, sparse</description>
+        <from>transform</from>
+        <to>transform</to>
+      </input>
+      <output global="false" required="false">
+        <to>location</to>
+        <from>location</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>location</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="virtual machine datastore">
+                <input global="false">
+                  <from>virtual machine datastore</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="resource pool">
+                <input global="false">
+                  <from>resource pool</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="host">
+                <input global="false">
+                  <from>host</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="disk list">
+                <input global="false">
+                  <from>disk list</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="transform">
+                <input global="false">
+                  <from>transform</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="cluster compute resource">
+                <input global="false">
+                  <from>cluster compute resource</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <location>
+      <datastore>${virtual machine datastore}</datastore>
+      <resource-pool>$[resource pool]</resource-pool>
+      <cluster-compute-resource>${cluster compute resource}</cluster-compute-resource>
+      <host-system>${host}</host-system>
+      ${disk list}
+      <transform>$[transform]</transform>
+    </location>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs complex &lt;location&gt; parameter.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a07b9cee-dbe4-3eea-831d-d6ed049f43e3</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288251436592</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,248 @@
+<process draft="false" dev-studio-version="7.6.02.06">
+  <process-def name=":AO-AD-AirWatch:Delete">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the Adapter to use for this Process. </description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The URL defining the devices to be deleted.</description>
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <input global="false" required="false">
+        <description>Fully qualified path of the certificate file.</description>
+        <from>certificate name</from>
+        <to>certificate name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Password corresponding to the certificate file.</description>
+        <from>certificate password</from>
+        <to>certificate password</to>
+      </input>
+      <input global="false" required="false">
+        <description>Tenant code to be added to the header of the http request.</description>
+        <from>tenant code</from>
+        <to>tenant code</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies whether to install certificates automatically.
+Valid Values: true, false</description>
+        <from>install certificate</from>
+        <to>install certificate</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specify whether to allow unsigned certificates from trusted zones.
+Valid Values: true, false</description>
+        <from>allow unsigned certificate</from>
+        <to>allow unsigned certificate</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specify the java standard trust keystore passphrase.
+Default value: changeit</description>
+        <from>passphrase</from>
+        <to>passphrase</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>adapter name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>adapter name</to>
+                  <value>AirWatchAdapter</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>url</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="url">
+                <input global="false">
+                  <from>url</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="certificate-name">
+                <input global="false">
+                  <from>certificate name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="certificate-password">
+                <input global="false">
+                  <from>certificate password</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tenant-code">
+                <input global="false">
+                  <from>tenant code</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="install-certificate">
+                <input global="false">
+                  <from>install certificate</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="allow-unsigned-certificate">
+                <input global="false">
+                  <from>allow unsigned certificate</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="passphrase">
+                <input global="false">
+                  <from>passphrase</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <air-watch-adapter-request>
+        <http-method>
+          <xsl:text disable-output-escaping="no">DELETE</xsl:text>
+        </http-method>
+        <url>$[url]</url>
+        <certificate-name>${certificate-name}</certificate-name>
+        <certificate-password>${certificate-password}</certificate-password>
+        <tenant-code>${tenant-code}</tenant-code>
+        <install-certificate>${install-certificate}</install-certificate>
+        <allow-unsigned-certificate>${allow-unsigned-certificate}</allow-unsigned-certificate>
+        <passphrase>${passphrase}</passphrase>
+      </air-watch-adapter-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <output global="false">
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>adapter request</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Deletes the specified device(s). </description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a370db57-68f7-45c2-81dc-2a90aae89e91</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1369646166094</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,118 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":BMC-SA-ITSM_Configuration:Read Sub Configuration">
+    <parameters>
+      <input global="false" required="true">
+        <description>Supported values are: BMC_AR_System.
+
+In future:
+RemedyForce, HP ServiceCenter, ServiceNow</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="false">
+        <description>The sub configuration item to be read:
+
+Example:
+
+ChangeManagement or IncidentManagement</description>
+        <from>configuration group</from>
+        <to>configuration group</to>
+      </input>
+      <output global="false" required="false">
+        <to>configuration xml</to>
+        <from>configuration xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input global="true">
+              <configuration>:BMC-SA-ITSM_Configuration:ITSM:BMC_AR_System</configuration>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>configuration xml</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="gname">
+                <input global="false">
+                  <from>configuration group</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="cname">
+                <input global="false">
+                  <from>configuration name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="elemName" select="'${gname}'" />
+  <xsl:variable name="configName" select="'${cname}'" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="string-length(normalize-space($configName)) &gt; 0  and boolean(//*[name()=$configName]) and string-length(normalize-space($elemName)) &gt; 0  and boolean(//*[name()=$elemName]) ">
+        <xsl:copy-of select="//*[name()=$configName]/*[name()=$elemName]" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:copy-of select="." />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Read Configuration Input</value>
+              </input>
+              <input>
+                <from>configuration group</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Given a group name under a configuration return group in the form of an XML.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>6ac6b966-b6d3-4566-941d-cb53c8933c52</process-id>
+      <author>Reads a sub configuration</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1592448206983</last-modified>
+    </meta>
+  </process-def>
+</process>

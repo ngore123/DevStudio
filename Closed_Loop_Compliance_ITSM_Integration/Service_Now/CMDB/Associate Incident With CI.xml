@@ -1,0 +1,190 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":Closed_Loop_Compliance_ITSM_Integration:Service_Now:CMDB:Associate Incident With CI">
+    <parameters>
+      <input global="false" required="true">
+        <description>List of configuration items to associate with incident.
+
+Sample XML:
+
+&lt;Configuration-Items&gt;
+      &lt;Configuration-Item&gt;
+         &lt;name&gt;configuration-item-name&lt;/name&gt;
+       &lt;/Configuration-Item&gt;
+       &lt;Configuration-Item&gt;
+         &lt;name&gt;configuration-item-name&lt;/name&gt;
+       &lt;/Configuration-Item&gt;
+&lt;/Configuration-Items&gt;</description>
+        <from>configuration items</from>
+        <to>configuration items</to>
+      </input>
+      <input global="false" required="true">
+        <description>incident to be associated with CIs</description>
+        <from>incidents</from>
+        <to>incidents</to>
+      </input>
+      <output global="false" required="false">
+        <to>incidents</to>
+        <from>incidents</from>
+      </output>
+      <output global="false" required="false">
+        <to>incident success status</to>
+        <from>incident success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>incident status message</to>
+        <from>incident status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>itsm platform</to>
+            <value>ServiceNow</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>configuration items</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>associated incident</to>
+              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                <attribute>ci-name</attribute>
+              </concept>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//name/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incidents</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>associated incident</to>
+              <concept type="AutoPilot-OA-Incident_Management:Incident">
+                <attribute>incident-number</attribute>
+              </concept>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//incident-number/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>associated incident</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>associated incidents</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="incident">
+                <input global="false">
+                  <from>associated incident</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Incidents>
+      <xsl:choose>
+        <xsl:when test="string-length(//incident) &gt; 0">
+          <xsl:copy-of select="//incident" />
+        </xsl:when>
+        <xsl:otherwise>${incident}</xsl:otherwise>
+      </xsl:choose>
+    </Incidents>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Incident_Management:Create Incident Association</process-name>
+        <parameters>
+          <input>
+            <from>itsm platform</from>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>associated incidents</from>
+            <to>incidents</to>
+          </input>
+          <output>
+            <from>incidents</from>
+            <to>incidents</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>incident success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>incident status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Associates a list of configuration items with incident</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>adeaeef6-ec03-4473-b6d7-5be5d2054317</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1420539907562</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,333 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AutoPilot-OA-Virtual_Server_Management:Add Disk Space">
+    <parameters>
+      <input global="false" required="true">
+        <description>String value - The name of a configuration item defined in a configuration module.
+
+Example: BladeLogic, VMware, Amazon</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the virtual server</description>
+        <from>vm name</from>
+        <to>vm name</to>
+      </input>
+      <input global="false" required="false">
+        <description>capacity in KB [optional]
+       Capacity of this virtual disk.</description>
+        <from>capacity in KB</from>
+        <to>capacity in KB</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing persistence mode [optional]
+                The disk persistence mode. 
+
+Valid values are: 
+persistent 
+independent_persistent 
+independent_nonpersistent 
+nonpersistent 
+undoable 
+append </description>
+        <from>backing persistence mode</from>
+        <to>backing persistence mode</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing file type split flag [optional]
+           Flag to indicate the type of virtual disk file: split or monolithic. If true, the virtual disk is stored in multiple files, each 2GB.
+
+valid values: true, false</description>
+        <from>backing file type split flag</from>
+        <to>backing file type split flag</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing file thin provisioned flag [optional]
+              Flag to indicate to the underlying filesystem, whether the virtual disk backing file should be allocated lazily (using thin provisioning). This flag is only used for file systems that support configuring the provisioning policy on a per file basis, such as VMFS3.
+
+
+Valid values: true, false</description>
+        <from>backing file thin provisioned flag</from>
+        <to>backing file thin provisioned flag</to>
+      </input>
+      <input global="false" required="false">
+        <description>backing write through flag [optional]
+         Flag to indicate whether writes should go directly to the file system or should be buffered.
+
+Valid values: true, false</description>
+        <from>backing write through flag</from>
+        <to>backing write through flag</to>
+      </input>
+      <input global="false" required="false">
+        <description> [optional] The number of shares allocated. Used to determine resource allocation in case of resource contention. This value is only set if level is set to custom. If level is not set to custom, this value is ignored. Therefore, only shares with custom values can be compared.
+
+There is no unit for this value. It is a relative measure based on the settings for other resource pools. 
+
+Valid Values: Integer</description>
+        <from>shares</from>
+        <to>shares</to>
+      </input>
+      <input global="false" required="false">
+        <description> [optional] The allocation level. The level is a simplified view of shares. Levels map to a pre-determined set of numeric values for shares. If the shares value does not map to a predefined size, then the level is set as custom. 
+
+Valid values:
+
+custom	 Shares are specified in the "shares" column.
+
+high	For CPU: Shares = 2000 * number of virtual CPUs
+		For Memory: Shares = 20 * virtual machine memory size in megabytes
+		For Disk: Shares = 2000
+		
+low		For CPU: Shares = 500 * number of virtual CPUs
+		For Memory: Shares = 5 * virtual machine memory size in megabytes
+		For Disk: Shares = 500
+		
+normal	For CPU: Shares = 1000 * number of virtual CPUs
+		For Memory: Shares = 10 * virtual machine memory size in megabytes
+		For Disk: Shares = 1000 </description>
+        <from>shares level</from>
+        <to>shares level</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Name/IP Address of the virtual center on which the given virtual machine is hosted</description>
+        <from>virtual center</from>
+        <to>virtual center</to>
+      </input>
+      <input global="false" required="false">
+        <description>[Optional] Number of seconds to wait before polling for the virtual center task status</description>
+        <from>delay</from>
+        <to>delay</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the url for the remote soap service running on the vmware virtual center.</description>
+        <from>soap url</from>
+        <to>soap url</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the user name that will be used for http basic authentication on the vmware virtual center.</description>
+        <from>username</from>
+        <to>username</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the password corresponding to the specified user name.
+
+
+</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>[optional] 
+
+Specifies the transport protocol for the message.</description>
+        <from>transport</from>
+        <to>transport</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully. 	
+Valid values: success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - A process specific explanation for the value of success status</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>Given system is not supported</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = 'VMware']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AutoPilot-OA-Virtual_Server_Management:Utilities:VMware:Add Disk Space</process-name>
+              <parameters>
+                <input>
+                  <from>vm name</from>
+                  <to>vm name</to>
+                </input>
+                <input>
+                  <from>capacity in KB</from>
+                  <to>capacity in KB</to>
+                </input>
+                <input>
+                  <from>backing persistence mode</from>
+                  <to>backing persistence mode</to>
+                </input>
+                <input>
+                  <from>backing file type split flag</from>
+                  <to>backing file type split flag</to>
+                </input>
+                <input>
+                  <from>backing file thin provisioned flag</from>
+                  <to>backing file thin provisioned flag</to>
+                </input>
+                <input>
+                  <from>backing write through flag</from>
+                  <to>backing write through flag</to>
+                </input>
+                <input>
+                  <from>shares</from>
+                  <to>shares</to>
+                </input>
+                <input>
+                  <from>shares level</from>
+                  <to>shares level</to>
+                </input>
+                <input>
+                  <from>virtual center</from>
+                  <to>virtual center</to>
+                </input>
+                <input>
+                  <from>delay</from>
+                  <to>delay</to>
+                </input>
+                <input>
+                  <from>soap url</from>
+                  <to>soap url</to>
+                </input>
+                <input>
+                  <from>username</from>
+                  <to>username</to>
+                </input>
+                <input>
+                  <from>password</from>
+                  <to>password</to>
+                </input>
+                <input>
+                  <from>transport</from>
+                  <to>transport</to>
+                </input>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This action creates new virtual disk for the given vm if the vm is in powered off state</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1298895494711</last-modified>
+    </meta>
+  </process-def>
+</process>

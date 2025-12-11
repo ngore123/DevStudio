@@ -1,0 +1,458 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:Host_Operations:Construct Item for Add Port Group">
+    <parameters>
+      <input global="false" required="true">
+        <description>DNS name of the host whose details are to be retrieved.
+
+Valid value:  dns name
+</description>
+        <from>host</from>
+        <to>host</to>
+      </input>
+      <input global="false" required="true">
+        <description>The name of the port group
+
+Valid values: String
+</description>
+        <from>name</from>
+        <to>name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The VLAN ID for ports using this port group. 
+
+Valid Values: 
+
+A value of 0 specifies that you do not want the port group associated with a VLAN. 
+A value from 1 to 4094 specifies a VLAN ID for the port group. 
+A value of 4095 specifies that the port group should use trunk mode, which allows the guest operating system to manage its own VLAN tags. 
+</description>
+        <from>vlan id</from>
+        <to>vlan id</to>
+      </input>
+      <input global="false" required="true">
+        <description>The identifier of the virtual switch on which this port group is located.
+
+Valid Values: String
+</description>
+        <from>vswitch name</from>
+        <to>vswitch name</to>
+      </input>
+      <input global="false" required="false">
+        <description>The flag to indicate whether or not all traffic is seen on the port
+
+Valid values: true, false
+</description>
+        <from>security allow promiscuous</from>
+        <to>security allow promiscuous</to>
+      </input>
+      <input global="false" required="false">
+        <description>The flag to indicate whether or not the Media Access Control (MAC) address can be changed.
+
+Valid values: true, false
+</description>
+        <from>security mac changes</from>
+        <to>security mac changes</to>
+      </input>
+      <input global="false" required="false">
+        <description>The flag to indicate whether or not the virtual network adapter should be allowed to send network traffic with a different MAC address than that of the virtual network adapter.
+
+Valid values: true, false
+</description>
+        <from>security forged transmits</from>
+        <to>security forged transmits</to>
+      </input>
+      <input global="false" required="false">
+        <description>Network adapter teaming policy includes failover and load balancing.
+
+Valid values: 
+loadbalance_ip: route based on ip hash. 
+loadbalance_srcmac: route based on source MAC hash. 
+loadbalance_srcid: route based on the source of the port ID. 
+</description>
+        <from>nic teaming policy</from>
+        <to>nic teaming policy</to>
+      </input>
+      <input global="false" required="false">
+        <description>The flag to indicate whether or not the teaming policy is applied to inbound frames as well. For example, if the policy is explicit failover, a broadcast request goes through uplink1 and comes back through uplink2. Then if the reverse policy is set, the frame is dropped when it is received from uplink2. This reverse policy is useful to prevent the virtual machine from getting reflections.
+
+Valid values: true, false
+</description>
+        <from>nic teaming reverse policy</from>
+        <to>nic teaming reverse policy</to>
+      </input>
+      <input global="false" required="false">
+        <description>Flag to specify whether or not to notify the physical switch if a link fails. If this property is true, ESX Server will respond to the failure by sending a RARP packet from a different physical adapter, causing the switch to update its cache.
+
+Valid values: true, false
+</description>
+        <from>nic teaming notify switches</from>
+        <to>nic teaming notify switches</to>
+      </input>
+      <input global="false" required="false">
+        <description>The flag to indicate whether or not to use a rolling policy when restoring links. For example, assume the explicit link order is (vmnic9, vmnic0), therefore vmnic9 goes down, vmnic0 comes up. 
+However, when vmnic9 comes backup, if rollingOrder is set to be true, vmnic0 continues to be used, otherwise, vmnic9 is restored as specified in the explicitly order.
+
+Valid values: true, false
+</description>
+        <from>nic teaming rolling order</from>
+        <to>nic teaming rolling order</to>
+      </input>
+      <input global="false" required="false">
+        <description>check-speed: 
+
+To use link speed as the criteria, checkSpeed must be one of the following values: 
+exact: Use exact speed to detect link failure. speed is the configured exact speed. 
+minimum: Use minimum speed to detect failure. speed is the configured minimum speed. 
+empty string: Do not use link speed to detect failure. speed is unused in this case. </description>
+        <from>failure criteria check speed</from>
+        <to>failure criteria check speed</to>
+      </input>
+      <input global="false" required="false">
+        <description>speed: See check-speed
+
+Valid values: Number
+</description>
+        <from>failure criteria speed</from>
+        <to>failure criteria speed</to>
+      </input>
+      <input global="false" required="false">
+        <description>check-duplex :
+
+The flag to indicate whether or not to use the link duplex reported by the driver as link selection criteria. 
+
+If check-duplex is true, then fullDuplex is the configured duplex mode. The link is considered bad if the link duplex reported by driver is not the same as fullDuplex. 
+If check-duplex is false, then fullDuplex is unused, and link duplexity is not used as a detection method.</description>
+        <from>failure criteria check duplex</from>
+        <to>failure criteria check duplex</to>
+      </input>
+      <input global="false" required="false">
+        <description>full-duplex: See check-duplex
+
+Valid values: true, false
+</description>
+        <from>failure criteria full duplex</from>
+        <to>failure criteria full duplex</to>
+      </input>
+      <input global="false" required="false">
+        <description>check-error-percent: 
+
+The flag to indicate whether or not to use link error percentage to detect failure. 
+
+If check-error-percent is true, then percentage is the configured error percentage that is tolerated. The link is considered bad if error rate exceeds percentage. 
+If check-error-percent is false, percentage is unused, and error percentage is not used as a detection method.</description>
+        <from>failure criteria check error percent</from>
+        <to>failure criteria check error percent</to>
+      </input>
+      <input global="false" required="false">
+        <description>percentage: See check-error-percent
+
+Valid values: Number</description>
+        <from>failure criteria percentage</from>
+        <to>failure criteria percentage</to>
+      </input>
+      <input global="false" required="false">
+        <description>check-beacon: 
+
+The flag to indicate whether or not to enable this property to enable beacon probing as a method to validate the link status of a physical network adapter. 
+checkBeacon can be enabled only if the VirtualSwitch has been configured to use the beacon. Attempting to set checkBeacon on a PortGroup or VirtualSwitch that does not have beacon probing configured for the applicable VirtualSwitch results in an error.
+
+Valid values: true, false</description>
+        <from>failure criteria check beacon</from>
+        <to>failure criteria check beacon</to>
+      </input>
+      <input global="false" required="false">
+        <description>Takes in XML with following parameters:
+
+&lt;active-nic-list&gt;
+		&lt;active-nic&gt;&lt;/active-nic&gt;
+		&lt;active-nic&gt;&lt;/active-nic&gt;
+&lt;/active-nic-list&gt;
+
+active-nic : Active network adapters used for load balancing.
+
+Valid values: String</description>
+        <from>active nic list</from>
+        <to>active nic list</to>
+      </input>
+      <input global="false" required="false">
+        <description>Takes in XML with following parameters:
+
+&lt;standby-nic-list&gt;
+		&lt;standby-nic&gt;&lt;/standby-nic&gt;
+		&lt;standby-nic&gt;&lt;/standby-nic&gt;
+&lt;/standby-nic-list&gt;
+
+standby-nic : Standby network adapters used for failover
+
+Valid values: String</description>
+        <from>standby nic list</from>
+        <to>standby nic list</to>
+      </input>
+      <input global="false" required="false">
+        <description>csum-offload: The flag to indicate whether or not checksum offloading is supported
+
+Valid values: true, false</description>
+        <from>offload policy csum offload</from>
+        <to>offload policy csum offload</to>
+      </input>
+      <input global="false" required="false">
+        <description>tcp-segmentation : The flag to indicate whether or not TCP segmentation offloading (TSO) is supported.
+
+Valid values: true, false</description>
+        <from>offload policy tcp segmentation</from>
+        <to>offload policy tcp segmentation</to>
+      </input>
+      <input global="false" required="false">
+        <description>zero-copy-xmit: The flag to indicate whether or not zero copy transmits are supported.
+
+Valid values: true, false</description>
+        <from>offload policy zero copy xmit</from>
+        <to>offload policy zero copy xmit</to>
+      </input>
+      <input global="false" required="false">
+        <description>enabled: 
+The flag to indicate whether or not traffic shaper is enabled on the port.
+
+Valid values: true, false</description>
+        <from>shaping policy enabled</from>
+        <to>shaping policy enabled</to>
+      </input>
+      <input global="false" required="false">
+        <description>average-bandwidth: The average bandwidth in bits per second if shaping is enabled on the port.
+
+Valid values: Number</description>
+        <from>shaping policy average bandwidth</from>
+        <to>shaping policy average bandwidth</to>
+      </input>
+      <input global="false" required="false">
+        <description>peak-bandwidth: The peak bandwidth during bursts in bits per second if traffic shaping is enabled on the port.
+
+Valid values: Number
+</description>
+        <from>shaping policy peak bandwidth</from>
+        <to>shaping policy peak bandwidth</to>
+      </input>
+      <input global="false" required="false">
+        <description>burst-size: The maximum burst size allowed in bytes if shaping is enabled on the port.
+
+Valid values: Number</description>
+        <from>shaping policy burst size</from>
+        <to>shaping policy burst size</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:RBA-AD-VMware_Infrastructure:Utilities:Host_Operations:Construct Port Group Parameters</process-name>
+        <parameters>
+          <input>
+            <from>name</from>
+            <to>name</to>
+          </input>
+          <input>
+            <from>vlan id</from>
+            <to>vlan id</to>
+          </input>
+          <input>
+            <from>vswitch name</from>
+            <to>vswitch name</to>
+          </input>
+          <input>
+            <from>security allow promiscuous</from>
+            <to>security allow promiscuous</to>
+          </input>
+          <input>
+            <from>security mac changes</from>
+            <to>security mac changes</to>
+          </input>
+          <input>
+            <from>security forged transmits</from>
+            <to>security forged transmits</to>
+          </input>
+          <input>
+            <from>nic teaming policy</from>
+            <to>nic teaming policy</to>
+          </input>
+          <input>
+            <from>nic teaming reverse policy</from>
+            <to>nic teaming reverse policy</to>
+          </input>
+          <input>
+            <from>nic teaming notify switches</from>
+            <to>nic teaming notify switches</to>
+          </input>
+          <input>
+            <from>nic teaming rolling order</from>
+            <to>nic teaming rolling order</to>
+          </input>
+          <input>
+            <from>failure criteria check speed</from>
+            <to>failure criteria check speed</to>
+          </input>
+          <input>
+            <from>failure criteria speed</from>
+            <to>failure criteria speed</to>
+          </input>
+          <input>
+            <from>failure criteria check duplex</from>
+            <to>failure criteria check duplex</to>
+          </input>
+          <input>
+            <from>failure criteria full duplex</from>
+            <to>failure criteria full duplex</to>
+          </input>
+          <input>
+            <from>failure criteria check error percent</from>
+            <to>failure criteria check error percent</to>
+          </input>
+          <input>
+            <from>failure criteria percentage</from>
+            <to>failure criteria percentage</to>
+          </input>
+          <input>
+            <from>failure criteria check beacon</from>
+            <to>failure criteria check beacon</to>
+          </input>
+          <input>
+            <from>active nic list</from>
+            <to>active nic list</to>
+          </input>
+          <input>
+            <from>standby nic list</from>
+            <to>standby nic list</to>
+          </input>
+          <input>
+            <from>offload policy csum offload</from>
+            <to>offload policy csum offload</to>
+          </input>
+          <input>
+            <from>offload policy tcp segmentation</from>
+            <to>offload policy tcp segmentation</to>
+          </input>
+          <input>
+            <from>offload policy zero copy xmit</from>
+            <to>offload policy zero copy xmit</to>
+          </input>
+          <input>
+            <from>shaping policy enabled</from>
+            <to>shaping policy enabled</to>
+          </input>
+          <input>
+            <from>shaping policy average bandwidth</from>
+            <to>shaping policy average bandwidth</to>
+          </input>
+          <input>
+            <from>shaping policy peak bandwidth</from>
+            <to>shaping policy peak bandwidth</to>
+          </input>
+          <input>
+            <from>shaping policy burst size</from>
+            <to>shaping policy burst size</to>
+          </input>
+          <output>
+            <from>portgroup</from>
+            <to>port group</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="host">
+                <input global="false">
+                  <from>host</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="portgroup">
+                <input global="false">
+                  <from>port group</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <parameters>
+          <host-system>${host}</host-system>
+          <config>
+            <portgroup-list>${portgroup}</portgroup-list>
+          </config>
+        </parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs &lt;items&gt; for Add Port Group operation</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>eb99cf3b-092d-3c1f-b3ad-9a7c7ad26434</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288251417154</last-modified>
+    </meta>
+  </process-def>
+</process>

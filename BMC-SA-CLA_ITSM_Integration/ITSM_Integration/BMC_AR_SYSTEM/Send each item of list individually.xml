@@ -1,0 +1,1126 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Send each item of list individually">
+    <parameters>
+      <input global="false" required="true">
+        <from>newSuccessTimestamp</from>
+        <to>newSuccessTimestamp</to>
+      </input>
+      <input global="false" required="true">
+        <from>remedyResponse</from>
+        <to>remedyResponse</to>
+      </input>
+      <input global="false" required="true">
+        <from>readWorklog</from>
+        <to>readWorklog</to>
+      </input>
+      <input global="false" required="true">
+        <from>automationHost</from>
+        <to>automationHost</to>
+      </input>
+      <output global="false" required="true">
+        <to>newSuccessTimestamp</to>
+        <from>newSuccessTimestamp</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>connectivityIssueFoundAtBlade</to>
+            <value>false</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>commandArguments</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>errorMessage</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>sessionID</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-SA-CLA_ITSM_Integration:Persistence:QueryConnectionDetails</process-name>
+        <parameters>
+          <input>
+            <from>automationHost</from>
+            <to>hostinfo</to>
+          </input>
+          <output>
+            <from>connectionDetailsValue</from>
+            <to>connectionDetailsValue</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <for-each>
+        <document>
+          <input>
+            <from>remedyResponse</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>updateFromRemedy</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//getListValues]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence />
+            </default>
+            <case>
+              <condition>
+                <document>
+                  <input>
+                    <from>connectivityIssueFoundAtBlade</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = "false"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>updateFromRemedy</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobID</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//JobID/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>updateFromRemedy</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobInstanceID</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//JobInstanceID/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>updateFromRemedy</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>TaskID</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//TaskID/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>updateFromRemedy</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>InfrastructureChangeID</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//InfrastructureChangeID/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>updateFromRemedy</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>JobVersion</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//JobVersion/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>updateFromRemedy</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>ciNames</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//CINameList/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>updateFromRemedy</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>ciIDs</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[//CIReconIDList/text()]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+                <switch>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>true</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                  <default>
+                    <sequence>
+                      <assign>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>updateFromRemedy</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>scheduledStartDate</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//ScheduledStartDate/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>updateFromRemedy</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>JobDescription</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//JobDescription/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>updateFromRemedy</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>status</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//ConsolidatedStatus/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>updateFromRemedy</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>useCase</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//UseCase/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>useCase</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>JobInstanceID</to>
+                            </output>
+                          </result>
+                          <xslt-stylesheet>
+                            <stylesheet-replacement-tokens>
+                              <replacement-token name="JobInstanceID">
+                                <input global="false">
+                                  <from>JobInstanceID</from>
+                                </input>
+                              </replacement-token>
+                            </stylesheet-replacement-tokens>
+                            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string(.)='Change Initiated Job'">
+          <xsl:text disable-output-escaping="no">0</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'${JobInstanceID}'" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                          </xslt-stylesheet>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                      </assign>
+                      <call-process>
+                        <process-name>:BMC-SA-CLA_ITSM_Integration:Utility:DateConverter</process-name>
+                        <parameters>
+                          <input>
+                            <from>scheduledStartDate</from>
+                            <to>inputdate</to>
+                          </input>
+                          <input>
+                            <value>utc</value>
+                            <to>convertTo</to>
+                          </input>
+                          <output>
+                            <from>datePostConversion</from>
+                            <to>datePostConversion</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                      </call-process>
+                      <call-process>
+                        <process-name>:BMC-SA-CLA_ITSM_Integration:CustomizedProcesses:Window3</process-name>
+                        <parameters>
+                          <input>
+                            <from>ciIDs</from>
+                            <to>CI_IDs</to>
+                          </input>
+                          <input>
+                            <from>ciNames</from>
+                            <to>CI_Names</to>
+                          </input>
+                          <input>
+                            <from>JobDescription</from>
+                            <to>JobDesc</to>
+                          </input>
+                          <input>
+                            <from>JobID</from>
+                            <to>JobID</to>
+                          </input>
+                          <input>
+                            <from>JobInstanceID</from>
+                            <to>JobInstanceID</to>
+                          </input>
+                          <input>
+                            <from>JobVersion</from>
+                            <to>JobVersion</to>
+                          </input>
+                          <input>
+                            <from>scheduledStartDate</from>
+                            <to>StartDate</to>
+                          </input>
+                          <input>
+                            <from>status</from>
+                            <to>Status</to>
+                          </input>
+                          <input>
+                            <from>TaskID</from>
+                            <to>TaskID</to>
+                          </input>
+                          <input>
+                            <from>InfrastructureChangeID</from>
+                            <to>ChangeID</to>
+                          </input>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[2]</location>
+                      </call-process>
+                      <assign>
+                        <assignment>
+                          <input>
+                            <concat>
+                              <input>
+                                <value>{"jobId":</value>
+                              </input>
+                              <input required="false">
+                                <from>JobID</from>
+                              </input>
+                              <input>
+                                <value>,"jobVersion":</value>
+                              </input>
+                              <input required="false">
+                                <from>JobVersion</from>
+                              </input>
+                              <input>
+                                <value>,"jobDescription":"</value>
+                              </input>
+                              <input required="false">
+                                <from>JobDescription</from>
+                              </input>
+                              <input>
+                                <value>","schedules":[{"scheduleId":</value>
+                              </input>
+                              <input required="false">
+                                <from>JobInstanceID</from>
+                              </input>
+                              <input>
+                                <value>,"startTime":"</value>
+                              </input>
+                              <input required="false">
+                                <from>datePostConversion</from>
+                              </input>
+                              <input>
+                                <value>","taskId":"</value>
+                              </input>
+                              <input required="false">
+                                <from>TaskID</from>
+                              </input>
+                              <input>
+                                <value>","changeId":"</value>
+                              </input>
+                              <input required="false">
+                                <from>InfrastructureChangeID</from>
+                              </input>
+                              <input>
+                                <value>","approvalStatus":"</value>
+                              </input>
+                              <input required="false">
+                                <from>status</from>
+                              </input>
+                              <input>
+                                <value>","ciNames":"</value>
+                              </input>
+                              <input required="false">
+                                <from>ciNames</from>
+                              </input>
+                              <input>
+                                <value>","ciReconIds":"</value>
+                              </input>
+                              <input required="false">
+                                <from>ciIDs</from>
+                              </input>
+                              <input>
+                                <value>"}],"version":"1.0"}</value>
+                              </input>
+                            </concat>
+                          </input>
+                          <output>
+                            <to>commandArguments</to>
+                          </output>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[2]</location>
+                      </assign>
+                    </sequence>
+                  </default>
+                  <case>
+                    <condition>
+                      <document>
+                        <input>
+                          <from>readWorklog</from>
+                        </input>
+                      </document>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[string(.) = "true"]]></xpath>
+                      </xpath-expression>
+                    </condition>
+                    <sequence>
+                      <assign>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>updateFromRemedy</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>LastModifiedDate</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//LastModifiedDate/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>updateFromRemedy</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>LastModifiedBy</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//LastModifiedBy/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>updateFromRemedy</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>FieldValue</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//FieldValue/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                      </assign>
+                      <call-process>
+                        <process-name>:BMC-SA-CLA_ITSM_Integration:Utility:DateConverter</process-name>
+                        <parameters>
+                          <input>
+                            <from>LastModifiedDate</from>
+                            <to>inputdate</to>
+                          </input>
+                          <input>
+                            <value>utc</value>
+                            <to>convertTo</to>
+                          </input>
+                          <output>
+                            <from>datePostConversion</from>
+                            <to>datePostConversion</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                      </call-process>
+                      <call-process>
+                        <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Form worklog update request</process-name>
+                        <parameters>
+                          <input>
+                            <from>JobID</from>
+                            <to>JobID</to>
+                          </input>
+                          <input>
+                            <from>JobInstanceID</from>
+                            <to>JobInstanceID</to>
+                          </input>
+                          <input>
+                            <from>InfrastructureChangeID</from>
+                            <to>InfrastructureChangeID</to>
+                          </input>
+                          <input>
+                            <from>TaskID</from>
+                            <to>TaskID</to>
+                          </input>
+                          <input>
+                            <from>FieldValue</from>
+                            <to>FieldValue</to>
+                          </input>
+                          <input>
+                            <from>LastModifiedBy</from>
+                            <to>LastModifiedBy</to>
+                          </input>
+                          <input>
+                            <from>datePostConversion</from>
+                            <to>LastModifiedDate</to>
+                          </input>
+                          <input>
+                            <from>JobVersion</from>
+                            <to>JobVersion</to>
+                          </input>
+                          <input>
+                            <from>ciIDs</from>
+                            <to>ciIDs</to>
+                          </input>
+                          <input>
+                            <from>ciNames</from>
+                            <to>ciNames</to>
+                          </input>
+                          <output>
+                            <from>commandArguments</from>
+                            <to>commandArguments</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                      </call-process>
+                    </sequence>
+                  </case>
+                  <location>:switch[1]:sequence[2]:switch[1]</location>
+                </switch>
+                <call-process>
+                  <process-name>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Blade:Send</process-name>
+                  <parameters>
+                    <input>
+                      <from>commandArguments</from>
+                      <to>commandArgs</to>
+                    </input>
+                    <input>
+                      <from>connectivityIssueFoundAtBlade</from>
+                      <to>connectivityIssueFoundWithBlade</to>
+                    </input>
+                    <input>
+                      <from>errorMessage</from>
+                      <to>errorMessage</to>
+                    </input>
+                    <input>
+                      <from>automationHost</from>
+                      <to>hostInfo</to>
+                    </input>
+                    <input>
+                      <from>connectionDetailsValue</from>
+                      <to>connectionDetails</to>
+                    </input>
+                    <input>
+                      <from>sessionID</from>
+                      <to>sessionID</to>
+                    </input>
+                    <output>
+                      <from>status</from>
+                      <to>status</to>
+                    </output>
+                    <output>
+                      <from>connectivityIssueFoundWithBlade</from>
+                      <to>connectivityIssueFoundAtBlade</to>
+                    </output>
+                    <output>
+                      <from>errorMessage</from>
+                      <to>errorMessage</to>
+                    </output>
+                    <output>
+                      <from>sessionID</from>
+                      <to>sessionID</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:call-process[1]</location>
+                </call-process>
+                <switch>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>true</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                  <default>
+                    <sequence>
+                      <switch>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>true</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                        <default>
+                          <sequence />
+                        </default>
+                        <case>
+                          <condition>
+                            <document>
+                              <input>
+                                <from>connectivityIssueFoundAtBlade</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[string(.) = "false"]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <sequence>
+                            <assign>
+                              <assignment>
+                                <document>
+                                  <input>
+                                    <from>updateFromRemedy</from>
+                                  </input>
+                                </document>
+                                <result>
+                                  <output>
+                                    <to>newSuccessTimestamp</to>
+                                  </output>
+                                </result>
+                                <xpath-expression>
+                                  <xpath-replacement-tokens />
+                                  <xpath><![CDATA[//LastModifiedDate/text()]]></xpath>
+                                </xpath-expression>
+                              </assignment>
+                              <meta>
+                                <documentation />
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <after-execution>
+                                <log>
+                                  <level>debug</level>
+                                  <parameters>
+                                    <input>
+                                      <value>BMC-SA-CLA_ITSM_Integration:Poll outbound form: blade response has error but not contained in retryable error:time updated=&gt; </value>
+                                    </input>
+                                    <input>
+                                      <from>newSuccessTimestamp</from>
+                                    </input>
+                                  </parameters>
+                                </log>
+                              </after-execution>
+                              <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                            </assign>
+                            <switch>
+                              <meta>
+                                <documentation />
+                                <run-mode-handling>
+                                  <run-mode>OCP</run-mode>
+                                  <allow-step-into>true</allow-step-into>
+                                </run-mode-handling>
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                              <default>
+                                <sequence />
+                              </default>
+                              <case>
+                                <condition>
+                                  <document>
+                                    <input>
+                                      <from>readWorklog</from>
+                                    </input>
+                                  </document>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[string(.) != "true"]]></xpath>
+                                  </xpath-expression>
+                                </condition>
+                                <sequence>
+                                  <assign>
+                                    <assignment>
+                                      <input global="true">
+                                        <from>ARInboundUrl</from>
+                                      </input>
+                                      <output>
+                                        <to>soapurl</to>
+                                      </output>
+                                    </assignment>
+                                    <assignment>
+                                      <input global="true">
+                                        <from>ARUsername</from>
+                                      </input>
+                                      <output>
+                                        <to>remedyUsername</to>
+                                      </output>
+                                    </assignment>
+                                    <assignment>
+                                      <input global="true">
+                                        <from>ARPassword</from>
+                                      </input>
+                                      <output>
+                                        <to>remedyPassword</to>
+                                      </output>
+                                    </assignment>
+                                    <assignment>
+                                      <input global="true">
+                                        <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:BMC_AR_SYSTEM:Connection_Details:transport</configuration>
+                                      </input>
+                                      <output>
+                                        <to>transport</to>
+                                      </output>
+                                    </assignment>
+                                    <assignment>
+                                      <document>
+                                        <input>
+                                          <from>soapurl</from>
+                                        </input>
+                                      </document>
+                                      <result>
+                                        <output>
+                                          <to>req</to>
+                                        </output>
+                                      </result>
+                                      <xslt-stylesheet>
+                                        <stylesheet-replacement-tokens>
+                                          <replacement-token name="username">
+                                            <input global="false">
+                                              <from>remedyUsername</from>
+                                            </input>
+                                          </replacement-token>
+                                          <replacement-token name="password">
+                                            <input global="false">
+                                              <from>remedyPassword</from>
+                                            </input>
+                                          </replacement-token>
+                                          <replacement-token name="changeID">
+                                            <input global="false">
+                                              <from>InfrastructureChangeID</from>
+                                            </input>
+                                          </replacement-token>
+                                          <replacement-token name="taskID">
+                                            <input global="false">
+                                              <from>TaskID</from>
+                                            </input>
+                                          </replacement-token>
+                                          <replacement-token name="notes">
+                                            <input global="false">
+                                              <from>errorMessage</from>
+                                            </input>
+                                          </replacement-token>
+                                        </stylesheet-replacement-tokens>
+                                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tem="http://tempuri.org" xmlns:urn="CHG_ChangeServiceInterface" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" version="1.0">
+  <xsl:output indent="yes" encoding="XML" cdata-section-elements="Change_ProcessInterfaceData " />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Header>
+        <xsl:element name="urn:AuthenticationInfo">
+          <xsl:element name="urn:userName">$[username]</xsl:element>
+          <xsl:element name="urn:password">$[password]</xsl:element>
+        </xsl:element>
+      </soapenv:Header>
+      <soapenv:Body>
+        <xsl:element name="urn:Change_ProcessInterfaceData">
+          <xsl:element name="urn:Action">
+            <xsl:text disable-output-escaping="no">ERROR_TIMEOUT</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:TaskID">
+            <xsl:text disable-output-escaping="no">${taskID}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:InfrastructureChangeID">
+            <xsl:text disable-output-escaping="no">${changeID}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:ChangeWorkInfoNotes">
+            <xsl:text disable-output-escaping="no">${notes}</xsl:text>
+          </xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                      </xslt-stylesheet>
+                                    </assignment>
+                                    <assignment>
+                                      <input global="true">
+                                        <configuration>:BMC-SA-CLA_ITSM_Integration:ITSM_Integration:Default_WebService_Adapter</configuration>
+                                      </input>
+                                      <output>
+                                        <to>wsAdapter</to>
+                                      </output>
+                                    </assignment>
+                                    <meta>
+                                      <documentation />
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <after-execution>
+                                      <log>
+                                        <level>info</level>
+                                        <parameters>
+                                          <input>
+                                            <value>BMC-SA-CLA_ITSM_Integration:Send failure notification to remedy=&gt;</value>
+                                          </input>
+                                          <input>
+                                            <from>req</from>
+                                          </input>
+                                        </parameters>
+                                      </log>
+                                    </after-execution>
+                                    <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                                  </assign>
+                                  <call-process>
+                                    <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+                                    <parameters>
+                                      <input>
+                                        <from>wsAdapter</from>
+                                        <to>adapter name</to>
+                                      </input>
+                                      <input>
+                                        <from>transport</from>
+                                        <to>transport</to>
+                                      </input>
+                                      <input>
+                                        <from>soapurl</from>
+                                        <to>soap url</to>
+                                      </input>
+                                      <input>
+                                        <from>req</from>
+                                        <to>soap message</to>
+                                      </input>
+                                      <input>
+                                        <value>urn:CHG_ChangeServiceInterface/Change_ProcessInterfaceData</value>
+                                        <to>soap action</to>
+                                      </input>
+                                      <output>
+                                        <from>adapter response</from>
+                                        <to>remedyResponse</to>
+                                      </output>
+                                      <output>
+                                        <from>status</from>
+                                        <to>status</to>
+                                      </output>
+                                      <output>
+                                        <from>error message</from>
+                                        <to>error message</to>
+                                      </output>
+                                    </parameters>
+                                    <meta>
+                                      <documentation />
+                                      <run-mode-handling>
+                                        <run-mode>OCP</run-mode>
+                                        <allow-step-into>false</allow-step-into>
+                                      </run-mode-handling>
+                                      <checkpoint>false</checkpoint>
+                                    </meta>
+                                    <after-execution>
+                                      <log>
+                                        <level>info</level>
+                                        <parameters>
+                                          <input>
+                                            <value>BMC-SA-CLA_ITSM_Integration:Send failure notification to Remedy =&gt;</value>
+                                          </input>
+                                          <input>
+                                            <from>remedyResponse</from>
+                                          </input>
+                                        </parameters>
+                                      </log>
+                                    </after-execution>
+                                    <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                                  </call-process>
+                                </sequence>
+                              </case>
+                              <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:switch[1]:sequence[2]:switch[1]</location>
+                            </switch>
+                          </sequence>
+                        </case>
+                        <location>:switch[1]:sequence[2]:switch[2]:sequence[1]:switch[1]</location>
+                      </switch>
+                    </sequence>
+                  </default>
+                  <case>
+                    <condition>
+                      <document>
+                        <input>
+                          <from>status</from>
+                        </input>
+                      </document>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[string(.) = "success"]]></xpath>
+                      </xpath-expression>
+                    </condition>
+                    <sequence>
+                      <assign>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>updateFromRemedy</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>newSuccessTimestamp</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//LastModifiedDate/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <after-execution>
+                          <log>
+                            <level>debug</level>
+                            <parameters>
+                              <input>
+                                <value>BMC-SA-CLA_ITSM_Integration:Poll outbound form: time updated=&gt;</value>
+                              </input>
+                              <input>
+                                <from>newSuccessTimestamp</from>
+                              </input>
+                            </parameters>
+                          </log>
+                        </after-execution>
+                        <location>:switch[1]:sequence[2]:switch[2]:sequence[2]:assign[1]</location>
+                      </assign>
+                    </sequence>
+                  </case>
+                  <location>:switch[1]:sequence[2]:switch[2]</location>
+                </switch>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>6c722f7f-a9e5-4e33-8388-c641711cffd8</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>AoAdmin</last-modified-by>
+      <last-modified>1475061225265</last-modified>
+    </meta>
+  </process-def>
+</process>

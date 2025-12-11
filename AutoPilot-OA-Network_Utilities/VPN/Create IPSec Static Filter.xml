@@ -1,0 +1,265 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Network_Utilities:VPN:Create IPSec Static Filter">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the Connection Details Concept that contains the information required to execute a command via command line.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the name of the filter list to which the filter is added. Each filter defines a set of inbound or outbound network traffic to be secured.</description>
+        <from>filter list</from>
+        <to>filter list</to>
+      </input>
+      <input global="false" required="true">
+        <description>{ Me or Any or IPAddress or DNSName or ServerType}
+Specifies the source IP address, DNS name, or server type for the IP traffic. You can use WINS, DNS, DHCP, or gateway for ServerType.</description>
+        <from>source address</from>
+        <to>srcaddr</to>
+      </input>
+      <input global="false" required="true">
+        <description>{ Me or Any or  IPAddress or DNSName or ServerType}
+Specifies the destination IP address, DNS name, or server type for the IP traffic. You can use WINS, DNS, DHCP, or gateway for ServerType.</description>
+        <from>destination address</from>
+        <to>destaddr</to>
+      </input>
+      <input global="false" required="true">
+        <description>Provides information about the IP filter.</description>
+        <from>description</from>
+        <to>description</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ ANY or ICMP or TCP or UDP or RAW or Integer }
+Specifies the IP protocol if, in addition to addressing information, you want to filter a specific IP protocol. The default value is ANY, meaning all protocols are used for the filter.
+</description>
+        <from>protocol</from>
+        <to>protocol</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ yes or no}
+Specifies whether to create a mirrored filter. Use yes to create two filters based on the filter settings--one for traffic to the destination and one for traffic from the destination. The default value is yes.</description>
+        <from>mirrored</from>
+        <to>mirrored</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ Mask or Prefix}
+Specifies the source address subnet mask or the prefix of the packets to be filtered. You can specify a prefix value in the range of 1 through 32. The default value is the mask of 255.255.255.255.</description>
+        <from>source mask</from>
+        <to>srcmask</to>
+      </input>
+      <input global="false" required="false">
+        <description>{ Mask or Prefix}
+Specifies the destination address subnet mask or the prefix value of the packets to be filtered. You can specify a prefix value in the range of 1 through 32. The default value is the mask of 255.255.255.255.</description>
+        <from>destination mask</from>
+        <to>destmask</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the source port number of the packets to be filtered. This option only applies if you are filtering TCP or UDP packets. If 0 is specified, packets sent from any port are filtered. The default is any.</description>
+        <from>source port</from>
+        <to>srcport</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the destination port number of the packets to be filtered. This option only applies if you are filtering TCP or UDP packets. If 0 is specified, packets sent to any port are filtered. The default is any.</description>
+        <from>destination port</from>
+        <to>destport</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation Succeed? Valid value: true.</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>
+              <empty />
+            </value>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="filter list">
+                  <input global="false">
+                    <from>filter list</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="srcaddr">
+                  <input global="false">
+                    <from>srcaddr</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="destaddr">
+                  <input global="false">
+                    <from>destaddr</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="description">
+                  <input global="false">
+                    <from>description</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="protocol">
+                  <input global="false">
+                    <from>protocol</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="mirrored">
+                  <input global="false">
+                    <from>mirrored</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="srcmask">
+                  <input global="false">
+                    <from>srcmask</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="destmask">
+                  <input global="false">
+                    <from>destmask</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="srcport">
+                  <input global="false">
+                    <from>srcport</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="destport">
+                  <input global="false">
+                    <from>destport</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:param name="mirrored">
+    <xsl:text disable-output-escaping="no">${mirrored}</xsl:text>
+  </xsl:param>
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Cisco IOS">
+        <xsl:text disable-output-escaping="no">show</xsl:text>
+      </command>
+      <command os-id="Windows XP">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Windows XP.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">netsh ipsec static add filter filterlist=${filter list} srcaddr=${srcaddr} dstaddr=${destaddr} description=$[description]</xsl:text>
+        <xsl:choose>
+          <xsl:when test="string-length('${protocol}')=0">
+            <xsl:text disable-output-escaping="no"> protocol=any</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> protocol=${protocol}</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+          <xsl:when test="$mirrored ='yes' or $mirrored='no'">
+            <xsl:text disable-output-escaping="no"> mirror=${mirrored}</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text disable-output-escaping="no"> mirrored=yes</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+        <xsl:if test="string-length('${srcmask}')!=0">
+          <xsl:text disable-output-escaping="no"> srcmask=${srcmask}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${destmask}')!=0">
+          <xsl:text disable-output-escaping="no"> dstmask=${destmask}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${srcport}')!=0">
+          <xsl:text disable-output-escaping="no"> srcport=${srcport}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${destport}')!=0">
+          <xsl:text disable-output-escaping="no"> dstport=${destport}</xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/bin/echo "Not Supported"</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/echo "Not Supported"</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+            <to>command</to>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Adds a filter to the specified filter list.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>c58f70c7-2626-3f12-a291-3816986da44c</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1288093412681</last-modified>
+    </meta>
+  </process-def>
+</process>

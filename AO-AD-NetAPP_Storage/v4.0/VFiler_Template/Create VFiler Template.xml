@@ -1,0 +1,222 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-NetAPP_Storage:v4.0:VFiler_Template:Create VFiler Template">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter. Default Name: NetAppActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Creates a vFiler template. A vFiler template contains configuration information that is used during vFiler setup.
+
+Sample Items XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;targets&gt;
+			&lt;target&gt;
+				&lt;host&gt;10.10.10.10&lt;/host&gt;
+				&lt;user-name&gt;userName&lt;/user-name&gt;
+				&lt;password&gt;password&lt;/password&gt;
+				&lt;protocol&gt;http&lt;/protocol&gt;
+				&lt;port&gt;8088&lt;/port&gt;                                
+			&lt;/target&gt;
+		&lt;/targets&gt;
+		&lt;target&gt;server1&lt;/target&gt;
+		&lt;vfiler-template-name&gt;test&lt;/vfiler-template-name&gt;
+		&lt;administrative-host-ip-address&gt;12.12.12.12&lt;/administrative-host-ip-address&gt;
+		&lt;description&gt;test description&lt;/description&gt;
+		&lt;dns-domain&gt;test.com&lt;/dns-domain&gt;
+		&lt;dns-servers&gt;
+			&lt;ip-address&gt;13.13.13.13&lt;/ip-address&gt;
+			&lt;ip-address&gt;12.12.12.12&lt;/ip-address&gt;
+		&lt;/dns-servers&gt;
+		&lt;cifs-auth-type&gt;workgroup&lt;/cifs-auth-type&gt;
+		&lt;cifs-domain&gt;abc.com&lt;/cifs-domain&gt;
+		&lt;cifs-security-style&gt;multiprotocol&lt;/cifs-security-style&gt;
+		&lt;nis-domain&gt;abc.com&lt;/nis-domain&gt;
+		&lt;nis-servers&gt;
+			&lt;ip-address&gt;13.13.13.13&lt;/ip-address&gt;
+			&lt;ip-address&gt;12.12.12.12&lt;/ip-address&gt;
+		&lt;/nis-servers&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description
+
+targets [Conditional] 
+
+        It is parent XML element for &lt;target&gt; XML element. 
+        The &lt;target&gt; XML element is used to specify dynamic targets at request level. 
+        Note: The &lt;targets&gt; XML element is required if the adapter configuration is empty in Grid Manager. 
+
+target [Conditional] 
+        It is child XML element of &lt;targets&gt; XML element. This element is used to specify dynamic targets at request level. 
+
+        Using dynamic targets you can define connection information for a remote host within an adapter request. This allows you to configure an adapter in Grid Manager, by specifying configuration information in an adapter request. 
+
+        Note: (1) Adapter configuration specified using request level dynamic targets takes precedence over Grid Manager level configuration information. (2) If request level dynamic target is specified using &lt;targets&gt; XML element, then the &lt;target&gt; element which is child of &lt;item&gt; element is ignored. (3) This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+host [Conditional] 
+Host name or IP address of server on which NetApp DataFabric Manager is running. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+user-name [Conditional] 
+NetApp DataFabric Manager login username. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+password [Conditional] 
+NetApp DataFabric Manager login password. 
+
+You can encrypt the password by specifying the encryption type attribute. 
+For example: &lt;password encryption-type = "Base64"&gt;cGFzc3dvcmQ=&lt;/password&gt;. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+protocol [Optional] 
+Communication protocol used by adapter. Valid value is http or https. Default value is http. 
+
+port [Optional] 
+Port on which NetApp DataFabric Manager is enabled. Default value is 8088 for http protocol and 8488 for https protocol. 
+
+target [Optional] 
+It is child XML element of &lt;item&gt; XML element. 
+You can use this element to specify the connection information for a DFM Server. For this a comma separated list of configuration names can be specified. This executes the request simultaneously on all DFM servers identified by the configuration names. 
+Valid values: 
+1. The values specified for &lt;target&gt; XML element must be same as the values that have been specified for the name attribute of &lt;config&gt; element in Grid Manager adapter configuration. 
+2. You can provide "ALL" as the value. In this case the request will get executed on all the DFM servers defined in Grid Manager adapter configuration. 
+3. You can specify multiple comma separated names to allow simultaneous execution of requests across multiple DFM servers. 
+4. You can skip this element. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+You can leave this element empty. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+
+Note: This element is ignored if request level dynamic target is specified using &lt;targets&gt; XML element.
+
+
+vfiler-template-name[Required]
+	Name of the vFiler template.
+
+administrative-host-ip-address[Optional]
+	IP Address of the vFiler's administrative host. By default, this field is empty.
+
+cifs-auth-type[Optional]
+	CIFS authentication mode to be used for the CIFS setup of a vFiler. This determines the method by which clients will be authenticated when connecting to the CIFS service on the vFiler. Possible values: "active_directory", "workgroup". Default value: "workgroup"
+
+cifs-domain[Conditional]
+	Active Directory domain to which the vFiler will join to. This can be the NetBIOS or fully qualified domain name. Examples: cifsdomain, cifs.domain.com This field is applicable only when cifs-auth-type is set to "active-directory" and is ignored otherwise.
+
+cifs-security-style[Optional]
+	The security style determines whether or not the CIFS service on vFiler will support multiprotocol access. Possible values: "ntfs", "multiprotocol". Default value is: "multiprotocol"
+
+description[Optional]
+	Description of vFiler template. By default, this field is empty.
+
+dns-domain[Optional]
+	Name of the DNS domain for a vFiler that is setup using this vFiler template. By default, this field is empty.
+
+dns-servers[Optional]
+	List of DNS servers for a vFiler that is setup using this vFiler template.
+
+nis-domain[Optional]
+	Name of the NIS domain for a vFiler that is setup using this vFiler template. By default, this field is empty.
+
+nis-servers[Optional]
+	List of NIS servers for a vFiler that is setup using this vFiler template.
+
+ip-address[Optional]
+	IP address in string format. The length of this string cannot be more than 40 characters.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>create-vfiler-template</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-NetAPP_Storage:Utilities:Invoke Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Creates a vFiler template. A vFiler template contains configuration information that is used during vFiler setup.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>97d749d8-1bb0-323e-a3dd-fe15a4a9e8b2</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598221860</last-modified>
+    </meta>
+  </process-def>
+</process>

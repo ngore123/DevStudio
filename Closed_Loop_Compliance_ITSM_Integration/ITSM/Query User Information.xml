@@ -1,0 +1,327 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":Closed_Loop_Compliance_ITSM_Integration:ITSM:Query User Information">
+    <parameters>
+      <input global="false" required="true">
+        <from>itsm platform</from>
+        <to>itsm platform</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration entry defined in a configuration module. 
+
+Example: BCAN</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - User name 
+
+Example: adapteruser</description>
+        <from>user name</from>
+        <to>user name</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - Login ID 
+
+Example: adapteruser</description>
+        <to>login id</to>
+        <from>login id</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - First name 
+
+Example: adapter</description>
+        <to>first name</to>
+        <from>first name</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - Last name  
+
+Example: user</description>
+        <to>last name</to>
+        <from>last name</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - Company name 
+
+Example: Calbro Financial Services</description>
+        <to>company</to>
+        <from>company</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - Company location 
+
+Example: Calbro Financial Services</description>
+        <to>company location</to>
+        <from>company location</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - Indicates whether or not the process completed successfully.  
+
+Valid values: 0-success,1-failure 
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value – A verbose message indicating the success or failure of the process</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:Closed_Loop_Compliance_ITSM_Integration:ITSM:Default_User:Default_First_Name</configuration>
+                </input>
+                <output>
+                  <to>first name</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:Closed_Loop_Compliance_ITSM_Integration:ITSM:Default_User:Default_Last_Name</configuration>
+                </input>
+                <output>
+                  <to>last name</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:Closed_Loop_Compliance_ITSM_Integration:ITSM:Default_User:Default_Company</configuration>
+                </input>
+                <output>
+                  <to>company</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input global="true">
+                  <configuration>:Closed_Loop_Compliance_ITSM_Integration:ITSM:Default_User:Default_Company_Location</configuration>
+                </input>
+                <output>
+                  <to>company location</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>user name</from>
+                </input>
+                <output>
+                  <to>login id</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>true</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>Authentication  disabled, application defaults used.</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[2]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input global="true">
+                <configuration>:Closed_Loop_Compliance_ITSM_Integration</configuration>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="configuration name">
+                  <input global="false">
+                    <from>configuration name</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[//$[configuration name]/Default_User/*[local-name()='Enable']/text() = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:Closed_Loop_Compliance_ITSM_Integration:ITSM:Extract Login ID Details</process-name>
+              <parameters>
+                <input>
+                  <from>itsm platform</from>
+                  <to>itsm platform</to>
+                </input>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>user name</from>
+                  <to>login id</to>
+                </input>
+                <output>
+                  <from>login id</from>
+                  <to>login id</to>
+                </output>
+                <output>
+                  <from>first name</from>
+                  <to>first name</to>
+                </output>
+                <output>
+                  <from>last name</from>
+                  <to>last name</to>
+                </output>
+                <output>
+                  <from>company</from>
+                  <to>company</to>
+                </output>
+                <output>
+                  <from>company location</from>
+                  <to>company location</to>
+                </output>
+                <output>
+                  <from>person id</from>
+                  <to>person id</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>true</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status message</to>
+                        <value>username  found.</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'false']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>false</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status message</to>
+                        <value>Authentication failure: invalid username.</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process will retrieve detail for a specified user id.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2e20890e-9a84-43e4-b1c8-122b5326a8fd</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1414997606764</last-modified>
+    </meta>
+  </process-def>
+</process>

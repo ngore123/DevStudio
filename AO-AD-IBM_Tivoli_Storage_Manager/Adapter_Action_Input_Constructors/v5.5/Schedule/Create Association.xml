@@ -1,0 +1,144 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Adapter_Action_Input_Constructors:v5.5:Schedule:Create Association">
+    <parameters>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="true">
+        <description>domain-name [Required]: Specifies the name of the policy domain to which the schedule belongs. 
+Valid values: The domain-name whom the targeted schedule belongs to.
+ </description>
+        <from>domain name</from>
+        <to>domain name</to>
+      </input>
+      <input global="false" required="true">
+        <description>
+schedule-name [Required]: Specifies the name of the schedule that you want to associate with one or more clients. 
+Valid values: The targeted schedule name.</description>
+        <from>schedule name</from>
+        <to>schedule name</to>
+      </input>
+      <input global="false" required="true">
+        <description>
+nodes-name [Required]: Specifies the name of a client node or a list of client nodes to associate with the specified schedule. Use commas to separate the items in the list. Do not leave spaces between the items and commas. The command will not associate a listed client to the schedule if: 
+-	The client is already associated with the specified schedule. 
+-	The client is not assigned to the policy domain to which the schedule belongs.
+-	The client is a NAS node name. All NAS nodes are ignored.
+
+Valid values: The targeted node/nodes, wildcard character.
+</description>
+        <from>nodes name</from>
+        <to>nodes name</to>
+      </input>
+      <output global="false" required="false">
+        <to>items xml</to>
+        <from>items xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items xml</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="domain name">
+                <input global="false">
+                  <from>domain name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="schedule name">
+                <input global="false">
+                  <from>schedule name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="nodes name">
+                <input global="false">
+                  <from>nodes name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">create-association</xsl:text>
+        </operation-name>
+        <timeout-secs>
+          <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+        </timeout-secs>
+        <command-options>
+          <domain-name>
+            <xsl:value-of select="'${domain name}'" disable-output-escaping="no" />
+          </domain-name>
+          <schedule-name>
+            <xsl:value-of select="'${schedule name}'" disable-output-escaping="no" />
+          </schedule-name>
+          <nodes-name>
+            <xsl:value-of select="'${nodes name}'" disable-output-escaping="no" />
+          </nodes-name>
+        </command-options>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Items xml : </value>
+              </input>
+              <input>
+                <from>items xml</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper generates item xml for - create association operations.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2551c436-6061-31da-a7e5-31cbb5cbc878</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290596965524</last-modified>
+    </meta>
+  </process-def>
+</process>

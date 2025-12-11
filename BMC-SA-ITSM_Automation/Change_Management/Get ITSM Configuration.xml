@@ -1,0 +1,897 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":BMC-SA-ITSM_Automation:Change_Management:Get ITSM Configuration">
+    <parameters>
+      <input global="false" required="false">
+        <description>BMC_AR_System/ServiceNow
+
+If not supplied, default will be taken from module configuration.</description>
+        <from>ITSMPlatform</from>
+        <to>ITSMPlatform</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the field to query in ITSM to retireve template List</description>
+        <from>FieldName</from>
+        <to>FieldName</to>
+      </input>
+      <input global="false" required="false">
+        <description>Value of the field to query in ITSM to retireve template List</description>
+        <from>FieldValue</from>
+        <to>FieldValue</to>
+      </input>
+      <output global="false" required="false">
+        <to>json response</to>
+        <from>json response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-ITSM_Automation:Utilities:Set Start Time</process-name>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Input Parameters</value>
+              </input>
+              <input>
+                <from>FieldName</from>
+              </input>
+              <input>
+                <value></value>
+              </input>
+              <input>
+                <from>FieldValue</from>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>Start time logged as -</value>
+              </input>
+              <input>
+                <from>start time</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-ITSM_Configuration:Read Configuration</process-name>
+        <parameters>
+          <input>
+            <value>ITSM</value>
+            <to>configuration group</to>
+          </input>
+          <output>
+            <from>configuration xml</from>
+            <to>configuration xml</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>Read module configuration for ITSM</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Module configuration for ITSM is - </value>
+              </input>
+              <input>
+                <from>configuration xml</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-ITSM_Configuration:Read Default ITSM Name</process-name>
+        <parameters>
+          <output>
+            <from>default_mapping_source</from>
+            <to>itsm-platform-value</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[3]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>ITSMPlatform</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>ITSMPlatform</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="default itsm">
+                <input global="false">
+                  <from>itsm-platform-value</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="string-length(.)=0">
+        <value>
+          <xsl:text disable-output-escaping="no">${default itsm}</xsl:text>
+        </value>
+      </xsl:when>
+      <xsl:otherwise>
+        <value>
+          <xsl:value-of select="string(.)" disable-output-escaping="no" />
+        </value>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>itsm-platform-key</to>
+            <value>ITSMPlatform</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>Initializing ITSM type</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>ITSM type is - </value>
+              </input>
+              <input>
+                <from>itsm-platform-value</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Utilities:Generate Response</process-name>
+              <parameters>
+                <input>
+                  <value>failure</value>
+                  <to>status</to>
+                </input>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Failed to create Change. Unsupported ITSM Platform Set -  </value>
+                    </input>
+                    <input required="false">
+                      <from>ITSMPlatform</from>
+                    </input>
+                  </concat>
+                  <to>error message</to>
+                </input>
+                <input>
+                  <value>Get ITSM Configuration</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Failed to create Change. Unsupported ITSM Platform Set -  </value>
+                    </input>
+                    <input required="false">
+                      <from>ITSMPlatform</from>
+                    </input>
+                  </concat>
+                  <to>data</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>ITSMPlatform</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "BMC_AR_System"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <spawn>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <sequence />
+              <sequence>
+                <call-process>
+                  <process-name>:BMC-SA-ITSM_Automation:Change_Management:ITSM_Mappings:Get Change Templates</process-name>
+                  <parameters>
+                    <input>
+                      <from>FieldName</from>
+                      <to>field name</to>
+                    </input>
+                    <input>
+                      <from>FieldValue</from>
+                      <to>field value</to>
+                    </input>
+                    <input>
+                      <from>ITSMPlatform</from>
+                      <to>ITSMPlatform</to>
+                    </input>
+                    <output>
+                      <from>change-template-list-xml-response</from>
+                      <to>change-template-list-xml-response</to>
+                    </output>
+                    <output>
+                      <from>get-change-template-json-response</from>
+                      <to>get-change-template-json-response</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:spawn[1]:sequence[2]:call-process[1]</location>
+                </call-process>
+                <call-process>
+                  <process-name>:BMC-SA-ITSM_Automation:Change_Management:ITSM_Mappings:Get Field Mappings</process-name>
+                  <parameters>
+                    <input>
+                      <from>ITSMPlatform</from>
+                      <to>ITSMPlatform</to>
+                    </input>
+                    <output>
+                      <from>JSON</from>
+                      <to>JSON</to>
+                    </output>
+                    <output>
+                      <from>ValueMap</from>
+                      <to>ValueMap</to>
+                    </output>
+                    <output>
+                      <from>change-class-map</from>
+                      <to>change-class-map</to>
+                    </output>
+                    <output>
+                      <from>change-type-map</from>
+                      <to>change-type-map</to>
+                    </output>
+                    <output>
+                      <from>impact-map</from>
+                      <to>impact-map</to>
+                    </output>
+                    <output>
+                      <from>urgency-map</from>
+                      <to>urgency-map</to>
+                    </output>
+                  </parameters>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>false</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <from>urgency-map</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[2]:spawn[1]:sequence[2]:call-process[2]</location>
+                </call-process>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>change-template-list-xml-response</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>ar-itsm-xml-response-data</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="itsm-platform-key">
+                          <input global="false">
+                            <from>itsm-platform-key</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="itsm-platform-value">
+                          <input global="false">
+                            <from>ITSMPlatform</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="urgency-map">
+                          <input global="false">
+                            <from>urgency-map</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="impact-map">
+                          <input global="false">
+                            <from>impact-map</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="change-class-map">
+                          <input global="false">
+                            <from>change-class-map</from>
+                          </input>
+                        </replacement-token>
+                        <replacement-token name="change-type-map">
+                          <input global="false">
+                            <from>change-type-map</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="@*|node()">
+    <response-data>
+      <xsl:element name="${itsm-platform-key}">${itsm-platform-value}</xsl:element>
+      <xsl:copy-of select="//response-data/*" />
+      ${urgency-map}${impact-map}${change-type-map}${change-class-map}
+    </response-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <after-execution>
+                    <log>
+                      <level>debug</level>
+                      <parameters>
+                        <input>
+                          <value>data prepared is - </value>
+                        </input>
+                        <input>
+                          <from>ar-itsm-xml-response-data</from>
+                        </input>
+                      </parameters>
+                    </log>
+                  </after-execution>
+                  <location>:switch[1]:sequence[2]:spawn[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+              <location>:switch[1]:sequence[2]:spawn[1]</location>
+            </spawn>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>ar-itsm-xml-response-data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>data</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="ar-xml-response">
+                      <input global="false">
+                        <from>ar-itsm-xml-response-data</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <response-data-list>${ar-xml-response}</response-data-list>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Utilities:Generate Response</process-name>
+              <parameters>
+                <input>
+                  <value>success</value>
+                  <to>status</to>
+                </input>
+                <input>
+                  <value>Get ITSM Configuration</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>data</from>
+                  <to>data</to>
+                </input>
+                <input>
+                  <value>1</value>
+                  <to>result count</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC-SA-ITSM_Automation:Utilities:Set End Time</process-name>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <value>Output</value>
+                    </input>
+                    <input>
+                      <from>json response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <value>End time logged as - </value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>ITSMPlatform</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "ServiceNow"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-ITSM_Automation:Change_Management:ITSM_Mappings:Get Change Templates</process-name>
+              <parameters>
+                <input>
+                  <from>FieldName</from>
+                  <to>field name</to>
+                </input>
+                <input>
+                  <from>FieldValue</from>
+                  <to>field value</to>
+                </input>
+                <input>
+                  <from>ITSMPlatform</from>
+                  <to>ITSMPlatform</to>
+                </input>
+                <output>
+                  <from>change-template-list-xml-response</from>
+                  <to>change-template-list-xml-response</to>
+                </output>
+                <output>
+                  <from>get-change-template-json-response</from>
+                  <to>get-change-template-json-response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC-SA-ITSM_Automation:Change_Management:ITSM_Mappings:Get Field Mappings</process-name>
+              <parameters>
+                <input>
+                  <from>ITSMPlatform</from>
+                  <to>ITSMPlatform</to>
+                </input>
+                <output>
+                  <from>JSON</from>
+                  <to>JSON</to>
+                </output>
+                <output>
+                  <from>ValueMap</from>
+                  <to>ValueMap</to>
+                </output>
+                <output>
+                  <from>change-class-map</from>
+                  <to>change-class-map</to>
+                </output>
+                <output>
+                  <from>change-type-map</from>
+                  <to>change-type-map</to>
+                </output>
+                <output>
+                  <from>impact-map</from>
+                  <to>impact-map</to>
+                </output>
+                <output>
+                  <from>urgency-map</from>
+                  <to>urgency-map</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>urgency-map</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[3]:call-process[2]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>change-template-list-xml-response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>ar-itsm-xml-response-data</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="itsm-platform-key">
+                      <input global="false">
+                        <from>itsm-platform-key</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="itsm-platform-value">
+                      <input global="false">
+                        <from>ITSMPlatform</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="urgency-map">
+                      <input global="false">
+                        <from>urgency-map</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="impact-map">
+                      <input global="false">
+                        <from>impact-map</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="change-class-map">
+                      <input global="false">
+                        <from>change-class-map</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="change-type-map">
+                      <input global="false">
+                        <from>change-type-map</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="@*|node()">
+    <response-data>
+      <xsl:element name="${itsm-platform-key}">${itsm-platform-value}</xsl:element>
+      <xsl:copy-of select="//response-data/*" />
+      ${urgency-map}${impact-map}${change-type-map}${change-class-map}
+    </response-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>data prepared is - </value>
+                    </input>
+                    <input>
+                      <from>ar-itsm-xml-response-data</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>ar-itsm-xml-response-data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>data</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="ar-xml-response">
+                      <input global="false">
+                        <from>ar-itsm-xml-response-data</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <response-data-list>${ar-xml-response}</response-data-list>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[2]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Utilities:Generate Response</process-name>
+              <parameters>
+                <input>
+                  <value>success</value>
+                  <to>status</to>
+                </input>
+                <input>
+                  <value>Get ITSM Configuration</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>data</from>
+                  <to>data</to>
+                </input>
+                <input>
+                  <value>1</value>
+                  <to>result count</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[3]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC-SA-ITSM_Automation:Utilities:Set End Time</process-name>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <value>Output</value>
+                    </input>
+                    <input>
+                      <from>json response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <value>End time logged as - </value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[3]:call-process[4]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>true</is-enabled>
+        <log-file-name>Get-ITSM-Types-</log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d25ad717-34aa-47b8-92eb-3ed85a46c129</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1594798785885</last-modified>
+    </meta>
+  </process-def>
+</process>

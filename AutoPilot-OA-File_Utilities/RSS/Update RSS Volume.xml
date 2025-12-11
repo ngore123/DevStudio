@@ -1,0 +1,217 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:RSS:Update RSS Volume">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specified volume name.</description>
+        <from>volume name</from>
+        <to>volume name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Enter the desired free space setting for the volume to the specified percentage (for example, 20 = 20%).</description>
+        <from>desired free space</from>
+        <to>desired free space</to>
+      </input>
+      <input global="false" required="false">
+        <description>Enter the minimum size in kilobytes (KB) for files to be managed. Only files larger than the specified size will be managed.</description>
+        <from>lower limit size</from>
+        <to>lower limit size</to>
+      </input>
+      <input global="false" required="false">
+        <description>Enter the number of days</description>
+        <from>days not accessed</from>
+        <to>days not accessed</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies an inclusion rule to be added to the volume.
+An example would look like: \windows:*.dll</description>
+        <from>include rule</from>
+        <to>include rule</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies an exclusion rule to be added to the volume.
+An example would look like: \windows:*.dll</description>
+        <from>exclude rule</from>
+        <to>exclude rule</to>
+      </input>
+      <input global="false" required="false">
+        <description>This option should be used only with "include rule" or "exclude rule"
+Valid value: true</description>
+        <from>recursive</from>
+        <to>recursive</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>volume name</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="volume name">
+                  <input global="false">
+                    <from>volume name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="desired free space">
+                  <input global="false">
+                    <from>desired free space</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="lower limit size">
+                  <input global="false">
+                    <from>lower limit size</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="days not accessed">
+                  <input global="false">
+                    <from>days not accessed</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="include rule">
+                  <input global="false">
+                    <from>include rule</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="exclude rule">
+                  <input global="false">
+                    <from>exclude rule</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="recursive">
+                  <input global="false">
+                    <from>recursive</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">rss volume set </xsl:text>
+        <xsl:if test="string-length('${volume name}') !=0">
+          <xsl:text disable-output-escaping="no">$[volume name] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${desired free space}') !=0">
+          <xsl:text disable-output-escaping="no">/dfs:$[desired free space] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${size lower limit}') !=0">
+          <xsl:text disable-output-escaping="no">/size:$[lower limit size] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${days not accessed}') !=0">
+          <xsl:text disable-output-escaping="no">/access:$[days not accessed] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${include rule}') !=0 and string-length('${exclude rule}') =0">
+          <xsl:text disable-output-escaping="no">/include:$[include rule]  </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${exclude rule}') !=0 and string-length('${include rule}') =0">
+          <xsl:text disable-output-escaping="no">/exclude:$[exclude rule] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${include rule}') !=0 and '${recursive}' ='true'">
+          <xsl:text disable-output-escaping="no">/recursive </xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows XP">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Windows XP.</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update RSS Volume
+    Update settings for a specified volume.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>12e55b7a-c32d-3091-b77e-7f343e46e2b0</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902430057</last-modified>
+    </meta>
+  </process-def>
+</process>

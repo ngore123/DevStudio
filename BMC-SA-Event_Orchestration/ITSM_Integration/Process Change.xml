@@ -1,0 +1,244 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration:ITSM_Integration:Process Change">
+    <parameters>
+      <input global="false" required="true">
+        <description>Like BMC_TrueSight</description>
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Like BMC_AR_System</description>
+        <from>itsm type</from>
+        <to>itsm type</to>
+      </input>
+      <input global="false" required="true">
+        <description>all configurations for this runbook</description>
+        <from>all configurations</from>
+        <to>all configurations</to>
+      </input>
+      <input global="false" required="true">
+        <description>An event of common event model structure.</description>
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <input global="false" required="true">
+        <description>Like ServiceDown</description>
+        <from>event type</from>
+        <to>event type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Like:
+&lt;flags&gt;
+  &lt;continue-processing&gt;true&lt;/continue-processing&gt;
+  &lt;status&gt;success&lt;/status&gt;
+  &lt;change-enabled&gt;true&lt;/change-enabled&gt;
+  &lt;incident-enabled&gt;true&lt;/incident-enabled&gt;
+  &lt;remediation-enabled&gt;true&lt;/remediation-enabled&gt;
+  &lt;remediation-required&gt;true&lt;/remediation-required&gt;
+  &lt;incident-created&gt;false&lt;/incident-created&gt;
+  &lt;incident-updated&gt;true&lt;/incident-updated&gt;
+&lt;/flags&gt;</description>
+        <from>flags</from>
+        <to>flags</to>
+      </input>
+      <input global="false" required="true">
+        <description>Like:
+
+&lt;itsm-data&gt;
+  &lt;itsm-incident-id&gt;INC000000000469&lt;/itsm-incident-id&gt;
+&lt;/itsm-data&gt; </description>
+        <from>itsm data</from>
+        <to>itsm data</to>
+      </input>
+      <input global="false" required="true">
+        <description>Like: BMC_TrueSight-ServiceDown-1
+A combination of event source type, event type and configuration id for that event type.
+[event-source-type]-[event-type]-[configuration id]</description>
+        <from>action id</from>
+        <to>action id</to>
+      </input>
+      <output global="false" required="false">
+        <to>change</to>
+        <from>change</from>
+      </output>
+      <output global="false" required="false">
+        <to>itsm data</to>
+        <from>itsm data</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>========Process Change Input=======</value>
+              </input>
+              <input>
+                <from>event type</from>
+              </input>
+              <input>
+                <from>action id</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Event_Orchestration:ITSM:Change_Management:Create Change</process-name>
+        <parameters>
+          <input>
+            <from>itsm type</from>
+            <to>itsm type</to>
+          </input>
+          <input>
+            <from>all configurations</from>
+            <to>all configurations</to>
+          </input>
+          <input>
+            <from>event data</from>
+            <to>event data</to>
+          </input>
+          <input>
+            <from>flags</from>
+            <to>flags</to>
+          </input>
+          <input>
+            <from>itsm data</from>
+            <to>itsm data</to>
+          </input>
+          <input>
+            <from>event source type</from>
+            <to>event source type</to>
+          </input>
+          <input>
+            <from>action id</from>
+            <to>action id</to>
+          </input>
+          <output>
+            <from>change</from>
+            <to>change</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML</process-name>
+        <parameters>
+          <input>
+            <from>itsm data</from>
+            <to>parent xml</to>
+          </input>
+          <input>
+            <from>change</from>
+            <to>child xml</to>
+          </input>
+          <output>
+            <from>result xml</from>
+            <to>itsm data</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>==========Process Change Output========</value>
+              </input>
+              <input>
+                <from>change</from>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+              <input>
+                <from>itsm data</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This a process template. It has a few basic things.
+1. Log Input
+2. Log Output
+3. Atleast 2 basic output parameters - status and error message.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>6c5a8972-72ed-4df3-94b7-4a44edb496ee</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration.</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1551192501761</last-modified>
+    </meta>
+  </process-def>
+</process>

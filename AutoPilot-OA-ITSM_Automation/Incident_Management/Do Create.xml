@@ -1,0 +1,718 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-ITSM_Automation:Incident_Management:Do Create">
+    <parameters>
+      <input global="false" required="true">
+        <description>The name of the WebService adapter to make the Soap call to Remedy ITSM. </description>
+        <from>AdapterName</from>
+        <to>AdapterName</to>
+      </input>
+      <input global="false" required="true">
+        <description>The URL of the Remedy ITSM, in the following format:
+
+http://midtier_server:port/arsys/services/ARService?server=ar_server</description>
+        <from>ServerUrl</from>
+        <to>ServerUrl</to>
+      </input>
+      <input global="false" required="true">
+        <description>The WebService Interface name to create the incident.
+
+Sample Value:
+HPD_IncidentServiceInterface</description>
+        <from>CreateIncidentInterface</from>
+        <to>CreateIncidentInterface</to>
+      </input>
+      <input global="false" required="true">
+        <description>The UserName of the Remedy ITSM.
+</description>
+        <from>UserName</from>
+        <to>UserName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Password of the Remedy ITSM</description>
+        <from>Password</from>
+        <to>Password</to>
+      </input>
+      <input global="false" required="false">
+        <description>XML, JSON (Default)</description>
+        <from>ReturnDataFormat</from>
+        <to>ReturnDataFormat</to>
+      </input>
+      <input global="false" required="true">
+        <description>Summary/description to be put in the incident ticket.</description>
+        <from>Summary</from>
+        <to>Summary</to>
+      </input>
+      <input global="false" required="false">
+        <description>Notes to be updated in the incident ticket.</description>
+        <from>Notes</from>
+        <to>Notes</to>
+      </input>
+      <input global="false" required="false">
+        <description>The type of the Incident.
+
+Valid Values:
+
+User Service Restoration
+User Service Request
+Infrastructure Restoration
+Infrastructure Event</description>
+        <from>IncidentType</from>
+        <to>IncidentType</to>
+      </input>
+      <input global="false" required="false">
+        <description>The source which reported the incident.
+
+Valid Values:
+
+Direct Input
+Email
+External Escalation
+Fax
+Self Service
+Systems Management
+Phone
+Voice Mail
+Walk In
+Web
+Other
+BMC Impact Manager Event</description>
+        <from>ReportedSource</from>
+        <to>ReportedSource</to>
+      </input>
+      <input global="false" required="false">
+        <description>The impact of the incident which is going to be created.
+
+Valid Values:
+
+1-Extensive/Widespread
+2-Significant/Large
+3-Moderate/Limited
+4-Minor/Localized</description>
+        <from>Impact</from>
+        <to>Impact</to>
+      </input>
+      <input global="false" required="false">
+        <description>The Urgency of the incident which is going to be created.
+
+Valid Values:
+
+1-Critical
+2-High
+3-Medium
+4-Low</description>
+        <from>Urgency</from>
+        <to>Urgency</to>
+      </input>
+      <input global="false" required="false">
+        <description>The Status of the Incident Ticket.
+
+Valid Values:
+
+New
+Assigned
+In Progress
+Pending
+Resolved
+Closed
+Cancelled</description>
+        <from>Status</from>
+        <to>Status</to>
+      </input>
+      <input global="false" required="false">
+        <description>The Reason of the current status of the incident ticket.
+
+Valid Values:
+
+Infrastructure Change Created
+Local Site Action Required
+Purchase Order Approval
+Registration Approval
+Supplier Delivery
+Support Contact Hold
+Third Party Vendor Action Reqd
+Client Action Required
+Infrastructure Change
+Request
+Future Enhancement
+Pending Original Incident
+Client Hold
+Monitoring Incident
+Customer Follow-Up Required
+Temporary Corrective Action
+No Further Action Required
+Resolved by Original Incident
+Automated Resolution Reported
+No longer a Causal CI
+Pending Causal Incident Resolution
+Resolved by Causal Incident</description>
+        <from>StatusReason</from>
+        <to>StatusReason</to>
+      </input>
+      <input global="false" required="false">
+        <from>AssignedSupportCompany</from>
+        <to>AssignedSupportCompany</to>
+      </input>
+      <input global="false" required="false">
+        <from>AssignedSupportOrganization</from>
+        <to>AssignedSupportOrganization</to>
+      </input>
+      <input global="false" required="false">
+        <from>AssignedGroup</from>
+        <to>AssignedGroup</to>
+      </input>
+      <input global="false" required="false">
+        <from>Assignee</from>
+        <to>Assignee</to>
+      </input>
+      <input global="false" required="false">
+        <from>Service</from>
+        <to>Service</to>
+      </input>
+      <input global="false" required="false">
+        <from>ServiceCIReconID</from>
+        <to>ServiceCIReconID</to>
+      </input>
+      <input global="false" required="false">
+        <from>CI</from>
+        <to>CI</to>
+      </input>
+      <input global="false" required="false">
+        <from>HPDCIReconID</from>
+        <to>HPDCIReconID</to>
+      </input>
+      <input global="false" required="false">
+        <from>CIName</from>
+        <to>CIName</to>
+      </input>
+      <input global="false" required="false">
+        <from>ReconciliationIdentity</from>
+        <to>ReconciliationIdentity</to>
+      </input>
+      <output global="false" required="false">
+        <to>json response</to>
+        <from>json response</from>
+      </output>
+      <output global="false" required="false">
+        <to>xml response</to>
+        <from>xml response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>ServerUrl</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>soapurl</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="create incident interface">
+                <input global="false">
+                  <from>CreateIncidentInterface</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="substring(., string-length(.)) = '&amp;'">
+          <xsl:value-of select="concat(., 'webService=',  '${create incident interface}')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat(., '&amp;webService=',  '${create incident interface}')" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>soapurl</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>soap request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="username">
+                <input global="false">
+                  <from>UserName</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="password">
+                <input global="false">
+                  <from>Password</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="urgency">
+                <input global="false">
+                  <from>Urgency</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="impact">
+                <input global="false">
+                  <from>Impact</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="summary">
+                <input global="false">
+                  <from>Summary</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="incident type">
+                <input global="false">
+                  <from>IncidentType</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="reported source">
+                <input global="false">
+                  <from>ReportedSource</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="assigned support org">
+                <input global="false">
+                  <from>AssignedSupportOrganization</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="assigned support comp">
+                <input global="false">
+                  <from>AssignedSupportCompany</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="assigned group">
+                <input global="false">
+                  <from>AssignedGroup</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="notes">
+                <input global="false">
+                  <from>Notes</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="status">
+                <input global="false">
+                  <from>Status</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="status reason">
+                <input global="false">
+                  <from>StatusReason</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="service">
+                <input global="false">
+                  <from>Service</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="service ci recon id">
+                <input global="false">
+                  <from>ServiceCIReconID</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="ci">
+                <input global="false">
+                  <from>CI</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="hpd ci recon id">
+                <input global="false">
+                  <from>HPDCIReconID</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="ci name">
+                <input global="false">
+                  <from>CIName</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="recon identity">
+                <input global="false">
+                  <from>ReconciliationIdentity</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="assignee">
+                <input global="false">
+                  <from>Assignee</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:urn="urn:HPD_IncidentServiceInterface" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org" version="1.0">
+  <xsl:output indent="yes" encoding="XML" cdata-section-elements="HPD_IncidentServiceInterface " />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Header>
+        <xsl:element name="urn:AuthenticationInfo">
+          <xsl:element name="urn:userName">$[username]</xsl:element>
+          <xsl:element name="urn:password">${password}</xsl:element>
+        </xsl:element>
+      </soapenv:Header>
+      <soapenv:Body>
+        <xsl:element name="urn:Create_Incident">
+          <xsl:element name="urn:Action">
+            <xsl:text disable-output-escaping="no">CREATE_INCIDENT</xsl:text>
+          </xsl:element>
+          <Incident_Type>${incident type}</Incident_Type>
+          <xsl:element name="urn:Summary">
+            <xsl:text disable-output-escaping="no">${summary}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Urgency">
+            <xsl:text disable-output-escaping="no">${urgency}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Impact">
+            <xsl:text disable-output-escaping="no">${impact}</xsl:text>
+          </xsl:element>
+          <xsl:element name="urn:Reported_Source">${reported source}</xsl:element>
+          <xsl:element name="urn:Assigned_Support_Company">${assigned support comp}</xsl:element>
+          <xsl:element name="urn:Assigned_Support_Organization">${assigned support org}</xsl:element>
+          <xsl:element name="urn:Assigned_Group">${assigned group}</xsl:element>
+          <xsl:element name="urn:Notes">$[notes]</xsl:element>
+          <xsl:element name="urn:Incident_Status">${status}</xsl:element>
+          <xsl:element name="urn:Incident_Status_Reason">${status reason}</xsl:element>
+          <xsl:element name="urn:ServiceCI">${service}</xsl:element>
+          <xsl:element name="urn:ServiceCI_ReconID">${service ci recon id}</xsl:element>
+          <xsl:element name="urn:HPD_CI">${ci}</xsl:element>
+          <xsl:element name="urn:HPD_CI_ReconID">${hpd ci recon id}</xsl:element>
+          <xsl:element name="urn:CI_Name">${ci name}</xsl:element>
+          <xsl:element name="urn:ReconciliationIdentity">${recon identity}</xsl:element>
+          <xsl:element name="urn:Assignee">${assignee}</xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>remedyRequest=&gt;</value>
+              </input>
+              <input>
+                <from>soap request</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+        <parameters>
+          <input>
+            <from>AdapterName</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>http-rpc</value>
+            <to>transport</to>
+          </input>
+          <input>
+            <from>soapurl</from>
+            <to>soap url</to>
+          </input>
+          <input>
+            <from>soap request</from>
+            <to>soap message</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>Create Incident call executed</value>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Utilities:Generate Response</process-name>
+              <unique-id>075b947d-4cef-42fe-95e7-19439aba8809</unique-id>
+              <parameters>
+                <input>
+                  <value>failure</value>
+                  <to>status</to>
+                </input>
+                <input>
+                  <from>adapter response</from>
+                  <to>error message</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(//faultstring)]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <value>Create Incident</value>
+                  <to>request type</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(//faultcode) =0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='Success' or .='success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>incident id</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"><xsl:output indent="yes" /><xsl:template match="/"><result><xsl:for-each select="//*"><xsl:choose><xsl:when test="contains(name(.), &quot;Incident_Number&quot;)"><xsl:copy-of select="." /></xsl:when></xsl:choose></xsl:for-each></result></xsl:template></xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Utilities:Generate Response</process-name>
+              <unique-id>075b947d-4cef-42fe-95e7-19439aba8809</unique-id>
+              <parameters>
+                <input>
+                  <from>status</from>
+                  <to>status</to>
+                </input>
+                <input>
+                  <from>error message</from>
+                  <to>error message</to>
+                </input>
+                <input>
+                  <value>Create Incident</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>incident id</from>
+                  <to>data</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens>
+                      <replacement-token name="incident id">
+                        <input global="false">
+                          <from>incident id</from>
+                        </input>
+                      </replacement-token>
+                    </stylesheet-replacement-tokens>
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <response-data>
+      <incident-id>${incident id}</incident-id>
+    </response-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>ReturnDataFormat</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='XML' or .='xml']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert JSON to XML</process-name>
+              <parameters>
+                <input>
+                  <from>json response</from>
+                  <to>JSON</to>
+                </input>
+                <output>
+                  <from>XML</from>
+                  <to>xml response</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens />
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="//bao-response" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>69dca266-3db1-4c60-bd92-3f9355f1e68d</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1575909116819</last-modified>
+    </meta>
+  </process-def>
+</process>

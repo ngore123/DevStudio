@@ -1,0 +1,259 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Change_Management:Utilities:Extract Change Association ID">
+    <parameters>
+      <input global="false" required="true">
+        <description>xml document - This contains the schema names used by the Change Management Module.</description>
+        <from>schema</from>
+        <to>schema</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - This contains the name or the id of the field you wish to search against.</description>
+        <from>key 1</from>
+        <to>key 1</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - This contains the value you are looking for in the key 1 field.</description>
+        <from>value 1</from>
+        <to>value 1</to>
+      </input>
+      <input global="false" required="true">
+        <from>create mappings</from>
+        <to>create mappings</to>
+      </input>
+      <input global="false" required="true">
+        <from>adapter</from>
+        <to>adapter</to>
+      </input>
+      <input global="false" required="true">
+        <from>version</from>
+        <to>version</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - The change ID</description>
+        <to>change id</to>
+        <from>change id</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>schema</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>schema name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//*[local-name()='Create-Relationships']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>create mappings</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>fields</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fields>
+      <xsl:apply-templates />
+    </fields>
+  </xsl:template>
+  <xsl:template match="mappings/*">
+    <xsl:if test="string(@queryable) = '' or @queryable='true' ">
+      <field>
+        <xsl:value-of select="." />
+      </field>
+    </xsl:if>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>create mappings</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>key 1</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens>
+              <replacement-token name="key 1">
+                <input global="false">
+                  <from>key 1</from>
+                </input>
+              </replacement-token>
+            </xpath-replacement-tokens>
+            <xpath><![CDATA[//*[local-name()='${key 1}']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>schema</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>items</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="key 1">
+                <input global="false">
+                  <from>key 1</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="value 1">
+                <input global="false">
+                  <from>value 1</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="schema name">
+                <input global="false">
+                  <from>schema name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="fields">
+                <input global="false">
+                  <from>fields</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="query" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <schema>${schema name}</schema>
+        <key>${key 1}</key>
+        <value>${value 1}</value>
+        ${fields}
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AMP-AD-BMC-Remedy-ARS:Find Items</process-name>
+        <parameters>
+          <input>
+            <from>adapter</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>version</from>
+            <to>version</to>
+          </input>
+          <input>
+            <value>read</value>
+            <to>item type</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value> show adapter response</value>
+              </input>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>change id</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//field [@name='Request ID02']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow will extract the change ID
+
+This is not supported by HP ServiceCenter</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2683fbf2-cc8d-35d5-b5f4-715355629bbf</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283249290165</last-modified>
+    </meta>
+  </process-def>
+</process>

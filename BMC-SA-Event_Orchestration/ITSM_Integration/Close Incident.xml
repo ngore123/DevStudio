@@ -1,0 +1,1119 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-SA-Event_Orchestration:ITSM_Integration:Close Incident">
+    <parameters>
+      <input global="false" required="true">
+        <from>incident id</from>
+        <to>incident id</to>
+      </input>
+      <input global="false" required="true">
+        <from>flags</from>
+        <to>flags</to>
+      </input>
+      <input global="false" required="true">
+        <from>itsm type</from>
+        <to>itsm type</to>
+      </input>
+      <input global="false" required="true">
+        <from>all configurations</from>
+        <to>all configurations</to>
+      </input>
+      <input global="false" required="true">
+        <from>authentication token</from>
+        <to>authentication token</to>
+      </input>
+      <input global="false" required="false">
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <input global="false" required="false">
+        <from>itsm authentication token</from>
+        <to>itsm authentication token</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>flags</to>
+        <from>flags</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>========Update Task and Change Input=======</value>
+              </input>
+              <input>
+                <from>incident id</from>
+              </input>
+              <input>
+                <from>flags</from>
+              </input>
+              <input>
+                <from>itsm type</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//Adapters/RESTAdapter/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>server url</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//BMC_AR_System/WebServiceConnectionData/URL/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>create change interface</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//BMC_AR_System/WebServiceConnectionData/Change_CreateInterface/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>create change soap action</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//BMC_AR_System/WebServiceConnectionData/Change_CreateSOAPAction/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>user name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//BMC_AR_System/WebServiceConnectionData/UserName/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>password</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//BMC_AR_System/WebServiceConnectionData/Password/*[name() = 'EncryptedData'])">
+        <xsl:copy-of select="//BMC_AR_System/WebServiceConnectionData/Password/*[name() = 'EncryptedData']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <value>
+          <xsl:value-of select="//BMC_AR_System/WebServiceConnectionData/Password/text()" disable-output-escaping="no" />
+        </value>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>task workinfo</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>task status</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>incident status</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>close or resolve incident</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[translate(//Defaults/CloseOrResolveIncident/text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incident status mappings</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="itsm type">
+                <input global="false">
+                  <from>itsm type</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="//*[name() = '${itsm type}']/Mappings/*/status-mappings" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident status mappings</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incident resolved status</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name = 'Resolved']/@name]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident status mappings</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incident resolved status number</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//*[@name = 'Resolved']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident status mappings</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incident closed status</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//mapping[@name = 'Closed']/@name]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident status mappings</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incident closed status number</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//*[@name = 'Closed']/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>all configurations</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incident management defaults</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="itsm type">
+                <input global="false">
+                  <from>itsm type</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="//*[name() = '${itsm type}']/IncidentManagementDefaults" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident management defaults</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>workinfo type</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//WorkInfoType/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident management defaults</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>workinfo source</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//WorkInfoSource/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident management defaults</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>workinfo locked</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//WorkInfoLocked/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident management defaults</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>workinfo view access</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//WorkInfoViewAccess/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>incident management defaults</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incident status reason</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//StatusReason/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>===configuration===</value>
+              </input>
+              <input>
+                <from>configuration</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>UserName=====Password</value>
+              </input>
+              <input>
+                <from>user name</from>
+              </input>
+              <input>
+                <from>password</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>flags</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>verification status</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//status/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>verification status</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>incident workinfo</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=". = 'success'">
+          <xsl:text disable-output-escaping="no">Remediation verification successful</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">Remediation failed because post-remediation verification failed</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <input>
+            <from>incident status reason</from>
+          </input>
+          <output>
+            <to>incident status reason</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>workinfo details</to>
+            <value>Remediation complete!</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>-------------------incident value--------------------</value>
+              </input>
+              <input>
+                <from>incident id</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>-------------------incident worklog details-------------</value>
+              </input>
+              <input>
+                <from>close incident</from>
+              </input>
+              <input>
+                <from>incident status</from>
+              </input>
+              <input>
+                <from>incident status reason</from>
+              </input>
+              <input>
+                <from>incident workinfo</from>
+              </input>
+              <input>
+                <from>workinfo type</from>
+              </input>
+              <input>
+                <from>workinfo source</from>
+              </input>
+              <input>
+                <from>workinfo locked</from>
+              </input>
+              <input>
+                <from>workinfo view access</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[3]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== Close or Resolve Incident Settings===</value>
+              </input>
+              <input>
+                <from>close incident</from>
+              </input>
+              <input>
+                <from>resolve incident</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>update incident status</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>incident status</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>close or resolve incident</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'close']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>incident closed status</from>
+                </input>
+                <output>
+                  <to>update incident status</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>incident closed status</from>
+                </input>
+                <output>
+                  <to>incident status</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>close or resolve incident</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'resolve']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>incident resolved status</from>
+                </input>
+                <output>
+                  <to>update incident status</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>incident resolved status</from>
+                </input>
+                <output>
+                  <to>incident status</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>====Skipping Incident Status Update===</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[2]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>update incident status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>close or resolve incident</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'close' or . = 'resolve']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Event_Orchestration:ITSM:Incident_Management:Update Incident Status</process-name>
+              <parameters>
+                <input>
+                  <from>itsm type</from>
+                  <to>itsm type</to>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>all configurations</to>
+                </input>
+                <input>
+                  <from>incident id</from>
+                  <to>incident id</to>
+                </input>
+                <input>
+                  <from>incident status</from>
+                  <to>incident status</to>
+                </input>
+                <input>
+                  <from>incident status reason</from>
+                  <to>incident status reason</to>
+                </input>
+                <input>
+                  <from>event source type</from>
+                  <to>event source type</to>
+                </input>
+                <input>
+                  <from>incident workinfo</from>
+                  <to>workinfo summary</to>
+                </input>
+                <input>
+                  <from>workinfo details</from>
+                  <to>workinfo details</to>
+                </input>
+                <input>
+                  <from>workinfo type</from>
+                  <to>workinfo type</to>
+                </input>
+                <input>
+                  <from>workinfo source</from>
+                  <to>workinfo source</to>
+                </input>
+                <input>
+                  <from>workinfo locked</from>
+                  <to>workinfo locked</to>
+                </input>
+                <input>
+                  <from>workinfo view access</from>
+                  <to>workinfo view access</to>
+                </input>
+                <input>
+                  <from>incident workinfo</from>
+                  <to>resolution</to>
+                </input>
+                <input>
+                  <value>xml</value>
+                  <to>retutn data format</to>
+                </input>
+                <input>
+                  <from>itsm authentication token</from>
+                  <to>itsm authentication token</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>update incident status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>update incident message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>===Updating incident status===</value>
+                    </input>
+                    <input>
+                      <from>incident id</from>
+                    </input>
+                    <input>
+                      <from>incident status</from>
+                    </input>
+                    <input>
+                      <from>update incident status</from>
+                    </input>
+                    <input>
+                      <from>update incident message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[2]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>update incident status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>incident update status</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=". = 'success'">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>flags</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>flags</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="update status">
+                      <input global="false">
+                        <from>incident update status</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="flags">
+    <flags>
+      <xsl:apply-templates select="@*|node()" />
+      <incident-updated-status>${update status}</incident-updated-status>
+    </flags>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>=====close incident process output (Using OA)===</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>error message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[2]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>flags</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>flags</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="incident update status">
+                      <input global="false">
+                        <from>incident update status</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootNode" select="name(/*)" />
+  <xsl:template match="@*|node()">
+    <xsl:apply-templates select="@*|node()" />
+  </xsl:template>
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+      <xsl:if test="name() = $rootNode">
+        <incident-update-status>${incident update status}</incident-update-status>
+      </xsl:if>
+    </xsl:copy>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>incident update status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test=". = 'success'">
+          <xsl:text disable-output-escaping="no">success</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>incident update status</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="incident update message">
+                      <input global="false">
+                        <from>update incident message</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value" />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test=". = 'failure' and string-length(normalize-space('${incident update message}')) &gt; 0">
+        <xsl:value-of select="concat('Incident status  update error message:  ', '${incident update message}')" disable-output-escaping="no" />
+        <xsl:text></xsl:text>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[2]:sequence[2]:assign[2]</location>
+            </assign>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==========Close  Incident Output========</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>error message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[2]:sequence[2]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[2]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>This a process template. It has a few basic things.
+1. Log Input
+2. Log Output
+3. Atleast 2 basic output parameters - status and error message.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>d7022e47-4efa-4ef7-9ea9-3f84be86a165</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration.</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1575926386169</last-modified>
+    </meta>
+  </process-def>
+</process>

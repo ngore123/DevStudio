@@ -1,0 +1,225 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AO-AD-Solaris_Zones:v10.4:Basic_Zone_Operations:Uninstall Zone">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+
+Default value: SolarisZoneActorAdapter
+</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <description>The XML containing the metadata needed by the adapter to connect to the target.
+Value takes the form:
+&lt;target-parameters&gt;
+	 &lt;host&gt;&lt;/host&gt; 
+	&lt;user-name&gt;&lt;/user-name&gt;
+	&lt;password&gt;&lt;/password&gt;
+&lt;/target-parameters&gt;
+
+Valid value:  XML
+</description>
+        <from>target parameters</from>
+        <to>target parameters</to>
+      </input>
+      <input global="false" required="true">
+        <description>Zone name on which operation to be performed.</description>
+        <from>zone name</from>
+        <to>zone name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the time, in seconds, to wait for operation get successful on the target server. If operation is not successful within this duration, an error message is returned. If no value is provided, a default value of 300 seconds is used.</description>
+        <from>operation timeout</from>
+        <to>operation timeout</to>
+      </input>
+      <output global="false" required="false">
+        <description>An adapter response contains the result returned from an adapter request. The contents of the response will vary by adapter.</description>
+        <to>adapter response</to>
+        <from>response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-Solaris_Zones:Utilities:Set Default Adapter Name</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <output>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>target parameters</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="zone">
+                <input global="false">
+                  <from>zone name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="timeout">
+                <input global="false">
+                  <from>operation timeout</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <solaris-zones-request>
+        <xsl:if test="//target-parameters">
+          <target>
+            <xsl:copy-of select="//target-parameters/*" />
+          </target>
+        </xsl:if>
+        <operation-type>
+          <xsl:text disable-output-escaping="no">Basic_Zone</xsl:text>
+        </operation-type>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">Uninstall_Zone</xsl:text>
+        </operation-name>
+        <xsl:if test="string-length('${timeout}')!=0">
+          <operation-timeout-secs>${timeout}</operation-timeout-secs>
+        </xsl:if>
+        <zone-name>
+          <xsl:text disable-output-escaping="no">$[zone]</xsl:text>
+        </zone-name>
+      </solaris-zones-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>request</from>
+          </input>
+          <input global="false">
+            <from>request</from>
+          </input>
+          <output global="false">
+            <to>response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>--------------- Adapter request -------------</value>
+              </input>
+              <input>
+                <from>request</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>--------------- Adapter response -------------</value>
+              </input>
+              <input>
+                <from>response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Uninstall Zone:
+   Perform uninstall operation on Zone.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2638839a-f01f-364d-ac05-9e8d53a6e2a2</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1282120396948</last-modified>
+    </meta>
+  </process-def>
+</process>

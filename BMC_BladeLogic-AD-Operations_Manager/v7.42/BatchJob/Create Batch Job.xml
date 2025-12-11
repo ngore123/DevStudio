@@ -1,0 +1,204 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:BatchJob:Create Batch Job">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the job to be created.</description>
+        <from>jobName</from>
+        <to>jobName</to>
+      </input>
+      <input global="false" required="true">
+        <description>ID of the job group where this job is stored.</description>
+        <from>groupId</from>
+        <to>groupId</to>
+      </input>
+      <input global="false" required="true">
+        <description>Handle to the initial member job.</description>
+        <from>memberKey</from>
+        <to>memberKey</to>
+      </input>
+      <input global="false" required="true">
+        <description>Continue on error.</description>
+        <from>bContinueOnError</from>
+        <to>bContinueOnError</to>
+      </input>
+      <input global="false" required="true">
+        <description>Execute by Stage(true)/Server(false).</description>
+        <from>bExecuteByStage</from>
+        <to>bExecuteByStage</to>
+      </input>
+      <input global="false" required="true">
+        <description>Override member targets.</description>
+        <from>bOverrideTargets</from>
+        <to>bOverrideTargets</to>
+      </input>
+      <input global="false" required="false">
+        <description>True to run the jobs within this Batch Job in parallel; false to run them sequentially.</description>
+        <from>bParallelExecution</from>
+        <to>bParallelExecution</to>
+      </input>
+      <output global="false" required="true">
+        <description>Success status of the command. "true" if successfule, "false" otherwise.</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>If "success" is false then error message contains the corresponding error message if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains the DBKey for the batch job.</description>
+        <to>DBKey</to>
+        <from>return values</from>
+      </output>
+      <output global="false" required="false">
+        <description>Contains any debug message accompanying the adapter response.</description>
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="true">
+        <description>Contains the Adapter response for this command.</description>
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>jobName</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>groupId</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>memberKey</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>bContinueOnError</from>
+            <to>argument 4</to>
+          </input>
+          <input>
+            <from>bExecuteByStage</from>
+            <to>argument 5</to>
+          </input>
+          <input>
+            <from>bOverrideTargets</from>
+            <to>argument 6</to>
+          </input>
+          <input>
+            <from>bParallelExecution</from>
+            <to>argument 7</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <value>BatchJob</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>createBatchJob</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return values</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[//value/text()]]></xpath>
+            </xpath-expression>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command creates a Batch Job with one member job. Use addMemberJobByJobKey to add more member jobs. Use removeMemberJobByJobKeyAndIndex to remove a job. If the Batch Job is to override targets, these must be added using Job : addTargetServer , or Job : addTargetGroup.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>11adda95-4da4-3c2d-b71e-2fabb647893c</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179751423</last-modified>
+    </meta>
+  </process-def>
+</process>

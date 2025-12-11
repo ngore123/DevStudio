@@ -1,0 +1,302 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Offboarding:Process User Offboarding Event">
+    <parameters>
+      <input global="false" required="true">
+        <from>inputevent</from>
+        <to>inputevent</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set Start Time</process-name>
+        <unique-id>c113440d-ac61-4f97-bc14-2607426fd912</unique-id>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-SDA_Fulfillment_Cases:Utils:Extract Event Info</process-name>
+        <parameters>
+          <input>
+            <from>inputevent</from>
+            <to>inputevent</to>
+          </input>
+          <input>
+            <value>,</value>
+            <to>delimiter</to>
+          </input>
+          <output>
+            <from>user name</from>
+            <to>user name</to>
+          </output>
+          <output>
+            <from>ticket number</from>
+            <to>ticket number</to>
+          </output>
+          <output>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </output>
+          <output>
+            <from>ticket type</from>
+            <to>ticket type</to>
+          </output>
+          <output>
+            <from>VD_TIME</from>
+            <to>VD_TIME</to>
+          </output>
+          <output>
+            <from>VD_FINANCIAL</from>
+            <to>VD_FINANCIAL</to>
+          </output>
+          <output>
+            <from>emailAddress</from>
+            <to>emailAddress</to>
+          </output>
+          <output>
+            <from>size extension requested</from>
+            <to>size extension requested</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+              <parameters>
+                <input>
+                  <value>failure</value>
+                  <to>success status</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <input>
+                  <value>Unknown</value>
+                  <to>target name</to>
+                </input>
+                <input>
+                  <value>Unlock Account</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <value>
+                    <adapter-response />
+                  </value>
+                  <to>target response</to>
+                </input>
+                <input global="true">
+                  <configuration>:BMC-SA-Service_Desk_Automation:FulfillmentIntegrations:Defaults:Templates:RequestResponseTemplate</configuration>
+                  <to>fulfillment response</to>
+                </input>
+                <input>
+                  <value>User Info not found.</value>
+                  <to>error summary</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>user name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)]]></xpath>
+            </xpath-expression>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Offboarding:Do offboarding</process-name>
+              <parameters>
+                <input global="true">
+                  <configuration>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Integrations:Exchange:Adapter</configuration>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>user name</from>
+                  <to>user name</to>
+                </input>
+                <input>
+                  <from>emailAddress</from>
+                  <to>email address</to>
+                </input>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>workinfo failure details</from>
+                  <to>workinfo failure details</to>
+                </output>
+                <output>
+                  <from>workinfo completion details</from>
+                  <to>workinfo completion details</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Post Fulfillment Update</process-name>
+              <parameters>
+                <input>
+                  <from>ticket number</from>
+                  <to>ticket number</to>
+                </input>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>ticket type</from>
+                  <to>ticket type</to>
+                </input>
+                <input>
+                  <from>error message</from>
+                  <to>error details</to>
+                </input>
+                <input>
+                  <from>workinfo completion details</from>
+                  <to>workinfo completion details</to>
+                </input>
+                <input>
+                  <from>workinfo failure details</from>
+                  <to>workinfo failure details</to>
+                </input>
+                <input>
+                  <from>VD_FINANCIAL</from>
+                  <to>VD Financial</to>
+                </input>
+                <input>
+                  <from>VD_TIME</from>
+                  <to>VD Time</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set End Time</process-name>
+        <parameters>
+          <output>
+            <from>end time</from>
+            <to>end time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[3]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7d97d534-6902-4477-bbbc-bab6162d6bc4</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1478867286653</last-modified>
+    </meta>
+  </process-def>
+</process>

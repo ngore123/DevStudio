@@ -1,0 +1,193 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-NetAPP_Storage:v4.0:Clone:Clone File">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter. Default Name: NetAppActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Clones a file using flexclone.
+
+Sample Items XML:
+
+&lt;items&gt;
+&lt;item&gt;
+		&lt;targets&gt;
+			&lt;target&gt;
+				&lt;host&gt;10.10.10.10&lt;/host&gt;
+				&lt;user-name&gt;userName&lt;/user-name&gt;
+				&lt;password&gt;password&lt;/password&gt;
+				&lt;protocol&gt;http&lt;/protocol&gt;
+				&lt;port&gt;8088&lt;/port&gt;                                
+			&lt;/target&gt;
+		&lt;/targets&gt;
+	&lt;target&gt;server1&lt;/target&gt;
+	&lt;target-host&gt;12.12.12.12&lt;/target-host&gt;
+	&lt;source-path&gt;/vol/test1_16/testlun1/testlun1&lt;/source-path&gt;
+	&lt;destination-path&gt;/vol/test1_16/testlun1/testlun2&lt;/destination-path&gt;
+	&lt;no-snap&gt;true&lt;/no-snap&gt;
+	&lt;change-log&gt;true&lt;/change-log&gt;
+&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+targets [Conditional] 
+
+        It is parent XML element for &lt;target&gt; XML element. 
+        The &lt;target&gt; XML element is used to specify dynamic targets at request level. 
+        Note: The &lt;targets&gt; XML element is required if the adapter configuration is empty in Grid Manager. 
+
+target [Conditional] 
+        It is child XML element of &lt;targets&gt; XML element. This element is used to specify dynamic targets at request level. 
+
+        Using dynamic targets you can define connection information for a remote host within an adapter request. This allows you to configure an adapter in Grid Manager, by specifying configuration information in an adapter request. 
+
+        Note: (1) Adapter configuration specified using request level dynamic targets takes precedence over Grid Manager level configuration information. (2) If request level dynamic target is specified using &lt;targets&gt; XML element, then the &lt;target&gt; element which is child of &lt;item&gt; element is ignored. (3) This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+host [Conditional] 
+Host name or IP address of server on which NetApp DataFabric Manager is running. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+user-name [Conditional] 
+NetApp DataFabric Manager login username. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+password [Conditional] 
+NetApp DataFabric Manager login password. 
+
+You can encrypt the password by specifying the encryption type attribute. 
+For example: &lt;password encryption-type = "Base64"&gt;cGFzc3dvcmQ=&lt;/password&gt;. 
+Note: This element is required if &lt;targets&gt; XML element is present in the adapter request. 
+
+protocol [Optional] 
+Communication protocol used by adapter. Valid value is http or https. Default value is http. 
+
+port [Optional] 
+Port on which NetApp DataFabric Manager is enabled. Default value is 8088 for http protocol and 8488 for https protocol. 
+
+target [Optional] 
+It is child XML element of &lt;item&gt; XML element. 
+You can use this element to specify the connection information for a DFM Server. For this a comma separated list of configuration names can be specified. This executes the request simultaneously on all DFM servers identified by the configuration names. 
+Valid values: 
+1. The values specified for &lt;target&gt; XML element must be same as the values that have been specified for the name attribute of &lt;config&gt; element in Grid Manager adapter configuration. 
+2. You can provide "ALL" as the value. In this case the request will get executed on all the DFM servers defined in Grid Manager adapter configuration. 
+3. You can specify multiple comma separated names to allow simultaneous execution of requests across multiple DFM servers. 
+4. You can skip this element. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+You can leave this element empty. In that case the request will be executed on the first defined Grid Manager adapter configuration. 
+
+Note: This element is ignored if request level dynamic target is specified using &lt;targets&gt; XML element.
+
+
+target-host[Required]
+	The hostname or IP of the target storage/filer.
+
+change-log[Optional]
+	This is a boolean field. If this option is "true", fingerprints of data blocks of the destination file/block ranges created will be change logged to the change log file if A-SIS is enabled on the volume. With change logging clone operation will be slow, as to get fingerprints all the data blocks will be read. Without change logging clone operation deals with only indirect blocks without reading data blocks. If this is "false" i.e. without change logging, fingerprints of the clone blocks are not recorded. The clone blocks are shared with the source blocks, but as later the source blocks are modified, corresponding clone blocks will no longer be shared. If change logging option is not used, clone blocks, which could be involved in sharing with rest of the file system, can not be shared in next sis operation. The only option, in case user had not used change logging while creating clone, will be to start sis from beginning using "sis start -s" to gather fingerprints of clone blocks.
+
+destination-path[Optional]
+	Full path of the Destination file or LUN in /vol/&lt;volume-name&gt;/&lt;file-path&gt; format. Destination path should be in same flexible volume where source file is located. For sub-file/sub-LUN clone operation within same file/LUN, destination path is not required.
+
+no-snap[Optional]
+	This is a boolean field. If no-snap is false or unspecified, then a temporary snapshot will be taken and source file locked in snapshot will be considered for cloning. So that the clone operation does not get affected by writes to the source file in parallel to the clone operation. User will get atomic point in time copy of the source. Irrespective of clone operation completes successfully or unsuccessfully, any temporary snapshot taken for cloning will be deleted automatically. If no-snap is "true", then the source file in AFS will be used for cloning. In this case user may get random data in clone if source file is modified while clone operation is in progress. This option should only be used when user is assured that the source file will remain consistent during the clone operation. Destination file is not protected against any modification while clone operation is in progress. User should use the destination file or destination block ranges after clone operation is finished.
+
+source-path[Required]
+	Full path of the source file or LUN in /vol/&lt;volume-name&gt;/&lt;file-path&gt; format.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>clone-file</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-NetAPP_Storage:Utilities:Invoke Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Clones a file using flexclone</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>35bb71f3-45f6-36e8-a557-c5a159654f2e</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598190282</last-modified>
+    </meta>
+  </process-def>
+</process>

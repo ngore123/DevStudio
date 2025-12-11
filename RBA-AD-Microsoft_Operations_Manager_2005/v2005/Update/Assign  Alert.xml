@@ -1,0 +1,224 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":RBA-AD-Microsoft_Operations_Manager_2005:v2005:Update:Assign  Alert">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is MOM2005Adapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>items
+The items XML that will be used to assign alert to an user.
+Sample:
+
+&lt;items&gt;
+&lt;operation-parameter&gt;
+	&lt;search-parameters&gt;		
+		&lt;alert-id&gt;f76fc97f-3172-4aa8-acb3-3f57a7fb40a1&lt;/alert-id&gt;
+	&lt;/search-parameters&gt;
+	&lt;update-parameters&gt;
+		&lt;owner-name&gt;BMC&lt;/owner-name&gt;
+	&lt;/update-parameters&gt;
+&lt;/operation-parameter&gt;
+&lt;/items&gt;
+
+Description of fields that can come in search-parameters xml:-
+
+alert-id [Optional]
+	  The guid of the alert used to identify the alert.
+component [Optional]
+	  The name of the component or feature within the application that caused the alert.
+component-instance [Optional]
+	  The name of a particular instance of the component or feature within the application that caused the alert.
+computer-domain [Optional]
+	  Domain to which the computer belongs.
+computer-name [Optional]
+	  The name of the computer.
+custom-field-1 [Optional]
+	  The first user-defined field.
+custom-field-2 [Optional]
+	  The second user-defined field.
+custom-field-3 [Optional]
+	  The third user-defined field.
+custom-field-4 [Optional]
+	  The fourth user-defined field.
+custom-field-5 [Optional]
+	  The fifth user-defined field.
+description [Optional]
+	  The alert description.
+name [Optional]
+	  The name of the alert.
+owner-name [Optional]
+	  The account name that owns the alert.
+problem-state [Optional]
+	  The values that specify the current state.
+resolution-state [Optional]
+	  The state of the alert.
+server-role [Optional]
+	  The role of the computer.
+server-role-instance [Optional]
+	  The name of the instance of the role.
+severity  [Optional]
+	  The severity of the alert.
+source [Optional]
+	  The name of the Windows service that was the source of the alert.
+time-raised [Optional]
+	  The time when the alert was raised.
+url [Optional]
+	  Hyperlink to the alert's page in the MOM Web console
+repeat-count [Optional]
+	  For consolidated events, the RepeatCount field gets the number of repeat occurrences.
+time-added [Optional]
+	  The time when the alert was added to the MOM database
+last-time-state-modified [Optional]
+	  The time when the alert's state last changed
+time-last-modified [Optional]
+	  The time when the alert's state or properties last changed
+ticket-id [Optional]
+	  Stores the id identifying a trouble ticket associated with this alert
+modified-by [Optional]
+	  The last user to change the alert's properties.
+time-of-first-event [Optional]
+	  The time when the first event was raised
+time-of-last-event [Optional]
+	  The time when the first event was raised
+resolved-by [Optional]
+	  The name of the user account responsible for resolving the alert, if it has been resolved
+comment [Optional]
+	  Comment in the history log
+acknowledge [Optional]
+	  Set to "true" if alerts need to be acknowledged which match the specified alert-id, else set to "false"
+
+Description of fields that can come in update-parameters xml:-
+
+owner-name
+	  The account name that owns the alert.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation type</to>
+            <value>CRUD_Alert</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>update_alerts</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:RBA-AD-Microsoft_Operations_Manager_2005:Utilities:Create Adapter Request With Allowed Param</process-name>
+        <parameters>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation type</from>
+            <to>operation type</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <input>
+            <value>owner-name</value>
+            <to>allowed param</to>
+          </input>
+          <output>
+            <from>adapter request</from>
+            <to>adapter request</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:RBA-AD-Microsoft_Operations_Manager_2005:Utilities:Execute Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>adapter request</from>
+            <to>adapter request</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Assigns the alert to an user.
+
+Sample input XML:
+
+&lt;items&gt;
+&lt;operation-parameter&gt;
+	&lt;search-parameters&gt;		
+		&lt;alert-id&gt;f76fc97f-3172-4aa8-acb3-3f57a7fb40a1&lt;/alert-id&gt;
+	&lt;/search-parameters&gt;
+	&lt;update-parameters&gt;
+		&lt;owner-name&gt;BMC&lt;/owner-name&gt;
+	&lt;/update-parameters&gt;
+&lt;/operation-parameter&gt;
+&lt;/items&gt;</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>271b3919-6661-3d27-99cb-8133c236d43d</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1282111573245</last-modified>
+    </meta>
+  </process-def>
+</process>

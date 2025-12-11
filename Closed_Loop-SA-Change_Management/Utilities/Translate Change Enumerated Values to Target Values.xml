@@ -1,0 +1,412 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":Closed_Loop-SA-Change_Management:Utilities:Translate Change Enumerated Values to Target Values">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration entry defined in a configuration module. 
+
+Example: BCAN</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>An XML document providing the data template for single or multiple Concept elements.The task concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <from>changes</from>
+        <to>changes</to>
+      </input>
+      <output global="false" required="false">
+        <description>An XML document providing the data template for single or multiple Concept elements.The task concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <to>changes</to>
+        <from>change collection</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - Indicates whether or not the process completed successfully. 
+
+Valid values: 0-success,1-failure
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value – A verbose message indicating the success or failure of the process</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:Closed_Loop-SA-Change_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>change impact mappings</from>
+            <to>impact mappings</to>
+          </output>
+          <output>
+            <from>change urgency mappings</from>
+            <to>urgency mappings</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>configuration name success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>configuration name status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>changes</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>change collection</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <Changes />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <for-each>
+              <document>
+                <input>
+                  <from>changes</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>change</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//Changes/*]]></xpath>
+              </xpath-expression>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <sequence>
+                <switch>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>true</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <execute-all-applicable-cases>true</execute-all-applicable-cases>
+                  <default>
+                    <sequence />
+                  </default>
+                  <case>
+                    <condition>
+                      <document>
+                        <input>
+                          <from>change</from>
+                        </input>
+                      </document>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[string-length(//*[local-name()='urgency']/text())!=0]]></xpath>
+                      </xpath-expression>
+                    </condition>
+                    <sequence>
+                      <assign>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>change</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>urgency</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//*[local-name()='urgency']/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>urgency mappings</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>change</to>
+                              <concept type="AutoPilot-OA-Change_Management:Change">
+                                <attribute>urgency</attribute>
+                              </concept>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens>
+                              <replacement-token name="urgency">
+                                <input global="false">
+                                  <from>urgency</from>
+                                </input>
+                              </replacement-token>
+                            </xpath-replacement-tokens>
+                            <xpath><![CDATA[//mapping[./@name='${urgency}']/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                      </assign>
+                    </sequence>
+                  </case>
+                  <case>
+                    <condition>
+                      <document>
+                        <input>
+                          <from>change</from>
+                        </input>
+                      </document>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[string-length(//*[local-name()='impact']/text())!=0]]></xpath>
+                      </xpath-expression>
+                    </condition>
+                    <sequence>
+                      <assign>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>change</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>impact</to>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens />
+                            <xpath><![CDATA[//*[local-name()='impact']/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <assignment>
+                          <document>
+                            <input>
+                              <from>impact mappings</from>
+                            </input>
+                          </document>
+                          <result>
+                            <output>
+                              <to>change</to>
+                              <concept type="AutoPilot-OA-Change_Management:Change">
+                                <attribute>impact</attribute>
+                              </concept>
+                            </output>
+                          </result>
+                          <xpath-expression>
+                            <xpath-replacement-tokens>
+                              <replacement-token name="impact">
+                                <input global="false">
+                                  <from>impact</from>
+                                </input>
+                              </replacement-token>
+                            </xpath-replacement-tokens>
+                            <xpath><![CDATA[//mapping[./@name='${impact}']/text()]]></xpath>
+                          </xpath-expression>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[1]:switch[1]:sequence[3]:assign[1]</location>
+                      </assign>
+                    </sequence>
+                  </case>
+                  <location>:switch[1]:sequence[1]:switch[1]</location>
+                </switch>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>change collection</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>change collection</to>
+                      </output>
+                    </result>
+                    <xslt-stylesheet>
+                      <stylesheet-replacement-tokens>
+                        <replacement-token name="change">
+                          <input global="false">
+                            <from>change</from>
+                          </input>
+                        </replacement-token>
+                      </stylesheet-replacement-tokens>
+                      <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Changes>
+      <xsl:copy-of select="./node()/*" />
+      ${change}
+    </Changes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                    </xslt-stylesheet>
+                  </assignment>
+                  <assignment>
+                    <output>
+                      <to>success status</to>
+                      <value>0</value>
+                    </output>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>configuration name</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>status message</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[concat("Mapping completed successfully for: ", .)]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[1]:assign[2]</location>
+                </assign>
+              </sequence>
+              <location>:switch[1]:sequence[1]:for-each[1]</location>
+            </for-each>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name success status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() = '1']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration name</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown configuration name: ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process will translate input field values to enumerated values using the module configuration mappings. </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7129b0b2-626e-3a7e-a2ff-99f99b64e2fd</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283245783901</last-modified>
+    </meta>
+  </process-def>
+</process>

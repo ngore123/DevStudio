@@ -1,0 +1,251 @@
+<process draft="false" dev-studio-version="8.1.00">
+  <process-def name=":BMC-SA-Event_Orchestration_Host_Down:Utilities:Traceroute">
+    <parameters>
+      <input global="false" required="true">
+        <description>Connection details of all host from where ping has been done to the target host.</description>
+        <from>connectiondetails</from>
+        <to>connectiondetails</to>
+      </input>
+      <input global="false" required="true">
+        <description>Investigation status.</description>
+        <from>investigation status</from>
+        <to>investigation status</to>
+      </input>
+      <input global="false" required="true">
+        <description>Target host or Down host.</description>
+        <from>destinationhost</from>
+        <to>destinationhost</to>
+      </input>
+      <output global="false" required="true">
+        <to>investigation message</to>
+        <from>investigation message</from>
+      </output>
+      <output global="false" required="true">
+        <to>investigation status</to>
+        <from>investigation status</from>
+      </output>
+      <output global="false" required="true">
+        <to>triagedata</to>
+        <from>triagedata</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <compose-xml>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>&lt;enrichment-data&gt;
+Triage data for host </value>
+                </input>
+              </fragment>
+              <fragment type="string" encode="true">
+                <input required="false">
+                  <from>destinationhost</from>
+                </input>
+              </fragment>
+              <fragment type="string" encode="false">
+                <input>
+                  <value>
+&amp;#10;----------------------------&amp;#10;
+&lt;/enrichment-data&gt;</value>
+                </input>
+              </fragment>
+            </compose-xml>
+          </input>
+          <output>
+            <to>triagedata</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>connectiondetails</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>connectiondetail</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[//connection-detail]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <sequence>
+          <assign>
+            <assignment>
+              <document>
+                <input>
+                  <from>connectiondetail</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>pingoutput</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//connection-detail/ping-output/text()]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <assignment>
+              <document>
+                <input>
+                  <from>connectiondetail</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>pinghost</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//connection-detail/component/@name]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <assignment>
+              <document>
+                <input>
+                  <from>triagedata</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>oldtext</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//enrichment-data/text()]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <assignment>
+              <document>
+                <input>
+                  <from>triagedata</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>triagedata</to>
+                </output>
+              </result>
+              <xslt-stylesheet>
+                <stylesheet-replacement-tokens>
+                  <replacement-token name="pingoutput">
+                    <input global="false">
+                      <from>pingoutput</from>
+                    </input>
+                  </replacement-token>
+                  <replacement-token name="pinghost">
+                    <input global="false">
+                      <from>pinghost</from>
+                    </input>
+                  </replacement-token>
+                  <replacement-token name="olddata">
+                    <input global="false">
+                      <from>oldtext</from>
+                    </input>
+                  </replacement-token>
+                </stylesheet-replacement-tokens>
+                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <enrichment-data>
+      <xsl:text disable-output-escaping="no">&amp;#10;</xsl:text>
+      <xsl:text disable-output-escaping="no">${olddata}</xsl:text>
+      <xsl:text disable-output-escaping="no">&amp;#10;</xsl:text>
+      <xsl:text disable-output-escaping="no">ping from host ${pinghost}</xsl:text>
+      <xsl:text disable-output-escaping="no">&amp;#10;</xsl:text>
+      <xsl:text disable-output-escaping="no">ping output: ${pingoutput}</xsl:text>
+    </enrichment-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+              </xslt-stylesheet>
+            </assignment>
+            <assignment>
+              <document>
+                <input>
+                  <from>destinationhost</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>investigation message</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[concat("Ping test to ", ., " succeeded after performing multiple Host Accessibility checks.")]]></xpath>
+              </xpath-expression>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <after-execution>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>---------------triage data------------------------</value>
+                  </input>
+                  <input>
+                    <from>triagedata</from>
+                  </input>
+                </parameters>
+              </log>
+            </after-execution>
+            <location>:assign[2]</location>
+          </assign>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4b13de6f-1f14-4e3f-a3dc-cd034d151d0c</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1548203931811</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,226 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":BMC_BladeLogic-AD-Operations_Manager:v7.42:Server:Bulk Add Servers">
+    <parameters>
+      <input global="false" required="false">
+        <description>The Connection details for the Adatpater.
+Ezample:
+&lt;BladeLogicConnectionDetail&gt;
+&lt;adapter-name&gt;BladeLogic Adapter&lt;/adapter-name&gt;
+&lt;/BladeLogicConnectionDetail&gt;</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Driectory containing the CSV file.</description>
+        <from>fileDir</from>
+        <to>fileDir</to>
+      </input>
+      <input global="false" required="true">
+        <description>Local file in CSV format containing the servers to add.</description>
+        <from>fileName</from>
+        <to>fileName</to>
+      </input>
+      <input global="false" required="true">
+        <description>The character set used in the CSV file. Can be UTF-8 or another supported character set. For a full list of available character sets, see the list above.</description>
+        <from>charset</from>
+        <to>charset</to>
+      </input>
+      <input global="false" required="true">
+        <description>Indicates whether or not you want the add process to contact the agent on each server and attempt to retrieve each server's intrinsic properties (true/false). </description>
+        <from>shouldUpdateIntrinsicProperties</from>
+        <to>shouldUpdateIntrinsicProperties</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>list</to>
+        <from>return vlaues</from>
+      </output>
+      <output global="false" required="false">
+        <to>debug message</to>
+        <from>debug message</from>
+      </output>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>output</from>
+      </output>
+      <output global="false" required="false">
+        <to>script lines</to>
+        <from>script lines</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Utilities:Add up to 10 Arguments to List</process-name>
+        <parameters>
+          <input>
+            <from>fileDir</from>
+            <to>argument 1</to>
+          </input>
+          <input>
+            <from>fileName</from>
+            <to>argument 2</to>
+          </input>
+          <input>
+            <from>charset</from>
+            <to>argument 3</to>
+          </input>
+          <input>
+            <from>shouldUpdateIntrinsicProperties</from>
+            <to>argument 4</to>
+          </input>
+          <output>
+            <from>updated list</from>
+            <to>argument list</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC_BladeLogic-AD-Operations_Manager:Perform BLCLI command</process-name>
+        <parameters>
+          <input>
+            <value>Server</value>
+            <to>namespace</to>
+          </input>
+          <input>
+            <value>bulkAddServers</value>
+            <to>command name</to>
+          </input>
+          <input>
+            <from>argument list</from>
+            <to>argument list</to>
+          </input>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>return values</from>
+            <to>return vlaues</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>debug message</from>
+            <to>debug message</to>
+          </output>
+          <output>
+            <from>output</from>
+            <to>output</to>
+          </output>
+          <output>
+            <from>script lines</from>
+            <to>script lines</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This command adds a list of servers whose names are contained in a text file.
+
+As input, the command requires the name of a local file. The file should be in CSV format with the following rules:
+
+    * The first row in the file is treated as the header row.
+    * The first column in the header row must be 'Name'. All other columns are treated as property names.
+    * The data in the first column can be server names or IP addresses.
+
+Use the charset argument to specify the encoding used in the CSV file. You can set charset to any of the following encodings. In the list below, the charset value is the value within parentheses. For example, some valid charset values are US-ASCII and UTF-8.
+
+    * English (US-ASCII)
+    * Arabic (ISO-8859-6)
+    * Arabic (windows-1256)
+    * Baltic (ISO-8859-13)
+    * Baltic (ISO-8859-4)
+    * Baltic (windows-1257)
+    * Central European (ISO-8859-2)
+    * Chinese Simplified (x-EUC-CN)
+    * Chinese Simplified (GB18030)
+    * Chinese Simplified (GBK)
+    * Chinese Simplified (x-mswin-936)
+    * Chinese Traditional (Big5)
+    * Chinese Traditional (Big5-HKSCS)
+    * Chinese Traditional (x-EUC-TW)
+    * Chinese Traditional (MS950-HKSCS)
+    * Chinese Traditional (x-windows-950)
+    * Cyrillic (ISO-8859-5)
+    * Cyrillic (windows-1251)
+    * Eastern European (windows-1250)
+    * Greek (ISO-8859-7)
+    * Greek (windows-1253)
+    * Hebrew (ISO-8859-8)
+    * Hebrew (windows-1255)
+    * Japanese (EUC-JP)
+    * Japanese (ISO-2022-JP)
+    * Japanese (Shift_JIS)
+    * Japanese (windows-31j)
+    * Korean (EUC-KR)
+    * Korean (ISO-2022-KR)
+    * Korean (x-windows-949)
+    * Russian (KOI8-R)
+    * South European (ISO-8859-3)
+    * Thai (TIS-620)
+    * Turkish (ISO-8859-9)
+    * Turkish (windows-1254)
+    * Vietnamese (windows-1258)
+    * Western (windows-1252)
+    * Western (ISO-8859-1)
+    * Western (ISO-8859-15)
+    * Unicode (UTF-8)
+    * Unicode (UTF-16)
+    * Unicode (UTF-16BE)
+    * Unicode (UTF-16LE)
+
+Returns a list of Strings containing names of the servers that were added.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d52771fd-e6f0-316c-bd36-92adebf32af8</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1283179864680</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,201 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:RSS:Perform RSS Cancel Storage Job">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specified volume name.</description>
+        <from>volume name</from>
+        <to>volume name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Cancels a Create Free Space job on the managed volumes.
+valid values: true
+
+Note: create free space</description>
+        <from>create free space</from>
+        <to>create free space</to>
+      </input>
+      <input global="false" required="false">
+        <description>Cancels copies files jobs on the specified volume to remote storage.
+Valid value: true
+
+Note: create free space</description>
+        <from>copy files</from>
+        <to>copy files</to>
+      </input>
+      <input global="false" required="false">
+        <description>Cancels validation jobs on specified volumes.
+Valid value: true
+
+Note: create free space</description>
+        <from>validate</from>
+        <to>validate</to>
+      </input>
+      <input global="false" required="false">
+        <description>Indicates that the jobs should run synchronously on each volume and that Remote Storage will wait until all jobs are complete or it encounters an error before returning to the command prompt.
+Valid value: true</description>
+        <from>wait</from>
+        <to>wait</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>volume name</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="volume name">
+                  <input global="false">
+                    <from>volume name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="create free space">
+                  <input global="false">
+                    <from>create free space</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="copy files">
+                  <input global="false">
+                    <from>copy files</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="validate">
+                  <input global="false">
+                    <from>validate</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="wait">
+                  <input global="false">
+                    <from>wait</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">rss volume job </xsl:text>
+        <xsl:if test="string-length('${volume name}') !=0">
+          <xsl:text disable-output-escaping="no">$[volume name] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${create free space}') !=0 and '${create free space}'='true'">
+          <xsl:text disable-output-escaping="no">/type:createfreespace </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${copy files}') !=0 and '${copy files}'='true'">
+          <xsl:text disable-output-escaping="no">/type:copyfiles </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${validate}') !=0 and '${validate}'='true'">
+          <xsl:text disable-output-escaping="no">/type:validate </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${volume name}') !=0">
+          <xsl:text disable-output-escaping="no">/cancel </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${wait}') !=0 and '${wait}'='true'">
+          <xsl:text disable-output-escaping="no">/wait </xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows XP">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Windows XP.</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform RSS Cancel Storage Job
+    Cancel a Remote Storage job.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e25f53e3-7ad0-3f06-986e-3d5fa870b185</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902426480</last-modified>
+    </meta>
+  </process-def>
+</process>

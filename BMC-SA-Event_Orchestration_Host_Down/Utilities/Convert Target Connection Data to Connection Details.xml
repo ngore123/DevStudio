@@ -1,0 +1,188 @@
+<process draft="false" dev-studio-version="8.1.00">
+  <process-def name=":BMC-SA-Event_Orchestration_Host_Down:Utilities:Convert Target Connection Data to Connection Details">
+    <parameters>
+      <input global="false" required="true">
+        <from>target connection data</from>
+        <to>target connection data</to>
+      </input>
+      <output global="false" required="false">
+        <to>connection details</to>
+        <from>connection details</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>target connection data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>os type</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//component/@type]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>target connection data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>host name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//component/@name]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>host name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>domain</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[substring-after(., '.')]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>target connection data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>connection details</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <connection-details>
+      <xsl:copy-of select="//invocation-mechanism" />
+      <xsl:copy-of select="//adapter-name" />
+      <hostname>
+        <xsl:value-of select="//component/@name" disable-output-escaping="no" />
+      </hostname>
+      <xsl:copy-of select="//username" />
+      <xsl:copy-of select="//password" />
+      <xsl:apply-templates select="//adapter-options/*" mode="adapter-options" />
+      <xsl:apply-templates select="//command-options/*" mode="command-options" />
+    </connection-details>
+  </xsl:template>
+  <xsl:template match="@*|node()" mode="adapter-options">
+    <xsl:copy-of select="." />
+  </xsl:template>
+  <xsl:template match="@*|node()" mode="command-options">
+    <xsl:copy-of select="." />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== incoming connection-details = target connection data===</value>
+              </input>
+              <input>
+                <from>target connection data</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== translated connection details=====</value>
+              </input>
+              <input>
+                <from>connection details</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Convert target connection data used in Event Orchestration to connection details used by AuotPilot-OA-Common_Utilties, etc.
+
+So, an XML of the format:
+&lt;connection-details&gt;
+  &lt;component xmlns:xalan="http://xml.apache.org/xalan" type="unix" name="clm-aus-021691.bmc.com"&gt;
+    &lt;username&gt;root&lt;/username&gt;
+    &lt;password-configuration-name&gt;UnixCredentials&lt;/password-configuration-name&gt;
+    &lt;invocation-mechanism&gt;ssh&lt;/invocation-mechanism&gt;
+    &lt;ping-mechanism&gt;command-line&lt;/ping-mechanism&gt;
+    &lt;adapter-options /&gt;
+    &lt;command-options /&gt;
+    &lt;adapter-name&gt;SSHAdapter&lt;/adapter-name&gt;
+    &lt;ping-adapter-name&gt;Command Line&lt;/ping-adapter-name&gt;
+  &lt;/component&gt;
+  &lt;password&gt;
+    &lt;EncryptedData xmlns="http://www.w3.org/2001/04/xmlenc#" Type="http://www.w3.org/2001/04/xmlenc#Content"&gt;
+      &lt;CipherData&gt;
+        &lt;CipherValue&gt;EypYPlQ/ST66jSgT8mqE5Q==&lt;/CipherValue&gt;
+      &lt;/CipherData&gt;
+    &lt;/EncryptedData&gt;
+  &lt;/password&gt;
+&lt;/connection-details&gt;
+
+is converted to 
+
+</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>17ab9c71-33ad-4aeb-98c1-a006f78733dc</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1543929520150</last-modified>
+    </meta>
+  </process-def>
+</process>

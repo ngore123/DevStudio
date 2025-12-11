@@ -1,0 +1,443 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Mailbox:Extend:Check Extension Allowed">
+    <parameters>
+      <input global="false" required="true">
+        <description>The name of the mailbox or the email-id of the user corresponding to the mailbox whose size is to be extended.</description>
+        <from>mailbox</from>
+        <to>mailbox</to>
+      </input>
+      <input global="false" required="true">
+        <description>The size extension requested in MBs.
+
+e.g. 200</description>
+        <from>requested size extension</from>
+        <to>requested size extension</to>
+      </input>
+      <output global="false" required="true">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>extension allowed</to>
+        <from>extension allowed</from>
+      </output>
+      <output global="false" required="false">
+        <to>partial extension allowed</to>
+        <from>partial extension allowed</from>
+      </output>
+      <output global="false" required="false">
+        <to>extend size</to>
+        <from>extend size</from>
+      </output>
+      <output global="false" required="false">
+        <to>unlimited</to>
+        <from>unlimited</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Mailbox:Extract Mailbox Size</process-name>
+        <parameters>
+          <input>
+            <from>mailbox</from>
+            <to>mailbox</to>
+          </input>
+          <output>
+            <from>existing size</from>
+            <to>existing size</to>
+          </output>
+          <output>
+            <from>success</from>
+            <to>success</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>In Check Extension Allowed. Extracted the Existing Size.</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>1</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status message</to>
+                  <value>Error in extracting the mailbox size.</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>success</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.=0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>0</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <utility>
+                    <number>
+                      <add>
+                        <input>
+                          <from>existing size</from>
+                        </input>
+                        <input>
+                          <from>requested size extension</from>
+                        </input>
+                      </add>
+                    </number>
+                    <output global="false">
+                      <to>requested final size</to>
+                    </output>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>Calculating the final requested size..</value>
+                          </input>
+                          <input>
+                            <from>existing size</from>
+                          </input>
+                          <input>
+                            <from>requested size extension</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>***** requested final size</value>
+                          </input>
+                          <input>
+                            <from>requested final size</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:utility[1]</location>
+                  </utility>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input global="true">
+                          <configuration>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:ServiceType:ExtendMailboxSize:MaxAllowedMailboxSizeInMB</configuration>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>maxAllowedSize</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[normalize-space(.)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <from>maxAllowedSize</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>existing size</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens>
+                            <replacement-token name="existing">
+                              <input global="false">
+                                <from>existing size</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="max">
+                              <input global="false">
+                                <from>maxAllowedSize</from>
+                              </input>
+                            </replacement-token>
+                          </xpath-replacement-tokens>
+                          <xpath><![CDATA[number(${existing} ) >= number (${max})]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>extension allowed</to>
+                              <value>false</value>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>requested final size</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens>
+                            <replacement-token name="requested final">
+                              <input global="false">
+                                <from>requested final size</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="max">
+                              <input global="false">
+                                <from>maxAllowedSize</from>
+                              </input>
+                            </replacement-token>
+                          </xpath-replacement-tokens>
+                          <xpath><![CDATA[number(${requested final} ) > number (${max})]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>partial extension allowed</to>
+                              <value>true</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>maxAllowedSize</from>
+                            </input>
+                            <output>
+                              <to>extend size</to>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[3]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>requested final size</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens>
+                            <replacement-token name="requested final">
+                              <input global="false">
+                                <from>requested final size</from>
+                              </input>
+                            </replacement-token>
+                            <replacement-token name="max">
+                              <input global="false">
+                                <from>maxAllowedSize</from>
+                              </input>
+                            </replacement-token>
+                          </xpath-replacement-tokens>
+                          <xpath><![CDATA[number(${requested final} ) <= number (${max})]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>extension allowed</to>
+                              <value>true</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>requested final size</from>
+                            </input>
+                            <output>
+                              <to>extend size</to>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[4]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>existing size</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[.='Unlimited']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>unlimited</to>
+                        <value>true</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>6958f3b1-c932-4d8a-8dec-5cf7f63f959d</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1470723707740</last-modified>
+    </meta>
+  </process-def>
+</process>

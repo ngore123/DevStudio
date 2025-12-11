@@ -1,0 +1,286 @@
+<process draft="false" dev-studio-version="7.6.02.02">
+  <process-def name=":AMP-AD-BMC-Remedy-ARS:v7.0:Get All Entries">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to be used by this process, as configured in Grid Manager. If the adapter name is not provided, then "ARSAdapter" will be used.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The name of the schema with which to interact</description>
+        <from>schema name</from>
+        <to>schema name</to>
+      </input>
+      <input global="false" required="true">
+        <description>an xml document with the following structure.
+
+&lt;fields&gt;
+&lt;field&gt;first field&lt;/field&gt;
+&lt;field&gt;second field&lt;/field&gt;
+	as required...
+&lt;/fields&gt;</description>
+        <from>requested fields</from>
+        <to>requested fields</to>
+      </input>
+      <input global="false" required="false">
+        <description>This parameter is used to specify whether attachment needs to be downloded with details or 
+only with details in response.
+If value set to true then attachment are downloaded on configured detination location (configurable through adapter configuration)on disk. if false then only attachment details are added in response.
+
+Valid values:
+1. true
+2. false</description>
+        <from>download attachments</from>
+        <to>download attachments</to>
+      </input>
+      <input global="false" required="false">
+        <description>This parameter is used to specify the attachment to be sent in adapter response 
+itself in Base 64 encoded string and set this string in &lt;attachment-data&gt; element in response if valuse is set to true else &lt;attachment-data&gt; is not added in response. Default value is false.
+Note: if &lt;retrieve-attachment-in-response&gt; is set to true then &lt;download-attachments&gt; parameter value is not considered.
+Only attachment details are shown in response if "retrieve-attachment-in-response" and "download-attachments"parameter values are set to false.
+Valid values:
+1. true
+2. false</description>
+        <from>retrieve attachment in response</from>
+        <to>retrieve attachment in response</to>
+      </input>
+      <input global="false" required="false">
+        <description>This parameter is used to limit the number of fetch records that match the query, this feature is useful when developer wants to process the records in batch when there are huge number of records that match the query qualification. E.g. If there are 3000 records that match the query, one can limit (let say 500) the records per request that number can be specified in this parameter to fetch the records with limit. This feature is only useful when the fetched records with limit is processed and updated with another value so that duplicate records are not fetched in next iteration of request with same query.
+
+Input data type: Positive Integer 
+Valid value: greater than or equal to 0 (0 = all matching records)
+</description>
+        <from>maximum records to retrieve</from>
+        <to>maximum records to retrieve</to>
+      </input>
+      <input global="false" required="false">
+        <description>XML input parameter to specify the sorting criteria (ascending/descending) on records to be retrieved in adapter response 
+
+Sample Input XML to specify sort criteria list
+
+&lt;sort-field-list&gt;
+   &lt;field&gt;
+             &lt;name-or-id&gt;&lt;/name-or-id&gt;
+             &lt;order&gt;&lt;/order&gt;
+    &lt;/field&gt;
+    &lt;field&gt;
+             &lt;name-or-id&gt;&lt;/name-or-id&gt;
+             &lt;order&gt;&lt;/order&gt;
+     &lt;/field&gt;
+&lt;/sort-field-list&gt; 
+
+XML Input Parameters element Description:
+
+
+sort-field-list: Root element of XML input to specify the sort criteria list 
+field:Each field's child elements contains the remedy form field and order info to perform the sorting on records 
+name-or-id : The Remedy Schema field Name or ID are specified on which Sorting to be performed 
+order: Specify sorting order of provided field specified in name-or-id element 
+Valid Values:
+1 or ASC : Results is sorted in Ascending Order of given field specified in corresponding name-or-id element
+2 or DESC : Results is sorted in Descending Order of given field specified in corresponding name-or-id element 
+Default  sorting order (i.e. ASC) is Ascending if order element is either not specified or contain invalid value
+
+Example:
+
+&lt;sort-field-list&gt;
+		&lt;field&gt;
+			&lt;name-or-id&gt;FirstName&lt;/name-or-id&gt;
+			&lt;order&gt;DESC&lt;/order&gt;
+		&lt;/field&gt;
+		&lt;field&gt;
+			&lt;name-or-id&gt;536870914&lt;/name-or-id&gt; 
+			&lt;order&gt;1&lt;/order&gt;
+		&lt;/field&gt;
+	&lt;/sort-field-list&gt;
+</description>
+        <from>sort list</from>
+        <to>sort list</to>
+      </input>
+      <output global="false" required="true">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AMP-AD-BMC-Remedy-ARS:Utilities:Set Default Adapter Name</process-name>
+        <unique-id>6409eda3-5efe-344b-b91a-1b37ccb2a147</unique-id>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <output>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>requested fields</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="download attachments">
+                <input global="false">
+                  <from>download attachments</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="max records to retrieve">
+                <input global="false">
+                  <from>maximum records to retrieve</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="retrieve attachment in response">
+                <input global="false">
+                  <from>retrieve attachment in response</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="schema name">
+                <input global="false">
+                  <from>schema name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="sort list">
+                <input global="false">
+                  <from>sort list</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request-data>
+      <remedy-action>
+        <xsl:if test="string-length('${retrieve attachment in response}')!=0">
+          <retrieve-attachment-in-response>
+            <xsl:text disable-output-escaping="no">${retrieve attachment in response}</xsl:text>
+          </retrieve-attachment-in-response>
+        </xsl:if>
+        <xsl:if test="string-length('${download attachments}')!=0">
+          <download-attachments>
+            <xsl:text disable-output-escaping="no">${download attachments}</xsl:text>
+          </download-attachments>
+        </xsl:if>
+        <schema>${schema name}</schema>
+        <xsl:if test="string-length('${max records to retrieve}')!=0">
+          <max-retrieve>
+            <xsl:text disable-output-escaping="no">${max records to retrieve}</xsl:text>
+          </max-retrieve>
+        </xsl:if>
+        <xsl:copy-of select="." />
+        ${sort list}
+      </remedy-action>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-adapter>
+        <parameters>
+          <input global="false">
+            <from>adapter name</from>
+          </input>
+          <input>
+            <value>
+              <adapter-request>
+                <peer-location>
+                  <location>any</location>
+                </peer-location>
+                <request-action>get</request-action>
+              </adapter-request>
+            </value>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <input global="false">
+            <from>adapter request</from>
+          </input>
+          <output global="false">
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Adapter request</value>
+              </input>
+              <input>
+                <from>adapter request</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Adapter response</value>
+              </input>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-adapter[1]</location>
+      </call-adapter>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b54f0f7f-080b-46cb-ad42-ee1c7a8b31e3</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1340285595274</last-modified>
+    </meta>
+  </process-def>
+</process>

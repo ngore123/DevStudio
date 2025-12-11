@@ -1,0 +1,186 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Configuration_Management:Utilities:Assign Instance ID to CI">
+    <parameters>
+      <input global="false" required="true">
+        <description>An XML concept document.</description>
+        <from>configuration item</from>
+        <to>configuration item</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The response returned after generating the entry id.</description>
+        <from>adapter response</from>
+        <to>adapter response</to>
+      </input>
+      <output global="false" required="false">
+        <description>String Value - The extracted ID</description>
+        <to>entry id</to>
+        <from>instance id</from>
+      </output>
+      <output global="false" required="false">
+        <description>String Value - The return code that indicates if the id was successfully extracted. 
+
+ Valid values: true/false.
+</description>
+        <to>exit code</to>
+        <from>exit code</from>
+      </output>
+      <output global="false" required="false">
+        <description>The XML concept with the &lt;id/&gt; populated if exit code is "true".</description>
+        <to>configuration item</to>
+        <from>configuration item</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <from>configuration item</from>
+                </input>
+                <output>
+                  <to>configuration item</to>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>exit code</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(//status/text())="success"]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>instance id</to>
+                  <value>
+                    <value />
+                  </value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>adapter response</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//status/text())="success"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>instance id</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//instance-id/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>adapter response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>exit code</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(//status/text())="success"]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <input>
+                  <from>instance id</from>
+                </input>
+                <output>
+                  <to>configuration item</to>
+                  <concept type="AutoPilot-OA-Configuration_Management:Configuration-Item">
+                    <attribute>id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process will extract the id returned by an adapter in the element &lt;instance-id/&gt; and insert it into the &lt;id/&gt; element of a concept.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0cc8ea29-bc7e-35b9-ac75-de4b95673853</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1283173369107</last-modified>
+    </meta>
+  </process-def>
+</process>

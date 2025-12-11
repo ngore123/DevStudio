@@ -1,0 +1,209 @@
+<process draft="false" dev-studio-version="7.6.02.05">
+  <process-def name=":RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Item for Update Hard Disk Configuration">
+    <parameters>
+      <input global="false" required="true">
+        <description>The name of the virtual machine whose hard disk size need to be increased
+
+Valid value:  String
+</description>
+        <from>virtual machine</from>
+        <to>virtual machine</to>
+      </input>
+      <input global="false" required="false">
+        <description>The name of the disk whose size need to be increased.
+
+You can also supply 'disk-key' instead of 'disk-name'. Either of 'disk-key' and 'disk-name' is mandatory. If both 'disk-name' and 'disk-key' are supplied, 'disk-key' will take priority and 'disk-name' will be ignored.
+
+Valid value: String
+</description>
+        <from>disk name</from>
+        <to>disk name</to>
+      </input>
+      <input global="false" required="false">
+        <description>The key of the disk whose size need to be increased.  This can be obtained by calling the 'Retrieve VM Configuration' method on the VM.
+
+You can also supply 'disk-name' instead of 'disk-key'. Either of 'disk-key' and 'disk-name' is mandatory. If both 'disk-name' and 'disk-key' are supplied, 'disk-key' will take priority and 'disk-name' will be ignored.
+
+Valid value: String
+</description>
+        <from>disk key</from>
+        <to>disk key</to>
+      </input>
+      <input global="false" required="true">
+        <description>New capacity of this virtual disk in KB
+
+Valid Value: Number
+</description>
+        <from>capacity in KB</from>
+        <to>capacity in KB</to>
+      </input>
+      <input global="false" required="false">
+        <description>shares [optional]
+       The number of shares allocated. Used to determine resource allocation in case of resource contention. This value is only set if level is set to custom. If level is not set to custom, this value is ignored. Therefore, only shares with custom values can be compared. 
+There is no unit for this value. It is a relative measure based on the settings for other resource pools.</description>
+        <from>shares</from>
+        <to>shares</to>
+      </input>
+      <input global="false" required="false">
+        <description>level [optional]
+          The allocation level. The level is a simplified view of shares. Levels map to a pre-determined set of numeric values for shares. If the shares value does not map to a predefined size, then the level is set as custom.
+
+valid values: 
+custom - Shares are specified in the "shares" column.  
+high - Shares =Shares = 20 * virtual machine memory size in megabytes
+low - Shares = 5 * virtual machine memory size in megabytes
+normal - Shares = 10 * virtual machine memory size in megabytes</description>
+        <from>level</from>
+        <to>level</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:RBA-AD-VMware_Infrastructure:Utilities:VM_Configuration_Operations:Construct Shares Parameters</process-name>
+        <parameters>
+          <input>
+            <from>shares</from>
+            <to>shares</to>
+          </input>
+          <input>
+            <from>level</from>
+            <to>level</to>
+          </input>
+          <output>
+            <from>shares info</from>
+            <to>shares info</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>items</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="shares">
+                <input global="false">
+                  <from>shares info</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="virtual machine">
+                <input global="false">
+                  <from>virtual machine</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="disk name">
+                <input global="false">
+                  <from>disk name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="capacity in KB">
+                <input global="false">
+                  <from>capacity in KB</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="disk key">
+                <input global="false">
+                  <from>disk key</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <parameters>
+          <virtual-machine>${virtual machine}</virtual-machine>
+          <spec>
+            <device-change-list>
+              <device-change>
+                <device>
+                  <xsl:choose>
+                    <xsl:when test="string-length('${disk key}')&gt;0">
+                      <disk-key>${disk key}</disk-key>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <disk-name>${disk name}</disk-name>
+                    </xsl:otherwise>
+                  </xsl:choose>
+                  <capacity-inKB>${capacity in KB}</capacity-inKB>
+                  ${shares}
+                </device>
+              </device-change>
+            </device-change-list>
+          </spec>
+        </parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Constructs Item XML for Update Hard Disk Configuration</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>2ba9f6b1-964b-3d6a-932a-ff1ac04a76fd</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1363157500704</last-modified>
+    </meta>
+  </process-def>
+</process>

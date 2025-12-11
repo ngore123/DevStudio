@@ -1,0 +1,200 @@
+<process draft="false" dev-studio-version="7.6.02.04">
+  <process-def name=":AO-AD-Infoblox-NIOS:v6.3:IPAM:Release IP Range">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+Default adapter name: InfobloxNIOS.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Removes an existing reserved IP range in an existing network.
+
+Sample items Xml: 
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;target&gt;
+			&lt;host&gt;localhost&lt;/host&gt;
+			&lt;user-name&gt;admin&lt;/user-name&gt;
+			&lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;
+			&lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+		&lt;/target&gt;
+           &lt;parameters&gt;
+			&lt;network&gt;10.10.10.0/24&lt;/network&gt;	
+			&lt;start-address&gt;10.10.10.20&lt;/start-address&gt;
+			&lt;end-address&gt;10.10.10.30&lt;/end-address&gt;
+			&lt;ipv6-start-prefix&gt;2001:db8:0:c000:0011::&lt;/ipv6-start-prefix&gt;
+			&lt;ipv6-end-prefix&gt;2001:db8:0:c000:0021::&lt;/ipv6-end-prefix&gt;
+			&lt;comment&gt;user comment&lt;/comment&gt;
+			&lt;failover-association&gt;Test_Assoc&lt;/failover-association&gt;
+			&lt;server-association-type&gt;Member&lt;/server-association-type&gt;
+			&lt;grid-member-address&gt;10.0.0.0&lt;/grid-member-address&gt;
+     			&lt;extensible-attributes&gt;
+				&lt;attribute&gt;
+					&lt;key&gt;Building&lt;/key&gt;
+					&lt;value&gt;value1&lt;/value&gt;
+				&lt;/attribute&gt;
+				&lt;attribute&gt;
+					&lt;key&gt;Site&lt;/key&gt;
+					&lt;value&gt;value2&lt;/value&gt;
+				&lt;/attribute&gt;
+			&lt;/extensible-attributes&gt;
+           &lt;/parameters&gt;
+      &lt;/item&gt;
+&lt;/items&gt;
+
+
+Elements' Description:
+
+target[Conditional]:
+	There are two ways in which this tag can be specified.
+	
+	First Option:
+		This tag can contain a dynamic target configuration. Following tags are applicable while defining a dynamic target.
+
+		host[Conditional]:
+			Host name or IP address of Infoblox Grid Manager. This tag is required while providing dynamic targets.
+
+		user-name[Conditional]:
+			Username required to connect Infoblox Grid Manager. This tag is required while providing dynamic targets.
+
+		password[Conditional]:
+			The password associated with the &lt;user-name&gt; provided. Encrypted password can be provided by providing an "encryption-type" attribute. This tag is required while providing dynamic targets. 
+			Valid values for encryption-type are: Plain, Base64
+			Default value: Plain
+
+		timeout-secs[Optional]
+			Specifies the time, in seconds, after which the attempt to connect to the Infoblox Grid Manager Server fails.
+			Default value in seconds: 60
+	
+	Second Option:
+		This tag can refer to one of pre-defined target configurations of Infoblox Grid Manager on which the request will be executed.
+
+		Valid values: The value specified for &lt;target&gt; XML element must be same as the value that has been specified for the name attribute of &lt;config&gt; element in Grid Manager adapter configuration.
+	
+		Default value: 
+		If this element is not provided or left empty, the request will be executed on the first defined Grid Manager adapter configuration.
+		
+	Note: If no adapter configurations are specified while configuring the adapter dynamic target need to be defined under "target" tag.
+
+network[Required]
+	Specify the network in CIDR format.
+
+start-address[Optional]
+	Specify the start address.
+
+end-address[Optional]
+	Specify the end address.
+
+ipv6-start-prefix[Optional]
+	Specify the start prefix of the IPv6 range. This parameter is only valid for IPv6 range.
+
+ipv6-end-prefix[Optional]
+	Specify the end prefix of the IPv6 range. This parameter is only valid for IPv6 range.
+
+comment[Optional]
+     Specify the user comment of IP range. This parameter is only valid for IPv4 range.
+
+failover-association[Optional]
+     Specify the failover association. This parameter is only valid for IPv4 range.
+
+grid-member-address[Optional]
+     Specify the IP address of the grid member. This parameter is only valid for IPv4 range.
+
+server-association-type[Optional]
+	Specify the server association type.
+	Valid values for IPv4 Range: NONE,MEMBER,FAILOVER,MS_SERVER
+	Valid values for IPv6 Range: NONE,MEMBER
+
+extensible-attributes[Optional]
+	Specifies additional custom attributes defined in Infoblox Grid Manager application.
+	Sample format to define an attribute:
+	&lt;attribute&gt;
+		&lt;key&gt;Site&lt;/key&gt;
+		&lt;value&gt;value2&lt;/value&gt;
+	&lt;/attribute&gt;
+
+key[Optional]
+	Specify the key for the attribute
+
+value[Optional]
+	Specify the value for the attribute</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>release-ip-range</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-Infoblox-NIOS:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Removes an existing reserved IP range in an existing network.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e6a423e1-e9d3-4fd1-98d5-e4552e738377</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1369656231859</last-modified>
+    </meta>
+  </process-def>
+</process>

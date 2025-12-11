@@ -1,0 +1,173 @@
+<process draft="false" dev-studio-version="24.3.00">
+  <process-def name=":AdapterAutomation:ServiceNow:snowAwakeInst">
+    <parameters />
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:REST:Post</process-name>
+        <parameters>
+          <input>
+            <value>rest</value>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <value>https://dev209486.service-now.com/api/now/table/sys_db_object</value>
+            <to>url</to>
+          </input>
+          <input>
+            <value>{
+"headers": {
+        "Authorization": "Basic YWRtaW46UGFzc3dvcmQjMDE=", 
+        "Content-Type": "application/json"
+      }          
+}</value>
+            <to>headers</to>
+          </input>
+          <input>
+            <value>{
+  "name": "u_custom_table",
+  "label": "Custom Table TSO",
+  "super_class": "task",
+  "table_type": "table"
+}</value>
+            <to>body</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response post</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert JSON to XML</process-name>
+        <parameters>
+          <input>
+            <from>adapter response post</from>
+            <to>JSON</to>
+          </input>
+          <output>
+            <from>XML</from>
+            <to>XML</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter response post</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>sysId</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//sys_id/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <pause>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <duration>5000</duration>
+        <location>:pause[1]</location>
+      </pause>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:REST:Delete</process-name>
+        <parameters>
+          <input>
+            <value>rest</value>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <concat>
+              <input>
+                <value>https://dev209486.service-now.com/api/now/table/sys_db_object/</value>
+              </input>
+              <input required="false">
+                <from>sysId</from>
+              </input>
+            </concat>
+            <to>url</to>
+          </input>
+          <input>
+            <value>{
+"headers": {
+        "Authorization": "Basic YWRtaW46UGFzc3dvcmQjMDE=", 
+        "Content-Type": "application/json"
+      }          
+}</value>
+            <to>headers</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response delete</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[3]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0e76fad7-1937-4eee-bc69-eb97f828a1fb</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1728649316503</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,384 @@
+<process draft="false" dev-studio-version="7.8.02">
+  <process-def name=":BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Mailbox:Extend:Process Extend Mailbox Event">
+    <parameters>
+      <input global="false" required="false">
+        <description>XML - Event from BMC AR system 
+
+Example:
+&lt;alert-message alert-id="000000000000999"&gt;
+  &lt;server-name&gt;Remedy_Server_Hostname&lt;/server-name&gt;
+  &lt;form-name&gt;WOI:WorkOrder&lt;/form-name&gt;
+  &lt;object-id&gt;WO0000000001042&lt;/object-id&gt;
+  &lt;source&gt;Service Request Management&lt;/source&gt;
+  &lt;timestamp&gt;1436341135&lt;/timestamp&gt;
+  &lt;priority&gt;1&lt;/priority&gt;
+  &lt;text&gt;ActionType=Extend Mailbox Size,Work Order Id=WO0000000001042,Configuration Name=BMC_AR_System,Ticket Type=WorkOrder,WorkInfo=Extend Mailbox Size
+BMC Service Desk Automation,Service Type=Extend Mailbox Size,EmailAddress=administrator@bmc.com,ExtensionSize=250MB&lt;/text&gt;
+&lt;/alert-message&gt;
+
+</description>
+        <from>inputevent</from>
+        <to>inputevent</to>
+      </input>
+      <output global="false" required="false">
+        <to>response xml</to>
+        <from>response xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set Start Time</process-name>
+        <unique-id>c113440d-ac61-4f97-bc14-2607426fd912</unique-id>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-SDA_Fulfillment_Cases:Utils:Extract Event Info</process-name>
+        <parameters>
+          <input>
+            <from>inputevent</from>
+            <to>inputevent</to>
+          </input>
+          <input>
+            <value>,</value>
+            <to>delimiter</to>
+          </input>
+          <output>
+            <from>user name</from>
+            <to>user name</to>
+          </output>
+          <output>
+            <from>ticket number</from>
+            <to>ticket number</to>
+          </output>
+          <output>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </output>
+          <output>
+            <from>ticket type</from>
+            <to>ticket type</to>
+          </output>
+          <output>
+            <from>VD_TIME</from>
+            <to>VD_TIME</to>
+          </output>
+          <output>
+            <from>VD_FINANCIAL</from>
+            <to>VD_FINANCIAL</to>
+          </output>
+          <output>
+            <from>emailAddress</from>
+            <to>mailbox</to>
+          </output>
+          <output>
+            <from>size extension requested</from>
+            <to>size extension requested</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+              <parameters>
+                <input>
+                  <value>failure</value>
+                  <to>success status</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <input>
+                  <value>Unknown</value>
+                  <to>target name</to>
+                </input>
+                <input>
+                  <value>Extend Mailbox Size</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <value>
+                    <adapter-response />
+                  </value>
+                  <to>target response</to>
+                </input>
+                <input global="true">
+                  <configuration>:BMC-SA-Service_Desk_Automation:FulfillmentIntegrations:Defaults:Templates:RequestResponseTemplate</configuration>
+                  <to>fulfillment response</to>
+                </input>
+                <input>
+                  <value>Mailbox or size info not found.</value>
+                  <to>error summary</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>mailbox</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)]]></xpath>
+            </xpath-expression>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>size extension requested</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(.)]]></xpath>
+            </xpath-expression>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Mailbox:Extend:Do Extend</process-name>
+              <parameters>
+                <input>
+                  <from>mailbox</from>
+                  <to>mailbox</to>
+                </input>
+                <input>
+                  <from>size extension requested</from>
+                  <to>requested size extension</to>
+                </input>
+                <output>
+                  <from>workInfo completion details</from>
+                  <to>workInfo completion details</to>
+                </output>
+                <output>
+                  <from>workInfo failure details</from>
+                  <to>workInfo failure details</to>
+                </output>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Before calling Do Extend..</value>
+                    </input>
+                    <input>
+                      <from>size extension requested</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>After calling Do Extend':</value>
+                    </input>
+                    <input>
+                      <from>workInfo completion details</from>
+                    </input>
+                    <input>
+                      <from>workInfo failure details</from>
+                    </input>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC-SA-SDA_Fulfillment_Cases:Fulfillment:Post Fulfillment Update</process-name>
+              <parameters>
+                <input>
+                  <from>ticket number</from>
+                  <to>ticket number</to>
+                </input>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>ticket type</from>
+                  <to>ticket type</to>
+                </input>
+                <input>
+                  <from>workInfo failure details</from>
+                  <to>error details</to>
+                </input>
+                <input>
+                  <from>workInfo completion details</from>
+                  <to>workinfo completion details</to>
+                </input>
+                <input>
+                  <from>workInfo failure details</from>
+                  <to>workinfo failure details</to>
+                </input>
+                <input>
+                  <from>VD_FINANCIAL</from>
+                  <to>VD Financial</to>
+                </input>
+                <input>
+                  <from>VD_TIME</from>
+                  <to>VD Time</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>info</level>
+                  <parameters>
+                    <input>
+                      <from>workInfo completion details</from>
+                    </input>
+                    <input>
+                      <value>
+</value>
+                    </input>
+                    <input>
+                      <from>workInfo failure details</from>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set End Time</process-name>
+        <parameters>
+          <output>
+            <from>end time</from>
+            <to>end time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[3]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e69bc746-5510-4a41-a5a2-048d037e6899</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1471018454272</last-modified>
+    </meta>
+  </process-def>
+</process>

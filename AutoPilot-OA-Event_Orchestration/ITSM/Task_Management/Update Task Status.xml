@@ -1,0 +1,388 @@
+<process draft="false" dev-studio-version="8.1.00">
+  <process-def name=":AutoPilot-OA-Event_Orchestration:ITSM:Task_Management:Update Task Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>For example: BMC_AR_System</description>
+        <from>itsm type</from>
+        <to>itsm type</to>
+      </input>
+      <input global="false" required="true">
+        <description>All confgurations from BMC-SA-Event_Orchestration_Configuration</description>
+        <from>all configurations</from>
+        <to>all configurations</to>
+      </input>
+      <input global="false" required="false">
+        <description>For example: BMC_TrueSight</description>
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Change ID in ITSM </description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="true">
+        <description>Task ID in ITSM</description>
+        <from>task id</from>
+        <to>task id</to>
+      </input>
+      <input global="false" required="true">
+        <description>Task status possible values are Closed or Bypassed</description>
+        <from>task status</from>
+        <to>task status</to>
+      </input>
+      <input global="false" required="true">
+        <description>Possible values are : Failed, Cancelled, Success.</description>
+        <from>status reason</from>
+        <to>status reason</to>
+      </input>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>Unsupported ITSM type: </value>
+                    </input>
+                    <input required="false">
+                      <from>itsm type</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>error message</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>itsm type</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'BMC_AR_System']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>========Input=======</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-ITSM_Automation:Change_Management:Do Update</process-name>
+              <parameters>
+                <input>
+                  <from>itsm type</from>
+                  <to>ITSMPlatform</to>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>AdapterName</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//Adapters/ITSMWebServiceAdapter/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>ServerURL</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="itsm type">
+                        <input global="false">
+                          <from>itsm type</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[//*[name() = '${itsm type}']/WebServiceConnectionData/URL/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>UserName</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="itsm type">
+                        <input global="false">
+                          <from>itsm type</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[//*[name() = '${itsm type}']/WebServiceConnectionData/UserName/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>Password</to>
+                  <xslt-stylesheet>
+                    <stylesheet-replacement-tokens>
+                      <replacement-token name="itsm type">
+                        <input global="false">
+                          <from>itsm type</from>
+                        </input>
+                      </replacement-token>
+                    </stylesheet-replacement-tokens>
+                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:choose>
+      <xsl:when test="boolean(//*[name() = '${itsm type}']/WebServiceConnectionData/Password/*[name() = 'EncryptedData'])">
+        <xsl:copy-of select="//*[name() = '${itsm type}']/WebServiceConnectionData/Password/*[name() = 'EncryptedData']" />
+      </xsl:when>
+      <xsl:otherwise>
+        <value>
+          <xsl:value-of select="//*[name() = '${itsm type}']/WebServiceConnectionData/Password/text()" disable-output-escaping="no" />
+        </value>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                  </xslt-stylesheet>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>OutboundChangeInterface</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="itsm type">
+                        <input global="false">
+                          <from>itsm type</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[//*[name() = '${itsm type}']/WebServiceConnectionData/Change_GetSOAPAction/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>all configurations</from>
+                  <to>CreateChangeInterface</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="itsm type">
+                        <input global="false">
+                          <from>itsm type</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[//*[name() = '${itsm type}']/WebServiceConnectionData/Change_CreateInterface/text()]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <from>change id</from>
+                  <to>ChangeID</to>
+                </input>
+                <input>
+                  <from>task id</from>
+                  <to>TaskID</to>
+                </input>
+                <input>
+                  <from>task status</from>
+                  <to>Status</to>
+                </input>
+                <input>
+                  <from>status reason</from>
+                  <to>StatusReason</to>
+                </input>
+                <input>
+                  <value>Remediation complete</value>
+                  <to>ChangeWorkInfoNotes</to>
+                </input>
+                <input>
+                  <value>XML</value>
+                  <to>ReturnDataFormat</to>
+                </input>
+                <output>
+                  <from>json response</from>
+                  <to>json response</to>
+                </output>
+                <output>
+                  <from>xml response</from>
+                  <to>xml response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>xml response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//metadata/status/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>xml response</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//metadata/error/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==========Close Task: Do Update Response Output========</value>
+                    </input>
+                    <input>
+                      <from>xml response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==========Close Task Output========</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>error message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[3]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Close a task in the target ITSM.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1a476a01-a5d3-4877-9ddd-7e1849b3895e</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1527526404287</last-modified>
+    </meta>
+  </process-def>
+</process>

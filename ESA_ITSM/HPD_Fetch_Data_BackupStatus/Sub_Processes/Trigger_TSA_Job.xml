@@ -1,0 +1,1397 @@
+<process draft="false" dev-studio-version="22.2.01">
+  <process-def name=":ESA_ITSM:HPD_Fetch_Data_BackupStatus:Sub_Processes:Trigger_TSA_Job">
+    <parameters>
+      <input global="false" required="false">
+        <from>CSV_list</from>
+        <to>CSV_list</to>
+      </input>
+      <output global="false" required="false">
+        <description>TSA Log</description>
+        <to>TSA_Log</to>
+        <from>JobLogItems</from>
+      </output>
+      <output global="false" required="false">
+        <to>Result</to>
+        <from>Result</from>
+      </output>
+      <output global="false" required="false">
+        <to>Inc_Success_FB</to>
+        <from>Inc_Success_FB</from>
+      </output>
+      <output global="false" required="false">
+        <to>Inc_Success_IB</to>
+        <from>Inc_Success_IB</from>
+      </output>
+      <output global="false" required="false">
+        <description>Debug Information, e.g. Exit Codes of TSA Jobs</description>
+        <to>Job_Result</to>
+        <from>Job_Result</from>
+      </output>
+      <output global="false" required="false">
+        <description>conclusion for ITSM WorkInfo &amp; Resolution</description>
+        <to>Result_short</to>
+        <from>Result_short</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>CSV_list</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>CSV_entry_count</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//read-response/rows/@row-count]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:Utilities:Timestamp_today</process-name>
+        <parameters>
+          <output>
+            <from>Date</from>
+            <to>Date</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>Inc_Success_FB</to>
+                  <value>failed</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Inc_Success_IB</to>
+                  <value>failed</value>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>BACKUP STATUS CHECK RESULT
+Initiated on </value>
+                    </input>
+                    <input required="false">
+                      <from>Date</from>
+                    </input>
+                    <input>
+                      <value> (UTC)
+#############################################</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>Result</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>CSV_entry_count</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[number(.) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>BACKUP STATUS CHECK RESULT
+Initiated on </value>
+                    </input>
+                    <input required="false">
+                      <from>Date</from>
+                    </input>
+                    <input>
+                      <value> (UTC)
+#############################################</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>Result</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <concat>
+                    <input>
+                      <value>BACKUP STATUS CHECK RESULT
+Initiated on </value>
+                    </input>
+                    <input required="false">
+                      <from>Date</from>
+                    </input>
+                    <input>
+                      <value> (UTC)
+#############################################</value>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>Result_short</to>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Inc_Success_FB</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Inc_Success_IB</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Job_Result</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <for-each>
+              <document>
+                <input>
+                  <from>CSV_list</from>
+                </input>
+              </document>
+              <result>
+                <output>
+                  <to>CSV_entry</to>
+                </output>
+              </result>
+              <xpath-expression>
+                <xpath-replacement-tokens />
+                <xpath><![CDATA[//row]]></xpath>
+              </xpath-expression>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>CSV_entry</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Target_Server_Name</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[string(//column[2])]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <assignment>
+                    <document>
+                      <input>
+                        <from>CSV_entry</from>
+                      </input>
+                    </document>
+                    <result>
+                      <output>
+                        <to>Target_Server_Type</to>
+                      </output>
+                    </result>
+                    <xpath-expression>
+                      <xpath-replacement-tokens />
+                      <xpath><![CDATA[string(//column[3])]]></xpath>
+                    </xpath-expression>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[2]</location>
+                </assign>
+                <switch>
+                  <meta>
+                    <documentation />
+                    <run-mode-handling>
+                      <run-mode>OCP</run-mode>
+                      <allow-step-into>true</allow-step-into>
+                    </run-mode-handling>
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                  <default>
+                    <sequence>
+                      <assign>
+                        <assignment>
+                          <output>
+                            <to>Inc_Success_FB</to>
+                            <value>failed</value>
+                          </output>
+                        </assignment>
+                        <assignment>
+                          <output>
+                            <to>Inc_Success_IB</to>
+                            <value>failed</value>
+                          </output>
+                        </assignment>
+                        <assignment>
+                          <input>
+                            <concat>
+                              <input>
+                                <value>
+</value>
+                              </input>
+                              <input required="false">
+                                <from>Result</from>
+                              </input>
+                              <input>
+                                <value>
+
+AUTOMATION INPUT:
+Shortname: (was not provided by Service Catalog)
+
+PROCESSING OUTPUT:
+Identified_FQDN: indeterminate
+ServerType: (was not provided by Service Catalog)
+TSA Job ExitCode: indeterminate
+
+AUTOMATION OUTPUT:
+Last successful ( "/" or "C:" ) Backup (CET): indeterminate
+
+Detailed Output last FULL-Backup:
+indeterminate
+
+Detailed Output last INCR-Backup:
+indeterminate
+
+#############################################
+</value>
+                              </input>
+                            </concat>
+                          </input>
+                          <output>
+                            <to>Result</to>
+                          </output>
+                        </assignment>
+                        <assignment>
+                          <input>
+                            <concat>
+                              <input required="false">
+                                <from>Job_Result</from>
+                              </input>
+                              <input>
+                                <value>
+Hostname: </value>
+                              </input>
+                              <input required="false">
+                                <from>Target_Server_Name</from>
+                              </input>
+                              <input>
+                                <value>, ESA_registered: indeterminate, TSAJob_ExitCode: indeterminate,</value>
+                              </input>
+                            </concat>
+                          </input>
+                          <output>
+                            <to>Job_Result</to>
+                          </output>
+                        </assignment>
+                        <assignment>
+                          <input>
+                            <concat>
+                              <input>
+                                <value>
+</value>
+                              </input>
+                              <input required="false">
+                                <from>Result_short</from>
+                              </input>
+                              <input>
+                                <value>
+
+(Server Name was not provided by Service Catalog)  STATUS: Indeterminate
+
+#############################################</value>
+                              </input>
+                            </concat>
+                          </input>
+                          <output>
+                            <to>Result_short</to>
+                          </output>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                      </assign>
+                    </sequence>
+                  </default>
+                  <case>
+                    <condition>
+                      <document>
+                        <input>
+                          <from>Target_Server_Name</from>
+                        </input>
+                      </document>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[boolean(string(.))]]></xpath>
+                      </xpath-expression>
+                    </condition>
+                    <sequence>
+                      <call-process>
+                        <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:TSSA_Jobs:Trigger_TSA_Get_Successful_Backup_Date</process-name>
+                        <parameters>
+                          <input>
+                            <from>Target_Server_Name</from>
+                            <to>Target_Server_Name</to>
+                          </input>
+                          <input>
+                            <from>Target_Server_Type</from>
+                            <to>Target_Server_Type</to>
+                          </input>
+                          <output>
+                            <from>TargetServer_FQDN</from>
+                            <to>TargetServer_FQDN</to>
+                          </output>
+                          <output>
+                            <from>JobLogItems</from>
+                            <to>JobLogItems</to>
+                          </output>
+                          <output>
+                            <from>Job_ExitCode</from>
+                            <to>Job_ExitCode</to>
+                          </output>
+                          <output>
+                            <from>Job_Result_MainDirectory_Backup</from>
+                            <to>Result_MainDirectory_Backup</to>
+                          </output>
+                          <output>
+                            <from>Job_Result_FullBackupDetail</from>
+                            <to>Result_FullBackupDetail</to>
+                          </output>
+                          <output>
+                            <from>Job_Result_IncrBackupDetail</from>
+                            <to>Result_IncrBackupDetail</to>
+                          </output>
+                          <output>
+                            <from>Server_Success_FB</from>
+                            <to>Server_Success_FB</to>
+                          </output>
+                          <output>
+                            <from>Server_Success_IB</from>
+                            <to>Server_Success_IB</to>
+                          </output>
+                          <output>
+                            <from>Server_BK_Date_FB</from>
+                            <to>Server_BK_Date_FB</to>
+                          </output>
+                          <output>
+                            <from>Server_BK_Date_IB</from>
+                            <to>Server_BK_Date_IB</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                      </call-process>
+                      <call-process>
+                        <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:Utilities:Line_Success_Check</process-name>
+                        <parameters>
+                          <input>
+                            <from>Inc_Success_FB</from>
+                            <to>Line_Success1</to>
+                          </input>
+                          <input>
+                            <from>Server_Success_FB</from>
+                            <to>Line_Success2</to>
+                          </input>
+                          <output>
+                            <from>Line_Success1</from>
+                            <to>Inc_Success_FB</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                      </call-process>
+                      <call-process>
+                        <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:Utilities:Line_Success_Check</process-name>
+                        <parameters>
+                          <input>
+                            <from>Inc_Success_IB</from>
+                            <to>Line_Success1</to>
+                          </input>
+                          <input>
+                            <from>Server_Success_IB</from>
+                            <to>Line_Success2</to>
+                          </input>
+                          <output>
+                            <from>Line_Success1</from>
+                            <to>Inc_Success_IB</to>
+                          </output>
+                        </parameters>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>false</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <before-execution>
+                          <log>
+                            <level>debug</level>
+                            <parameters>
+                              <input>
+                                <value>DEBUG_CHECK_IB_before</value>
+                              </input>
+                              <input>
+                                <from>Inc_Success_IB</from>
+                              </input>
+                              <input>
+                                <value></value>
+                              </input>
+                              <input>
+                                <from>Server_Success_IB</from>
+                              </input>
+                              <input>
+                                <value></value>
+                              </input>
+                            </parameters>
+                          </log>
+                        </before-execution>
+                        <after-execution>
+                          <log>
+                            <level>debug</level>
+                            <parameters>
+                              <input>
+                                <value>DEBUG_CHECK_IB_after</value>
+                              </input>
+                              <input>
+                                <from>Inc_Success_IB</from>
+                              </input>
+                              <input>
+                                <value></value>
+                              </input>
+                              <input>
+                                <from>Server_Success_IB</from>
+                              </input>
+                              <input>
+                                <value></value>
+                              </input>
+                            </parameters>
+                          </log>
+                        </after-execution>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[3]</location>
+                      </call-process>
+                      <switch>
+                        <meta>
+                          <documentation />
+                          <run-mode-handling>
+                            <run-mode>OCP</run-mode>
+                            <allow-step-into>true</allow-step-into>
+                          </run-mode-handling>
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                        <default>
+                          <sequence>
+                            <assign>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+AUTOMATION INPUT:
+Shortname: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+PROCESSING OUTPUT:
+Identified_FQDN: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>TargetServer_FQDN</from>
+                                    </input>
+                                    <input>
+                                      <value>
+ServerType: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Type</from>
+                                    </input>
+                                    <input>
+                                      <value> 
+TSA Job ExitCode: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Job_ExitCode</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+AUTOMATION OUTPUT:
+Last successful ( "/" or "C:" ) Backup (CET): </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_MainDirectory_Backup</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+Detailed Output last FULL-Backup:
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_FullBackupDetail</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+Detailed Output last INCR-Backup:
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_IncrBackupDetail</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+#############################################
+</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Result</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input required="false">
+                                      <from>Job_Result</from>
+                                    </input>
+                                    <input>
+                                      <value>
+Hostname: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>, ESA_registered: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>TargetServer_FQDN</from>
+                                    </input>
+                                    <input>
+                                      <value>, TSAJob_ExitCode: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Job_ExitCode</from>
+                                    </input>
+                                    <input>
+                                      <value>,</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Job_Result</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_short</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>  STATUS: Success  FULL: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Server_BK_Date_FB</from>
+                                    </input>
+                                    <input>
+                                      <value>  INCR: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Server_BK_Date_IB</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+#############################################</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Result_short</to>
+                                </output>
+                              </assignment>
+                              <meta>
+                                <documentation />
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                            </assign>
+                          </sequence>
+                        </default>
+                        <case applies-if-any-condition-true="false">
+                          <condition>
+                            <document>
+                              <input>
+                                <from>Server_Success_FB</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[string(.) = "success"]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <condition>
+                            <document>
+                              <input>
+                                <from>Server_Success_IB</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[string(.) != "success"]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <condition>
+                            <document>
+                              <input>
+                                <from>Job_ExitCode</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[number(.) < 1]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <sequence>
+                            <assign>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+AUTOMATION INPUT:
+Shortname: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+PROCESSING OUTPUT:
+Identified_FQDN: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>TargetServer_FQDN</from>
+                                    </input>
+                                    <input>
+                                      <value>
+ServerType: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Type</from>
+                                    </input>
+                                    <input>
+                                      <value> 
+TSA Job ExitCode: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Job_ExitCode</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+AUTOMATION OUTPUT:
+Last successful ( "/" or "C:" ) Backup (CET): </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_MainDirectory_Backup</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+Detailed Output last FULL-Backup:
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_FullBackupDetail</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+Detailed Output last INCR-Backup:
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_IncrBackupDetail</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+#############################################
+</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Result</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input required="false">
+                                      <from>Job_Result</from>
+                                    </input>
+                                    <input>
+                                      <value>
+Hostname: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>, ESA_registered: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>TargetServer_FQDN</from>
+                                    </input>
+                                    <input>
+                                      <value>, TSAJob_ExitCode: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Job_ExitCode</from>
+                                    </input>
+                                    <input>
+                                      <value>,</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Job_Result</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_short</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>  STATUS: Partially Success  FULL: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Server_BK_Date_FB</from>
+                                    </input>
+                                    <input>
+                                      <value>  INCR: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Server_BK_Date_IB</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+#############################################</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Result_short</to>
+                                </output>
+                              </assignment>
+                              <meta>
+                                <documentation />
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                            </assign>
+                          </sequence>
+                        </case>
+                        <case applies-if-any-condition-true="false">
+                          <condition>
+                            <document>
+                              <input>
+                                <from>Job_ExitCode</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[number(.) < 1]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <condition>
+                            <document>
+                              <input>
+                                <from>Server_Success_FB</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[string(.) != "success"]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <condition>
+                            <document>
+                              <input>
+                                <from>Server_Success_IB</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[string(.) = "success"]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <sequence>
+                            <assign>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+AUTOMATION INPUT:
+Shortname: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+PROCESSING OUTPUT:
+Identified_FQDN: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>TargetServer_FQDN</from>
+                                    </input>
+                                    <input>
+                                      <value>
+ServerType: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Type</from>
+                                    </input>
+                                    <input>
+                                      <value> 
+TSA Job ExitCode: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Job_ExitCode</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+AUTOMATION OUTPUT:
+Last successful ( "/" or "C:" ) Backup (CET): </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_MainDirectory_Backup</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+Detailed Output last FULL-Backup:
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_FullBackupDetail</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+Detailed Output last INCR-Backup:
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_IncrBackupDetail</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+#############################################
+</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Result</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input required="false">
+                                      <from>Job_Result</from>
+                                    </input>
+                                    <input>
+                                      <value>
+Hostname: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>, ESA_registered: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>TargetServer_FQDN</from>
+                                    </input>
+                                    <input>
+                                      <value>, TSAJob_ExitCode: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Job_ExitCode</from>
+                                    </input>
+                                    <input>
+                                      <value>,</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Job_Result</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_short</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>  STATUS: Partially Success  FULL: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Server_BK_Date_FB</from>
+                                    </input>
+                                    <input>
+                                      <value>  INCR: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Server_BK_Date_IB</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+#############################################</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Result_short</to>
+                                </output>
+                              </assignment>
+                              <meta>
+                                <documentation />
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[3]:assign[1]</location>
+                            </assign>
+                          </sequence>
+                        </case>
+                        <case applies-if-any-condition-true="true">
+                          <condition>
+                            <document>
+                              <input>
+                                <from>Job_ExitCode</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[number(.) > 0]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <condition>
+                            <document>
+                              <input>
+                                <from>Job_ExitCode</from>
+                              </input>
+                            </document>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[string(.) = "none"]]></xpath>
+                            </xpath-expression>
+                          </condition>
+                          <sequence>
+                            <assign>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+AUTOMATION INPUT:
+Shortname: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+PROCESSING OUTPUT:
+Identified_FQDN: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>TargetServer_FQDN</from>
+                                    </input>
+                                    <input>
+                                      <value>
+ServerType: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Type</from>
+                                    </input>
+                                    <input>
+                                      <value> 
+TSA Job ExitCode: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Job_ExitCode</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+AUTOMATION OUTPUT:
+Last successful ( "/" or "C:" ) Backup (CET): </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_MainDirectory_Backup</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+Detailed Output last FULL-Backup:
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_FullBackupDetail</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+Detailed Output last INCR-Backup:
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_IncrBackupDetail</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+#############################################
+</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Result</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input required="false">
+                                      <from>Job_Result</from>
+                                    </input>
+                                    <input>
+                                      <value>
+Hostname: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>, ESA_registered: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>TargetServer_FQDN</from>
+                                    </input>
+                                    <input>
+                                      <value>, TSAJob_ExitCode: </value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Job_ExitCode</from>
+                                    </input>
+                                    <input>
+                                      <value>,</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Job_Result</to>
+                                </output>
+                              </assignment>
+                              <assignment>
+                                <input>
+                                  <concat>
+                                    <input>
+                                      <value>
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Result_short</from>
+                                    </input>
+                                    <input>
+                                      <value>
+
+</value>
+                                    </input>
+                                    <input required="false">
+                                      <from>Target_Server_Name</from>
+                                    </input>
+                                    <input>
+                                      <value>  STATUS: Indeterminate
+
+#############################################</value>
+                                    </input>
+                                  </concat>
+                                </input>
+                                <output>
+                                  <to>Result_short</to>
+                                </output>
+                              </assignment>
+                              <meta>
+                                <documentation />
+                                <checkpoint>false</checkpoint>
+                              </meta>
+                              <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[4]:assign[1]</location>
+                            </assign>
+                          </sequence>
+                        </case>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                      </switch>
+                      <assign>
+                        <assignment>
+                          <output>
+                            <to>Server_BK_Date_FB</to>
+                            <value></value>
+                          </output>
+                        </assignment>
+                        <assignment>
+                          <output>
+                            <to>Server_BK_Date_IB</to>
+                            <value></value>
+                          </output>
+                        </assignment>
+                        <meta>
+                          <documentation />
+                          <checkpoint>false</checkpoint>
+                        </meta>
+                        <before-execution>
+                          <log>
+                            <level>debug</level>
+                            <parameters>
+                              <input>
+                                <value>DEBUG</value>
+                              </input>
+                              <input>
+                                <from>Server_Success_IB</from>
+                              </input>
+                              <input>
+                                <value></value>
+                              </input>
+                              <input>
+                                <from>Inc_Success_IB</from>
+                              </input>
+                              <input>
+                                <value></value>
+                              </input>
+                            </parameters>
+                          </log>
+                        </before-execution>
+                        <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                      </assign>
+                    </sequence>
+                  </case>
+                  <location>:switch[1]:sequence[2]:switch[1]</location>
+                </switch>
+              </sequence>
+              <location>:switch[1]:sequence[2]:for-each[1]</location>
+            </for-each>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>47cafc9e-ef8b-40a8-af12-dd92bfc3ba4c</process-id>
+      <author>Yannic Legermann</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1726046566756</last-modified>
+    </meta>
+  </process-def>
+</process>

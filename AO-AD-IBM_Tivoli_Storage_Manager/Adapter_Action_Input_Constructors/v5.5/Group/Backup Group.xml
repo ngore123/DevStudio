@@ -1,0 +1,161 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Adapter_Action_Input_Constructors:v5.5:Group:Backup Group">
+    <parameters>
+      <input global="false" required="true">
+        <description>The Tivoli Storage Manager client opens the file you specify with this option and processes the list of files within according to the specific command. With the exception of the restore and retrieve commands, when you use the filelist option, Tivoli Storage Manager ignores all other file specifications on the command line.
+Note: The &lt;FILELIST&gt; option does not support the wildcard characters.
+</description>
+        <from>filelist</from>
+        <to>filelist</to>
+      </input>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="true">
+        <description>Use the groupname option with the backup group command to specify the name for a group. You can only perform operations on new groups or the current active version of the group.</description>
+        <from>groupname</from>
+        <to>groupname</to>
+      </input>
+      <input global="false" required="false">
+        <description>To specify whether to perform a full or differential group backup containing a list of files from one or more file space origins. Valid values – full(Default),differential
+
+NOTE: While attempting a differential backup, the application automatically performs a full backup if no full backup had been taken earlier for the same group and file list.
+</description>
+        <from>mode</from>
+        <to>mode</to>
+      </input>
+      <input global="false" required="true">
+        <description>Use the virtualfsname option with the backup group command to specify the name of the virtual file space for the group on which you want to perform the operation. The virtualfsname cannot be the same as an existing file space name.</description>
+        <from>virtualfsname</from>
+        <to>virtualfsname</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>final items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>final items</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="filelist">
+                <input global="false">
+                  <from>filelist</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="groupname">
+                <input global="false">
+                  <from>groupname</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="mode">
+                <input global="false">
+                  <from>mode</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="virtualfsname">
+                <input global="false">
+                  <from>virtualfsname</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" omit-xml-declaration="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">backup-group</xsl:text>
+        </operation-name>
+        <xsl:if test="string('${timeout secs}')!=''">
+          <timeout-secs>
+            <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+        <command-options>
+          <xsl:if test="string('${groupname}')!=''">
+            <groupname>
+              <xsl:value-of select="'${groupname}'" disable-output-escaping="no" />
+            </groupname>
+          </xsl:if>
+          <xsl:if test="string('${mode}')!=''">
+            <mode>
+              <xsl:value-of select="'${mode}'" disable-output-escaping="no" />
+            </mode>
+          </xsl:if>
+          <xsl:if test="string('${virtualfsname}')!=''">
+            <virtualfsname>
+              <xsl:value-of select="'${virtualfsname}'" disable-output-escaping="no" />
+            </virtualfsname>
+          </xsl:if>
+          <xsl:if test="string('${filelist}')!=''">
+            <filelist>
+              <xsl:value-of select="'${filelist}'" disable-output-escaping="no" />
+            </filelist>
+          </xsl:if>
+        </command-options>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>FINAL ITEMS: </value>
+              </input>
+              <input>
+                <from>final items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for Backup Group process.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8c81f48f-7903-39ae-bd83-4ee6e277798a</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290596962037</last-modified>
+    </meta>
+  </process-def>
+</process>

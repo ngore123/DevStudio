@@ -1,0 +1,154 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-Microsoft_System_Center_Operations_Manager:Adapter_Action_Input_Constructors:v2007:Management_Pack:Find Management Pack">
+    <parameters>
+      <input global="false" required="false">
+        <description>
+timeout-secs[Optional]
+	Time in seconds after which the request will time-out of not completed. Default is: 60 secs
+</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="false">
+        <description>
+managementpack-prop-key[Optional]
+	This tag contains the name of the property of management pack by which we want to filter the search.
+	Valid values - Name,KeyToken,Version,Id,VersionId,References,Sealed,ContentReadable,FriendlyName,DisplayName,Description,
+DefaultLanguageCode,LockObject
+</description>
+        <from>managementpack prop key</from>
+        <to>managementpack prop key</to>
+      </input>
+      <input global="false" required="false">
+        <description>
+managementpack-prop-val[Optional]
+	This tag contains the value of the property specified in managementpack-prop-key. </description>
+        <from>managementpack prop val</from>
+        <to>managementpack prop val</to>
+      </input>
+      <input global="false" required="false">
+        <description>
+operand[Optional]
+	This tag specifies the operation that will be applied between 'managementpack-prop-key' and 'managementpack-prop-val'.
+Valid values - equals, not equals, matches
+
+NOTE: There are a few discrepencies in the naming between SCOM application and API.
+		 1. In the SCOM application, the value provided in ID is actually mapped to 'Name' attribute of management pack in SCOM API.
+		 2. In the SCOM application, the value provided in Name is actually mapped to 'DisplayName' attribute of management pack in SCOM API.</description>
+        <from>operand</from>
+        <to>operand</to>
+      </input>
+      <output global="false" required="false">
+        <to>items xml</to>
+        <from>items xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items xml</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok1">
+                <input global="false">
+                  <from>managementpack prop key</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok2">
+                <input global="false">
+                  <from>managementpack prop val</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok3">
+                <input global="false">
+                  <from>operand</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">get-managementpack</xsl:text>
+        </operation-name>
+        <timeout-secs>
+          <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+        </timeout-secs>
+        <command-parameters>
+          <filters>
+            <filter>
+              <managementpack-prop-key>
+                <xsl:value-of select="'${tok1}'" disable-output-escaping="no" />
+              </managementpack-prop-key>
+              <managementpack-prop-val>
+                <xsl:value-of select="'${tok2}'" disable-output-escaping="no" />
+              </managementpack-prop-val>
+              <operand>
+                <xsl:value-of select="'${tok3}'" disable-output-escaping="no" />
+              </operand>
+            </filter>
+          </filters>
+        </command-parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Item Xml:</value>
+              </input>
+              <input>
+                <from>items xml</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for the process - "Find Management Pack"</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>740c9f00-e1f9-3d2f-96f1-d7278f03da59</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598686094</last-modified>
+    </meta>
+  </process-def>
+</process>

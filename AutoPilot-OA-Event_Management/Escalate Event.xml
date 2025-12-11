@@ -1,0 +1,873 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Event_Management:Escalate Event">
+    <parameters>
+      <input global="false" required="true">
+        <description>String value - The name of a configuration item defined in a configuration module.
+
+Example: Netcool_OMNIbus, HP_NNM, BMC_Event_Manager
+</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String value - The serial number of the event.
+
+Example: 10333
+
+BMC Event Manager: The Serial number corresponds to the ID of the Event in BEM.</description>
+        <from>serial number</from>
+        <to>serial number</to>
+      </input>
+      <input global="false" required="false">
+        <description>String value - The new severity value. 
+
+
+BMC Event Manager Valid Values: Critical, Major, Minor, Warning, Info, OK, Unknown
+
+Note: Not valid for Netcool_OMNIbus</description>
+        <from>severity</from>
+        <to>severity</to>
+      </input>
+      <input global="false" required="false">
+        <description>String value - The new severity value. 
+
+BMC Event Manager Valid Values: Highest, High, Moderate, Low, Lowest
+
+Note: Not valid for Netcool_OMNIbus</description>
+        <from>priority</from>
+        <to>priority</to>
+      </input>
+      <output global="false" required="false">
+        <description>XML output that contains results returned by the adapter request. The contents of the response will vary by adapter.</description>
+        <to>events</to>
+        <from>events</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value - status success, failure</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value - verbose status message.
+</description>
+        <to>success message</to>
+        <from>success message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Event_Management:Utilities:Extract Configuration Data</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>adapter</from>
+            <to>adapter</to>
+          </output>
+          <output>
+            <from>system</from>
+            <to>system</to>
+          </output>
+          <output>
+            <from>concept template</from>
+            <to>concept template</to>
+          </output>
+          <output>
+            <from>field mappings</from>
+            <to>field mappings</to>
+          </output>
+          <output>
+            <from>severity mappings</from>
+            <to>severity mappings</to>
+          </output>
+          <output>
+            <from>log mappings</from>
+            <to>log mappings</to>
+          </output>
+          <output>
+            <from>version</from>
+            <to>version</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>success message</from>
+            <to>success message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>system</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat("Unknown System ", .)]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>system</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='OMNIbus']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Event_Management:Searches:Get Event by Serial Number</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>serial number</from>
+                  <to>serial number</to>
+                </input>
+                <output>
+                  <from>events</from>
+                  <to>events</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>success message</from>
+                  <to>success message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>success status</to>
+                              <value>success</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>serial number</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>status message</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[concat("Escalation Level is already at its maximum for Serial Number: ", .)]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>events</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//escalation-level < 6]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>events</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>current escalation level</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//escalation-level/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <removal>
+                            <input>
+                              <from>event</from>
+                            </input>
+                          </removal>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>current escalation level</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>new escalation level numeric</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="current escalation level">
+                                  <input global="false">
+                                    <from>current escalation level</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[number(.) + 1]]></xpath>
+                            </xpath-expression>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="current escalation level">
+                                  <input global="false">
+                                    <from>current escalation level</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[substring-before(., ".")]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input global="true">
+                                <configuration>:AutoPilot-OA-Event_Management:Netcool_OMNIbus:Priority_Mappings</configuration>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>new escalation level</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens>
+                                <replacement-token name="level numeric">
+                                  <input global="false">
+                                    <from>new escalation level numeric</from>
+                                  </input>
+                                </replacement-token>
+                              </xpath-replacement-tokens>
+                              <xpath><![CDATA[//mapping[text()='${level numeric}']/@name]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>serial number</from>
+                            </input>
+                            <output>
+                              <to>event</to>
+                              <concept type="AutoPilot-OA-Event_Management:Event">
+                                <attribute>serial</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <from>new escalation level</from>
+                            </input>
+                            <output>
+                              <to>event</to>
+                              <concept type="AutoPilot-OA-Event_Management:Event">
+                                <attribute>escalation-level</attribute>
+                              </concept>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>event</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>events</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="event">
+                                  <input global="false">
+                                    <from>event</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Events>
+      <xsl:choose>
+        <xsl:when test="string-length(//event) &gt; 0">
+          <xsl:copy-of select="//event" />
+        </xsl:when>
+        <xsl:otherwise>${event}</xsl:otherwise>
+      </xsl:choose>
+    </Events>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>****CHECK</value>
+                                </input>
+                                <input>
+                                  <from>new escalation level numeric</from>
+                                </input>
+                                <input>
+                                  <from>new escalation level</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Event_Management:Update Events</process-name>
+                          <parameters>
+                            <input>
+                              <from>configuration name</from>
+                              <to>configuration name</to>
+                            </input>
+                            <input>
+                              <from>events</from>
+                              <to>events</to>
+                            </input>
+                            <output>
+                              <from>events</from>
+                              <to>events</to>
+                            </output>
+                            <output>
+                              <from>success status</from>
+                              <to>success status</to>
+                            </output>
+                            <output>
+                              <from>success message</from>
+                              <to>success message</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>**Event to be updated</value>
+                                </input>
+                                <input>
+                                  <from>configuration name</from>
+                                </input>
+                                <input>
+                                  <from>events</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <output>
+                                    <to>success status</to>
+                                    <value>success</value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>serial number</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>status message</to>
+                                    </output>
+                                  </result>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[concat("Escalation Level has been updated for Serial Number: ", .)]]></xpath>
+                                  </xpath-expression>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                              </assign>
+                            </sequence>
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>success status</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[text() = 'failure']]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <output>
+                                    <to>success status</to>
+                                    <value>failure</value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>serial number</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>status message</to>
+                                    </output>
+                                  </result>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[concat("Unable to update the escalation level for Serial Number: ", .)]]></xpath>
+                                  </xpath-expression>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                              </assign>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>success status</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'failure']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>success status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>serial number</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[concat("Unable to retrieve data for Serial Number: ", .)]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>system</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='HP NNM']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>success status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>success message</to>
+                  <value>HP NNM does not support event oralert escalation.</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Message</value>
+                    </input>
+                    <input>
+                      <from>adapter response</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[3]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>system</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text() = "BMC_Event_Manager"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <input>
+                  <from>serial number</from>
+                </input>
+                <output>
+                  <to>event</to>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>severity</from>
+                </input>
+                <output>
+                  <to>event</to>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>severity</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>priority</from>
+                </input>
+                <output>
+                  <to>event</to>
+                  <concept type="AutoPilot-OA-Event_Management:Event">
+                    <attribute>escalation-level</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>event</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>events</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="event">
+                      <input global="false">
+                        <from>event</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Events>
+      <xsl:choose>
+        <xsl:when test="string-length(//event) &gt; 0">
+          <xsl:copy-of select="//event" />
+        </xsl:when>
+        <xsl:otherwise>${event}</xsl:otherwise>
+      </xsl:choose>
+    </Events>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[4]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Event_Management:Update Events</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>events</from>
+                  <to>events</to>
+                </input>
+                <output>
+                  <from>events</from>
+                  <to>events</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>success message</from>
+                  <to>success message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[4]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow will incrementally escalate an event.
+
+Not supported by HP NNM
+
+</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>641b16e9-ae2d-3ede-81ee-b854fcede31a</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1475131947117</last-modified>
+    </meta>
+  </process-def>
+</process>

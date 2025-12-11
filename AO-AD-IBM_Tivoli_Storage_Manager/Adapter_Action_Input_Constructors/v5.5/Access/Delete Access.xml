@@ -1,0 +1,159 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:Adapter_Action_Input_Constructors:v5.5:Access:Delete Access">
+    <parameters>
+      <input global="false" required="true">
+        <description>Name of the node(as registered with the tsm server) where this command will be executed.</description>
+        <from>nodename</from>
+        <to>nodename</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the node to whom the access rights will be given.</description>
+        <from>client nodename</from>
+        <to>client nodename</to>
+      </input>
+      <input global="false" required="true">
+        <description>String indicating the set of files\directories on which access rights will be given to the node specified in client-nodename.
+Note: The value of fileset should be provided in the format as returned by “Query Access” wrapper. For example, if the access rights were given for a file - C:\AmitG\Say_Nothing\*.*, the user should provide the value in the following format - \\win2stdvm\c$\AmitG\Say_Nothing\*, because tsm server stores the archived files in the above mentioned format.  Here ‘win2stdvm’ is the node name of the workstation from where the files were archived. This is valid only for windows clients.</description>
+        <from>fileset</from>
+        <to>fileset</to>
+      </input>
+      <input global="false" required="true">
+        <description>Type of access rights that are given.
+Valid values: Archive, Backup
+</description>
+        <from>access type</from>
+        <to>access type</to>
+      </input>
+      <input global="false" required="false">
+        <description>The timeout value is seconds. This is the time after which the command will timeout regardless of whether the command execution is complete or not.</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <output global="false" required="false">
+        <to>items</to>
+        <from>final items</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>final items</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="access type">
+                <input global="false">
+                  <from>access type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="fileset">
+                <input global="false">
+                  <from>fileset</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="nodename">
+                <input global="false">
+                  <from>nodename</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="client nodename">
+                <input global="false">
+                  <from>client nodename</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" omit-xml-declaration="yes" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">delete-access</xsl:text>
+        </operation-name>
+        <xsl:if test="string('${timeout secs}')!=''">
+          <timeout-secs>
+            <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+          </timeout-secs>
+        </xsl:if>
+        <command-arguments>
+          <xsl:if test="string('${fileset}')!=''">
+            <fileset>
+              <xsl:value-of select="'${fileset}'" disable-output-escaping="no" />
+            </fileset>
+          </xsl:if>
+          <xsl:if test="string('${access type}')!=''">
+            <access-type>
+              <xsl:value-of select="'${access type}'" disable-output-escaping="no" />
+            </access-type>
+          </xsl:if>
+          <xsl:if test="string('${nodename}')!=''">
+            <nodename>
+              <xsl:value-of select="'${nodename}'" disable-output-escaping="no" />
+            </nodename>
+          </xsl:if>
+          <xsl:if test="string('${client nodename}')!=''">
+            <client-nodename>
+              <xsl:value-of select="'${client nodename}'" disable-output-escaping="no" />
+            </client-nodename>
+          </xsl:if>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>FINAL ITEMS: </value>
+              </input>
+              <input>
+                <from>final items</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for Delete Access process.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d78dc291-80b9-34f5-81d1-e28bf1459817</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290596954091</last-modified>
+    </meta>
+  </process-def>
+</process>

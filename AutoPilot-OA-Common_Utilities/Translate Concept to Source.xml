@@ -1,0 +1,223 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AutoPilot-OA-Common_Utilities:Translate Concept to Source">
+    <parameters>
+      <input global="false" required="true">
+        <from>concept</from>
+        <to>concept</to>
+      </input>
+      <input global="false" required="true">
+        <from>mappings</from>
+        <to>mappings</to>
+      </input>
+      <input global="false" required="true">
+        <from>collection</from>
+        <to>collection</to>
+      </input>
+      <output global="false" required="false">
+        <to>output</to>
+        <from>full source document</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>collection</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>source document container name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[name()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>collection</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>source document element name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[name(/node()/*)]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>collection</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>full source document</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="source container">
+                <input global="false">
+                  <from>source document container name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <xsl:element name="${source container}">
+      <xsl:copy-of select="${source container}/*[position() &gt; 1]" />
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>collection</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>source document name attribute name</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[name(./*[1]/@*[1])]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>concept</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>full source document</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="change-concept">
+                <input global="false">
+                  <from>concept</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="mappings">
+                <input global="false">
+                  <from>mappings</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="container">
+                <input global="false">
+                  <from>source document container name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="fields">
+                <input global="false">
+                  <from>source document element name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="attribute name">
+                <input global="false">
+                  <from>source document name attribute name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="${fields} " />
+  <xsl:template match="/">
+    <xsl:element name="${container}">
+      <xsl:variable name="create-mappings">${mappings}</xsl:variable>
+      <xsl:choose>
+        <xsl:when test="string-length(.) &gt; 0">
+          <xsl:for-each select="//*">
+            <xsl:variable name="element-name" select="name()" />
+            <xsl:variable name="element-value" select="text()" />
+            <xsl:if test="string-length($element-name) &gt; 0 and string-length($element-value) &gt; 0">
+              <xsl:element name="${fields}">
+                <xsl:attribute name="${attribute name}">
+                  <xsl:value-of select="xalan:nodeset($create-mappings)//node()[name()=$element-name]" disable-output-escaping="no" />
+                </xsl:attribute>
+                <xsl:value-of select="$element-value" disable-output-escaping="no" />
+              </xsl:element>
+            </xsl:if>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise />
+      </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Creating source document</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Source document created</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description> </description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>9b3b0c68-f9b5-3402-9a04-f18f66eb8a1a</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1293711563002</last-modified>
+    </meta>
+  </process-def>
+</process>

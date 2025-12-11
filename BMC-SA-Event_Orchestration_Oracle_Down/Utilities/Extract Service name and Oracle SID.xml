@@ -1,0 +1,176 @@
+<process draft="false" dev-studio-version="99.99.99-SNAPSHOT">
+  <process-def name=":BMC-SA-Event_Orchestration_Oracle_Down:Utilities:Extract Service name and Oracle SID">
+    <parameters>
+      <input global="false" required="true">
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <output global="false" required="false">
+        <to>service name</to>
+        <from>service name</from>
+      </output>
+      <output global="false" required="false">
+        <to>oracle sid</to>
+        <from>oracle sid</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Oracle_Down:Service_Actions_Aliasing</configuration>
+          </input>
+          <output>
+            <to>service alias configuration</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>component caption</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//sourceData/componentCaption/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>event data</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>service name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <servicename>
+      <xsl:choose>
+        <xsl:when test="//sourceData/componentType/text() = 'KOE_INSTANCE'">
+          <xsl:text disable-output-escaping="no">oradb</xsl:text>
+        </xsl:when>
+        <xsl:when test="//sourceData/componentType/text() = 'KOE_INST_LISTENER'">
+          <xsl:text disable-output-escaping="no">oralistener</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text></xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </servicename>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Tokenize String</process-name>
+        <parameters>
+          <input>
+            <from>component caption</from>
+            <to>string</to>
+          </input>
+          <input>
+            <value>^</value>
+            <to>delimiter</to>
+          </input>
+          <output>
+            <from>tokens</from>
+            <to>tokens</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>tokens</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>oracle sid</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[/*/*[position()="4"]]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>oracle sid</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>oracle sid</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//token/text()]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>e91d3f2c-8756-40fb-a56c-0663e46eabb3</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1570784278493</last-modified>
+    </meta>
+  </process-def>
+</process>

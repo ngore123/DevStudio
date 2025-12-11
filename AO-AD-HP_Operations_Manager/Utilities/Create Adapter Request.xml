@@ -1,0 +1,92 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Operations_Manager:Utilities:Create Adapter Request">
+    <parameters>
+      <input global="false" required="true">
+        <description>Valid Operations: get-message, get-annotations, modify-message, add-annotation, modify-annotation, acknowledge-message, escalate-message, own-message, disown-message, unacknowledge-message, delete-annotation, create-message, start-automatic-action, start-operator-action.
+</description>
+        <from>operation name</from>
+        <to>operation name</to>
+      </input>
+      <input global="false" required="true">
+        <description>XML Sample of Items for the wrapper:  
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;message-id&gt;e0ab4abe-1c9c-71dd-0ad2-ac1031690000&lt;/message-id&gt;
+	&lt;/item&gt;
+&lt;/items&gt;</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="true">
+        <to>request</to>
+        <from>formed request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>items</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>formed request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="operation name">
+                <input global="false">
+                  <from>operation name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <hpom-request>
+        <operation>${operation name}</operation>
+        <xsl:for-each select="//items/item">
+          <xsl:copy-of select="./*" />
+        </xsl:for-each>
+      </hpom-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Creates Adapter Request</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>d80d9450-9c1f-30f4-a0de-ba84a3a0cb65</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290587666656</last-modified>
+    </meta>
+  </process-def>
+</process>

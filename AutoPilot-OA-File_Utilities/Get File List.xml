@@ -1,0 +1,275 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:Get File List">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specific file for which to retrieve information.</description>
+        <from>file</from>
+        <to>file</to>
+      </input>
+      <input global="false" required="false">
+        <description>The format of the resulting file list. 
+Valid values:
+For Linux/Solaris.  
+COLUMNS (multi-column output with entries sorted down the columns)
+LONG (long format output listing mode
+For a Windows O/S.
+BARE (Uses bare format - no heading information or summary)
+WIDE (Uses wide list format)</description>
+        <from>output format</from>
+        <to>output format</to>
+      </input>
+      <input global="false" required="false">
+        <description>The file attribute used to sort the resulting file list. 
+Valid values:  
+For Linux/Solaris.
+NAME
+For a Windows O/S
+OWNER (owner of the files displayed)
+LAST MODIFIED (displays files in timefield order of last written)
+ACCESS TIME (displays files in timefield order of last accessed)</description>
+        <from>sort by</from>
+        <to>sort by</to>
+      </input>
+      <input global="false" required="false">
+        <description>Filter method to use on the output returned. 
+Valid values:
+For Linux/Solaris.
+DEFAULT (No Entry) (lists files and directories that do not begin with a dot (.))
+ALL (lists all entries)
+NO PARENT OR WORKING DIR (Do not list Parent or Working Directories)
+For a Windows O/S.
+DEFAULT (No Entry) (displays the contents of the specified directory)
+ALL (displays all hidden files and directories)</description>
+        <from>file filter</from>
+        <to>file filter</to>
+      </input>
+      <input global="false" required="false">
+        <description>Reverse the order of sorting?
+Valid values:  true
+Applies to all OS.</description>
+        <from>reverse sort</from>
+        <to>reverse sort</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>file</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="file filter">
+                  <input global="false">
+                    <from>file filter</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="output format">
+                  <input global="false">
+                    <from>output format</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="sort by">
+                  <input global="false">
+                    <from>sort by</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="reverse sort">
+                  <input global="false">
+                    <from>reverse sort</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="file">
+                  <input global="false">
+                    <from>file</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text>ls</xsl:text>
+        <xsl:if test="string-length('${file filter}') != 0 and '${file filter}' = 'ALL'">
+          <xsl:text> -a</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file filter}') != 0 and '${file filter}' = 'NO PARENT OR WORKING DIR'">
+          <xsl:text> -A</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${output format}') != 0 and '${output format}' = 'LONG'">
+          <xsl:text> -l</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${output format}') != 0 and '${output format}' = 'LINES'">
+          <xsl:text> -x</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${output format}') != 0 and '${output format}' = 'STREAMS'">
+          <xsl:text> -m</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'MODIFICATION TIME'">
+          <xsl:text> -t</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'INODE MODIFICATION TIME'">
+          <xsl:text> -c</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'ACCESS TIME'">
+          <xsl:text> -u</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${reverse sort}') != 0 and '${reverse sort}' = 'true'">
+          <xsl:text> -r</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0"> ${file}</xsl:if>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text>/usr/xpg4/bin/ls</xsl:text>
+        <xsl:if test="string-length('${file filter}') != 0 and '${file filter}' = 'ALL'">
+          <xsl:text> -a</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file filter}') != 0 and '${file filter}' = 'NO PARENT OR WORKING DIR'">
+          <xsl:text> -A</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${output format}') != 0 and '${output format}' = 'LONG'">
+          <xsl:text> -l</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${output format}') != 0 and '${output format}' = 'LINES'">
+          <xsl:text> -x</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${output format}') != 0 and '${output format}' = 'STREAMS'">
+          <xsl:text> -m</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'MODIFICATION TIME'">
+          <xsl:text> -t</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'INODE MODIFICATION TIME'">
+          <xsl:text> -c</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'ACCESS TIME'">
+          <xsl:text> -u</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${reverse sort}') != 0 and '${reverse sort}' = 'true'">
+          <xsl:text> -r</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0"> ${file}</xsl:if>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">dir</xsl:text>
+        <xsl:if test="string-length('${file filter}') != 0 and '${file filter}' = 'ALL'">
+          <xsl:text disable-output-escaping="no"> /A</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file filter}') != 0 and '${file filter}' = 'RECURSIVE'">
+          <xsl:text disable-output-escaping="no"> /S</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${output format}') != 0 and '${output format}' = 'BARE'">
+          <xsl:text disable-output-escaping="no"> /B</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${output format}') != 0 and '${output format}' = 'WIDE'">
+          <xsl:text disable-output-escaping="no"> /W</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'OWNER'">
+          <xsl:text disable-output-escaping="no"> /Q</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'LAST MODIFIED'">
+          <xsl:text disable-output-escaping="no"> /TW</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${sort by}') != 0 and '${sort by}' = 'ACCESS TIME'">
+          <xsl:text disable-output-escaping="no"> /TA</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${reverse sort}') != 0 and '${reverse sort}' = 'true'">
+          <xsl:text disable-output-escaping="no"> /O-</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file}') != 0"> ${file}</xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Get File List
+    List the contents of a directory.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>496c7b9f-ff75-3b23-9635-00ac37438ee5</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902415999</last-modified>
+    </meta>
+  </process-def>
+</process>

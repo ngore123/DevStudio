@@ -1,0 +1,240 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:v6.0:Discovery:Create Discovery Entry">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is HPSEActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>1. Creates a new entry for database information
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;create&lt;/command&gt;
+	    &lt;category&gt;domaindiscovery&lt;/category&gt;
+		&lt;process-id&gt;create-discovery-entry&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;application&gt;
+	        &lt;databaseinfo&gt;
+	          &lt;address&gt;172.16.49.111&lt;/address&gt;
+	          &lt;managementaddress&gt;172.16.49.111&lt;/managementaddress&gt;
+	          &lt;server&gt;172.16.49.111&lt;/server&gt;
+	          &lt;port&gt;1522&lt;/port&gt;
+	          &lt;type&gt;oracle&lt;/type&gt;
+	        &lt;/databaseinfo&gt;
+	      &lt;/application&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+application[Required]
+	Indicates that an entry of type application is created here.
+databaseinfo[Required]
+	Indicates that an entry of type application database is created here.
+address[Required]
+	IP/DNS Name of the host server.
+managementaddress[Optional]
+	IP/DNS Name of the management server.
+server[Required]
+	IP address of the database server.
+port[Required]
+	Port on which database is listening.
+type[Required]
+	Database type.Valid values are - oracle/sybase/sql/cache
+	
+2. Creates a new entry for the exchange domain controller
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;create&lt;/command&gt;
+	    &lt;category&gt;domaindiscovery&lt;/category&gt;
+		&lt;process-id&gt;create-discovery-entry&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+			&lt;application&gt;
+				&lt;domaincontrollerinfo&gt;
+					&lt;domain&gt;bmccat.com&lt;/domain&gt;
+					&lt;username&gt;Administrator&lt;/username&gt;
+					&lt;password&gt;root123&lt;/password&gt;
+					&lt;domaincontroller&gt;bmccat.com&lt;/domaincontroller&gt;
+				&lt;/domaincontrollerinfo&gt;
+			&lt;/application&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+application[Required]
+	Indicates that an entry of type application is created here.
+domaincontrollerinfo[Required]
+	Indicates that an entry of type application domaincontroller is created here.
+domain[Required]
+	Name of the new domain controller
+username[Required]
+	Username of the domain controller
+password[Required]
+	Password of the domain controller
+domaincontroller[Required]
+	Domain of the new domain controller.
+	
+3. Creates a new entry for the TNSLinstenerPort
+Sample Request XML:
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;command&gt;create&lt;/command&gt;
+	    &lt;category&gt;domaindiscovery&lt;/category&gt;
+		&lt;process-id&gt;create-discovery-entry&lt;/process-id&gt;
+	    &lt;command-arguments&gt;
+	      &lt;application&gt;
+	        &lt;tnslistenerport&gt;1111&lt;/tnslistenerport&gt;
+	      &lt;/application&gt;
+	    &lt;/command-arguments&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+command[Required]
+	The actual command type that will be executed.
+category[Required]
+	This parameter identifies the top-level functional category.
+process-id[Required]
+	Unique identifier for the process workflow.
+application[Required]
+	Indicates that an entry of type application is created here.
+tnslistenerport[Required]
+	Port for which the new entry will be created.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Process ID Error Reporting</process-name>
+              <parameters>
+                <input>
+                  <value>create-discovery-entry</value>
+                  <to>process id</to>
+                </input>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>items</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(//items/item/process-id)='create-discovery-entry']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Invoke Adapter Request</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>items</from>
+                  <to>items</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper supports the following requirements:-
+
+1. Creates a new entry for database information.
+2. Creates a new entry for the exchange domain controller. The -primary tag is required if the domain controller is primary.
+3. Creates a new entry for the Oracle TNS Listener Port.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>17277968-a3de-3b3c-b84b-88e97dbba376</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588089058</last-modified>
+    </meta>
+  </process-def>
+</process>

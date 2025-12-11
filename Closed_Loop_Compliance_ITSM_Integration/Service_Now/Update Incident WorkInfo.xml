@@ -1,0 +1,293 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":Closed_Loop_Compliance_ITSM_Integration:Service_Now:Update Incident WorkInfo">
+    <parameters>
+      <input global="false" required="false">
+        <from>incident number</from>
+        <to>incident number</to>
+      </input>
+      <input global="false" required="false">
+        <from>workinfo summary</from>
+        <to>workinfo summary</to>
+      </input>
+      <input global="false" required="false">
+        <from>workinfo details</from>
+        <to>workinfo details</to>
+      </input>
+      <input global="false" required="false">
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <output global="false" required="false">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+      <output global="false" required="false">
+        <to>updated incidents</to>
+        <from>updated incidents</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>incident platform</to>
+            <value>ServiceNow</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Incident_Management:Update WorkInfo</process-name>
+              <parameters>
+                <input>
+                  <from>incident platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>incident number</from>
+                  <to>incident number</to>
+                </input>
+                <input>
+                  <from>workinfo summary</from>
+                  <to>workinfo summary</to>
+                </input>
+                <input>
+                  <from>workinfo details</from>
+                  <to>workinfo details</to>
+                </input>
+                <input>
+                  <value>General Information</value>
+                  <to>workinfo type</to>
+                </input>
+                <input>
+                  <value>Yes</value>
+                  <to>locked</to>
+                </input>
+                <input>
+                  <value>Internal</value>
+                  <to>view access</to>
+                </input>
+                <output>
+                  <from>incidents</from>
+                  <to>updated incidents</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='create incident ticket']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Incident_Management:Update WorkInfo</process-name>
+              <parameters>
+                <input>
+                  <from>incident platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>incident number</from>
+                  <to>incident number</to>
+                </input>
+                <input>
+                  <from>workinfo summary</from>
+                  <to>workinfo summary</to>
+                </input>
+                <input>
+                  <from>workinfo details</from>
+                  <to>workinfo details</to>
+                </input>
+                <input>
+                  <value>General Information</value>
+                  <to>workinfo type</to>
+                </input>
+                <input>
+                  <value>Yes</value>
+                  <to>locked</to>
+                </input>
+                <input>
+                  <value>Internal</value>
+                  <to>view access</to>
+                </input>
+                <output>
+                  <from>incidents</from>
+                  <to>updated incidents</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>workinfo summary</from>
+                    </input>
+                    <input>
+                      <from>inconsistent target data</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='remediation job failure']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Incident_Management:Update WorkInfo</process-name>
+              <parameters>
+                <input>
+                  <from>incident platform</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>incident number</from>
+                  <to>incident number</to>
+                </input>
+                <input>
+                  <from>workinfo summary</from>
+                  <to>workinfo summary</to>
+                </input>
+                <input>
+                  <from>workinfo details</from>
+                  <to>workinfo details</to>
+                </input>
+                <input>
+                  <value>General Information</value>
+                  <to>workinfo type</to>
+                </input>
+                <input>
+                  <value>Yes</value>
+                  <to>locked</to>
+                </input>
+                <input>
+                  <value>Internal</value>
+                  <to>view access</to>
+                </input>
+                <output>
+                  <from>incidents</from>
+                  <to>updated incidents</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[3]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>3c8192ae-4756-466a-bba8-575b3d3a12e3</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1416297294794</last-modified>
+    </meta>
+  </process-def>
+</process>

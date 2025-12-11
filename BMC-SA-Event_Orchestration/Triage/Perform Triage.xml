@@ -1,0 +1,1969 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":BMC-SA-Event_Orchestration:Triage:Perform Triage">
+    <parameters>
+      <input global="false" required="true">
+        <description>For example: BMC_TrueSight</description>
+        <from>event source type</from>
+        <to>event source type</to>
+      </input>
+      <input global="false" required="true">
+        <description>From example: BMC_AR_System</description>
+        <from>itsm type</from>
+        <to>itsm type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Use case type. For example: ServiceDown</description>
+        <from>event type</from>
+        <to>event type</to>
+      </input>
+      <input global="false" required="true">
+        <description>Configuration data like below:
+</description>
+        <from>all configurations</from>
+        <to>all configurations</to>
+      </input>
+      <input global="false" required="true">
+        <description>Incoming event data</description>
+        <from>event data</from>
+        <to>event data</to>
+      </input>
+      <input global="false" required="false">
+        <description>BAO's authentication token</description>
+        <from>authentication token</from>
+        <to>authentication token</to>
+      </input>
+      <input global="false" required="true">
+        <description>Connection information related to target in the event data</description>
+        <from>target connection data</from>
+        <to>target connection data</to>
+      </input>
+      <input global="false" required="true">
+        <description>Output data from pre-triage actions:
+
+If empty, then supply:
+
+&lt;pretriage-response-data /&gt;</description>
+        <from>pre triage response data</from>
+        <to>pre triage response data</to>
+      </input>
+      <input global="false" required="true">
+        <description>Collection of status and decision flags. By defualt it is as below:
+&lt;flags /&gt;.
+ At this stage it is atleast as below:
+&lt;flags&gt;
+   &lt;status&gt;success&lt;/status&gt;
+&lt;/flags&gt;
+</description>
+        <from>flags</from>
+        <to>flags</to>
+      </input>
+      <input global="false" required="false">
+        <description>Truesight auth token</description>
+        <from>ts auth token</from>
+        <to>ts auth token</to>
+      </input>
+      <input global="false" required="true">
+        <description>Action id
+
+1. BMC_TrueSight-ServiceDown-1
+2. BMC_TrueSight-HostDown-1</description>
+        <from>action id</from>
+        <to>action id</to>
+      </input>
+      <input global="false" required="false">
+        <description>Authentication token for ITSM</description>
+        <from>itsm authentication token</from>
+        <to>itsm authentication token</to>
+      </input>
+      <output global="false" required="false">
+        <to>triage response</to>
+        <from>triage response</from>
+      </output>
+      <output global="false" required="false">
+        <to>flags</to>
+        <from>flags</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>triage response</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value>Skipping triage due to earlier errors.</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>remediation required</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>flags</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>flags</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="remediation required">
+                      <input global="false">
+                        <from>remediation required</from>
+                      </input>
+                    </replacement-token>
+                    <replacement-token name="status">
+                      <input global="false">
+                        <from>status</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootName" select="name(/*)" />
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="flags">
+    <xsl:element name="{$rootName}">
+      <xsl:apply-templates select="@*|node()" />
+      <remediation-required>${remediation required}</remediation-required>
+      <xsl:choose>
+        <xsl:when test="boolean(drop-event) = false">
+          <xsl:choose>
+            <xsl:when test="not(contains('${status}',  'success'))">
+              <drop-event>
+                <xsl:text disable-output-escaping="no">true</xsl:text>
+              </drop-event>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="boolean(triage-status) = false">
+          <triage-status>
+            <xsl:text disable-output-escaping="no">${status}</xsl:text>
+          </triage-status>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="continue-processing">
+    <continue-processing>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success' and '${remediation required}' = 'true'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </continue-processing>
+  </xsl:template>
+  <xsl:template match="status">
+    <status>${status}</status>
+  </xsl:template>
+  <xsl:template match="drop-event">
+    <drop-event>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success'">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </drop-event>
+  </xsl:template>
+  <xsl:template match="triage-status">
+    <triage-status>${status}</triage-status>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <input>
+                  <compose-xml>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;triage-response&gt;
+   &lt;remediation-required&gt;</value>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="true">
+                      <input required="false">
+                        <from>remediation required</from>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;/remediation-required&gt;
+   &lt;status&gt;</value>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="true">
+                      <input required="false">
+                        <from>status</from>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;/status&gt;
+   &lt;log&gt;</value>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="true">
+                      <input required="false">
+                        <from>error message</from>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;/log&gt;
+   &lt;error-message&gt;</value>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="true">
+                      <input required="false">
+                        <from>error message</from>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;/error-message&gt;
+&lt;/triage-response&gt;</value>
+                      </input>
+                    </fragment>
+                  </compose-xml>
+                </input>
+                <output>
+                  <to>triage response</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==========Triage Output========</value>
+                    </input>
+                    <input>
+                      <from>remediation required</from>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>error message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[1]:assign[3]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>flags</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[not(boolean(//drop-event)) or //*[name() = 'drop-event']/text() = 'false' ]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>========Input=======</value>
+                    </input>
+                    <input>
+                      <from>event source type</from>
+                    </input>
+                    <input>
+                      <from>itsm type</from>
+                    </input>
+                    <input>
+                      <from>event type</from>
+                    </input>
+                    <input>
+                      <from>flags</from>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>authentication token</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>tso auth token present</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>itsm authentication token</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>itsm auth token present</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>ts auth token</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>event source auth token present</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>===Perform Triage Auth Tokens===</value>
+                    </input>
+                    <input>
+                      <from>tso auth token present</from>
+                    </input>
+                    <input>
+                      <from>event source auth token present</from>
+                    </input>
+                    <input>
+                      <from>itsm auth token present</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[2]</location>
+            </assign>
+            <assign>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>success</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>error message</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>remediation required</to>
+                  <value>false</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>triage data</to>
+                  <value>
+                    <triage-data />
+                  </value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[3]</location>
+            </assign>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>error message</to>
+                        <value>Skipping triage due to earlier errors.</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>remediation required</to>
+                        <value>false</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>flags</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>flags</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="remediation required">
+                            <input global="false">
+                              <from>remediation required</from>
+                            </input>
+                          </replacement-token>
+                          <replacement-token name="status">
+                            <input global="false">
+                              <from>status</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootName" select="name(/*)" />
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="flags">
+    <xsl:element name="{$rootName}">
+      <xsl:apply-templates select="@*|node()" />
+      <remediation-required>${remediation required}</remediation-required>
+      <xsl:choose>
+        <xsl:when test="boolean(drop-event) = false">
+          <xsl:choose>
+            <xsl:when test="not(contains('${status}',  'success'))">
+              <drop-event>
+                <xsl:text disable-output-escaping="no">true</xsl:text>
+              </drop-event>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="boolean(triage-status) = false">
+          <triage-status>
+            <xsl:text disable-output-escaping="no">${status}</xsl:text>
+          </triage-status>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="continue-processing">
+    <continue-processing>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success' and '${remediation required}' = 'true'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </continue-processing>
+  </xsl:template>
+  <xsl:template match="status">
+    <status>${status}</status>
+  </xsl:template>
+  <xsl:template match="drop-event">
+    <drop-event>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success'">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </drop-event>
+  </xsl:template>
+  <xsl:template match="triage-status">
+    <triage-status>${status}</triage-status>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <compose-xml>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;triage-response&gt;
+   &lt;remediation-required&gt;</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>remediation required</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;/remediation-required&gt;
+   &lt;status&gt;</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>status</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;/status&gt;
+   &lt;log&gt;</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>error message</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;/log&gt;
+   &lt;error-message&gt;</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>error message</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;/error-message&gt;
+&lt;/triage-response&gt;</value>
+                            </input>
+                          </fragment>
+                        </compose-xml>
+                      </input>
+                      <output>
+                        <to>triage response</to>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>==========Triage Output========</value>
+                          </input>
+                          <input>
+                            <from>remediation required</from>
+                          </input>
+                          <input>
+                            <from>status</from>
+                          </input>
+                          <input>
+                            <from>error message</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[2]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:BMC-SA-Event_Orchestration:Event_Integration:Create Related Event</process-name>
+                    <parameters>
+                      <input>
+                        <from>all configurations</from>
+                        <to>all configurations</to>
+                      </input>
+                      <input>
+                        <from>event data</from>
+                        <to>event data</to>
+                      </input>
+                      <input>
+                        <from>ts auth token</from>
+                        <to>auth token</to>
+                      </input>
+                      <input>
+                        <from>error message</from>
+                        <to>notes</to>
+                      </input>
+                      <input>
+                        <value>Triage Action</value>
+                        <to>action name</to>
+                      </input>
+                      <input>
+                        <from>error message</from>
+                        <to>message</to>
+                      </input>
+                      <input>
+                        <value>MAJOR</value>
+                        <to>severity</to>
+                      </input>
+                      <input>
+                        <value>1</value>
+                        <to>exit code</to>
+                      </input>
+                      <input>
+                        <from>error message</from>
+                        <to>error notes</to>
+                      </input>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>flags</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//continue-processing/text() = 'true']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-SA-Event_Orchestration:Utilities:Get Workflow Name by Event Type and Action</process-name>
+                    <parameters>
+                      <input>
+                        <from>all configurations</from>
+                        <to>all configurations</to>
+                      </input>
+                      <input>
+                        <from>event source type</from>
+                        <to>event source type</to>
+                      </input>
+                      <input>
+                        <from>event type</from>
+                        <to>event type</to>
+                      </input>
+                      <input>
+                        <value>triage</value>
+                        <to>action</to>
+                      </input>
+                      <input>
+                        <from>all configurations</from>
+                        <to>default workflow name</to>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[//Defaults/UnfoundWorkflowName/text()]]></xpath>
+                        </xpath-expression>
+                      </input>
+                      <output>
+                        <from>workflow name</from>
+                        <to>workflow name</to>
+                      </output>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>===========:BMC-SA-Event_Orchestration:Utilities:Get Workflow Name by Event Type and Action ==============</value>
+                          </input>
+                          <input>
+                            <from>workflow name</from>
+                          </input>
+                          <input>
+                            <from>status</from>
+                          </input>
+                          <input>
+                            <from>error message</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>status</to>
+                              <value>failure</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <concat>
+                                <input>
+                                  <value>Workflow mapping for event: '</value>
+                                </input>
+                                <input required="false">
+                                  <from>event type</from>
+                                </input>
+                                <input>
+                                  <value>' not found!</value>
+                                </input>
+                              </concat>
+                            </input>
+                            <output>
+                              <to>error message</to>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>remediation required</to>
+                              <value>false</value>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                        </assign>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>flags</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>flags</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="remediation required">
+                                  <input global="false">
+                                    <from>remediation required</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="status">
+                                  <input global="false">
+                                    <from>status</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootName" select="name(/*)" />
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="flags">
+    <xsl:element name="{$rootName}">
+      <xsl:apply-templates select="@*|node()" />
+      <remediation-required>${remediation required}</remediation-required>
+      <xsl:choose>
+        <xsl:when test="boolean(drop-event) = false">
+          <xsl:choose>
+            <xsl:when test="not(contains('${status}',  'success'))">
+              <drop-event>
+                <xsl:text disable-output-escaping="no">true</xsl:text>
+              </drop-event>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="boolean(triage-status) = false">
+          <triage-status>
+            <xsl:text disable-output-escaping="no">${status}</xsl:text>
+          </triage-status>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="continue-processing">
+    <continue-processing>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success' and '${remediation required}' = 'true'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </continue-processing>
+  </xsl:template>
+  <xsl:template match="status">
+    <status>${status}</status>
+  </xsl:template>
+  <xsl:template match="drop-event">
+    <drop-event>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success'">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </drop-event>
+  </xsl:template>
+  <xsl:template match="triage-status">
+    <triage-status>${status}</triage-status>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <input>
+                              <compose-xml>
+                                <fragment type="string" encode="false">
+                                  <input>
+                                    <value>&lt;triage-response&gt;
+   &lt;remediation-required&gt;</value>
+                                  </input>
+                                </fragment>
+                                <fragment type="string" encode="true">
+                                  <input required="false">
+                                    <from>remediation required</from>
+                                  </input>
+                                </fragment>
+                                <fragment type="string" encode="false">
+                                  <input>
+                                    <value>&lt;/remediation-required&gt;
+   &lt;status&gt;</value>
+                                  </input>
+                                </fragment>
+                                <fragment type="string" encode="true">
+                                  <input required="false">
+                                    <from>status</from>
+                                  </input>
+                                </fragment>
+                                <fragment type="string" encode="false">
+                                  <input>
+                                    <value>&lt;/status&gt;
+   &lt;error-message&gt;</value>
+                                  </input>
+                                </fragment>
+                                <fragment type="string" encode="true">
+                                  <input required="false">
+                                    <from>error message</from>
+                                  </input>
+                                </fragment>
+                                <fragment type="string" encode="false">
+                                  <input>
+                                    <value>&lt;/error-message&gt;
+&lt;/triage-response&gt;</value>
+                                  </input>
+                                </fragment>
+                              </compose-xml>
+                            </input>
+                            <output>
+                              <to>triage response</to>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>==========Triage Output========</value>
+                                </input>
+                                <input>
+                                  <from>remediation required</from>
+                                </input>
+                                <input>
+                                  <from>status</from>
+                                </input>
+                                <input>
+                                  <from>error message</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[2]</location>
+                        </assign>
+                        <call-process>
+                          <process-name>:BMC-SA-Event_Orchestration:Event_Integration:Create Related Event</process-name>
+                          <parameters>
+                            <input>
+                              <from>all configurations</from>
+                              <to>all configurations</to>
+                            </input>
+                            <input>
+                              <from>event data</from>
+                              <to>event data</to>
+                            </input>
+                            <input>
+                              <from>ts auth token</from>
+                              <to>auth token</to>
+                            </input>
+                            <input>
+                              <from>error message</from>
+                              <to>notes</to>
+                            </input>
+                            <input>
+                              <value>Triage Action</value>
+                              <to>action name</to>
+                            </input>
+                            <input>
+                              <from>error message</from>
+                              <to>message</to>
+                            </input>
+                            <input>
+                              <value>MAJOR</value>
+                              <to>severity</to>
+                            </input>
+                            <input>
+                              <value>1</value>
+                              <to>exit code</to>
+                            </input>
+                            <input>
+                              <from>error message</from>
+                              <to>error notes</to>
+                            </input>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                        </call-process>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[. = 'success']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>notes</to>
+                              <value>Starting Triage Process.</value>
+                            </output>
+                          </assignment>
+                          <assignment>
+                            <output>
+                              <to>exit code</to>
+                              <value>0</value>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                        <call-process>
+                          <process-name>:BMC-SA-Event_Orchestration:Event_Integration:Create Related Event</process-name>
+                          <parameters>
+                            <input>
+                              <from>all configurations</from>
+                              <to>all configurations</to>
+                            </input>
+                            <input>
+                              <from>event data</from>
+                              <to>event data</to>
+                            </input>
+                            <input>
+                              <from>ts auth token</from>
+                              <to>auth token</to>
+                            </input>
+                            <input>
+                              <from>notes</from>
+                              <to>notes</to>
+                            </input>
+                            <input>
+                              <value>Initiating Triage</value>
+                              <to>action name</to>
+                            </input>
+                            <input>
+                              <from>notes</from>
+                              <to>message</to>
+                            </input>
+                            <input>
+                              <value>INFO</value>
+                              <to>severity</to>
+                            </input>
+                            <input>
+                              <from>notes</from>
+                              <to>command output</to>
+                            </input>
+                            <input>
+                              <from>exit code</from>
+                              <to>exit code</to>
+                            </input>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Execute Process</process-name>
+                          <parameters>
+                            <input>
+                              <from>all configurations</from>
+                              <to>adapter name</to>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[//Adapters/RESTAdapter/text()]]></xpath>
+                              </xpath-expression>
+                            </input>
+                            <input>
+                              <from>all configurations</from>
+                              <to>target url</to>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[//BAO/URL/text()]]></xpath>
+                              </xpath-expression>
+                            </input>
+                            <input>
+                              <from>all configurations</from>
+                              <to>user name</to>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[//BAO/UserName/text()]]></xpath>
+                              </xpath-expression>
+                            </input>
+                            <input>
+                              <from>all configurations</from>
+                              <to>password</to>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[//BAO/Password/text()]]></xpath>
+                              </xpath-expression>
+                            </input>
+                            <input>
+                              <from>authentication token</from>
+                              <to>authentication token</to>
+                            </input>
+                            <input>
+                              <from>workflow name</from>
+                              <to>process name</to>
+                            </input>
+                            <input>
+                              <from>event data</from>
+                              <to>input parameters</to>
+                              <xslt-stylesheet>
+                                <stylesheet-replacement-tokens>
+                                  <replacement-token name="target connectoin datsa">
+                                    <input global="false">
+                                      <from>target connection data</from>
+                                    </input>
+                                  </replacement-token>
+                                </stylesheet-replacement-tokens>
+                                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="targetConnectionData">${target connectoin datsa}</xsl:variable>
+  <xsl:template match="/">
+    <inputParameters>
+      <inputParameter>
+        <name>
+          <xsl:text disable-output-escaping="no">event data</xsl:text>
+        </name>
+        <value>
+          <xsl:copy-of select="." />
+        </value>
+      </inputParameter>
+      <inputParameter>
+        <name>
+          <xsl:text disable-output-escaping="no">target connection data</xsl:text>
+        </name>
+        <value>
+          <xsl:copy-of select="$targetConnectionData" />
+        </value>
+      </inputParameter>
+    </inputParameters>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                              </xslt-stylesheet>
+                            </input>
+                            <input>
+                              <from>all configurations</from>
+                              <to>request timeout</to>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[//Defaults/RESTRequestTimeout/text()]]></xpath>
+                              </xpath-expression>
+                            </input>
+                            <output>
+                              <from>process output</from>
+                              <to>process output</to>
+                            </output>
+                            <output>
+                              <from>detailed process output</from>
+                              <to>detailed process output</to>
+                            </output>
+                            <output>
+                              <from>status</from>
+                              <to>status</to>
+                            </output>
+                            <output>
+                              <from>error message</from>
+                              <to>error message</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                        </call-process>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>process output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>triage output string</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//*[name = 'triage output']/value/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>==== triage output string</value>
+                                </input>
+                                <input>
+                                  <from>triage output string</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[2]</location>
+                        </assign>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:XML String to XML</process-name>
+                          <parameters>
+                            <input>
+                              <from>triage output string</from>
+                              <to>XML String</to>
+                            </input>
+                            <output>
+                              <from>XML</from>
+                              <to>triage output</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>=== triage output xml ====</value>
+                                </input>
+                                <input>
+                                  <from>triage output</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[3]</location>
+                        </call-process>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triage output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>remediation required</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens />
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:value-of select="//remediation-required/text()" disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triage output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>related event msg</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens />
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="//status/text() = 'success' and //remediation-required/text() = 'true'">
+          <xsl:text disable-output-escaping="no">Triage completed. Remediation is required.</xsl:text>
+        </xsl:when>
+        <xsl:when test="//status/text() = 'success' and //remediation-required/text() = 'false'">
+          <xsl:text disable-output-escaping="no">Triage completed. Remediation is NOT required:</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">Triage failed:</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triage output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>related event command</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//command/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triage output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>related event command output</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//command-output/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>related event command output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>related event long message</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="related event command">
+                                  <input global="false">
+                                    <from>related event command</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value" />
+  <xsl:template match="/">
+    <value>
+      ${related event command}
+      <xsl:text />
+      <xsl:value-of select="." disable-output-escaping="no" />
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triage output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>status</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//triage-output/status/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>process output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>triage command history</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens />
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value " />
+  <xsl:template match="/">
+    <triage-command-history>
+      <xsl:if test="boolean(//command)">
+        <xsl:copy-of select="//command" />
+      </xsl:if>
+      <xsl:if test="boolean(//command-output)">
+        <xsl:copy-of select="//command-output" />
+      </xsl:if>
+    </triage-command-history>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triage output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>error message</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[//error-message/text()]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>===Triage Process Output===</value>
+                                </input>
+                                <input>
+                                  <from>process output</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>===Triage Output===</value>
+                                </input>
+                                <input>
+                                  <from>triage output</from>
+                                </input>
+                                <input>
+                                  <from>remediation required</from>
+                                </input>
+                                <input>
+                                  <from>related event long message</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[3]</location>
+                        </assign>
+                        <call-process>
+                          <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Add XML</process-name>
+                          <parameters>
+                            <input>
+                              <from>triage output</from>
+                              <to>parent xml</to>
+                            </input>
+                            <input>
+                              <from>triage command history</from>
+                              <to>child xml</to>
+                            </input>
+                            <output>
+                              <from>result xml</from>
+                              <to>triage output</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[4]</location>
+                        </call-process>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>flags</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>flags</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens>
+                                <replacement-token name="remediation required">
+                                  <input global="false">
+                                    <from>remediation required</from>
+                                  </input>
+                                </replacement-token>
+                                <replacement-token name="status">
+                                  <input global="false">
+                                    <from>status</from>
+                                  </input>
+                                </replacement-token>
+                              </stylesheet-replacement-tokens>
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="rootName" select="name(/*)" />
+  <xsl:template match="@* | node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="flags">
+    <xsl:element name="{$rootName}">
+      <xsl:apply-templates select="@*|node()" />
+      <remediation-required>${remediation required}</remediation-required>
+      <xsl:choose>
+        <xsl:when test="boolean(drop-event) = false">
+          <xsl:choose>
+            <xsl:when test="not(contains('${status}',  'success'))">
+              <drop-event>
+                <xsl:text disable-output-escaping="no">true</xsl:text>
+              </drop-event>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+      <xsl:choose>
+        <xsl:when test="boolean(triage-status) = false">
+          <triage-status>
+            <xsl:text disable-output-escaping="no">${status}</xsl:text>
+          </triage-status>
+        </xsl:when>
+      </xsl:choose>
+    </xsl:element>
+  </xsl:template>
+  <xsl:template match="continue-processing">
+    <continue-processing>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success' and '${remediation required}' = 'true'">
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">false</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </continue-processing>
+  </xsl:template>
+  <xsl:template match="status">
+    <status>${status}</status>
+  </xsl:template>
+  <xsl:template match="drop-event">
+    <drop-event>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success'">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">true</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </drop-event>
+  </xsl:template>
+  <xsl:template match="triage-status">
+    <triage-status>${status}</triage-status>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>triage output</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>triage response</to>
+                              </output>
+                            </result>
+                            <xslt-stylesheet>
+                              <stylesheet-replacement-tokens />
+                              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <triage-response>
+      <xsl:copy>
+        <xsl:apply-templates select="@*|node()" />
+      </xsl:copy>
+    </triage-response>
+  </xsl:template>
+  <xsl:template match="XML">
+    <xsl:apply-templates select="./*" />
+  </xsl:template>
+  <xsl:template match="command-output">
+    <log>
+      <xsl:value-of select="." disable-output-escaping="no" />
+    </log>
+  </xsl:template>
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                            </xslt-stylesheet>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <before-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <value>==========Triage Output========</value>
+                                </input>
+                                <input>
+                                  <from>triage output</from>
+                                </input>
+                                <input>
+                                  <from>remediation required</from>
+                                </input>
+                                <input>
+                                  <from>status</from>
+                                </input>
+                                <input>
+                                  <from>error message</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </before-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[4]</location>
+                        </assign>
+                        <call-process>
+                          <process-name>:BMC-SA-Event_Orchestration:Event_Integration:Create Related Event</process-name>
+                          <parameters>
+                            <input>
+                              <from>all configurations</from>
+                              <to>all configurations</to>
+                            </input>
+                            <input>
+                              <from>event data</from>
+                              <to>event data</to>
+                            </input>
+                            <input>
+                              <from>ts auth token</from>
+                              <to>auth token</to>
+                            </input>
+                            <input>
+                              <from>related event msg</from>
+                              <to>notes</to>
+                            </input>
+                            <input>
+                              <value>Executing Triage</value>
+                              <to>action name</to>
+                            </input>
+                            <input>
+                              <from>related event long message</from>
+                              <to>message</to>
+                            </input>
+                            <input>
+                              <from>triage output</from>
+                              <to>severity</to>
+                              <xslt-stylesheet>
+                                <stylesheet-replacement-tokens />
+                                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="//status/text() = 'success'">
+          <xsl:text disable-output-escaping="no">INFO</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">MAJOR</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                              </xslt-stylesheet>
+                            </input>
+                            <input>
+                              <from>triage output</from>
+                              <to>command</to>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[//command/text()]]></xpath>
+                              </xpath-expression>
+                            </input>
+                            <input>
+                              <from>triage output</from>
+                              <to>command output</to>
+                              <xslt-stylesheet>
+                                <stylesheet-replacement-tokens />
+                                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value " />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="//status/text() = 'success'">
+        <xsl:choose>
+          <xsl:when test="boolean(//log)">
+            <xsl:value-of select="//log/text()" disable-output-escaping="no" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select="//command-output/text()" disable-output-escaping="no" />
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                              </xslt-stylesheet>
+                            </input>
+                            <input>
+                              <from>triage output</from>
+                              <to>exit code</to>
+                              <xslt-stylesheet>
+                                <stylesheet-replacement-tokens />
+                                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="//status/text() = 'success'">
+          <xsl:text disable-output-escaping="no">0</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">1</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                              </xslt-stylesheet>
+                            </input>
+                            <input>
+                              <from>triage output</from>
+                              <to>error notes</to>
+                              <xslt-stylesheet>
+                                <stylesheet-replacement-tokens />
+                                <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value " />
+  <xsl:template match="/">
+    <value>
+      <xsl:if test="//status/text() != 'success'">
+        <xsl:value-of select="//command-output/text()" disable-output-escaping="no" />
+      </xsl:if>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                              </xslt-stylesheet>
+                            </input>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[5]</location>
+                        </call-process>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                  <assign>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Triage for a given set of inputs:
+1. Event Source Type
+2. ITSM type
+3. All Configurations - All module configurations required to determine if triage is required and type of triage to be performed.
+4. Event Data - Incoming event data
+5. Flags - if continue-processing is false, traige step is skipped. This could be because event type is not supported.
+6. Log error - if true, then, an error is logged in the target event system.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>ceec421c-70fd-4ca5-b4f0-9030668c29fa</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestration.</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1594650879934</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,151 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-Microsoft_System_Center_Operations_Manager:Adapter_Action_Input_Constructors:v2007:Discovery:Find Discovery">
+    <parameters>
+      <input global="false" required="false">
+        <description>
+timeout-secs[Optional]
+	Time in seconds after which the request will time-out of not completed. Default is: 60 secs
+</description>
+        <from>timeout secs</from>
+        <to>timeout secs</to>
+      </input>
+      <input global="false" required="false">
+        <description>discovery-prop-key[Optional]
+	This tag contains the name of the property of discovery entity by which we want to filter the search.
+	Valid values - Enabled,Name,DisplayName,Description,Category,HasNonCategoryOverride,Priority,ManagementGroup,ManagementGroupId,HasNonCategoryOverride,Remotable,
+DataSource,Id,Status,LanguageCode,XmlTag
+</description>
+        <from>discovery prop key</from>
+        <to>discovery prop key</to>
+      </input>
+      <input global="false" required="false">
+        <description>discovery-prop-val[Optional]
+	This tag contains the value of the property specified in discovery-prop-key. Texts like true or false should be enclosed in single quotes if they are to be treated as String rather than as Boolean entities.
+NOTE: While retrieving discovery objects by key as 'Enabled', the value for 'Enabled' tag in 'discovery-prop-val' should be provided in single-quotes. Fo ex. 'true'</description>
+        <from>discovery prop val</from>
+        <to>discovery prop val</to>
+      </input>
+      <input global="false" required="false">
+        <description>
+operand[Optional]
+	This tag specifies the operation that will be applied between 'discovery-prop-key' and 'discovery-prop-val'.
+
+Valid values - equals, not equals, matches
+</description>
+        <from>operand</from>
+        <to>operand</to>
+      </input>
+      <output global="false" required="false">
+        <to>items xml</to>
+        <from>items xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>items xml</to>
+            <value>
+              <root />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="timeout secs">
+                <input global="false">
+                  <from>timeout secs</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok1">
+                <input global="false">
+                  <from>discovery prop key</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok2">
+                <input global="false">
+                  <from>discovery prop val</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tok3">
+                <input global="false">
+                  <from>operand</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">get-discovery</xsl:text>
+        </operation-name>
+        <timeout-secs>
+          <xsl:value-of select="'${timeout secs}'" disable-output-escaping="no" />
+        </timeout-secs>
+        <command-parameters>
+          <filters>
+            <filter>
+              <discovery-prop-key>
+                <xsl:value-of select="'${tok1}'" disable-output-escaping="no" />
+              </discovery-prop-key>
+              <discovery-prop-val>
+                <xsl:value-of select="'${tok2}'" disable-output-escaping="no" />
+              </discovery-prop-val>
+              <operand>
+                <xsl:value-of select="'${tok3}'" disable-output-escaping="no" />
+              </operand>
+            </filter>
+          </filters>
+        </command-parameters>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Item Xml:</value>
+              </input>
+              <input>
+                <from>items xml</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Utility to create items xml for the process - "Find Discovery"</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>6c7be325-9011-3f7d-894d-95b390048d25</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598683626</last-modified>
+    </meta>
+  </process-def>
+</process>

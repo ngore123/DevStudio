@@ -1,0 +1,260 @@
+<process draft="false" dev-studio-version="8.0.00">
+  <process-def name=":AutoPilot-OA-BAOGridManagement:Utils:Logout">
+    <parameters>
+      <input global="false" required="true">
+        <from>authentication token</from>
+        <to>authentication token</to>
+      </input>
+      <input global="false" required="false">
+        <description>If none provided, information provided in module configuration shall be used.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <description>If none provided, information provided in module configuration shall be used.</description>
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <output global="false" required="false">
+        <to>status reason</to>
+        <from>status reason</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status code</to>
+        <from>status code</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+      <output global="false" required="false">
+        <to>error number</to>
+        <from>error number</from>
+      </output>
+      <output global="false" required="false">
+        <to>remediation message</to>
+        <from>remediation message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-BAOGridManagement:Utils:Read Configuration</process-name>
+        <parameters>
+          <output>
+            <from>configuration xml</from>
+            <to>configuration xml</to>
+          </output>
+          <output>
+            <from>ConfigUserName</from>
+            <to>ConfigUserName</to>
+          </output>
+          <output>
+            <from>ConfigPassword</from>
+            <to>ConfigPassword</to>
+          </output>
+          <output>
+            <from>ConfigURL</from>
+            <to>ConfigURL</to>
+          </output>
+          <output>
+            <from>adapter name</from>
+            <to>config adapter name</to>
+          </output>
+          <output>
+            <from>Plaintext Password</from>
+            <to>Plaintext Password</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>adapter name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="config adapter name">
+                <input global="false">
+                  <from>config adapter name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${config adapter name}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>url</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>url</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="config url">
+                <input global="false">
+                  <from>ConfigURL</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${config url}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Login input values</value>
+              </input>
+              <input>
+                <from>adapter name</from>
+              </input>
+              <input>
+                <from>url</from>
+              </input>
+              <input>
+                <from>user name</from>
+              </input>
+              <input>
+                <from>password</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:BAO_Utilities:REST:Logout</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>authentication token</from>
+            <to>authentication token</to>
+          </input>
+          <input>
+            <from>url</from>
+            <to>url</to>
+          </input>
+          <output>
+            <from>status reason</from>
+            <to>status reason</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>status code</from>
+            <to>status code</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+          <output>
+            <from>error number</from>
+            <to>error number</to>
+          </output>
+          <output>
+            <from>remediation message</from>
+            <to>remediation message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Login into BAO grid.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>ed88e93e-8f8f-4e48-a0b4-132ad0be89d3</process-id>
+      <author>Ranganath Samudrala</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>rsamudrala</last-modified-by>
+      <last-modified>1524488354181</last-modified>
+    </meta>
+  </process-def>
+</process>

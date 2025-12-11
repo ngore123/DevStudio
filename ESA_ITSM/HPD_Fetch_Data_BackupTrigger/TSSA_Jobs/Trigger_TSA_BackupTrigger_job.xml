@@ -1,0 +1,1289 @@
+<process draft="false" dev-studio-version="24.3.00">
+  <process-def name=":ESA_ITSM:HPD_Fetch_Data_BackupTrigger:TSSA_Jobs:Trigger_TSA_BackupTrigger_job">
+    <parameters>
+      <input global="false" required="true">
+        <from>Target_Server_Name</from>
+        <to>Target_Server_Name</to>
+      </input>
+      <output global="false" required="false">
+        <to>TargetServer_FQDN</to>
+        <from>ServerName</from>
+      </output>
+      <output global="false" required="false">
+        <to>JobLogItems</to>
+        <from>JobLogItems</from>
+      </output>
+      <output global="false" required="false">
+        <description>TSO Job ExitCode</description>
+        <to>Job_ExitCode</to>
+        <from>Job_ExitCode</from>
+      </output>
+      <output global="false" required="false">
+        <description>returned Backup Date of main directory</description>
+        <to>Job_Result_MainDirectory_Backup</to>
+        <from>Job_Result</from>
+      </output>
+      <output global="false" required="false">
+        <to>Job_Result_FullBackupDetail</to>
+        <from>Job_Result_FullBackupDetail</from>
+      </output>
+      <output global="false" required="false">
+        <to>Job_Result_IncrBackupDetail</to>
+        <from>Job_Result_IncrBackupDetail</from>
+      </output>
+      <output global="false" required="false">
+        <to>Server_Success_FB</to>
+        <from>Server_Success_FB</from>
+      </output>
+      <output global="false" required="false">
+        <to>Server_Success_IB</to>
+        <from>Server_Success_IB</from>
+      </output>
+      <output global="false" required="false">
+        <to>Server_BK_Date_FB</to>
+        <from>Server_BK_Date_FB</from>
+      </output>
+      <output global="false" required="false">
+        <to>Server_BK_Date_IB</to>
+        <from>Server_BK_Date_IB</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>TSSA_Result_Level</to>
+            <value>1</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[2]</location>
+      </assign>
+      <call-process>
+        <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:Utilities:Get_Server_by_ShortName</process-name>
+        <parameters>
+          <input>
+            <from>Target_Server_Name</from>
+            <to>ServerNameShort</to>
+          </input>
+          <output>
+            <from>ServerName</from>
+            <to>ServerName</to>
+          </output>
+          <output>
+            <from>count_Server</from>
+            <to>count_Server</to>
+          </output>
+          <output>
+            <from>exists</from>
+            <to>exists</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <input global="true">
+                  <configuration>:ESA_ITSM:Adapter:TSA_Adapter</configuration>
+                </input>
+                <output>
+                  <to>TSA_Connection_Details</to>
+                  <concept type="BMC_BladeLogic-AD-Operations_Manager:ConnectionDetails">
+                    <attribute>adapter-name</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:BatchJob:Get DBKey by Group and Name</process-name>
+              <parameters>
+                <input>
+                  <from>TSA_Connection_Details</from>
+                  <to>connection details</to>
+                </input>
+                <input global="true">
+                  <configuration>:ESA_ITSM:TSSA_Jobs:TSSA_TriggerBackup_Job_Location</configuration>
+                  <to>parentGroup</to>
+                </input>
+                <input global="true">
+                  <configuration>:ESA_ITSM:TSSA_Jobs:TSSA_TriggerBackup_Job_Name</configuration>
+                  <to>jobName</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>DBKey</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>DBKey</from>
+                </input>
+                <output>
+                  <to>DBKey</to>
+                </output>
+              </assignment>
+              <assignment>
+                <input>
+                  <from>TSA_Connection_Details</from>
+                </input>
+                <output>
+                  <to>TSA_Connection_Details</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[2]</location>
+            </assign>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Job:Clear Target Groups</process-name>
+              <parameters>
+                <input>
+                  <from>TSA_Connection_Details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>DBKey</from>
+                  <to>jobKey</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>DBKey</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[2]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Job:Clear Target Servers</process-name>
+              <parameters>
+                <input>
+                  <from>TSA_Connection_Details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>DBKey</from>
+                  <to>jobKey</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>DBKey</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[3]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>DBKey</from>
+                </input>
+                <output>
+                  <to>DBKey</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[3]</location>
+            </assign>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:Job:Add Target Server</process-name>
+              <parameters>
+                <input>
+                  <from>TSA_Connection_Details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>DBKey</from>
+                  <to>jobKey</to>
+                </input>
+                <input>
+                  <from>ServerName</from>
+                  <to>serverName</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>DBKey</from>
+                  <to>DBKey</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[4]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>DBKey</from>
+                </input>
+                <output>
+                  <to>DBKey</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[4]</location>
+            </assign>
+            <call-process>
+              <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.6:Job:Execute Job and Wait for RunID</process-name>
+              <parameters>
+                <input>
+                  <from>TSA_Connection_Details</from>
+                  <to>connection details</to>
+                </input>
+                <input>
+                  <from>DBKey</from>
+                  <to>jobKey</to>
+                </input>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+                <output>
+                  <from>jobRunKey</from>
+                  <to>jobRunKey</to>
+                </output>
+                <output>
+                  <from>debug message</from>
+                  <to>debug message</to>
+                </output>
+                <output>
+                  <from>output</from>
+                  <to>output</to>
+                </output>
+                <output>
+                  <from>script lines</from>
+                  <to>script lines</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[5]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>jobRunKey</from>
+                </input>
+                <output>
+                  <to>jobRunKey</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[5]</location>
+            </assign>
+            <call-process>
+              <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:TSSA_Commands:TSA_WaitForJob</process-name>
+              <unique-id>22851612-c979-4ed8-a28b-d6dec8e964cf</unique-id>
+              <parameters>
+                <input>
+                  <from>jobRunKey</from>
+                  <to>Run_Key</to>
+                </input>
+                <input>
+                  <from>TSA_Connection_Details</from>
+                  <to>TSA_Connection_Details</to>
+                </input>
+                <output>
+                  <from>Is_Running</from>
+                  <to>Is_Running</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[6]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>Job_Result</to>
+                        <value>TSA Job was not triggered, or did not finish in time. Please check manually!</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>Job_ExitCode</to>
+                        <value>none</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>TSA Job was either not triggered, or it did not finish in expected time frame  - check log results for Server </value>
+                          </input>
+                          <input required="false">
+                            <from>ServerName</from>
+                          </input>
+                          <input>
+                            <value> in TSSA (if available)</value>
+                          </input>
+                        </concat>
+                      </input>
+                      <output>
+                        <to>error message</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <system>MODULE_NAME</system>
+                      </input>
+                      <output>
+                        <to>Module</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <input>
+                        <system>ROOT_PROCESS_ID</system>
+                      </input>
+                      <output>
+                        <to>Process</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>Server_Success_FB</to>
+                        <value>failed</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>Server_Success_IB</to>
+                        <value>failed</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AutoPilot-AD-Utilities:Email:SMTP:Send Email</process-name>
+                    <parameters>
+                      <input global="true">
+                        <configuration>:ESA_ITSM:Adapter:EMail_Adapter</configuration>
+                        <to>adapter name</to>
+                      </input>
+                      <input global="true">
+                        <configuration>:ESA_ITSM:Email:Mail_to</configuration>
+                        <to>to address list</to>
+                      </input>
+                      <input global="true">
+                        <configuration>:ESA_ITSM:Email:Mail_from</configuration>
+                        <to>from address</to>
+                      </input>
+                      <input global="true">
+                        <configuration>:ESA_ITSM:Email:Mail_CC</configuration>
+                        <to>cc address list</to>
+                      </input>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>ITSM_HPD__TSSA__AutomatedBackupExecution/</value>
+                          </input>
+                          <input global="true">
+                            <configuration>:ESA_ITSM:TSSA_Jobs:TSSA_TriggerBackup_Job_Name</configuration>
+                          </input>
+                          <input>
+                            <value> TSA Job --&gt; Error Notification</value>
+                          </input>
+                        </concat>
+                        <to>subject</to>
+                      </input>
+                      <input>
+                        <concat>
+                          <input>
+                            <value>Module: </value>
+                          </input>
+                          <input required="false">
+                            <from>Module</from>
+                          </input>
+                          <input>
+                            <value>
+Process: </value>
+                          </input>
+                          <input required="false">
+                            <from>Process</from>
+                          </input>
+                          <input>
+                            <value>
+Error Message:
+</value>
+                          </input>
+                          <input required="false">
+                            <from>error message</from>
+                          </input>
+                          <input>
+                            <value>
+
+
+
+--- Email created by TSO ---</value>
+                          </input>
+                        </concat>
+                        <to>body</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>Is_Running</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.) = "false"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:JobRun:Job Run Key to Job Run ID</process-name>
+                    <parameters>
+                      <input>
+                        <from>TSA_Connection_Details</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>jobRunKey</from>
+                        <to>jobRunKey</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>ID</from>
+                        <to>ID</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <call-process>
+                    <process-name>:BMC_BladeLogic-AD-Operations_Manager:v7.42:JobRun:Get Job Run Had Errors by ID</process-name>
+                    <parameters>
+                      <input>
+                        <from>TSA_Connection_Details</from>
+                        <to>connection details</to>
+                      </input>
+                      <input>
+                        <from>ID</from>
+                        <to>jobRunId</to>
+                      </input>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                      <output>
+                        <from>exists</from>
+                        <to>exists</to>
+                      </output>
+                      <output>
+                        <from>debug message</from>
+                        <to>debug message</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                      <output>
+                        <from>script lines</from>
+                        <to>script lines</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[2]</location>
+                  </call-process>
+                  <call-process>
+                    <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:TSSA_Commands:Get_TSA_Job_LogItems</process-name>
+                    <parameters>
+                      <input>
+                        <from>DBKey</from>
+                        <to>Job_Key</to>
+                      </input>
+                      <input>
+                        <from>ID</from>
+                        <to>Job_RunID</to>
+                      </input>
+                      <input>
+                        <from>TSA_Connection_Details</from>
+                        <to>TSA_Connection</to>
+                      </input>
+                      <output>
+                        <from>JobLogItems</from>
+                        <to>JobLogItems</to>
+                      </output>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>output</from>
+                        <to>output</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[3]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>status</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(.) = "true"]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence />
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>TSSA_Result_Level</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string(.) != "1"]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <input>
+                                    <from>ServerName</from>
+                                  </input>
+                                  <output>
+                                    <to>ServerName</to>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>JobLogItems</to>
+                                    <value></value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>Job_ExitCode</to>
+                                    <value>none</value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <input>
+                                    <concat>
+                                      <input>
+                                        <value>TSSA Job Run (</value>
+                                      </input>
+                                      <input required="false">
+                                        <from>DBKey</from>
+                                      </input>
+                                      <input>
+                                        <value> </value>
+                                      </input>
+                                      <input required="false">
+                                        <from>jobRunKey</from>
+                                      </input>
+                                      <input>
+                                        <value>) completed</value>
+                                      </input>
+                                    </concat>
+                                  </input>
+                                  <output>
+                                    <to>Job_Result</to>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>Job_Result_FullBackupDetail</to>
+                                    <value>unknown</value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>Job_Result_IncrBackupDetail</to>
+                                    <value>unknown</value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>Server_Success_FB</to>
+                                    <value>unknown</value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>Server_Success_IB</to>
+                                    <value>unknown</value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>Server_BK_Date_FB</to>
+                                    <value></value>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <output>
+                                    <to>Server_BK_Date_IB</to>
+                                    <value></value>
+                                  </output>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                              </assign>
+                            </sequence>
+                          </case>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>TSSA_Result_Level</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens />
+                                <xpath><![CDATA[string(.) = "3"]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <call-process>
+                                <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:Utilities:XML_Parsing</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>output</from>
+                                    <to>XML_Input</to>
+                                  </input>
+                                  <output>
+                                    <from>Text_Output</from>
+                                    <to>Text_Output</to>
+                                  </output>
+                                  <output>
+                                    <from>i</from>
+                                    <to>i</to>
+                                  </output>
+                                  <output>
+                                    <from>ResultLines_FB_Details</from>
+                                    <to>ResultLines_FB_Details</to>
+                                  </output>
+                                  <output>
+                                    <from>ResultLines_IB_Details</from>
+                                    <to>ResultLines_IB_Details</to>
+                                  </output>
+                                  <output>
+                                    <from>Line_Success_FB</from>
+                                    <to>Server_Success_FB</to>
+                                  </output>
+                                  <output>
+                                    <from>Line_Success_IB</from>
+                                    <to>Server_Success_IB</to>
+                                  </output>
+                                  <output>
+                                    <from>Line_BK_Date_FB</from>
+                                    <to>Server_BK_Date_FB</to>
+                                  </output>
+                                  <output>
+                                    <from>Line_BK_Date_IB</from>
+                                    <to>Server_BK_Date_IB</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[3]:call-process[1]</location>
+                              </call-process>
+                              <switch>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>true</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                                <default>
+                                  <sequence />
+                                </default>
+                                <case>
+                                  <condition>
+                                    <document>
+                                      <input>
+                                        <from>Target_Server_Type</from>
+                                      </input>
+                                    </document>
+                                    <xpath-expression>
+                                      <xpath-replacement-tokens />
+                                      <xpath><![CDATA[string(.) = "Virtual Server"]]></xpath>
+                                    </xpath-expression>
+                                  </condition>
+                                  <sequence>
+                                    <assign>
+                                      <assignment>
+                                        <output>
+                                          <to>Server_Success_IB</to>
+                                          <value>success</value>
+                                        </output>
+                                      </assignment>
+                                      <meta>
+                                        <documentation />
+                                        <checkpoint>false</checkpoint>
+                                      </meta>
+                                      <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[3]:switch[1]:sequence[2]:assign[1]</location>
+                                    </assign>
+                                  </sequence>
+                                </case>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[3]:switch[1]</location>
+                              </switch>
+                              <assign>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>JobLogItems</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>Job_Result</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens />
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"><xsl:output indent="no" /><xsl:template match="/"><text> <xsl:for-each select="/*/*"> <xsl:value-of select="." disable-output-escaping="no" /> <xsl:text disable-output-escaping="no"> 
+</xsl:text> </xsl:for-each> </text> </xsl:template> </xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[substring-after(., "- last successful backup found:")]]></xpath>
+                                  </xpath-expression>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[substring-before(., "Type: Info")]]></xpath>
+                                  </xpath-expression>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>Job_Result</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>Job_Result_lg</to>
+                                    </output>
+                                  </result>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[string-length(.)]]></xpath>
+                                  </xpath-expression>
+                                </assignment>
+                                <assignment>
+                                  <input>
+                                    <from>ResultLines_FB_Details</from>
+                                  </input>
+                                  <output>
+                                    <to>Job_Result_FullBackupDetail</to>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <input>
+                                    <from>ResultLines_IB_Details</from>
+                                  </input>
+                                  <output>
+                                    <to>Job_Result_IncrBackupDetail</to>
+                                  </output>
+                                </assignment>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>JobLogItems</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>Job_ExitCode</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens />
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"><xsl:output indent="no" /><xsl:template match="/"><text> <xsl:for-each select="/*/*"> <xsl:value-of select="." disable-output-escaping="no" /> <xsl:text disable-output-escaping="no"> 
+</xsl:text> </xsl:for-each> </text> </xsl:template> </xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[substring-after(., "Message: Exit Code")]]></xpath>
+                                  </xpath-expression>
+                                  <xpath-expression>
+                                    <xpath-replacement-tokens />
+                                    <xpath><![CDATA[substring-before(., "Type:")]]></xpath>
+                                  </xpath-expression>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[3]:assign[1]</location>
+                              </assign>
+                              <switch>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>true</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                                <default>
+                                  <sequence />
+                                </default>
+                                <case>
+                                  <condition>
+                                    <document>
+                                      <input>
+                                        <from>Job_Result_lg</from>
+                                      </input>
+                                    </document>
+                                    <xpath-expression>
+                                      <xpath-replacement-tokens />
+                                      <xpath><![CDATA[number(.) < 1]]></xpath>
+                                    </xpath-expression>
+                                  </condition>
+                                  <sequence>
+                                    <assign>
+                                      <assignment>
+                                        <output>
+                                          <to>Job_Result</to>
+                                          <value>none</value>
+                                        </output>
+                                      </assignment>
+                                      <meta>
+                                        <documentation />
+                                        <checkpoint>false</checkpoint>
+                                      </meta>
+                                      <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[3]:switch[2]:sequence[2]:assign[1]</location>
+                                    </assign>
+                                  </sequence>
+                                </case>
+                                <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[3]:switch[2]</location>
+                              </switch>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+            <assign>
+              <assignment>
+                <input>
+                  <from>JobLogItems</from>
+                </input>
+                <output>
+                  <to>JobLogItems</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[6]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>exists</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.) = "false"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>ServerName</to>
+                  <value>unknown</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>JobLogItems</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Job_ExitCode</to>
+                  <value>none</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Job_Result</to>
+                  <value>No trigger possible, since Server could not be identified in ESA!</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Job_Result_FullBackupDetail</to>
+                  <value>unknown</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Job_Result_IncrBackupDetail</to>
+                  <value>unknown</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Server_Success_FB</to>
+                  <value>failed</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Server_Success_IB</to>
+                  <value>failed</value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Server_BK_Date_FB</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>Server_BK_Date_IB</to>
+                  <value></value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>33048440-2023-4ca2-8d3c-a86ab680f9cb</process-id>
+      <author>Yannic Legermann</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1756817001935</last-modified>
+    </meta>
+  </process-def>
+</process>

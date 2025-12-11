@@ -1,0 +1,397 @@
+<process draft="false" dev-studio-version="22.2.01">
+  <process-def name=":ESA_ITSM:HPD_INC_Status:Inc_Set_InProgress">
+    <parameters>
+      <input global="false" required="false">
+        <from>Support_Group</from>
+        <to>Support_Group</to>
+      </input>
+      <input global="false" required="false">
+        <from>Incident_Number</from>
+        <to>Incident_Number</to>
+      </input>
+      <output global="false" required="false">
+        <to>success</to>
+        <from>success</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>success</to>
+            <value>failed</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:ESA_ITSM:HPD_INC_Status:Check_4_TSO_ITSM_User</process-name>
+        <unique-id>ccd3f5b8-eef1-4229-a772-04eabd78665e</unique-id>
+        <parameters>
+          <input>
+            <from>Support_Group</from>
+            <to>SupportGroup</to>
+          </input>
+          <output>
+            <from>Login_ID</from>
+            <to>Login_ID</to>
+          </output>
+          <output>
+            <from>FullName</from>
+            <to>FullName</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>Login_ID</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(string(.))]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AMP-AD-BMC-Remedy-ARS:Query Update Items</process-name>
+              <parameters>
+                <input global="true">
+                  <configuration>:ESA_ITSM:Adapter:ITSM9</configuration>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <compose-xml>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;items&gt;
+&lt;item&gt;
+&lt;field-id&gt;1000000161&lt;/field-id&gt;
+&lt;schema&gt;HPD:Help Desk&lt;/schema&gt;
+&lt;id&gt;</value>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="true">
+                      <input required="false">
+                        <from>Incident_Number</from>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;/id&gt;
+&lt;fields&gt;
+&lt;field name="Assignee Login ID"&gt;</value>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="true">
+                      <input required="false">
+                        <from>Login_ID</from>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;/field&gt;
+&lt;field name="Assignee"&gt;</value>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="true">
+                      <input required="false">
+                        <from>FullName</from>
+                      </input>
+                    </fragment>
+                    <fragment type="string" encode="false">
+                      <input>
+                        <value>&lt;/field&gt;
+&lt;/fields&gt;
+&lt;/item&gt;
+&lt;/items&gt;</value>
+                      </input>
+                    </fragment>
+                  </compose-xml>
+                  <to>items</to>
+                </input>
+                <input>
+                  <value>v9.1</value>
+                  <to>version</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <call-process>
+              <process-name>:VF_Utilities:ITSM:Adapter:ITMS_Adapter_Result</process-name>
+              <parameters>
+                <input>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </input>
+                <input>
+                  <system>MODULE_NAME</system>
+                  <to>Module_Name</to>
+                </input>
+                <input>
+                  <system>ROOT_PROCESS_ID</system>
+                  <to>Process_Name</to>
+                </input>
+                <output>
+                  <from>adapter_count</from>
+                  <to>adapter_count</to>
+                </output>
+                <output>
+                  <from>adapter_error</from>
+                  <to>adapter_error</to>
+                </output>
+                <output>
+                  <from>adapter_error_lg</from>
+                  <to>adapter_error_lg</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>adapter_count</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[number(.) = 1]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AMP-AD-BMC-Remedy-ARS:Query Update Items</process-name>
+                    <parameters>
+                      <input global="true">
+                        <configuration>:ESA_ITSM:Adapter:ITSM9</configuration>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <compose-xml>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;items&gt;
+&lt;item&gt;
+&lt;field-id&gt;1000000161&lt;/field-id&gt;
+&lt;schema&gt;HPD:Help Desk&lt;/schema&gt;
+&lt;id&gt;</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>Incident_Number</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;/id&gt;
+&lt;fields&gt;
+&lt;field name="Status"&gt;2&lt;/field&gt;
+&lt;/fields&gt;
+&lt;/item&gt;
+&lt;/items&gt;</value>
+                            </input>
+                          </fragment>
+                        </compose-xml>
+                        <to>items</to>
+                      </input>
+                      <input>
+                        <value>v9.1</value>
+                        <to>version</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <call-process>
+                    <process-name>:VF_Utilities:ITSM:Adapter:ITMS_Adapter_Result</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </input>
+                      <input>
+                        <system>MODULE_NAME</system>
+                        <to>Module_Name</to>
+                      </input>
+                      <input>
+                        <system>ROOT_PROCESS_ID</system>
+                        <to>Process_Name</to>
+                      </input>
+                      <output>
+                        <from>adapter_count</from>
+                        <to>adapter_count</to>
+                      </output>
+                      <output>
+                        <from>adapter_error</from>
+                        <to>adapter_error</to>
+                      </output>
+                      <output>
+                        <from>adapter_error_lg</from>
+                        <to>adapter_error_lg</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence />
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>adapter_count</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[number(.) = 1]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>success</to>
+                              <value>true</value>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b28d4f85-6933-456e-b4ee-4892728b9ae0</process-id>
+      <author>C. Lenz</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>ylegerma</last-modified-by>
+      <last-modified>1711627979232</last-modified>
+    </meta>
+  </process-def>
+</process>

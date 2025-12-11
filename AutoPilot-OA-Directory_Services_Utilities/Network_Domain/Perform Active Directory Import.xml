@@ -1,0 +1,206 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AutoPilot-OA-Directory_Services_Utilities:Network_Domain:Perform Active Directory Import">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command.</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The path and name of the export file.</description>
+        <from>file name</from>
+        <to>file name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specifies the domain controller to perform the export operation.</description>
+        <from>domain</from>
+        <to>domain</to>
+      </input>
+      <input global="false" required="true">
+        <description>User name for the domain login.</description>
+        <from>user name</from>
+        <to>user name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Sets the command to run with the supplied user name password.</description>
+        <from>password</from>
+        <to>password</to>
+      </input>
+      <input global="false" required="false">
+        <description>Sets the distinguished name of the search base for data export.</description>
+        <from>base dn</from>
+        <to>base dn</to>
+      </input>
+      <input global="false" required="false">
+        <description>LDAP search object class name
+An example would be: User</description>
+        <from>ldap filter object class</from>
+        <to>ldap filter object class</to>
+      </input>
+      <input global="false" required="false">
+        <description>Specifies the domain controller to perform the import or export operation. By default, it will run on the domain controller on which Ldifde is installed.</description>
+        <from>server name</from>
+        <to>server name</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>file name</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="file name">
+                  <input global="false">
+                    <from>file name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="domain">
+                  <input global="false">
+                    <from>domain</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="base dn">
+                  <input global="false">
+                    <from>base dn</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="user name">
+                  <input global="false">
+                    <from>user name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="server name">
+                  <input global="false">
+                    <from>server name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="ldap filter object class">
+                  <input global="false">
+                    <from>ldap filter object class</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="password">
+                  <input global="false">
+                    <from>password</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="command " />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">ldifde -i </xsl:text>
+        <xsl:if test="string-length('${file name}') !=0">
+          <xsl:text disable-output-escaping="no"> -f ${file name}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${user name}') !=0 and string-length('${domain}') !=0">
+          <xsl:text disable-output-escaping="no"> -b $[user name] $[domain] $[password]</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${server name}') !=0">
+          <xsl:text disable-output-escaping="no"> -s ${server name}</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${base dn}') !=0">
+          <xsl:text disable-output-escaping="no"> -d "$[base dn]"</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('$[ldap filter object class]') !=0 ">
+          <xsl:text disable-output-escaping="no"> -r (objectClass=$[ldap filter object class])</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Active Directory Import
+    Import Active Directory optionally using LDAP search filter criteria.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>3aea368b-986b-3ac0-b9e8-14b64266c1b1</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290416896318</last-modified>
+    </meta>
+  </process-def>
+</process>

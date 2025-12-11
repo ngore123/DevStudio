@@ -1,0 +1,113 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-IBM_Tivoli_Storage_Manager:v5.5:Access:Delete Access">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is IBMTSMActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The delete access command deletes authorization rules for files or images that are stored on the server.
+
+Sample Request XML:
+
+&lt;items&gt;
+  &lt;item&gt;
+  &lt;operation-name&gt;delete-access&lt;/operation-name&gt;
+  &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+  &lt;command-arguments&gt;
+	&lt;nodename&gt;d-13096&lt;/nodename&gt;
+	&lt;client-nodename&gt;sol10&lt;/client-nodename&gt;
+	&lt;fileset&gt;\\d-13096\c$\*&lt;/fileset&gt;
+	&lt;access-type&gt;archive&lt;/access-type&gt;
+    &lt;/command-arguments&gt;
+  &lt;/item&gt;
+&lt;/items&gt;
+
+Parameters Description:
+
+Command Arguments Description
+
+nodename[Required]
+	Name of the node(as registered with the tsm server) where this command will be executed.
+Note: This parameter is not required if the peer is running on UNIX platform.
+
+client-nodename[Required]
+	Name of the node to whom the access rights were given(via Set Archive/Backup Access wrapper).
+
+fileset[Required]
+	String indicating the set of files\directories on which access rights were given(via Set Archive/Backup Access wrapper) to the node specified in client-nodename.
+Note: The value of fileset should be provided in the format as returned by “Query Access” wrapper. For example, if the access rights were given for a file - C:\AmitG\Say_Nothing\*.*, the user should provide the value in the following format - \\win2stdvm\c$\AmitG\Say_Nothing\*, because tsm server stores the archived files in the above mentioned format.  Here ‘win2stdvm’ is the node name of the workstation from where the files were archived. This is valid only for windows clients.
+
+access-type[Required]
+	Type of access rights that were given.
+Valid values: Archive, Backup
+
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-IBM_Tivoli_Storage_Manager:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <value>delete-access</value>
+            <to>valid operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper deletes authorization rules for files or images that are stored on the server.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>0c567fed-6aca-31bc-a94d-3e90e14ba62a</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290597029333</last-modified>
+    </meta>
+  </process-def>
+</process>

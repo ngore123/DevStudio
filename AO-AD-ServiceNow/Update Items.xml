@@ -1,0 +1,549 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":AO-AD-ServiceNow:Update Items">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+Default adapter name: ServiceNowActor.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>item type :
+The type of item to be updated.
+
+Supported 'item type'-
+change, incident, close change, close incident
+
+
+1. if 'change' is to be updated then 'item type' is : change
+2. if 'incident' is to be updated then 'item type' is : incident
+3. if a change is to be updated using import set then 'item type' is: change-importset
+4. if an incident is to be updated using import set then 'item type' is: incident-importset
+5. if a 'change' is to be closed then 'item type' is: close change
+6. if an 'incident' is to be closed then 'item type' is: close incident
+7. if 'task' is to be updated then 'item type' is : task</description>
+        <from>item type</from>
+        <to>item type</to>
+      </input>
+      <input global="false" required="true">
+        <description>
+The 'items' xml of the entries to be updated.
+
+Bellow is an example 'items' xml to update 'changes' (for elements' description, see 'Update Change' wrapper input description)
+
+&lt;items&gt;
+	&lt;proxy-settings&gt;
+         &lt;host&gt;10.128.1.2&lt;/host&gt;
+         &lt;port&gt;808&lt;/port&gt;
+         &lt;user-name&gt;test&lt;/user-name&gt;
+         &lt;password&gt;test&lt;/password&gt;
+     &lt;/proxy-settings&gt;
+	&lt;item&gt;
+		&lt;query&gt;
+			&lt;number&gt;aaCHG001&lt;/number&gt;
+			&lt;assigned-to&gt;Beth Anglin&lt;/assigned-to&gt;
+			&lt;cmdb-ci&gt;*JEMPLOYEE-IBM&lt;/cmdb-ci&gt;
+			&lt;requested-by&gt;ITIL User&lt;/requested-by&gt;
+			&lt;priority&gt;Low&lt;/priority&gt;
+			&lt;short-description&gt;short desc&lt;/short-description&gt;
+			&lt;approval&gt;Not Yet Requested&lt;/approval&gt;
+			&lt;category&gt;Other&lt;/category&gt;
+			&lt;type&gt;normal&lt;/type&gt;
+			&lt;state&gt;-5&lt;/state&gt;
+			&lt;risk&gt;Moderate&lt;/risk&gt;
+			&lt;description&gt;desc&lt;/description&gt;
+			&lt;work-notes&gt;my notes&lt;/work-notes&gt;
+			&lt;requested-by-date&gt;2010-03-29 13:30:45&lt;/requested-by-date&gt;
+			&lt;start-date&gt;2010-03-29 13:30:48&lt;/start-date&gt;
+			&lt;end-date&gt;2010-03-29 13:30:50&lt;/end-date&gt;
+			&lt;work-start&gt;2010-03-29 13:30:53&lt;/work-start&gt;
+			&lt;work-end&gt;2010-03-29 13:30:56&lt;/work-end&gt;
+			&lt;change-plan&gt;change plan&lt;/change-plan&gt;
+			&lt;backout-plan&gt;backout plan&lt;/backout-plan&gt;
+			&lt;test-plan&gt;test plan&lt;/test-plan&gt;
+		&lt;/query&gt;		
+		&lt;update&gt;
+			&lt;number&gt;aaCHG001&lt;/number&gt;
+			&lt;assigned-to&gt;Beth Anglin&lt;/assigned-to&gt;
+			&lt;cmdb-ci&gt;*JEMPLOYEE-IBM&lt;/cmdb-ci&gt;
+			&lt;requested-by&gt;ITIL User&lt;/requested-by&gt;
+			&lt;priority&gt;Low&lt;/priority&gt;
+			&lt;short-description&gt;short desc&lt;/short-description&gt;
+			&lt;approval&gt;Not Yet Requested&lt;/approval&gt;
+			&lt;category&gt;Other&lt;/category&gt;
+			&lt;type&gt;normal&lt;/type&gt;
+			&lt;state&gt;-5&lt;/state&gt;
+			&lt;risk&gt;Moderate&lt;/risk&gt;
+			&lt;description&gt;desc&lt;/description&gt;
+			&lt;work-notes&gt;my notes&lt;/work-notes&gt;
+			&lt;requested-by-date&gt;2010-03-29 13:30:45&lt;/requested-by-date&gt;
+			&lt;start-date&gt;2010-03-29 13:30:48&lt;/start-date&gt;
+			&lt;end-date&gt;2010-03-29 13:30:50&lt;/end-date&gt;
+			&lt;work-start&gt;2010-03-29 13:30:53&lt;/work-start&gt;
+			&lt;work-end&gt;2010-03-29 13:30:56&lt;/work-end&gt;
+			&lt;change-plan&gt;change plan&lt;/change-plan&gt;
+			&lt;backout-plan&gt;backout plan&lt;/backout-plan&gt;
+			&lt;test-plan&gt;test plan&lt;/test-plan&gt;		
+		&lt;/update&gt;		
+	&lt;/item&gt;
+&lt;/items&gt;
+</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="true">
+        <description>version
+The version of 'Service-now' which is supported by adapter. 
+
+Valid value: v1.0 (which corresponds to 'Winter 2010 Stable 3' release of Service-now)</description>
+        <from>version</from>
+        <to>version</to>
+      </input>
+      <output global="false" required="false">
+        <description>Returned adapter response is captured in this context parameter.</description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>version</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()='v1.0']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+            </console-output>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-ServiceNow:Utilities:Item Type Error Reporting</process-name>
+                    <parameters>
+                      <input>
+                        <from>item type</from>
+                        <to>provided item type</to>
+                      </input>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()='change']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-ServiceNow:v1.0:Change_Management:Update Change</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text() = 'incident']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-ServiceNow:v1.0:Incident_Management:Update Incident</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[3]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="change-importset"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-ServiceNow:v1.0:Change_Management:Update Change Using Import Set</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[4]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="incident-importset"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-ServiceNow:v1.0:Incident_Management:Update Incident Using Import Set</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[5]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="close change"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-ServiceNow:v1.0:Change_Management:Close Change</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[6]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[text()="close incident"]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                  </console-output>
+                  <call-process>
+                    <process-name>:AO-AD-ServiceNow:v1.0:Incident_Management:Close Incident</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[7]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>item type</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string(.)='task']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:AO-AD-ServiceNow:v1.0:Task_Management:Update Task</process-name>
+                    <unique-id>f4d42872-2627-45c5-a297-1d49b32a23bb</unique-id>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>items</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>adapter response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[8]:call-process[1]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update Items:
+
+It is a generic wrapper to update different type of entries.
+</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8af75e67-68de-399b-a7bc-4d50941b62a2</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1588224816072</last-modified>
+    </meta>
+  </process-def>
+</process>

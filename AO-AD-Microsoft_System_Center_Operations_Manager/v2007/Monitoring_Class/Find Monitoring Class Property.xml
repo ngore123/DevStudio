@@ -1,0 +1,225 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-Microsoft_System_Center_Operations_Manager:v2007:Monitoring_Class:Find Monitoring Class Property">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is SCOMActor</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Sample Item XML:
+
+&lt;items&gt;
+  &lt;item&gt;
+  &lt;operation-name&gt;get-monitoringclassproperty&lt;/operation-name&gt;
+  &lt;timeout-secs&gt;120&lt;/timeout-secs&gt;
+&lt;command-parameters&gt;
+&lt;monitoringclass&gt;
+        &lt;monitoringclass-name&gt;Microsoft.Windows.Computer&lt;/monitoringclass-name&gt;
+      &lt;/monitoringclass&gt;
+      &lt;filters&gt;
+        &lt;filter&gt;
+          &lt;monitoringclassproperty-key&gt;Name&lt;/monitoringclassproperty-key&gt;
+          &lt;monitoringclassproperty-val&gt;ActiveDirectorySite&lt;/monitoringclassproperty-val&gt;
+          &lt;operand&gt;equals&lt;/operand&gt;
+        &lt;/filter&gt;
+      &lt;/filters&gt;
+&lt;/command-parameters&gt;
+  &lt;/item&gt;
+&lt;/items&gt;
+
+Parameter Description:
+
+operation-name[Required]
+	Operation that will be executed
+
+timeout-secs[Optional]
+	Time in seconds after which the request will time-out of not completed. Default is: 60 secs
+
+command-parameters[Required]
+	This is the parent tag that contains actual parameters required to execute this particular operation.
+
+monitoringclass[Required]
+	This tag contains the XML that contains the data to find the monitoring classes whose properties list will be returned. This XML can be of following forms:
+
+Format 1 - Find Monitoring Class By Id:
+&lt;monitoringclass&gt;
+&lt;monitoringclass-id&gt;1f06bba9-58a9-fd0b-d980-08d5af2e67d3&lt;/monitoringclass-id&gt;
+&lt;/monitoringclass&gt;
+
+Format 2 - Find Monitoring Class By Name:
+&lt;monitoringclass&gt;
+        &lt;monitoringclass-name&gt;Microsoft.Windows.Computer&lt;/monitoringclass-name&gt;
+      &lt;/monitoringclass&gt;
+
+Format 3 - Find Monitoring Class By Management Pack:
+&lt;monitoringclass&gt;
+&lt;managementpack&gt;
+&lt;managementpack-id&gt;66de9512-d446-f46b-bb85-197ec864f1f7&lt;/managementpack-id&gt;
+&lt;/managementpack&gt;
+&lt;/monitoringclass&gt;
+
+Format 4 - Find Monitoring Class By Monitoring Object:
+&lt;monitoringclass&gt;
+&lt;monitoringobject&gt;
+&lt;monitoringobject-id&gt;6c4bb046-82a8-ad78-0bc5-97aa4b8cc200&lt;/monitoringobject-id&gt;
+&lt;/monitoringobject&gt;
+&lt;/monitoringclass&gt;
+
+Format 5 - Find Monitoring Class:
+&lt;monitoringclass&gt;
+&lt;filters&gt;
+  &lt;filter&gt;
+    &lt;monitoringclass-key&gt;Description&lt;/monitoringclass-key&gt;
+    &lt;monitoringclass-val&gt;2003&lt;/monitoringclass-val&gt;
+    &lt;operand&gt;matches&lt;/operand&gt;
+  &lt;/filter&gt;
+  &lt;filter&gt;
+    &lt;monitoringclass-key&gt;DisplayName&lt;/monitoringclass-key&gt;
+    &lt;monitoringclass-val&gt;Terminal Server&lt;/monitoringclass-val&gt;
+    &lt;operand&gt;matches&lt;/operand&gt;
+  &lt;/filter&gt;
+&lt;/filters&gt;
+&lt;/monitoringclass&gt;
+
+For documentation of each of the formats refer to the individual wrapper documentation.
+
+filters[Optional]
+	This is the parent tag that contains all the filter criterias.
+
+The following tags are required if 'filters' tag is provided by user
+filter[Optional]
+	This tag contains a particular filter criteria.  More than one filter tags can be provided. All the filter criterias will be ANDED to get the final result.
+
+monitoringclassproperty-key[Optional]
+	This tag contains the name of the property of monitoring class property by which we want to filter the search.
+
+monitoringclassproperty-val[Optional]
+	This tag contains the value of the property specified in monitoringclass-key. Please refer to 'Regular Expressions Guide.doc' for more details.
+
+operand[Optional]
+	This tag specifies the operation that will be applied between 'monitoringclassproperty-key' and 'monitoringclassproperty-val'.Please refer to 'Filter Operators Guide.doc' for more details.
+Valid values - equals, not equals, matches
+
+NOTE: For more detail on how to write a filter value expression and on how to use a particular operand with the corresponding filter value expression refer to 'Filter Operators Guide.doc'</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-Microsoft_System_Center_Operations_Manager:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <value>get-monitoringclassproperty</value>
+            <to>valid operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This wrapper is used to gather information on one or more of the following items and output this information to a file or the console:
+
+For Windows:
+
+*  DSMOPTFILE - The contents of dsm.opt file.
+*  ENV - Environment variables.
+*  ERRORLOG - The Tivoli Storage Manager error log file.
+*  FILE - Attributes for the file name that you specify.
+*  FILESNOTTOBACKUP - Enumeration of Windows Registry key:
+   HKEY_LOCAL_MACHINE\
+      SYSTEM\
+         CurrentControlSet\
+            BackupRestore\
+               FilesNotToBackup
+
+   This key specifies those files that backup products should not back up. The query inclexcl command will indicate that these files are excluded per the operating system.
+*  INCLEXCL - Compiles a list of include-exclude in the order in which they are processed during backup and archive operations.
+*  KEYSNOTTORESTORE - Enumeration of Windows Registry key:
+   HKEY_LOCAL_MACHINE\
+      SYSTEM\
+         ControlSet001\
+            BackupRestore\
+               KeysNotToRestore
+
+   This key specifies those Windows Registry keys that backup products should not restore.
+*  MSINFO - Windows system information (output from MSINFO32.EXE).
+*  OPTIONS - Compiled options.
+*  OSINFO - Name and version of the client operating system
+*  POLICY - Policy set dump.
+*  REGISTRY - Windows Tivoli Storage Manager-related Windows Registry entries.
+*  SCHEDLOG - The contents of the Tivoli Storage Manager schedule log (usually dsmsched.log).
+*  SFP - The list of files protected by Windows System File Protection, and for each file, indicates whether that file exists. These files are backed up as part of the SYSFILES
+   system object.
+*  SFP=&lt;filename&gt; - Indicates whether the specified file (filename) is protected by Windows System File Protection. For example:
+   SFP=C:\WINNT\SYSTEM32\MSVCRT.DLL
+
+*  SYSTEMOBJECT - Windows system object information.
+*  CLUSTER - Windows cluster information.
+*  ENCRYPT - Available encryption methods.
+
+For Unix:
+
+*  DB2UDB -DATABase=dbconfigname - Verifies that the Configuration Wizard successfully transferred the DB2 UDB, Tivoli Storage Manager, and storage subsystem settings to the master backup node. Replace dbconfigname with the DB2 UDB configuration name provided in the Configuration Wizard. Note that this item is         only valid for AIX when both the DB2 Integration Module and Hardware Devices Snapshot Integration Module are installed.
+      *  DSMOPTFILE - The contents of dsm.opt file.
+      *  DSMSYSFILE - The contents of the dsm.sys file.
+      *  ENV - Environment variables.
+      *  ERRORLOG - The Tivoli Storage Manager error log file.
+      *  FILE - Attributes for the file name that you specify.
+      *  INCLEXCL - Compiles a list of include-exclude in the order in which they are processed during backup and archive operations.
+      *  OPTIONS - Compiled options.
+      *  OSINFO - Name and version of the client operating system (includes ULIMIT information for UNIX).
+      *  POLICY - Policy set dump.
+      *  SCHEDLOG - The contents of the Tivoli Storage Manager schedule log (usually dsmsched.log).
+      *  CLUSTER - AIX cluster information.
+      *  ENCRYPT - Available encryption methods.</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7fc0829e-9fa7-329a-bbc0-971d6a6f39dc</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290598732157</last-modified>
+    </meta>
+  </process-def>
+</process>

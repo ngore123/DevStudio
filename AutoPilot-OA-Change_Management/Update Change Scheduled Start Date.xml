@@ -1,0 +1,198 @@
+<process draft="false" dev-studio-version="20.02.00">
+  <process-def name=":AutoPilot-OA-Change_Management:Update Change Scheduled Start Date">
+    <parameters>
+      <input global="false" required="true">
+        <description>String value - The name of a configuration item defined in a configuration module. 
+
+Example: BMC_AR_System, HP_ServiceCenter,BMC_Remedyforce, ServiceNow</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The change ID
+
+Remedy Example: CRQ000000000201
+
+HP ServiceCenter Example: C23
+
+BMC_Remedyforce  Example:CR00000055
+
+ServiceNow : CHG0030109</description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - scheduled start date
+
+Remedy Example: 1262304060  (epoch) 
+
+HP_ServiceCenter Example: 2009.11.01 08:00:00
+
+BMC_Remedyforce Example : 2012-08-05T13:15:30Z (utc)	
+
+ServiceNow: yyyy-MM-dd HH:mm:ss</description>
+        <from>scheduled start date</from>
+        <to>scheduled start date</to>
+      </input>
+      <output global="false" required="true">
+        <description>An XML document providing the data template for single or multiple Concept elements.The change concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <to>changes</to>
+        <from>changes</from>
+      </output>
+      <output global="false" required="true">
+        <description>String value - Indicates whether or not the process completed successfully. 
+
+Valid values: success, failure
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>String Value - A process specific string that explains the value of success status.
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <from>change id</from>
+          </input>
+          <output>
+            <to>change</to>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>change-id</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>scheduled start date</from>
+          </input>
+          <output>
+            <to>change</to>
+            <concept type="AutoPilot-OA-Change_Management:Change">
+              <attribute>scheduled-start-date</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>change</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>changes</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="change">
+                <input global="false">
+                  <from>change</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Changes>
+      <xsl:choose>
+        <xsl:when test="string-length(//change) &gt; 0">
+          <xsl:copy-of select="//change" />
+        </xsl:when>
+        <xsl:otherwise>${change}</xsl:otherwise>
+      </xsl:choose>
+    </Changes>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>Show contents of change</value>
+              </input>
+              <input>
+                <from>change</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Change_Management:Update Changes</process-name>
+        <parameters>
+          <input>
+            <from>changes</from>
+            <to>changes</to>
+          </input>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>changes</from>
+            <to>changes</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This workflow updates the scheduled start date of an existing change record. </description>
+        <version>1.0</version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>3ce05620-870d-3f4b-9859-2f719d8c1967</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1587957837513</last-modified>
+    </meta>
+  </process-def>
+</process>

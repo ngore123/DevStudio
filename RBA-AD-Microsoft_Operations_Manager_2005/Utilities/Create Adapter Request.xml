@@ -1,0 +1,110 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":RBA-AD-Microsoft_Operations_Manager_2005:Utilities:Create Adapter Request">
+    <parameters>
+      <input global="false" required="true">
+        <description>items
+The items XML that will be used to create the alert.
+Sample:
+
+&lt;items&gt;
+&lt;process-options&gt;
+	&lt;search-parameters&gt;		
+		&lt;alert-id&gt;f76fc97f-3172-4aa8-acb3-3f57a7fb40a1&lt;/alert-id&gt;
+	&lt;/search-parameters&gt;
+	&lt;update-parameters&gt;
+	&lt;/update-parameters&gt;
+&lt;/process-options&gt;
+&lt;/items&gt;</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <input global="false" required="true">
+        <description>operation type
+				  The classification in which this operations lies.</description>
+        <from>operation type</from>
+        <to>operation type</to>
+      </input>
+      <input global="false" required="true">
+        <description>operation name
+				   The operation which will be executed.</description>
+        <from>operation name</from>
+        <to>operation name</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>items</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>adapter request</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="operation name">
+                <input global="false">
+                  <from>operation name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="operation type">
+                <input global="false">
+                  <from>operation type</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <request-data>
+      <mom-request>
+        <operation-name>
+          <xsl:text disable-output-escaping="no">${operation name}</xsl:text>
+        </operation-name>
+        <xsl:copy-of select="//operation-parameter" />
+      </mom-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Transforms user input request to adapter request</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b8fb821c-4230-3457-a067-5d39f59a2c92</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1282111566666</last-modified>
+    </meta>
+  </process-def>
+</process>

@@ -1,0 +1,337 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-AD-Remedy_REST:Query Update Item">
+    <parameters>
+      <input global="false" required="true">
+        <description>Adapter supporting requests to Remedy REST API</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Remedy REST API URL. For example: http(s)://&lt;remedy-host&gt;:&lt;remedy-rest-api-port&gt;
+
+By default, out of the box, Remedy REST API server port is 8008.
+
+http://remedy-server-name:8008</description>
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <input global="false" required="true">
+        <description>Authorization token received via login to Remedy REST API.</description>
+        <from>authorization token</from>
+        <to>authorization token</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the Remedy form from which entries are retrieved.</description>
+        <from>form name</from>
+        <to>form name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Query to retrieve Entry ID that will be used to perform updates
+
+Query will be of the form: 
+
+'Submitter'="xx" and 'Assignee Login ID' = "XXX"</description>
+        <from>query</from>
+        <to>query</to>
+      </input>
+      <input global="false" required="true">
+        <description>Values in JSON format as below:
+
+{
+  "values":{
+    "Submitter":"Allen",
+    "Short Description":"testing 123"
+  }
+}</description>
+        <from>values</from>
+        <to>values</to>
+      </input>
+      <input global="false" required="false">
+        <description>Field name to be used for query. If not, a value of Entry-ID will be used. 
+
+NOTE: For each form, field name where entry ID is stored is/can be different. Because query update uses entry ID to update the record, first get the entry ID using correct field name. </description>
+        <from>field name</from>
+        <to>field name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Return response headers and body in JSON or XML format. Default is JSON</description>
+        <from>return data format</from>
+        <to>return data format</to>
+      </input>
+      <output global="false" required="false">
+        <description>HTTP response header  in XML or JSON format based on return data format.</description>
+        <to>response headers</to>
+        <from>response headers</from>
+      </output>
+      <output global="false" required="false">
+        <description>REST message body  in XML or JSON format based on return data format.</description>
+        <to>response body</to>
+        <from>response body</from>
+      </output>
+      <output global="false" required="false">
+        <description>success/failure</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>HTTP return code</description>
+        <to>status code</to>
+        <from>status code</from>
+      </output>
+      <output global="false" required="false">
+        <description>Error message, if any.</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>response headers</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>response body</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-AD-Remedy_REST:Utilities:Query Entry ID</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>url</from>
+            <to>url</to>
+          </input>
+          <input>
+            <from>authorization token</from>
+            <to>authorization token</to>
+          </input>
+          <input>
+            <from>form name</from>
+            <to>form name</to>
+          </input>
+          <input>
+            <from>query</from>
+            <to>query</to>
+          </input>
+          <input>
+            <from>field name</from>
+            <to>field name</to>
+          </input>
+          <output>
+            <from>entry id</from>
+            <to>entry id</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>status code</from>
+            <to>status code</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>error message</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[concat(., ' ', 'Entry ID not found!')]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>entry id</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-AD-Remedy_REST:Update Item</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>url</from>
+                  <to>url</to>
+                </input>
+                <input>
+                  <from>authorization token</from>
+                  <to>authorization token</to>
+                </input>
+                <input>
+                  <from>form name</from>
+                  <to>form name</to>
+                </input>
+                <input>
+                  <from>entry id</from>
+                  <to>entry id</to>
+                </input>
+                <input>
+                  <from>values</from>
+                  <to>values</to>
+                </input>
+                <input>
+                  <from>return data format</from>
+                  <to>return data format</to>
+                </input>
+                <output>
+                  <from>response headers</from>
+                  <to>response headers</to>
+                </output>
+                <output>
+                  <from>response body</from>
+                  <to>response body</to>
+                </output>
+                <output>
+                  <from>status</from>
+                  <to>status</to>
+                </output>
+                <output>
+                  <from>status code</from>
+                  <to>status code</to>
+                </output>
+                <output>
+                  <from>error message</from>
+                  <to>error message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Update Item after querying for Entry ID in  Remedy using REST API.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>39c8d57c-ed9e-45d7-9df5-d5f324f14327</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Remedy REST API</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1574880404609</last-modified>
+    </meta>
+  </process-def>
+</process>

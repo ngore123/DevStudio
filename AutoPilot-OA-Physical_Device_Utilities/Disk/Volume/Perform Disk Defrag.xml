@@ -1,0 +1,137 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-Physical_Device_Utilities:Disk:Volume:Perform Disk Defrag">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The device, drive letter or a mount point of the volume to be defragmented.
+</description>
+        <from>device</from>
+        <to>device</to>
+      </input>
+      <input global="false" required="false">
+        <description>Analyzes the volume/filesystem in read-only mode.
+Valid value: true</description>
+        <from>analyize</from>
+        <to>analyize</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>device</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="device">
+                  <input global="false">
+                    <from>device</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="analyize">
+                  <input global="false">
+                    <from>analyize</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">/sbin/e2fsck</xsl:text>
+        <xsl:if test="string-length('${device}')!=0 and '${analyize}' != 'true'">
+          <xsl:text disable-output-escaping="no"> -p</xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${device}')!=0 and '${analyize}' = 'true'">
+          <xsl:text disable-output-escaping="no"> -n</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> $[device]</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/sbin/fsck</xsl:text>
+        <xsl:if test="string-length('${device}')!=0 and '${analyize}' = 'true'">
+          <xsl:text disable-output-escaping="no"> -n</xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no"> $[device]</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">defrag $[device]</xsl:text>
+        <xsl:if test="string-length('${device}')!=0 and '${analyize}' = 'true'">
+          <xsl:text disable-output-escaping="no"> /a</xsl:text>
+        </xsl:if>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform Disk Defrag
+    Locates and consolidates fragmented boot files, data files, and folders on specified volumes.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>cbb7edb1-b428-315f-8162-52b9ca7c4012</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1292079894740</last-modified>
+    </meta>
+  </process-def>
+</process>

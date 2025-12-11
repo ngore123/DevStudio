@@ -1,0 +1,153 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":RBA-AD-Microsoft_Operations_Manager_2005:v2005:Find:Find Alerts by Description">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name [Optional]
+The name of the adapter that is enabled on the Peer.
+The default adapter name is MOM2005Adapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>items
+The items XML that will be used to find alerts by description.
+Sample:
+
+&lt;items&gt;
+&lt;operation-parameter&gt;
+	&lt;search-parameters&gt;		
+		&lt;description&gt;some description&lt;/description&gt;
+	&lt;/search-parameters&gt;
+&lt;/operation-parameter&gt;
+&lt;/items&gt;
+
+Description of fields that can come in search-parameters xml:-
+
+description
+	  The alert description.
+acknowledge [Optional]
+	  Set to "true" if alerts need to be acknowledged which match the specified description, else set to "false"</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation type</to>
+            <value>CRUD_Alert</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>get_data</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:RBA-AD-Microsoft_Operations_Manager_2005:Utilities:Create Adapter Request With Allowed Param</process-name>
+        <parameters>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation type</from>
+            <to>operation type</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <input>
+            <value>description</value>
+            <to>allowed param</to>
+          </input>
+          <output>
+            <from>adapter request</from>
+            <to>adapter request</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:RBA-AD-Microsoft_Operations_Manager_2005:Utilities:Execute Adapter Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>adapter request</from>
+            <to>adapter request</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Finds all the alerts that have the matching description.
+
+Sample input XML:
+
+&lt;items&gt;
+&lt;operation-parameter&gt;
+	&lt;search-parameters&gt;		
+		&lt;description&gt;some description&lt;/description&gt;
+	&lt;/search-parameters&gt;
+&lt;/operation-parameter&gt;
+&lt;/items&gt;</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1204d096-1e38-34f7-8852-5911d44b8696</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1282111571057</last-modified>
+    </meta>
+  </process-def>
+</process>

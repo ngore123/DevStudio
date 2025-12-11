@@ -1,0 +1,595 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":BMC-SA-Service_Desk_Automation:Task_Management:Update Task Work Info">
+    <parameters>
+      <input global="false" required="true">
+        <description>The Configuration Name. 
+
+Currently supported value: BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The ID of the Task to update the Work Info.</description>
+        <from>task id</from>
+        <to>task id</to>
+      </input>
+      <input global="false" required="true">
+        <description>The format to specify the information to be updated: 
+
+&lt;bao-process-data&gt;
+  &lt;metadata&gt;
+    &lt;!-- Optional, Target server name or IP Address and port information --&gt;
+    &lt;target-name /&gt;
+    &lt;!-- Optional, Request type, like 'Reset Password' or 'Unlock Account'--&gt;
+    &lt;request-type /&gt;
+    &lt;!-- Optional, Indicates data type of the response data. Supported values: text/xml --&gt;
+    &lt;data-type /&gt;
+    &lt;!-- Optional, success or failure --&gt;
+    &lt;status /&gt;
+    &lt;!-- Optional, Runbook specific error code, in case of failure --&gt;
+    &lt;error-code /&gt;
+    &lt;!-- Optional, Summary error text, in case of failure --&gt;
+    &lt;error-summary /&gt;
+    &lt;!-- Optional, Detailed error text, in case of failure --&gt;
+    &lt;error-detail /&gt;
+    &lt;!-- Optional, Resolution text, in case of failure --&gt;
+    &lt;resolution-steps /&gt;
+    &lt;!-- Optional, Time taken to fulfill the request, success or failure --&gt;
+    &lt;time-taken-seconds /&gt;
+    &lt;!-- Optional, location of any external log file or record --&gt;
+    &lt;log-info /&gt;
+  &lt;/metadata&gt;
+  &lt;!-- Required, Contains data to be updated by a process. Should represent name/value pairs,
+  where tag name is the field name to be updated and value is the new value --&gt;
+  &lt;request-data&gt;
+	&lt;!-- Optional, the summary to be updated. --&gt;
+	&lt;workinfo-summary /&gt;
+     &lt;!-- Optional, the details to be updated. --&gt;
+     &lt;workinfo-details /&gt;
+     &lt;!-- Optional, the type of the work info to be updated. --&gt;
+     &lt;workinfo-type /&gt;
+  &lt;/request-data&gt;
+  &lt;!-- Optional, Details of the response from the target server --&gt;
+  &lt;response-data /&gt;
+&lt;/bao-process-data&gt;
+
+A sample of the input to update the WorkInfo:
+
+&lt;bao-process-data&gt;
+  &lt;metadata /&gt;
+   &lt;request-data&gt;
+     &lt;workinfo-summary&gt;Sample Summary&lt;/workinfo-summary&gt;
+     &lt;workinfo-details&gt;Sample Details&lt;/workinfo-details&gt;
+     &lt;workinfo-type&gt;General Information&lt;/workinfo-type&gt;
+   &lt;/request-data&gt;
+  &lt;response-data /&gt;
+&lt;/bao-process-data&gt;
+</description>
+        <from>bao process data</from>
+        <to>bao process data</to>
+      </input>
+      <output global="false" required="false">
+        <to>response xml</to>
+        <from>response xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set Start Time</process-name>
+        <unique-id>c113440d-ac61-4f97-bc14-2607426fd912</unique-id>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response For Invalid Configuration</process-name>
+              <parameters>
+                <input>
+                  <value>Update Incident Work Info</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:call-process[1]</location>
+            </call-process>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>configuration name</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'BMC_AR_System']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Read Sub Configuration</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <value>TaskManagement</value>
+                  <to>configuration group</to>
+                </input>
+                <output>
+                  <from>configuration xml</from>
+                  <to>configuration xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <from>task id</from>
+                </input>
+                <output>
+                  <to>task</to>
+                  <concept type="AutoPilot-OA-Task_Management:Task">
+                    <attribute>task-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration xml</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>Default_Task_Summary</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Default_Workinfo_Summary_Prefix/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration xml</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>Default_Notes</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Default_Notes/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration xml</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>Default_Workinfo_Type</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Default_WorkInfo_Type/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration xml</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>Default_Communication_Source</to>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Default_Communication_Source/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration xml</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task</to>
+                    <concept type="AutoPilot-OA-Task_Management:Task">
+                      <attribute>secure-log</attribute>
+                    </concept>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Default_WorkInfo_SecureLog/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>configuration xml</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task</to>
+                    <concept type="AutoPilot-OA-Task_Management:Task">
+                      <attribute>view-access</attribute>
+                    </concept>
+                  </output>
+                </result>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//Default_WorkInfo_ViewAccess/text()]]></xpath>
+                </xpath-expression>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>bao process data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task</to>
+                    <concept type="AutoPilot-OA-Task_Management:Task">
+                      <attribute>summary</attribute>
+                    </concept>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="default_task_summary">
+                      <input global="false">
+                        <from>Default_Task_Summary</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(//workinfo-summary/text())) &gt; 0">
+          <xsl:value-of select="//workinfo-summary/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${default_task_summary}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>bao process data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task</to>
+                    <concept type="AutoPilot-OA-Task_Management:Task">
+                      <attribute>notes</attribute>
+                    </concept>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="default_notes">
+                      <input global="false">
+                        <from>Default_Notes</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(//workinfo-notes/text())) &gt; 0">
+          <xsl:value-of select="//workinfo-notes/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${default_notes}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>bao process data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task</to>
+                    <concept type="AutoPilot-OA-Task_Management:Task">
+                      <attribute>work-info-type</attribute>
+                    </concept>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="default_workinfo_type">
+                      <input global="false">
+                        <from>Default_Workinfo_Type</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(//workinfo-type/text())) &gt; 0">
+          <xsl:value-of select="//workinfo-type/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${default_workinfo_type}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>bao process data</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>task</to>
+                    <concept type="AutoPilot-OA-Task_Management:Task">
+                      <attribute>communication-source</attribute>
+                    </concept>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="default_communication_source">
+                      <input global="false">
+                        <from>Default_Communication_Source</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(//communication-source/text())) &gt; 0">
+          <xsl:value-of select="//communication-source/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${default_communication_source}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>task</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>inputtasks</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="task">
+                      <input global="false">
+                        <from>task</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>${task}</Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-OA-Task_Management:Create WorkInfo</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>inputtasks</from>
+                  <to>tasks</to>
+                </input>
+                <output>
+                  <from>tasks</from>
+                  <to>tasks</to>
+                </output>
+                <output>
+                  <from>failed task collection</from>
+                  <to>failed task collection</to>
+                </output>
+                <output>
+                  <from>success counter</from>
+                  <to>success counter</to>
+                </output>
+                <output>
+                  <from>failure counter</from>
+                  <to>failure counter</to>
+                </output>
+                <output>
+                  <from>success status</from>
+                  <to>success status</to>
+                </output>
+                <output>
+                  <from>status message</from>
+                  <to>status message</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Create Response</process-name>
+              <parameters>
+                <input>
+                  <from>success status</from>
+                  <to>success status</to>
+                </input>
+                <input>
+                  <from>start time</from>
+                  <to>start time</to>
+                </input>
+                <input>
+                  <value>Unknown</value>
+                  <to>target name</to>
+                </input>
+                <input>
+                  <value>Update Task Work Info</value>
+                  <to>request type</to>
+                </input>
+                <input>
+                  <from>tasks</from>
+                  <to>target response</to>
+                </input>
+                <input>
+                  <from>bao process data</from>
+                  <to>fulfillment response</to>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//response-data]]></xpath>
+                  </xpath-expression>
+                </input>
+                <input>
+                  <value>Update Task Workinfo failed.</value>
+                  <to>error summary</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[3]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8d2a0800-8b09-415c-aad1-8f5c40dcce1e</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1443439059816</last-modified>
+    </meta>
+  </process-def>
+</process>

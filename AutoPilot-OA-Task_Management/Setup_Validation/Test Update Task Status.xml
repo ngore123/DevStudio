@@ -1,0 +1,224 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Task_Management:Setup_Validation:Test Update Task Status">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module. 
+
+Example: BMC_AR_System,  HP_ServiceCenter, BMC_Remedyforce</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The task id
+
+HP ServiceCenter Example : T20
+
+BMC AR System Example: TAS76
+
+BMC_Remedyforce: 00000054</description>
+        <from>task id</from>
+        <to>task id</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The new status
+
+HP ServiceCenter 
+
+Example:
+
+Initial
+Closed
+Waiting
+Reopened
+
+BMC AR System
+
+Example:
+Staged
+Assigned
+Pending
+Work In Progress
+Waiting
+Closed
+Bypassed
+Potentia
+Active
+Inactive
+</description>
+        <from>new status</from>
+        <to>new status</to>
+      </input>
+      <input global="false" required="false">
+        <description>String Value
+
+Not valid for  HP ServiceCenter
+
+values for BMC_AR_System
+
+Success
+Failed
+Canceled
+Assignment
+Staging in Progress
+Staging Complete
+Acknowledgment
+Completion
+Error</description>
+        <from>status reason</from>
+        <to>status reason</to>
+      </input>
+      <output global="false" required="true">
+        <description>An XML document providing the data template for single or multiple Concept elements.The task concept is an XML document containing specific elements used to assign multiple values to a single context item. Each value is associated with an element of the Concept.
+</description>
+        <to>tasks</to>
+        <from>tasks</from>
+      </output>
+      <output global="false" required="true">
+        <description>Indicates whether or not the process completed successfully.
+Valid values: success, failure.
+</description>
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="true">
+        <description>A process specific string that explains the value of success status.
+</description>
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input>
+            <from>task id</from>
+          </input>
+          <output>
+            <to>task</to>
+            <concept type="AutoPilot-OA-Task_Management:Task">
+              <attribute>task-id</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>new status</from>
+          </input>
+          <output>
+            <to>task</to>
+            <concept type="AutoPilot-OA-Task_Management:Task">
+              <attribute>status</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>status reason</from>
+          </input>
+          <output>
+            <to>task</to>
+            <concept type="AutoPilot-OA-Task_Management:Task">
+              <attribute>status-reason-selection</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>task</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>tasks</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="task">
+                <input global="false">
+                  <from>task</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="location" />
+  <xsl:template match="/">
+    <Tasks>
+      <xsl:choose>
+        <xsl:when test="string-length(//task) &gt; 0">
+          <xsl:copy-of select="//task" />
+        </xsl:when>
+        <xsl:otherwise>${task}</xsl:otherwise>
+      </xsl:choose>
+    </Tasks>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-OA-Task_Management:Update Tasks</process-name>
+        <parameters>
+          <input>
+            <from>tasks</from>
+            <to>tasks</to>
+          </input>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <output>
+            <from>tasks</from>
+            <to>tasks</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This test workflow tests updating an existing task status.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>5179b2bb-e580-3379-bdb1-0832f6b5880f</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1393584641792</last-modified>
+    </meta>
+  </process-def>
+</process>

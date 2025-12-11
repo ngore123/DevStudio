@@ -1,0 +1,219 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:RSS:Perform RSS Show Media">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>Specified media name.</description>
+        <from>media name</from>
+        <to>media name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Displays the Removable Storage name for the media.
+Valid value: true</description>
+        <from>name</from>
+        <to>name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Displays the media status (for example, Healthy, Read only, and so on)</description>
+        <from>status</from>
+        <to>status</to>
+      </input>
+      <input global="false" required="false">
+        <description>Displays the media capacity in gigabytes (GB).
+Valid value: true</description>
+        <from>capacity</from>
+        <to>capacity</to>
+      </input>
+      <input global="false" required="false">
+        <description>Displays the amount of free space on the media in gigabytes.
+Valid value: true</description>
+        <from>free space</from>
+        <to>free space</to>
+      </input>
+      <input global="false" required="false">
+        <description>Displays the most recent update date for the media.
+Valid value: true</description>
+        <from>version</from>
+        <to>version</to>
+      </input>
+      <input global="false" required="false">
+        <description>Displays the number of existing copies for the media and each copy's status.
+Valid value: true</description>
+        <from>copies</from>
+        <to>copies</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>media name</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="media name">
+                  <input global="false">
+                    <from>media name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="name">
+                  <input global="false">
+                    <from>name</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="status">
+                  <input global="false">
+                    <from>status</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="capacity">
+                  <input global="false">
+                    <from>capacity</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="free space">
+                  <input global="false">
+                    <from>free space</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="version">
+                  <input global="false">
+                    <from>version</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="copies">
+                  <input global="false">
+                    <from>copies</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Linux.</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">echo Command not supported on SunOS.</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">rss media show </xsl:text>
+        <xsl:if test="string-length('${media name}') !=0">
+          <xsl:text disable-output-escaping="no">$[media name] </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${name}') !=0 and '${name}' ='true'">
+          <xsl:text disable-output-escaping="no">/name </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${status}') !=0 and '${status}' ='true'">
+          <xsl:text disable-output-escaping="no">/status </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${capacity}') !=0 and '${capacity}' ='true'">
+          <xsl:text disable-output-escaping="no">/capacity </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${free space}') !=0 and '${free space}' ='true'">
+          <xsl:text disable-output-escaping="no">/freespace </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${version}') !=0 and '${version}' ='true'">
+          <xsl:text disable-output-escaping="no">/version </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${copies}') !=0 and '${copies}' ='true'">
+          <xsl:text disable-output-escaping="no">/copies </xsl:text>
+        </xsl:if>
+      </command>
+      <command os-id="Windows XP">
+        <xsl:text disable-output-escaping="no">echo Command not supported on Windows XP.</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform RSS Show Media
+    Display information about specified media.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b633dc39-de54-3f2b-8006-af34f86cea76</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902428490</last-modified>
+    </meta>
+  </process-def>
+</process>

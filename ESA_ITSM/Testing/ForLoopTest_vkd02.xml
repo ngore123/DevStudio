@@ -1,0 +1,621 @@
+<process draft="false" dev-studio-version="24.3.00">
+  <process-def name=":ESA_ITSM:Testing:ForLoopTest_vkd02">
+    <parameters>
+      <input global="false" required="true">
+        <from>Target_Server_Name_CSV_List</from>
+        <to>Target_Server_Name_CSV_List</to>
+      </input>
+      <input global="false" required="true">
+        <from>INC_Number</from>
+        <to>INC_Number</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupTrigger:Sub_Processes:Simulate_CSV_AdapterResponse</process-name>
+        <parameters>
+          <input>
+            <from>Target_Server_Name_CSV_List</from>
+            <to>CSV_String_Input</to>
+          </input>
+          <input>
+            <value>Host</value>
+            <to>Simulated_Header</to>
+          </input>
+          <output>
+            <from>Simulated_CSV_AdapterResponse</from>
+            <to>Simulated_CSV_AdapterResponse</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>########## Before #############</value>
+              </input>
+              <input>
+                <from>Target_Server_Name_CSV_List</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>########### After ###########</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <assign>
+        <assignment>
+          <output>
+            <to>TSSA_Result_Level</to>
+            <value>1</value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>Simulated_CSV_AdapterResponse</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>Simulated_CSV_AdapterResponseMOD</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//row]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>Target_Server_FQDN_CSV_List</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>Unknown_Target_Server_Name_CSV_List</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>TSA_JobResult_FileContent1</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>TSA_JobResult_FileContent2</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>Simulated_CSV_AdapterResponseMOD</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>CSV_entry</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[//column[1]]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>########### Assign - Before #############</value>
+              </input>
+              <input>
+                <from>Simulated_CSV_AdapterResponse</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>############ Assign - After  ############ </value>
+              </input>
+              <input>
+                <from>Simulated_CSV_AdapterResponseMOD</from>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[//row]]></xpath>
+                </xpath-expression>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <for-each>
+        <document>
+          <input>
+            <from>CSV_entry</from>
+          </input>
+        </document>
+        <result>
+          <output>
+            <to>CSV_entry_Out</to>
+          </output>
+        </result>
+        <xpath-expression>
+          <xpath-replacement-tokens />
+          <xpath><![CDATA[string(//column[1])]]></xpath>
+        </xpath-expression>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>############ For Loop Before ############</value>
+              </input>
+              <input>
+                <from>CSV_entry</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>############ For Loop After ############</value>
+              </input>
+              <input>
+                <from>CSV_entry_Out</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <sequence>
+          <assign>
+            <assignment>
+              <input>
+                <from>CSV_entry</from>
+              </input>
+              <output>
+                <to>Target_Server_Name</to>
+              </output>
+            </assignment>
+            <assignment>
+              <output>
+                <to>ServerName</to>
+                <value></value>
+              </output>
+            </assignment>
+            <meta>
+              <documentation />
+              <checkpoint>false</checkpoint>
+            </meta>
+            <before-execution>
+              <log>
+                <level>debug</level>
+                <parameters>
+                  <input>
+                    <value>######## 2nd Assign after for loop Before ###########</value>
+                  </input>
+                  <input>
+                    <from>Target_Server_Name</from>
+                  </input>
+                </parameters>
+              </log>
+            </before-execution>
+            <location>:assign[2]</location>
+          </assign>
+          <call-process>
+            <process-name>:ESA_ITSM:HPD_Fetch_Data_BackupStatus:Utilities:Get_Server_by_ShortName</process-name>
+            <parameters>
+              <input>
+                <from>Target_Server_Name</from>
+                <to>ServerNameShort</to>
+              </input>
+              <output>
+                <from>ServerName</from>
+                <to>ServerName</to>
+              </output>
+              <output>
+                <from>count_Server</from>
+                <to>count_Server</to>
+              </output>
+              <output>
+                <from>exists</from>
+                <to>exists</to>
+              </output>
+            </parameters>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>false</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <location>:call-process[2]</location>
+          </call-process>
+          <switch>
+            <meta>
+              <documentation />
+              <run-mode-handling>
+                <run-mode>OCP</run-mode>
+                <allow-step-into>true</allow-step-into>
+              </run-mode-handling>
+              <checkpoint>false</checkpoint>
+            </meta>
+            <execute-all-applicable-cases>false</execute-all-applicable-cases>
+            <default>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <input>
+                      <concat>
+                        <input required="false">
+                          <from>ServerName</from>
+                        </input>
+                      </concat>
+                    </input>
+                    <output>
+                      <to>Target_Server_FQDN_CSV_List</to>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[1]:assign[1]</location>
+                </assign>
+              </sequence>
+            </default>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>Target_Server_FQDN_CSV_List</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[boolean(string(.))]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>exists</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = "true"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>Target_Server_Name</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) != "Host"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <input>
+                      <concat>
+                        <input required="false">
+                          <from>Target_Server_FQDN_CSV_List</from>
+                        </input>
+                        <input>
+                          <value>,</value>
+                        </input>
+                        <input required="false">
+                          <from>ServerName</from>
+                        </input>
+                      </concat>
+                    </input>
+                    <output>
+                      <to>Target_Server_FQDN_CSV_List</to>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[2]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>exists</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = "false"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>Unknown_Target_Server_Name_CSV_List</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[not(boolean(string(.)))]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>Target_Server_Name</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) != "Host"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <input>
+                      <concat>
+                        <input required="false">
+                          <from>Target_Server_Name</from>
+                        </input>
+                      </concat>
+                    </input>
+                    <output>
+                      <to>Unknown_Target_Server_Name_CSV_List</to>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[3]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>exists</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = "false"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>Unknown_Target_Server_Name_CSV_List</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[boolean(string(.))]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>Target_Server_Name</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) != "Host"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <assignment>
+                    <input>
+                      <concat>
+                        <input required="false">
+                          <from>Unknown_Target_Server_Name_CSV_List</from>
+                        </input>
+                        <input>
+                          <value>,</value>
+                        </input>
+                        <input required="false">
+                          <from>Target_Server_Name</from>
+                        </input>
+                      </concat>
+                    </input>
+                    <output>
+                      <to>Unknown_Target_Server_Name_CSV_List</to>
+                    </output>
+                  </assignment>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[4]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <case applies-if-any-condition-true="false">
+              <condition>
+                <document>
+                  <input>
+                    <from>Target_Server_Name</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = "Host"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <condition>
+                <document>
+                  <input>
+                    <from>exists</from>
+                  </input>
+                </document>
+                <xpath-expression>
+                  <xpath-replacement-tokens />
+                  <xpath><![CDATA[string(.) = "false"]]></xpath>
+                </xpath-expression>
+              </condition>
+              <sequence>
+                <assign>
+                  <meta>
+                    <documentation />
+                    <checkpoint>false</checkpoint>
+                  </meta>
+                  <location>:switch[1]:sequence[5]:assign[1]</location>
+                </assign>
+              </sequence>
+            </case>
+            <location>:switch[1]</location>
+          </switch>
+        </sequence>
+        <location>:for-each[1]</location>
+      </for-each>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:ESA_ITSM:Adapter:TSA_Adapter</configuration>
+          </input>
+          <output>
+            <to>TSA_Connection_Details</to>
+            <concept type="BMC_BladeLogic-AD-Operations_Manager:ConnectionDetails">
+              <attribute>adapter-name</attribute>
+            </concept>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>Target_Server_FQDN_CSV_List</from>
+          </input>
+          <output>
+            <to>Target_Server_FQDN_CSV_List</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <from>Unknown_Target_Server_Name_CSV_List</from>
+          </input>
+          <output>
+            <to>Unknown_Target_Server_Name_CSV_List</to>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>########## Assign TSSA Adapter Before ##########</value>
+              </input>
+              <input>
+                <from>Target_Server_FQDN_CSV_List</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>########## Assign TSSA Adapter After ##########</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[3]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>c31c65e5-2014-443d-9f12-7ba543239937</process-id>
+      <author>aoadmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1757995852408</last-modified>
+    </meta>
+  </process-def>
+</process>

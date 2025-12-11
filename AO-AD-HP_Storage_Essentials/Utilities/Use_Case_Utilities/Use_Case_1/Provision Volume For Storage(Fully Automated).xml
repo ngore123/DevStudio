@@ -1,0 +1,972 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Use_Case_1:Provision Volume For Storage(Fully Automated)">
+    <parameters>
+      <input global="false" required="false">
+        <from>hpse adapter name</from>
+        <to>hpse adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <from>storage system id</from>
+        <to>storage system id</to>
+      </input>
+      <input global="false" required="true">
+        <from>pool name</from>
+        <to>pool name</to>
+      </input>
+      <input global="false" required="true">
+        <from>volume name</from>
+        <to>volume name</to>
+      </input>
+      <input global="false" required="true">
+        <from>volume size</from>
+        <to>volume size</to>
+      </input>
+      <input global="false" required="false">
+        <from>cacheahead</from>
+        <to>cacheahead</to>
+      </input>
+      <input global="false" required="false">
+        <from>segment size</from>
+        <to>segment size</to>
+      </input>
+      <input global="false" required="false">
+        <from>raid configuration name</from>
+        <to>raid configuration name</to>
+      </input>
+      <output global="false" required="false">
+        <to>create volume response</to>
+        <from>create volume response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Use_Case_1:Create Initial Request Use Case 1</process-name>
+        <parameters>
+          <input>
+            <value>not required</value>
+            <to>storage system name</to>
+          </input>
+          <input>
+            <value>1</value>
+            <to>pool size</to>
+          </input>
+          <input>
+            <from>volume name</from>
+            <to>volume name</to>
+          </input>
+          <input>
+            <from>volume size</from>
+            <to>volume size</to>
+          </input>
+          <input>
+            <value>n</value>
+            <to>pool creation required</to>
+          </input>
+          <output>
+            <from>initial request</from>
+            <to>initial request</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <utility>
+              <string>
+                <concat>
+                  <input>
+                    <concat>
+                      <input>
+                        <value>No valid storage system id found.</value>
+                      </input>
+                    </concat>
+                  </input>
+                </concat>
+              </string>
+              <output global="false">
+                <to>final error</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>final error</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:utility[1]</location>
+            </utility>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>storage system id</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="ss id">
+                  <input global="false">
+                    <from>storage system id</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[string('${ss id}')!='']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <call-process>
+              <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Find Storage Pool ID From Name</process-name>
+              <parameters>
+                <input>
+                  <from>hpse adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>storage system id</from>
+                  <to>storage system id</to>
+                </input>
+                <input>
+                  <from>pool name</from>
+                  <to>pool name</to>
+                </input>
+                <output>
+                  <from>storage pool id</from>
+                  <to>storage pool id</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <console-output>
+                  <type>INFO</type>
+                  <summary>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </summary>
+                  <detail>
+                    <concat>
+                      <input>
+                        <value></value>
+                      </input>
+                    </concat>
+                  </detail>
+                </console-output>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <utility>
+                    <string>
+                      <concat>
+                        <input>
+                          <concat>
+                            <input>
+                              <value>An error occurred while trying to fetch storage pool id. No valid pool id found.</value>
+                            </input>
+                          </concat>
+                        </input>
+                      </concat>
+                    </string>
+                    <output global="false">
+                      <to>final error</to>
+                    </output>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <from>final error</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:utility[1]</location>
+                  </utility>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>storage pool id</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens>
+                      <replacement-token name="pool id">
+                        <input global="false">
+                          <from>storage pool id</from>
+                        </input>
+                      </replacement-token>
+                    </xpath-replacement-tokens>
+                    <xpath><![CDATA[string('${pool id}')!='']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <console-output>
+                    <type>INFO</type>
+                    <summary>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </summary>
+                    <detail>
+                      <concat>
+                        <input>
+                          <value></value>
+                        </input>
+                      </concat>
+                    </detail>
+                  </console-output>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <assign>
+                          <assignment>
+                            <output>
+                              <to>setting id</to>
+                              <value></value>
+                            </output>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                        </assign>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>raid configuration name</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens>
+                            <replacement-token name="setting name">
+                              <input global="false">
+                                <from>raid configuration name</from>
+                              </input>
+                            </replacement-token>
+                          </xpath-replacement-tokens>
+                          <xpath><![CDATA[string('${setting name}')!='']]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <call-process>
+                          <process-name>:AO-AD-HP_Storage_Essentials:Utilities:Use_Case_Utilities:Find Storage Setting ID From Name</process-name>
+                          <parameters>
+                            <input>
+                              <from>hpse adapter name</from>
+                              <to>adapter name</to>
+                            </input>
+                            <input>
+                              <from>storage pool id</from>
+                              <to>pool id</to>
+                            </input>
+                            <input>
+                              <from>raid configuration name</from>
+                              <to>setting name</to>
+                            </input>
+                            <output>
+                              <from>storage setting id</from>
+                              <to>setting id</to>
+                            </output>
+                          </parameters>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>false</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <console-output>
+                              <type>INFO</type>
+                              <summary>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </summary>
+                              <detail>
+                                <concat>
+                                  <input>
+                                    <value></value>
+                                  </input>
+                                </concat>
+                              </detail>
+                            </console-output>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                        </call-process>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[1]</location>
+                  </switch>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>storage system id</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>find storage system details request</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="ss id">
+                            <input global="false">
+                              <from>storage system id</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <command>
+          <xsl:text disable-output-escaping="no">show</xsl:text>
+        </command>
+        <category>
+          <xsl:text disable-output-escaping="no">storagesystem</xsl:text>
+        </category>
+        <process-id>
+          <xsl:text disable-output-escaping="no">find-storage-system-details</xsl:text>
+        </process-id>
+        <command-arguments>
+          <storage-system-id>${ss id}</storage-system-id>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AO-AD-HP_Storage_Essentials:v6.0:Storage_System:Find Storage System Details</process-name>
+                    <parameters>
+                      <input>
+                        <from>hpse adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>find storage system details request</from>
+                        <to>items</to>
+                      </input>
+                      <output>
+                        <from>adapter response</from>
+                        <to>storage system details response</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <console-output>
+                        <type>INFO</type>
+                        <summary>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </summary>
+                        <detail>
+                          <concat>
+                            <input>
+                              <value></value>
+                            </input>
+                          </concat>
+                        </detail>
+                      </console-output>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <switch>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>true</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                    <default>
+                      <sequence>
+                        <utility>
+                          <string>
+                            <concat>
+                              <input>
+                                <concat>
+                                  <input>
+                                    <value>An error occurred while trying to fetch storage system details or no matching record(s) found. Error: </value>
+                                  </input>
+                                </concat>
+                              </input>
+                              <input>
+                                <from>storage system details response</from>
+                                <xpath-expression>
+                                  <xpath-replacement-tokens />
+                                  <xpath><![CDATA[string(//command-output/output)]]></xpath>
+                                </xpath-expression>
+                              </input>
+                            </concat>
+                          </string>
+                          <output global="false">
+                            <to>final error</to>
+                          </output>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <after-execution>
+                            <log>
+                              <level>debug</level>
+                              <parameters>
+                                <input>
+                                  <from>final error</from>
+                                </input>
+                              </parameters>
+                            </log>
+                          </after-execution>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[1]:utility[1]</location>
+                        </utility>
+                      </sequence>
+                    </default>
+                    <case>
+                      <condition>
+                        <document>
+                          <input>
+                            <from>storage system details response</from>
+                          </input>
+                        </document>
+                        <xpath-expression>
+                          <xpath-replacement-tokens />
+                          <xpath><![CDATA[string(//command-output/metadata/status)='success'  and  round(//command-output/metadata/count)>0]]></xpath>
+                        </xpath-expression>
+                      </condition>
+                      <sequence>
+                        <console-output>
+                          <type>INFO</type>
+                          <summary>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </summary>
+                          <detail>
+                            <concat>
+                              <input>
+                                <value></value>
+                              </input>
+                            </concat>
+                          </detail>
+                        </console-output>
+                        <assign>
+                          <assignment>
+                            <document>
+                              <input>
+                                <from>storage system details response</from>
+                              </input>
+                            </document>
+                            <result>
+                              <output>
+                                <to>storage system vendor</to>
+                              </output>
+                            </result>
+                            <xpath-expression>
+                              <xpath-replacement-tokens />
+                              <xpath><![CDATA[string(//output/command-response/Vendor)]]></xpath>
+                            </xpath-expression>
+                          </assignment>
+                          <meta>
+                            <documentation />
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:assign[1]</location>
+                        </assign>
+                        <switch>
+                          <meta>
+                            <documentation />
+                            <run-mode-handling>
+                              <run-mode>OCP</run-mode>
+                              <allow-step-into>true</allow-step-into>
+                            </run-mode-handling>
+                            <checkpoint>false</checkpoint>
+                          </meta>
+                          <execute-all-applicable-cases>false</execute-all-applicable-cases>
+                          <default>
+                            <sequence>
+                              <assign>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>initial request</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>create volume request</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens>
+                                      <replacement-token name="pool id">
+                                        <input global="false">
+                                          <from>storage pool id</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="setting id">
+                                        <input global="false">
+                                          <from>setting id</from>
+                                        </input>
+                                      </replacement-token>
+                                    </stylesheet-replacement-tokens>
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <command>
+          <xsl:text disable-output-escaping="no">create</xsl:text>
+        </command>
+        <category>
+          <xsl:text disable-output-escaping="no">volume</xsl:text>
+        </category>
+        <process-id>
+          <xsl:text disable-output-escaping="no">create-storage-volume</xsl:text>
+        </process-id>
+        <command-arguments>
+          <pool-id>${pool id}</pool-id>
+          <xsl:if test="string('${setting id}')!=''">
+            <storage-setting-id>${setting id}</storage-setting-id>
+          </xsl:if>
+          <size>
+            <xsl:value-of select="number(//vol-size)*1024" disable-output-escaping="no" />
+          </size>
+          <name>
+            <xsl:value-of select="//vol-name" disable-output-escaping="no" />
+          </name>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <log>
+                                    <level>debug</level>
+                                    <parameters>
+                                      <input>
+                                        <value>Create Volume Item XML: </value>
+                                      </input>
+                                      <input>
+                                        <from>create volume request</from>
+                                      </input>
+                                    </parameters>
+                                  </log>
+                                </after-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                              </assign>
+                              <call-process>
+                                <process-name>:AO-AD-HP_Storage_Essentials:v6.0:Volume:Create Storage Volume</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>hpse adapter name</from>
+                                    <to>adapter name</to>
+                                  </input>
+                                  <input>
+                                    <from>create volume request</from>
+                                    <to>items</to>
+                                  </input>
+                                  <output>
+                                    <from>adapter response</from>
+                                    <to>create volume response</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:switch[1]:sequence[1]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </default>
+                          <case>
+                            <condition>
+                              <document>
+                                <input>
+                                  <from>storage system vendor</from>
+                                </input>
+                              </document>
+                              <xpath-expression>
+                                <xpath-replacement-tokens>
+                                  <replacement-token name="vendor">
+                                    <input global="false">
+                                      <from>storage system vendor</from>
+                                    </input>
+                                  </replacement-token>
+                                </xpath-replacement-tokens>
+                                <xpath><![CDATA[contains('${vendor}', "LSI") or contains('${vendor}', "lsi") or contains('${vendor}', "Lsi") or contains('${vendor}', "LSi") or contains('${vendor}', "lSI") or contains('${vendor}', "lsI")]]></xpath>
+                              </xpath-expression>
+                            </condition>
+                            <sequence>
+                              <console-output>
+                                <type>INFO</type>
+                                <summary>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </summary>
+                                <detail>
+                                  <concat>
+                                    <input>
+                                      <value></value>
+                                    </input>
+                                  </concat>
+                                </detail>
+                              </console-output>
+                              <assign>
+                                <assignment>
+                                  <document>
+                                    <input>
+                                      <from>initial request</from>
+                                    </input>
+                                  </document>
+                                  <result>
+                                    <output>
+                                      <to>create lsi volume request</to>
+                                    </output>
+                                  </result>
+                                  <xslt-stylesheet>
+                                    <stylesheet-replacement-tokens>
+                                      <replacement-token name="pool id">
+                                        <input global="false">
+                                          <from>storage pool id</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="segment size">
+                                        <input global="false">
+                                          <from>segment size</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="ca">
+                                        <input global="false">
+                                          <from>cacheahead</from>
+                                        </input>
+                                      </replacement-token>
+                                      <replacement-token name="setting id">
+                                        <input global="false">
+                                          <from>setting id</from>
+                                        </input>
+                                      </replacement-token>
+                                    </stylesheet-replacement-tokens>
+                                    <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <items>
+      <item>
+        <command>
+          <xsl:text disable-output-escaping="no">create</xsl:text>
+        </command>
+        <category>
+          <xsl:text disable-output-escaping="no">volume</xsl:text>
+        </category>
+        <process-id>
+          <xsl:text disable-output-escaping="no">create-storage-volume</xsl:text>
+        </process-id>
+        <command-arguments>
+          <pool-id>${pool id}</pool-id>
+          <cacheahead>${ca}</cacheahead>
+          <segmentsize>${segment size}</segmentsize>
+          <xsl:if test="string('${setting id}')!=''">
+            <storage-setting-id>${setting id}</storage-setting-id>
+          </xsl:if>
+          <lsi />
+          <size>
+            <xsl:value-of select="number(//vol-size)*1024" disable-output-escaping="no" />
+          </size>
+          <name>
+            <xsl:value-of select="//vol-name" disable-output-escaping="no" />
+          </name>
+        </command-arguments>
+      </item>
+    </items>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                                  </xslt-stylesheet>
+                                </assignment>
+                                <meta>
+                                  <documentation />
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <log>
+                                    <level>debug</level>
+                                    <parameters>
+                                      <input>
+                                        <value>Create LSI Volume request: </value>
+                                      </input>
+                                      <input>
+                                        <from>create lsi volume request</from>
+                                      </input>
+                                    </parameters>
+                                  </log>
+                                </after-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                              </assign>
+                              <call-process>
+                                <process-name>:AO-AD-HP_Storage_Essentials:v6.0:Volume:Create Storage Volume</process-name>
+                                <parameters>
+                                  <input>
+                                    <from>hpse adapter name</from>
+                                    <to>adapter name</to>
+                                  </input>
+                                  <input>
+                                    <from>create lsi volume request</from>
+                                    <to>items</to>
+                                  </input>
+                                  <output>
+                                    <from>adapter response</from>
+                                    <to>create volume response</to>
+                                  </output>
+                                </parameters>
+                                <meta>
+                                  <documentation />
+                                  <run-mode-handling>
+                                    <run-mode>OCP</run-mode>
+                                    <allow-step-into>false</allow-step-into>
+                                  </run-mode-handling>
+                                  <checkpoint>false</checkpoint>
+                                </meta>
+                                <after-execution>
+                                  <console-output>
+                                    <type>INFO</type>
+                                    <summary>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </summary>
+                                    <detail>
+                                      <concat>
+                                        <input>
+                                          <value></value>
+                                        </input>
+                                      </concat>
+                                    </detail>
+                                  </console-output>
+                                </after-execution>
+                                <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                              </call-process>
+                            </sequence>
+                          </case>
+                          <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]:sequence[2]:switch[1]</location>
+                        </switch>
+                      </sequence>
+                    </case>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:switch[2]</location>
+                  </switch>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>b3717cc7-c84b-3e03-a6ef-eddf26317739</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1290588079415</last-modified>
+    </meta>
+  </process-def>
+</process>

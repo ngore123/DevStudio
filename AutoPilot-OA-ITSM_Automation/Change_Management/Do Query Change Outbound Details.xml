@@ -1,0 +1,625 @@
+<process draft="false" dev-studio-version="8.0.00">
+  <process-def name=":AutoPilot-OA-ITSM_Automation:Change_Management:Do Query Change Outbound Details">
+    <parameters>
+      <input global="false" required="true">
+        <description>Sample Value :
+'SourceID' = "EventOrchestration" and 'ConsolidatedStatus' = "ReadyToExecute" and JobID = $NULL$</description>
+        <from>Query</from>
+        <to>Query</to>
+      </input>
+      <input global="false" required="true">
+        <description>Sample Value :
+WebServiceAdapter</description>
+        <from>AdapterName</from>
+        <to>AdapterName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Sample Value :
+
+http://&amp;lt;Midtier&amp;gt;:8080/arsys/services/ARService?server=&amp;lt;ARServer&amp;gt;&amp;amp;</description>
+        <from>ServerURL</from>
+        <to>ServerURL</to>
+      </input>
+      <input global="false" required="true">
+        <description>Sample value :
+Orchestrator</description>
+        <from>UserName</from>
+        <to>UserName</to>
+      </input>
+      <input global="false" required="true">
+        <description>Sample Value:
+Password</description>
+        <from>Password</from>
+        <to>Password</to>
+      </input>
+      <input global="false" required="false">
+        <from>CommunicationProtocol</from>
+        <to>CommunicationProtocol</to>
+      </input>
+      <input global="false" required="false">
+        <from>Keystore</from>
+        <to>Keystore</to>
+      </input>
+      <input global="false" required="false">
+        <from>TrustStore</from>
+        <to>TrustStore</to>
+      </input>
+      <input global="false" required="false">
+        <from>Passphrase</from>
+        <to>Passphrase</to>
+      </input>
+      <output global="false" required="false">
+        <to>ChangesXML</to>
+        <from>ChangesXML</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>ServerURL</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>soapurl</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="contains(.,  '&amp;')">
+          <xsl:value-of select="concat(., 'webService=CHG_ChangeOutboundInterface')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="concat(., '&amp;webService=CHG_ChangeOutboundInterface')" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <input>
+            <from>CommunicationProtocol</from>
+          </input>
+          <output>
+            <to>transport</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>soapurl</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>getOutboundDetailsRequest</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="username">
+                <input global="false">
+                  <from>UserName</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="password">
+                <input global="false">
+                  <from>Password</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="Query">
+                <input global="false">
+                  <from>Query</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:urn="CHG_ChangeOutboundInterface" xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org" version="1.0">
+  <xsl:output indent="yes" encoding="XML" cdata-section-elements="ChangeOutboundInterfaceData" />
+  <xsl:template match="/">
+    <soapenv:Envelope>
+      <soapenv:Header>
+        <xsl:element name="urn:AuthenticationInfo">
+          <xsl:element name="urn:userName">$[username]</xsl:element>
+          <xsl:element name="urn:password">${password}</xsl:element>
+        </xsl:element>
+      </soapenv:Header>
+      <soapenv:Body>
+        <xsl:element name="urn:GetChangeOutboundDetails">
+          <xsl:element name="urn:Qualification">
+            <xsl:text disable-output-escaping="no">${Query}</xsl:text>
+          </xsl:element>
+        </xsl:element>
+      </soapenv:Body>
+    </soapenv:Envelope>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>ServerURL</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>isSecure</to>
+            </output>
+          </result>
+          <xpath-expression>
+            <xpath-replacement-tokens />
+            <xpath><![CDATA[contains(., "https")]]></xpath>
+          </xpath-expression>
+        </assignment>
+        <assignment>
+          <output>
+            <to>ChangesXML</to>
+            <value></value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>remedyRequest=&gt;</value>
+              </input>
+              <input>
+                <from>getOutboundDetailsRequest</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AutoPilot-AD-Utilities:Web_Service:Make SOAP Request Method One</process-name>
+        <parameters>
+          <input>
+            <from>AdapterName</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>transport</from>
+            <to>transport</to>
+          </input>
+          <input>
+            <from>soapurl</from>
+            <to>soap url</to>
+          </input>
+          <input>
+            <from>getOutboundDetailsRequest</from>
+            <to>soap message</to>
+          </input>
+          <input>
+            <value>urn:CHG_ChangeOutboundInterface/GetChangeOutboundDetails</value>
+            <to>soap action</to>
+          </input>
+          <input>
+            <from>isSecure</from>
+            <to>use ssl certificate</to>
+          </input>
+          <input>
+            <from>isSecure</from>
+            <to>install certificate</to>
+          </input>
+          <input>
+            <from>isSecure</from>
+            <to>allow unsigned certificate</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>remedyResponse</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>info</level>
+            <parameters>
+              <input>
+                <value>Going to call web service update for update.</value>
+              </input>
+              <input>
+                <value></value>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>WS Adapter Response:</value>
+              </input>
+              <input>
+                <from>remedyResponse</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>remedyResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>status</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="boolean(//faultstring) or boolean(//faultcode)">
+          <xsl:text disable-output-escaping="no">failure</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="//status/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>remedyResponse</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens />
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="boolean(//faultstring) or boolean(//faultcode)">
+          <xsl:value-of select="concat(//faultcode/text(), ':::' , //faultstring/text())" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:when test="boolean(//error-message) and string-length(normalize-space(//error-message/text())) &gt; 0">
+          <xsl:value-of select="//error-message/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">Unknown error retrieving change records. See log for details!</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case applies-if-any-condition-true="false">
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[.='Success' or .='success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <condition>
+            <document>
+              <input>
+                <from>remedyResponse</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[boolean(//faultstring) = false  or string-length(normalize-space(//faultstring/text())) = 0]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Strip Namespaces</process-name>
+              <parameters>
+                <input>
+                  <from>remedyResponse</from>
+                  <to>XML</to>
+                </input>
+                <output>
+                  <from>XML</from>
+                  <to>ChangesXML</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>remedyResponse</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>status</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//status/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>error message</to>
+                        <value></value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>ChangesXML</to>
+                        <value>
+                          <changes>
+                            <count>0</count>
+                          </changes>
+                        </value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>ChangesXML</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[count(//getListValues)>0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>ChangesXML</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>ChangesXML</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens />
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="@*|node()">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="GetChangeOutboundDetailsResponse">
+    <changes>
+      <xsl:apply-templates select="@*|node()" />
+    </changes>
+  </xsl:template>
+  <xsl:template match="getListValues">
+    <change>
+      <xsl:apply-templates select="InfrastructureChangeID | TaskID | TaskStatus | TaskStatusReason | ChangeRequestStatus | ApprovalStatus | ScheduledStartDate | ScheduledEndDate" />
+    </change>
+  </xsl:template>
+  <xsl:template match="InfrastructureChangeID">
+    <change-id>
+      <xsl:apply-templates select="node()" />
+    </change-id>
+  </xsl:template>
+  <xsl:template match="TaskID">
+    <task-id>
+      <xsl:apply-templates select="node()" />
+    </task-id>
+  </xsl:template>
+  <xsl:template match="TaskStatus">
+    <task-status>
+      <xsl:apply-templates select="node()" />
+    </task-status>
+  </xsl:template>
+  <xsl:template match="TaskStatusReason">
+    <task-status-reason>
+      <xsl:apply-templates select="node()" />
+    </task-status-reason>
+  </xsl:template>
+  <xsl:template match="ChangeRequestStatus">
+    <change-request-status>
+      <xsl:apply-templates select="node()" />
+    </change-request-status>
+  </xsl:template>
+  <xsl:template match="ApprovalStatus">
+    <approval-status>
+      <xsl:apply-templates select="node()" />
+    </approval-status>
+  </xsl:template>
+  <xsl:template match="ScheduledStartDate">
+    <scheduled-start-date>
+      <xsl:apply-templates select="node()" />
+    </scheduled-start-date>
+  </xsl:template>
+  <xsl:template match="ScheduledEndDate">
+    <scheduled-end-date>
+      <xsl:apply-templates select="node()" />
+    </scheduled-end-date>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status</to>
+                        <value>success</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>ChangesXML SOAP Response</value>
+                          </input>
+                          <input>
+                            <from>ChangesXML</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>ChangesXML Output Format</value>
+                          </input>
+                          <input>
+                            <from>ChangesXML</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Query CHG_ChangeOutboundDetails form using the provided query</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>true</is-enabled>
+        <log-file-name>Do-Get-Change-Outbound-Details</log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>4f29c2de-a210-4118-9afc-95fd29b50871</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1525946174325</last-modified>
+    </meta>
+  </process-def>
+</process>

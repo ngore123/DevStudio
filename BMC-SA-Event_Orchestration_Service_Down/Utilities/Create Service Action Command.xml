@@ -1,0 +1,327 @@
+<process draft="false" dev-studio-version="8.2.01">
+  <process-def name=":BMC-SA-Event_Orchestration_Service_Down:Utilities:Create Service Action Command">
+    <parameters>
+      <input global="false" required="true">
+        <from>host name</from>
+        <to>host name</to>
+      </input>
+      <input global="false" required="true">
+        <from>domain</from>
+        <to>domain</to>
+      </input>
+      <input global="false" required="true">
+        <from>os type</from>
+        <to>os type</to>
+      </input>
+      <input global="false" required="true">
+        <from>service name</from>
+        <to>service name</to>
+      </input>
+      <input global="false" required="false">
+        <from>PID</from>
+        <to>PID</to>
+      </input>
+      <output global="false" required="false">
+        <to>commands</to>
+        <from>commands</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Service_Down:Service_Actions_Aliasing:Aliases</configuration>
+          </input>
+          <output>
+            <to>service alias configuration</to>
+          </output>
+        </assignment>
+        <assignment>
+          <input global="true">
+            <configuration>:BMC-SA-Event_Orchestration_Service_Down:Service_Actions_Aliasing:ServiceNameMappings</configuration>
+          </input>
+          <output>
+            <to>service name mapping configuration</to>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>service name mapping configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>service name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="command">
+                <input global="false">
+                  <from>service name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="//service-name-mappings/service-name/@name='${command}'">
+          <xsl:value-of select="//service-name-mappings/service-name[@name='${command}']/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>${command}</xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>service alias configuration</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>commands</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="domain">
+                <input global="false">
+                  <from>domain</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="host name">
+                <input global="false">
+                  <from>host name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="os type">
+                <input global="false">
+                  <from>os type</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="service name">
+                <input global="false">
+                  <from>service name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="domain">
+    <xsl:choose>
+      <xsl:when test="//domain/@name = '${domain}'">${domain}</xsl:when>
+      <xsl:when test="contains('${domain}', //domain/@name)">
+        <xsl:value-of select="//domain/@name" disable-output-escaping="no" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">*</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="host">
+    <xsl:choose>
+      <xsl:when test="//domain[@name = $domain]/hosts/host/@name = '${host name}'">${host name}</xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">*</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="serviceName">
+    <xsl:choose>
+      <xsl:when test="contains('${service name}', '@')">
+        <xsl:value-of select="substring-before('${service name}', '@')" disable-output-escaping="no" />
+      </xsl:when>
+      <xsl:otherwise>${service name}</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name="service">
+    <xsl:choose>
+      <xsl:when test="//domain[@name = $domain]/hosts/host[@name = $host]/services/service/@name = $serviceName">
+        <xsl:value-of select="$serviceName" disable-output-escaping="no" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text disable-output-escaping="no">*</xsl:text>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:template match="/">
+    <commands>
+      <xsl:choose>
+        <xsl:when test="boolean(//domain[@name = $domain]/hosts/host[@name = $host and @os-type = '${os type}' ])">
+          <xsl:choose>
+            <xsl:when test="boolean(//domain[@name = $domain]/hosts/host[@name = $host and @os-type = '${os type}' ]/services/service[@name = $service])">
+              <xsl:call-template name="Start">
+                <xsl:with-param name="commandStr" select="//domain[@name =  $domain]/hosts/host[@name =$host and @os-type = '${os type}' ]/services/service[@name = $service]/start/command/text()" />
+              </xsl:call-template>
+              <xsl:call-template name="Stop">
+                <xsl:with-param name="commandStr" select="//domain[@name =  $domain]/hosts/host[@name =$host and @os-type = '${os type}' ]/services/service[@name = $service]/stop/command/text()" />
+              </xsl:call-template>
+              <xsl:apply-templates select="//domain[@name =  $domain]/hosts/host[@name = $host and @os-type = '${os type}' ]/services/service[@name = $service]/restart" mode="restart" />
+            </xsl:when>
+          </xsl:choose>
+        </xsl:when>
+      </xsl:choose>
+    </commands>
+  </xsl:template>
+  <xsl:template name="Start" mode="start" match="service">
+    <xsl:param name="commandStr" />
+    <start>
+      <xsl:choose>
+        <xsl:when test="starts-with($commandStr, 'net')">
+          <xsl:value-of select="concat($commandStr, ' &quot;', $serviceName,'&quot;')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:when test="starts-with($commandStr, 'service')">
+          <xsl:value-of select="concat($commandStr, ' &quot;', $serviceName, '&quot;',' start' )" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$commandStr" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </start>
+  </xsl:template>
+  <xsl:template name="Stop" mode="stop" match="service">
+    <xsl:param name="commandStr" />
+    <stop>
+      <xsl:choose>
+        <xsl:when test="starts-with($commandStr, 'net')">
+          <xsl:value-of select="concat($commandStr, ' &quot;', $serviceName,'&quot;')" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:when test="starts-with($commandStr, 'service')">
+          <xsl:value-of select="concat($commandStr, ' &quot;', $serviceName, '&quot;',' stop' )" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$commandStr" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </stop>
+  </xsl:template>
+  <xsl:template name="Restart" mode="restart" match="restart">
+    <restart>
+      <xsl:choose>
+        <xsl:when test="count(command) = 1">
+          <xsl:value-of select="command/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <stop>
+            <xsl:choose>
+              <xsl:when test="starts-with(commands/command[1]/text(), 'net')">
+                <xsl:value-of select="concat(commands/command[1]/text(), ' ', $serviceName)" disable-output-escaping="no" />
+              </xsl:when>
+              <xsl:when test="starts-with(commands/command[1]/text(), 'service')">
+                <xsl:value-of select="concat(commands/command[1]/text(), ' ', $serviceName, ' stop' )" disable-output-escaping="no" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="commands/command[1]/text()" disable-output-escaping="no" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </stop>
+          <start>
+            <xsl:choose>
+              <xsl:when test="starts-with(commands/command[2]/text(), 'net')">
+                <xsl:value-of select="concat(commands/command[2]/text(), ' ', $serviceName)" disable-output-escaping="no" />
+              </xsl:when>
+              <xsl:when test="starts-with(commands/command[2]/text(), 'service')">
+                <xsl:value-of select="concat(commands/command[2]/text(), ' ', $serviceName, ' start' )" disable-output-escaping="no" />
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="commands/command[2]/text()" disable-output-escaping="no" />
+              </xsl:otherwise>
+            </xsl:choose>
+          </start>
+        </xsl:otherwise>
+      </xsl:choose>
+    </restart>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== service action inputs===</value>
+              </input>
+              <input>
+                <from>domain</from>
+              </input>
+              <input>
+                <from>host name</from>
+              </input>
+              <input>
+                <from>os type</from>
+              </input>
+              <input>
+                <from>service name</from>
+              </input>
+              <input>
+                <from>PID</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== service action commands===</value>
+              </input>
+              <input>
+                <from>commands</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Create commands for service start, stop and restart.
+Output format will be:
+
+&lt;commands&gt;
+   &lt;start/&gt;
+   &lt;stop /&gt;
+   &lt;restart /&gt;
+&lt;/commands&gt;</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>927c77ff-4652-4654-877d-e85e369f694e</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Event Orchestrations</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1573709522119</last-modified>
+    </meta>
+  </process-def>
+</process>

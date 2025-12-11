@@ -1,0 +1,571 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":AutoPilot-OA-ITSM_Automation:Change_Management:Query Incident to Change Association">
+    <parameters>
+      <input global="false" required="true">
+        <description>Remedy Actor adapter if Java is used. Otherwise, REST adapter name.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <from>incident id</from>
+        <to>incident id</to>
+      </input>
+      <input global="false" required="true">
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="false">
+        <description>Required if REST adapter is used.</description>
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <input global="false" required="false">
+        <description>ITSM authentication token, if any. Required if REST API is used instead of Java</description>
+        <from>itsm authentication token</from>
+        <to>itsm authentication token</to>
+      </input>
+      <output global="false" required="false">
+        <to>association id</to>
+        <from>association id</from>
+      </output>
+      <output global="false" required="false">
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>association id</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>schema name</to>
+            <value>CHG:Associations</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>request type 01</to>
+            <value>9000</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>association type 01</to>
+            <value>35000</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>association status</to>
+            <value>1</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>fields xml</to>
+            <value>
+              <fields>
+                <field>Associations ID</field>
+              </fields>
+            </value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>version</to>
+            <value>v9.0</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>item type</to>
+            <value>chg-association-id</value>
+          </output>
+        </assignment>
+        <assignment>
+          <input>
+            <concat>
+              <input>
+                <value>'Request ID01' = "</value>
+              </input>
+              <input required="false">
+                <from>incident id</from>
+              </input>
+              <input>
+                <value>" AND 'Request Type01' = </value>
+              </input>
+              <input required="false">
+                <from>request type 01</from>
+              </input>
+              <input>
+                <value> AND 'Association Type01' = </value>
+              </input>
+              <input required="false">
+                <from>association type 01</from>
+              </input>
+              <input>
+                <value> AND 'Status' = </value>
+              </input>
+              <input required="false">
+                <from>association status</from>
+              </input>
+              <input>
+                <value> AND 'Request ID02' = "</value>
+              </input>
+              <input required="false">
+                <from>change id</from>
+              </input>
+              <input>
+                <value>"</value>
+              </input>
+            </concat>
+          </input>
+          <output>
+            <to>match condition</to>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>fields</to>
+            <value>values(Associations ID)</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>=== Associate Incident to Change Input====</value>
+              </input>
+              <input>
+                <from>incident id</from>
+              </input>
+              <input>
+                <from>change id</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[1]</location>
+      </assign>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>status code</to>
+                        <value>500</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <output>
+                        <to>error message</to>
+                        <value>No ITSM authentication token present. Unable to query for incident or change associations.</value>
+                      </output>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>itsm authentication token</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[string-length(normalize-space(.)) > 0]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <call-process>
+                    <process-name>:BMC-AD-Remedy_REST:Find Items</process-name>
+                    <parameters>
+                      <input>
+                        <from>adapter name</from>
+                        <to>adapter name</to>
+                      </input>
+                      <input>
+                        <from>url</from>
+                        <to>url</to>
+                      </input>
+                      <input>
+                        <from>itsm authentication token</from>
+                        <to>authorization token</to>
+                      </input>
+                      <input>
+                        <from>schema name</from>
+                        <to>form name</to>
+                      </input>
+                      <input>
+                        <from>match condition</from>
+                        <to>query</to>
+                      </input>
+                      <input>
+                        <value>xml</value>
+                        <to>return data format</to>
+                      </input>
+                      <input>
+                        <from>fields</from>
+                        <to>fields</to>
+                      </input>
+                      <output>
+                        <from>response headers</from>
+                        <to>response headers</to>
+                      </output>
+                      <output>
+                        <from>response body</from>
+                        <to>response body</to>
+                      </output>
+                      <output>
+                        <from>status</from>
+                        <to>status</to>
+                      </output>
+                      <output>
+                        <from>error message</from>
+                        <to>error message</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>response body</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>association id</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="status">
+                            <input global="false">
+                              <from>status</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="'${status}' = 'success'">
+          <xsl:value-of select="//Associations-ID/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[1]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[1]:switch[1]</location>
+            </switch>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input global="true">
+                <configuration>:AutoPilot-OA-ITSM_Automation:BMC_AR_System:Defaults:Use_Java</configuration>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:AMP-AD-BMC-Remedy-ARS:v7.5:Get Entries</process-name>
+              <parameters>
+                <input>
+                  <from>adapter name</from>
+                  <to>adapter name</to>
+                </input>
+                <input>
+                  <from>schema name</from>
+                  <to>schema name</to>
+                </input>
+                <input>
+                  <from>fields xml</from>
+                  <to>requested fields</to>
+                </input>
+                <input>
+                  <from>match condition</from>
+                  <to>match condition</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>query response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>status</to>
+                        <value>failure</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>query response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>error message</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//error/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case applies-if-any-condition-true="true">
+                <condition>
+                  <document>
+                    <input>
+                      <from>query response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[boolean(//field)]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <condition>
+                  <document>
+                    <input>
+                      <from>query response</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[boolean(//entry-count)]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <output>
+                        <to>status</to>
+                        <value>success</value>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>query response</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>association id</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens />
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <association-ids>
+      <xsl:apply-templates select="//field" />
+    </association-ids>
+  </xsl:template>
+  <xsl:template match="field">
+    <association-id>
+      <xsl:value-of select="." disable-output-escaping="no" />
+    </association-id>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <assign>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <before-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>====Asscociate Incident to Change Output====</value>
+              </input>
+              <input>
+                <from>association id</from>
+              </input>
+              <input>
+                <from>status</from>
+              </input>
+              <input>
+                <from>error message</from>
+              </input>
+            </parameters>
+          </log>
+        </before-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Associate an incident to a change. 
+
+Due to non-existent  support via the web service, this process will use Remedy's Java API.
+
+Inputs are incident ID and change ID.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>edf009ac-1edc-4835-a7cc-78a0a0d14199</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>ITSM Automation</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1569922848196</last-modified>
+    </meta>
+  </process-def>
+</process>

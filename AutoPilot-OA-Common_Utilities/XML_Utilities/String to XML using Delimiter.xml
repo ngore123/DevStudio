@@ -1,0 +1,292 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":AutoPilot-OA-Common_Utilities:XML_Utilities:String to XML using Delimiter">
+    <parameters>
+      <input global="false" required="true">
+        <description>A string containing with delimiters like comma (,), pipe (|), etc.
+
+Examples:
+delmited using a comma: a,b,c,d
+delmited using a pipe: a|b|c|d
+delmited using a colon: a:b:c:d
+
+Tokenization uses the delimiter as a regular expression. Regular expression special characters need to be escaped. These are listed here: http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html
+
+So, pipe character (|) should be escaped using 2 backslash characters like - \|</description>
+        <from>string</from>
+        <to>string</to>
+      </input>
+      <input global="false" required="true">
+        <description>Any set of characters that can be used in a regular expression.
+
+
+Tokenization uses the delimiter as a regular expression. Regular expression special characters need to be escaped. These are listed here: http://docs.oracle.com/javase/6/docs/api/java/util/regex/Pattern.html
+
+So, pipe character (|) should be escaped using 2 backslash characters like - \|</description>
+        <from>delimiter</from>
+        <to>delimiter</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the root element to be used in the output XML.
+Optional - If none provided, a default value of 'loops' is used.</description>
+        <from>root element name</from>
+        <to>root element name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Name of the child element to be used in the output XML.
+Optional - If none provided, a default value of 'loop' is used.</description>
+        <from>child element name</from>
+        <to>child element name</to>
+      </input>
+      <output global="false" required="false">
+        <to>XML</to>
+        <from>XML</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <document>
+            <input>
+              <from>root element name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>root element name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">loops</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>child element name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>child element name</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">loop</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>string</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>XML String</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="delimiter">
+                <input global="false">
+                  <from>delimiter</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="rootElem">
+                <input global="false">
+                  <from>root element name</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="childElem">
+                <input global="false">
+                  <from>child element name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:tokenizer="com.realops.common.xml" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="data" select="." />
+  <xsl:template match="/">
+    <tokenized>
+      <xsl:value-of select="tokenizer:StringXmlUtils.toXMLString($data, '$[delimiter]', '${rootElem}', '${childElem}')" disable-output-escaping="no" />
+    </tokenized>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <utility>
+        <string>
+          <regex>
+            <input>
+              <from>XML String</from>
+            </input>
+            <expression>
+              <search case-sensitive="false">&lt;\?xml[\s\t]*version=[\'\"]1.[0-9]+[\"\'][\s\t]*(encoding=[\'\"][\w\W]*[\'\"])*[\s\t]*(standalone=[\'\"][\w\W]*[\'\"])*[\s\t]*\?&gt;</search>
+              <replace replace-all="true" />
+            </expression>
+          </regex>
+        </string>
+        <output global="false">
+          <to>XML String</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[1]</location>
+      </utility>
+      <utility>
+        <string>
+          <regex>
+            <input>
+              <from>XML String</from>
+            </input>
+            <expression>
+              <search case-sensitive="false">&lt;!DOCTYPE.*?&gt;</search>
+              <replace replace-all="true" />
+            </expression>
+          </regex>
+        </string>
+        <output global="false">
+          <to>XML String</to>
+        </output>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:utility[2]</location>
+      </utility>
+      <assign>
+        <assignment>
+          <output>
+            <to>XML</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="XML String">
+                <input global="false">
+                  <from>XML String</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <XML>${XML String}</XML>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>XML</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>XML</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="rootElem">
+                <input global="false">
+                  <from>root element name</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <xsl:copy-of select="//${rootElem}" />
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>XML Output</value>
+              </input>
+              <input>
+                <from>XML</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:assign[2]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>740a2a53-2635-42d6-9f31-40f23fd3a63d</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1490969092769</last-modified>
+    </meta>
+  </process-def>
+</process>

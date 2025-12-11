@@ -1,0 +1,187 @@
+<process draft="false" dev-studio-version="7.6.01.00">
+  <process-def name=":AutoPilot-OA-File_Utilities:Perform File Compare">
+    <parameters>
+      <input global="false" required="true">
+        <description>XML document conforming to the ConnectionDetails Concept that contains the information required to execute a command via command line</description>
+        <from>connection details</from>
+        <to>connection details</to>
+      </input>
+      <input global="false" required="true">
+        <description>The path and file name of the first file to be comared.</description>
+        <from>file1</from>
+        <to>file1</to>
+      </input>
+      <input global="false" required="true">
+        <description>The path and file name of the second file to be comared.</description>
+        <from>file2</from>
+        <to>file2</to>
+      </input>
+      <input global="false" required="false">
+        <description>Files are by default compared as text files.
+Valid value: true
+Note: not applicable to SunOS.</description>
+        <from>binary compare</from>
+        <to>binary compare</to>
+      </input>
+      <input global="false" required="false">
+        <description>Ignore upper/lower case distinctions during comparisons? 
+Valid value:  true</description>
+        <from>case insensitive</from>
+        <to>case insensitive</to>
+      </input>
+      <output global="false" required="true">
+        <description>XML document consisting of one or more &lt;line&gt; elements that contain the command response. Each  &lt;line&gt; element contains an index attribute indicating the order in which the information was returned by the command.</description>
+        <to>output</to>
+        <from>command output</from>
+      </output>
+      <output global="false" required="true">
+        <description>Did the operation succeed? Valid values:  true</description>
+        <to>success</to>
+        <from>exit code</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AutoPilot-OA-Common_Utilities:Invoke Command</process-name>
+        <parameters>
+          <input>
+            <from>connection details</from>
+            <to>connection details</to>
+          </input>
+          <input>
+            <from>file1</from>
+            <to>command</to>
+            <xslt-stylesheet>
+              <stylesheet-replacement-tokens>
+                <replacement-token name="file1">
+                  <input global="false">
+                    <from>file1</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="file2">
+                  <input global="false">
+                    <from>file2</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="binary compare">
+                  <input global="false">
+                    <from>binary compare</from>
+                  </input>
+                </replacement-token>
+                <replacement-token name="case insensitive">
+                  <input global="false">
+                    <from>case insensitive</from>
+                  </input>
+                </replacement-token>
+              </stylesheet-replacement-tokens>
+              <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <fat-command>
+      <command os-id="Linux">
+        <xsl:text disable-output-escaping="no">diff </xsl:text>
+        <xsl:if test="string-length('${binary compare}') !=0 and '${binary compare}' = 'true'">
+          <xsl:text disable-output-escaping="no">-q </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file1}') !=0 and string-length('${binary compare}') =0">
+          <xsl:text disable-output-escaping="no">-a </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${case insensitive}') !=0 and '${case insensitive}' = 'true' and string-length('${binary compare}') =0">
+          <xsl:text>-i </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">$[file1] $[file2]</xsl:text>
+      </command>
+      <command os-id="SunOS">
+        <xsl:text disable-output-escaping="no">/usr/bin/diff </xsl:text>
+        <xsl:if test="string-length('${case insensitive}') !=0 and '${case insensitive}' = 'true'">
+          <xsl:text>-i </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">$[file1] $[file2]</xsl:text>
+      </command>
+      <command os-id="Windows Default">
+        <xsl:text disable-output-escaping="no">fc </xsl:text>
+        <xsl:if test="string-length('${binary compare}') !=0 and '${binary compare}' = 'true'">
+          <xsl:text disable-output-escaping="no">/b </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${file1}') !=0 and string-length('${binary compare}') =0">
+          <xsl:text disable-output-escaping="no">/l </xsl:text>
+        </xsl:if>
+        <xsl:if test="string-length('${case insensitive}') !=0 and '${case insensitive}' = 'true' and string-length('${binary compare}') =0">
+          <xsl:text disable-output-escaping="no">/c </xsl:text>
+        </xsl:if>
+        <xsl:text disable-output-escaping="no">$[file1] $[file2]</xsl:text>
+      </command>
+    </fat-command>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+            </xslt-stylesheet>
+          </input>
+          <output>
+            <from>command output</from>
+            <to>command output</to>
+          </output>
+          <output>
+            <from>exit code</from>
+            <to>exit code</to>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)=0]]></xpath>
+            </xpath-expression>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Perform File Compare
+    Compares the contents of two files in either text or binary form.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>55e90954-59ac-355b-a029-be12315496fb</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1289902420338</last-modified>
+    </meta>
+  </process-def>
+</process>

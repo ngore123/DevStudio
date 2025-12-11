@@ -1,0 +1,254 @@
+<process draft="false" dev-studio-version="7.6.01.04">
+  <process-def name=":AO-AD-Amazon_EC2:Adapter_Actions:v1.0:Security_Group_Operations:Revoke Security Group Ingress">
+    <parameters>
+      <input global="false" required="false">
+        <description>adapter name    [Optional]
+            The name of the adapter use to handle the request.
+
+Default value: AmazonEC2ActorAdapter</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon EC2. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - 
+http://ec2.amazonaws.com/doc/2009-11-30/AmazonEC2.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon EC2 instances across different regions. Respective values for different regions are as below:
+
+    * http://us-east-1.ec2.amazonaws.com/ — Endpoint located in the US-East (Northern Virginia) Region
+    * http://us-west-1.ec2.amazonaws.com/ — Endpoint located in the US-West (Northern California) Region
+    * http://eu-west-1.ec2.amazonaws.com/ ---Endpoint located in the EU (Ireland) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>signature properties [Optional]
+
+Specify this element for including authentication credentials at request level. 
+
+Sample values that can be specified are:
+
+&lt;signature-properties mode = "key-files"&gt;
+    &lt;private-key-file&gt;&lt;/private-key-file&gt;
+    &lt;certificate-file&gt;&lt;/certificate-file&gt;
+&lt;/signature-properties&gt;
+
+OR
+
+&lt;signature-properties mode = "key-data"&gt;
+    &lt;private-key-data&gt;&lt;/private-key-data&gt;
+    &lt;certificate-data&gt;&lt;/certificate-data&gt;
+&lt;/signature-properties&gt;
+</description>
+        <from>signature properties</from>
+        <to>signature properties</to>
+      </input>
+      <input global="false" required="false">
+        <description>user id [Optional]
+
+AWS Access Key ID.
+
+</description>
+        <from>user id</from>
+        <to>user id</to>
+      </input>
+      <input global="false" required="true">
+        <description>group name [Mandatory]
+
+Name of the group to modify. The name must be valid and belong to the account
+
+</description>
+        <from>group name</from>
+        <to>group name</to>
+      </input>
+      <input global="false" required="true">
+        <description>ip permissions[Mandatory]
+
+Set of permissions for the security group.
+
+Description of different parameters in this is as below:
+
+ip-protocol - Valid Values: tcp,udp,icmp
+from-port - Start of port range for the TCP and UDP protocols, or an ICMP type number. 
+to-port - End of port range for the TCP and UDP protocols, or an ICMP code.
+groups - List of security group and user ID pairs.
+ip-ranges - Contains list of CIDR IP ranges
+
+Sample ip permissions structure:
+
+&lt;ip-permissions&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;ip-protocol&gt;&lt;/ip-protocol&gt;
+        &lt;from-port&gt;&lt;/from-port&gt;
+        &lt;to-port&gt;&lt;/to-port&gt;
+        &lt;groups&gt;
+            &lt;!--Zero or more repetition--&gt;
+            &lt;item&gt;
+                &lt;user-id&gt;&lt;/user-id&gt;
+                &lt;group-name&gt;&lt;/group-name&gt;
+            &lt;/item&gt;
+        &lt;/groups&gt;
+        &lt;ip-ranges&gt;
+            &lt;!--Zero or more repetition--&gt;
+            &lt;item&gt;
+                &lt;cidr-ip&gt;&lt;/cidr-ip&gt;
+            &lt;/item&gt;
+        &lt;/ip-ranges&gt;
+    &lt;/item&gt;
+&lt;/ip-permissions&gt;
+</description>
+        <from>ip permissions</from>
+        <to>ip permissions</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:AO-AD-Amazon_EC2:Utilities:Security_Group_Operations:Construct Request for Revoke Security Group Ingress</process-name>
+        <parameters>
+          <input>
+            <from>wsdl location</from>
+            <to>wsdl location</to>
+          </input>
+          <input>
+            <from>endpoint address</from>
+            <to>endpoint address</to>
+          </input>
+          <input>
+            <from>signature properties</from>
+            <to>signature properties</to>
+          </input>
+          <input>
+            <from>user id</from>
+            <to>user id</to>
+          </input>
+          <input>
+            <from>group name</from>
+            <to>group name</to>
+          </input>
+          <input>
+            <from>ip permissions</from>
+            <to>ip permissions</to>
+          </input>
+          <output>
+            <from>adapter request</from>
+            <to>adapter request</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:AO-AD-Amazon_EC2:Utilities:Call Amazon EC2 Adapter</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>adapter request</from>
+            <to>adapter request</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[2]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Revokes permissions from a security group. The permissions used to revoke must be specified using
+the same values used to grant the permissions.
+
+Permissions are specified by IP protocol (TCP, UDP, or ICMP), the source of the request (by IP range
+or an Amazon EC2 user-group pair), the source and destination port ranges (for TCP and UDP), and
+the ICMP codes and types (for ICMP).</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>117e60fb-78f0-3a00-8215-753871fe321b</process-id>
+      <author></author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1296739544133</last-modified>
+    </meta>
+  </process-def>
+</process>

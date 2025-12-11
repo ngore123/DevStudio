@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process>
+   <process-def name=":BMC-SA-Service_Desk_Automation:rules">
+      <sequence>
+         <switch>
+            <meta>
+               <peer-location>
+                  <location>any</location>
+               </peer-location>
+            </meta>
+            <execute-all-applicable-cases>true</execute-all-applicable-cases>
+            <case name="BMC SDA Fulfillment On AR Alert Notification" applies-if-any-condition-true="false">
+               <condition>
+                  <document>
+                     <input>
+                        <from>inputevent</from>
+                     </input>
+                  </document>
+                  <xpath-expression>
+                     <xpath><![CDATA[(contains(//form-name, "HPD:Help Desk") or contains(//form-name, "WOI:WorkOrder") or contains(//form-name, "TMS:Task")) and  (normalize-space(substring-before(substring-after(//text, "ServiceType="), "ActionType"))="Service Desk Automation")='true']]></xpath>
+                  </xpath-expression>
+                  <gui-data>
+                     <from><![CDATA[(contains(//form-name, "HPD:Help Desk") or contains(//form-name, "WOI:WorkOrder") or contains(//form-name, "TMS:Task")) and  (normalize-space(substring-before(substring-after(//text, "ServiceType="), "ActionType"))="Service Desk Automation")]]></from>
+                     <fromKey><![CDATA[2136]]></fromKey>
+                     <to><![CDATA['true']]></to>
+                     <operator><![CDATA[=]]></operator>
+                     <type><![CDATA[String]]></type>
+                  </gui-data>
+               </condition>
+               <sequence>
+                  <schedule-job>
+                     <parameters>
+                        <input required="false">
+                           <from>inputevent</from>
+                           <to>inputevent</to>
+                        </input>
+                     </parameters>
+                     <group>BMC-SA-Service_Desk_Automation</group>
+                     <name-prefix>BMC SDA Fulfillment On AR Alert Notification</name-prefix>
+                     <process-name>:BMC-SA-Service_Desk_Automation:Process Event</process-name>
+                  </schedule-job>
+               </sequence>
+            </case>
+         </switch>
+      </sequence>
+      <meta>
+         <peer-location>
+            <location>any</location>
+         </peer-location>
+      </meta>
+      <parameters>
+         <input>
+            <from>inputevent</from>
+            <to>inputevent</to>
+         </input>
+      </parameters>
+   </process-def>
+</process>
+

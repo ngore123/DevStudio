@@ -1,0 +1,454 @@
+<process draft="false" dev-studio-version="7.6.01.02">
+  <process-def name=":AutoPilot-OA-Storage_Management:Setup_Validation:Test Provision Storage">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of a configuration item defined in a configuration module.
+
+Valid Values: NetApp</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>String Value - The type of a storage to be provisioned
+
+Valid Values: NAS or SAN</description>
+        <from>storage type</from>
+        <to>storage type</to>
+      </input>
+      <output global="false" required="false">
+        <to>storages</to>
+        <from>storages</from>
+      </output>
+      <output global="false" required="false">
+        <to>provision dataset response</to>
+        <from>provision dataset response</from>
+      </output>
+      <output global="false" required="false">
+        <to>success status</to>
+        <from>success status</from>
+      </output>
+      <output global="false" required="false">
+        <to>status message</to>
+        <from>status message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>BMC-AO</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>target</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>AO_SAN_Runbook_DS2</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>dataset-name</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>33554432</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>size</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>CHECKSAN101</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>name</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>Storage 'CHECKSAN101' provisioned with a size of 20MB</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>description</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value></value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>dataset-export-protocol</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>windows</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>igroup-os-type</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>aus-r710-esx-aspen01.bmc.com</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>lun-mapping-initiator-hostname</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>aus-netapp-01_iscsi_initiator1</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>lun-mapping-initiator-id</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value></value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>initial-snapshot-space</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>554432</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>maximum-snapshot-space</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>storage</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>storages</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="storage">
+                      <input global="false">
+                        <from>storage</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="empty-document" />
+  <xsl:template match="/">
+    <Storages>
+      <xsl:choose>
+        <xsl:when test="string-length(//storage) &gt; 0">
+          <xsl:copy-of select="//storage" />
+        </xsl:when>
+        <xsl:otherwise>${storage}</xsl:otherwise>
+      </xsl:choose>
+    </Storages>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>storages</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>storage type</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[text()="NAS"]]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <console-output>
+              <type>INFO</type>
+              <summary>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </summary>
+              <detail>
+                <concat>
+                  <input>
+                    <value></value>
+                  </input>
+                </concat>
+              </detail>
+            </console-output>
+            <assign>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>AO NAS Dataset</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>dataset-name</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>27020096</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>size</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>CHECK100</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>name</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>Storage CHECK100 provisioned with a size of 17MB</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>description</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value></value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>dataset-export-protocol</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value></value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>nfs-security-flavor</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>rba-dev15.bmc.com</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>nfs-export-rw-hosts-hostname</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>storage</to>
+                  <value>BMC-AO</value>
+                  <concept type="AutoPilot-OA-Storage_Management:Storage">
+                    <attribute>target</attribute>
+                  </concept>
+                </output>
+              </assignment>
+              <assignment>
+                <document>
+                  <input>
+                    <from>storage</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>storages</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="storage">
+                      <input global="false">
+                        <from>storage</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" cdata-section-elements="empty-document" />
+  <xsl:template match="/">
+    <Storages>
+      <xsl:choose>
+        <xsl:when test="string-length(//storage) &gt; 0">
+          <xsl:copy-of select="//storage" />
+        </xsl:when>
+        <xsl:otherwise>${storage}</xsl:otherwise>
+      </xsl:choose>
+    </Storages>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>storages</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+      <call-process>
+        <process-name>:AutoPilot-OA-Storage_Management:Provision Storage</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>storages</from>
+            <to>storages</to>
+          </input>
+          <input>
+            <from>storage type</from>
+            <to>storage type</to>
+          </input>
+          <output>
+            <from>provision dataset response</from>
+            <to>provision dataset response</to>
+          </output>
+          <output>
+            <from>storages</from>
+            <to>storages</to>
+          </output>
+          <output>
+            <from>success status</from>
+            <to>success status</to>
+          </output>
+          <output>
+            <from>status message</from>
+            <to>status message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+          <log>
+            <level>debug</level>
+            <parameters>
+              <input>
+                <value>After Provisioning</value>
+              </input>
+              <input>
+                <from>storages</from>
+              </input>
+            </parameters>
+          </log>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>This process deletes storage</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>76e726ea-b642-35c2-8142-b545a6a6ba1d</process-id>
+      <author />
+      <category />
+      <status />
+      <keywords />
+      <systems />
+      <last-modified-by />
+      <last-modified>1291624140589</last-modified>
+    </meta>
+  </process-def>
+</process>

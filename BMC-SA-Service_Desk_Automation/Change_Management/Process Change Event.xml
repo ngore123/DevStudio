@@ -1,0 +1,458 @@
+<process draft="false" dev-studio-version="7.8.00">
+  <process-def name=":BMC-SA-Service_Desk_Automation:Change_Management:Process Change Event">
+    <parameters>
+      <input global="false" required="true">
+        <description>String Value - The name of the configuration item defined in the configuration module. 
+
+Currently supported value:  BMC_AR_System</description>
+        <from>configuration name</from>
+        <to>configuration name</to>
+      </input>
+      <input global="false" required="true">
+        <description>The ID of the Change to read.
+
+Remedy Example: CRQ000000000829</description>
+        <from>change id</from>
+        <to>change id</to>
+      </input>
+      <input global="false" required="true">
+        <description>The ID of the associated task.</description>
+        <from>task id</from>
+        <to>task id</to>
+      </input>
+      <input global="false" required="true">
+        <description>The action to be taken on the input event. 
+
+Currently supported value: Unlock Account</description>
+        <from>action</from>
+        <to>action</to>
+      </input>
+      <output global="false" required="false">
+        <to>response xml</to>
+        <from>response xml</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Set Start Time</process-name>
+        <unique-id>c113440d-ac61-4f97-bc14-2607426fd912</unique-id>
+        <parameters>
+          <output>
+            <from>start time</from>
+            <to>start time</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <call-process>
+        <process-name>:BMC-SA-Service_Desk_Automation:Change_Management:Read Change</process-name>
+        <parameters>
+          <input>
+            <from>configuration name</from>
+            <to>configuration name</to>
+          </input>
+          <input>
+            <from>change id</from>
+            <to>change id</to>
+          </input>
+          <output>
+            <from>response xml</from>
+            <to>response xml</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[2]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>response xml</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens>
+                <replacement-token name="changeid">
+                  <input global="false">
+                    <from>change id</from>
+                  </input>
+                </replacement-token>
+              </xpath-replacement-tokens>
+              <xpath><![CDATA[//Changes//Change//change-id/text()='${changeid}']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <call-process>
+              <process-name>:BMC-SA-Service_Desk_Automation:Change_Management:Validate Change</process-name>
+              <parameters>
+                <input>
+                  <from>configuration name</from>
+                  <to>configuration name</to>
+                </input>
+                <input>
+                  <from>response xml</from>
+                  <to>bao process data</to>
+                </input>
+                <output>
+                  <from>response xml</from>
+                  <to>response xml</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <before-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>Validating Change...</value>
+                    </input>
+                    <input>
+                      <value></value>
+                    </input>
+                  </parameters>
+                </log>
+              </before-execution>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence />
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>response xml</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[//metadata/status/text()='success']]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>action</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>ActionGroupName</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[translate(.," ","")]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:BMC-SA-Service_Desk_Automation:Utilities:Get Required Fulfillment Input</process-name>
+                    <unique-id>f04ed8c6-fce8-40a0-a070-02937bf5f5ea</unique-id>
+                    <parameters>
+                      <input>
+                        <from>configuration name</from>
+                        <to>configuration name</to>
+                      </input>
+                      <input>
+                        <value>ChangeManagement</value>
+                        <to>configuration group</to>
+                      </input>
+                      <input>
+                        <from>change id</from>
+                        <to>number</to>
+                      </input>
+                      <output>
+                        <from>field value</from>
+                        <to>field value</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>The Change is Valid. Now getting the required fulfillment input.</value>
+                          </input>
+                          <input>
+                            <value></value>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <input>
+                        <compose-xml>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;item&gt;ActionType=</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>action</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>,Change Id=</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>change id</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>,Task Id=</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>task id</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>,Configuration Name=</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>configuration name</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>,Ticket Type=Change,WorkInfo=</value>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="true">
+                            <input required="false">
+                              <from>field value</from>
+                            </input>
+                          </fragment>
+                          <fragment type="string" encode="false">
+                            <input>
+                              <value>&lt;/item&gt;</value>
+                            </input>
+                          </fragment>
+                        </compose-xml>
+                      </input>
+                      <output>
+                        <to>fulfillment input</to>
+                      </output>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>response xml</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>response xml</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="fulfillment input">
+                            <input global="false">
+                              <from>fulfillment input</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="node()|@*">
+    <xsl:copy>
+      <xsl:apply-templates select="node()|@*" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="request-data">
+    <xsl:copy>
+      <xsl:copy-of select="@*|node()" />
+      ${fulfillment input}
+    </xsl:copy>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <assignment>
+                      <document>
+                        <input global="true">
+                          <configuration>:BMC-SA-Service_Desk_Automation:FulfillmentIntegrations:Defaults:Templates:RequestResponseTemplate</configuration>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>response xml</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="fulfillment input">
+                            <input global="false">
+                              <from>fulfillment input</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="node()|@*">
+    <xsl:copy>
+      <xsl:apply-templates select="node()|@*" />
+    </xsl:copy>
+  </xsl:template>
+  <xsl:template match="request-data">
+    <xsl:copy>
+      <xsl:copy-of select="@*|node()" />
+      <fulfillment-input>${fulfillment input}</fulfillment-input>
+    </xsl:copy>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[2]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:BMC-SA-Service_Desk_Automation:Change_Management:Process Fulfillment On Change</process-name>
+                    <parameters>
+                      <input>
+                        <from>configuration name</from>
+                        <to>configuration name</to>
+                      </input>
+                      <input>
+                        <from>change id</from>
+                        <to>change id</to>
+                      </input>
+                      <input>
+                        <from>task id</from>
+                        <to>task id</to>
+                      </input>
+                      <input>
+                        <from>response xml</from>
+                        <to>bao process data</to>
+                      </input>
+                      <output>
+                        <from>response xml</from>
+                        <to>response xml</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[2]</location>
+                  </call-process>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>true</is-enabled>
+        <log-file-name>Process-Change-Event.log</log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>a01c4780-c1af-4b60-b72f-395f13fb64aa</process-id>
+      <author>AoAdmin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1462181420972</last-modified>
+    </meta>
+  </process-def>
+</process>

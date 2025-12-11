@@ -1,0 +1,183 @@
+<process draft="false" dev-studio-version="7.6.03">
+  <process-def name=":Closed_Loop_Compliance-SA-Servers:Utilities:Log Message">
+    <parameters>
+      <input global="false" required="true">
+        <from>message</from>
+        <to>message</to>
+      </input>
+      <input global="false" required="true">
+        <from>message type</from>
+        <to>message type</to>
+      </input>
+    </parameters>
+    <access />
+    <sequence>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence />
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input global="true">
+                <configuration>:Closed_Loop_Compliance-SA-Servers:BLADELOGIC:Runbook_Defaults:Logging_Enabled</configuration>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[string(.)='true']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <utility>
+              <date>
+                <now />
+              </date>
+              <output global="false">
+                <to>time now</to>
+              </output>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <from>time now</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[2]:utility[1]</location>
+            </utility>
+            <call-process>
+              <process-name>:AutoPilot-OA-Common_Utilities:Format Date</process-name>
+              <parameters>
+                <input>
+                  <from>time now</from>
+                  <to>date</to>
+                </input>
+                <input global="true">
+                  <configuration>:Closed_Loop_Compliance-SA-Servers:BLADELOGIC:Runbook_Defaults:Default_TimeZone</configuration>
+                  <to>time zone</to>
+                </input>
+                <input>
+                  <value>yyyy-MM-dd HH:mm:ss</value>
+                  <to>format string</to>
+                </input>
+                <output>
+                  <from>formatted date</from>
+                  <to>formatted date</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[1]</location>
+            </call-process>
+            <assign>
+              <assignment>
+                <input>
+                  <concat>
+                    <input required="false">
+                      <from>formatted date</from>
+                    </input>
+                    <input>
+                      <value>: </value>
+                    </input>
+                    <input required="false">
+                      <from>message type</from>
+                    </input>
+                    <input>
+                      <value>: </value>
+                    </input>
+                    <input required="false">
+                      <from>message</from>
+                    </input>
+                  </concat>
+                </input>
+                <output>
+                  <to>log message</to>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:assign[1]</location>
+            </assign>
+            <call-process>
+              <process-name>:AutoPilot-AD-Utilities:Terminal:File:Append</process-name>
+              <parameters>
+                <input global="true">
+                  <configuration>:Closed_Loop_Compliance-SA-Servers:BLADELOGIC:Adapters:FileAdapter</configuration>
+                  <to>adapter name</to>
+                </input>
+                <input global="true">
+                  <configuration>:Closed_Loop_Compliance-SA-Servers:BLADELOGIC:Runbook_Defaults:Log_File_Path</configuration>
+                  <to>file name</to>
+                </input>
+                <input>
+                  <from>log message</from>
+                  <to>line 1</to>
+                </input>
+                <output>
+                  <from>adapter response</from>
+                  <to>adapter response</to>
+                </output>
+              </parameters>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>false</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <location>:switch[1]:sequence[2]:call-process[2]</location>
+            </call-process>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description></description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>7b099b8c-c11d-4e87-a69e-bdf08fd2cafd</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1407317155611</last-modified>
+    </meta>
+  </process-def>
+</process>

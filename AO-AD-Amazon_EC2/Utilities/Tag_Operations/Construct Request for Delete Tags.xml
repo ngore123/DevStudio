@@ -1,0 +1,172 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AO-AD-Amazon_EC2:Utilities:Tag_Operations:Construct Request for Delete Tags">
+    <parameters>
+      <input global="false" required="false">
+        <description>wsdl location [Optional]
+
+The target WSDL URL for Amazon EC2. The value of this parameter overrides the WSDL URL value provided in adapter configuration. A sample WSDL URL is - 
+http://ec2.amazonaws.com/doc/2009-11-30/AmazonEC2.wsdl</description>
+        <from>wsdl location</from>
+        <to>wsdl location</to>
+      </input>
+      <input global="false" required="false">
+        <description>endpoint address [Optional]
+
+The WebService endpoint to use for performing operations on Amazon EC2 instances across different regions. Respective values for different regions are as below:
+
+    * http://us-east-1.ec2.amazonaws.com/ — Endpoint located in the US-East (Northern Virginia) Region
+    * http://us-west-1.ec2.amazonaws.com/ — Endpoint located in the US-West (Northern California) Region
+    * http://eu-west-1.ec2.amazonaws.com/ ---Endpoint located in the EU (Ireland) Region
+</description>
+        <from>endpoint address</from>
+        <to>endpoint address</to>
+      </input>
+      <input global="false" required="false">
+        <description>signature properties [Optional]
+
+Specify this element for including authentication credentials at request level. 
+
+Sample values that can be specified are:
+
+&lt;signature-properties mode = "key-files"&gt;
+    &lt;private-key-file&gt;&lt;/private-key-file&gt;
+    &lt;certificate-file&gt;&lt;/certificate-file&gt;
+&lt;/signature-properties&gt;
+
+OR
+
+&lt;signature-properties mode = "key-data"&gt;
+    &lt;private-key-data&gt;&lt;/private-key-data&gt;
+    &lt;certificate-data&gt;&lt;/certificate-data&gt;
+&lt;/signature-properties&gt;
+</description>
+        <from>signature properties</from>
+        <to>signature properties</to>
+      </input>
+      <input global="false" required="true">
+        <description>resources set [Mandatory]
+
+Resouce details for which tag(s) need to be removed
+
+&lt;resources-set&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;resource-id&gt;ami-0535d66c&lt;/resource-id&gt;
+    &lt;/item&gt;
+&lt;/resources-set&gt;
+</description>
+        <from>resources set</from>
+        <to>resources set</to>
+      </input>
+      <input global="false" required="true">
+        <description>tag set [Mandatory]
+
+Tags to be removed from the resources
+
+&lt;tag-set&gt;
+    &lt;!--Zero or more repetition--&gt;
+    &lt;item&gt;
+        &lt;key&gt;Name&lt;/key&gt;
+        &lt;value&gt;Amazon Windows First&lt;/value&gt;
+    &lt;/item&gt;
+&lt;/tag-set&gt;
+</description>
+        <from>tag set</from>
+        <to>tag set</to>
+      </input>
+      <output global="false" required="false">
+        <to>adapter request</to>
+        <from>adapter request</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>adapter request</to>
+            <value>
+              <empty />
+            </value>
+          </output>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens>
+              <replacement-token name="wsdl location">
+                <input global="false">
+                  <from>wsdl location</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="endpoint address">
+                <input global="false">
+                  <from>endpoint address</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="signature properties">
+                <input global="false">
+                  <from>signature properties</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="resources set">
+                <input global="false">
+                  <from>resources set</from>
+                </input>
+              </replacement-token>
+              <replacement-token name="tag set">
+                <input global="false">
+                  <from>tag set</from>
+                </input>
+              </replacement-token>
+            </stylesheet-replacement-tokens>
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="yes" />
+  <xsl:template match="/">
+    <request-data>
+      <amazon-ec2-request>
+        <xsl:if test="string-length('${wsdl location}')&gt;0">
+          <wsdl-location>${wsdl location}</wsdl-location>
+        </xsl:if>
+        <xsl:if test="string-length('${endpoint address}')&gt;0">
+          <endpoint-address>${endpoint address}</endpoint-address>
+        </xsl:if>
+        ${signature properties}
+        <operation-name>
+          <xsl:text disable-output-escaping="no">delete-tags</xsl:text>
+        </operation-name>
+        <parameters>${resources set}${tag set}</parameters>
+      </amazon-ec2-request>
+    </request-data>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Deletes a specific set of tags from a specific set of resources.</description>
+        <version>1.0</version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>1170a0a0-9a98-4e23-9ffb-c33b8c180ced</process-id>
+      <author />
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by></last-modified-by>
+      <last-modified>1310358253368</last-modified>
+    </meta>
+  </process-def>
+</process>

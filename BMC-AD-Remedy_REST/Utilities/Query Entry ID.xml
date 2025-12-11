@@ -1,0 +1,551 @@
+<process draft="false" dev-studio-version="8.2.00">
+  <process-def name=":BMC-AD-Remedy_REST:Utilities:Query Entry ID">
+    <parameters>
+      <input global="false" required="true">
+        <description>Adapter supporting requests to Remedy REST API</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Remedy REST API URL. For example: http(s)://&lt;remedy-host&gt;:&lt;remedy-rest-api-port&gt;
+
+By default, out of the box, Remedy REST API server port is 8008.
+
+http://remedy-server-name:8008</description>
+        <from>url</from>
+        <to>url</to>
+      </input>
+      <input global="false" required="true">
+        <description>Authorization token received via login to Remedy REST API.</description>
+        <from>authorization token</from>
+        <to>authorization token</to>
+      </input>
+      <input global="false" required="true">
+        <description>Name of the Remedy form from which entries are retrieved.</description>
+        <from>form name</from>
+        <to>form name</to>
+      </input>
+      <input global="false" required="false">
+        <description>Like 'Submitter' = "Allen"</description>
+        <from>query</from>
+        <to>query</to>
+      </input>
+      <input global="false" required="false">
+        <description>Field name in the form represents the entry ID. By default a value Entry-ID will be used. But for a given form the field name can be different. Like in CHG:ChangeInterface for the field name is "Change_Entry_ID".</description>
+        <from>field name</from>
+        <to>field name</to>
+      </input>
+      <output global="false" required="false">
+        <description>Entry ID for the record.</description>
+        <to>entry id</to>
+        <from>entry id</from>
+      </output>
+      <output global="false" required="false">
+        <description>succcess/failure</description>
+        <to>status</to>
+        <from>status</from>
+      </output>
+      <output global="false" required="false">
+        <description>HTTP return code</description>
+        <to>status code</to>
+        <from>status code</from>
+      </output>
+      <output global="false" required="false">
+        <description>Error message if any</description>
+        <to>error message</to>
+        <from>error message</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>status</to>
+            <value>success</value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>error message</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>response headers</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>response body</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <output>
+            <to>entry id</to>
+            <value></value>
+          </output>
+        </assignment>
+        <assignment>
+          <document>
+            <input>
+              <from>field name</from>
+            </input>
+          </document>
+          <result>
+            <output>
+              <to>fields</to>
+            </output>
+          </result>
+          <xslt-stylesheet>
+            <stylesheet-replacement-tokens />
+            <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:template match="/">
+    <value>
+      <xsl:text disable-output-escaping="no">values(</xsl:text>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">Entry-ID</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+      <xsl:text disable-output-escaping="no">)</xsl:text>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+          </xslt-stylesheet>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:BMC-AD-Remedy_REST:Find Items</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>url</from>
+            <to>url</to>
+          </input>
+          <input>
+            <from>authorization token</from>
+            <to>authorization token</to>
+          </input>
+          <input>
+            <from>form name</from>
+            <to>form name</to>
+          </input>
+          <input>
+            <from>query</from>
+            <to>query</to>
+          </input>
+          <input>
+            <value>xml</value>
+            <to>return data format</to>
+          </input>
+          <input>
+            <from>fields</from>
+            <to>fields</to>
+          </input>
+          <output>
+            <from>response headers</from>
+            <to>response headers</to>
+          </output>
+          <output>
+            <from>response body</from>
+            <to>response body</to>
+          </output>
+          <output>
+            <from>status</from>
+            <to>status</to>
+          </output>
+          <output>
+            <from>status code</from>
+            <to>status code</to>
+          </output>
+          <output>
+            <from>error message</from>
+            <to>error message</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:call-process[1]</location>
+      </call-process>
+      <switch>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>true</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <execute-all-applicable-cases>false</execute-all-applicable-cases>
+        <default>
+          <sequence>
+            <assign>
+              <assignment>
+                <document>
+                  <input>
+                    <from>error message</from>
+                  </input>
+                </document>
+                <result>
+                  <output>
+                    <to>error message</to>
+                  </output>
+                </result>
+                <xslt-stylesheet>
+                  <stylesheet-replacement-tokens>
+                    <replacement-token name="query">
+                      <input global="false">
+                        <from>query</from>
+                      </input>
+                    </replacement-token>
+                  </stylesheet-replacement-tokens>
+                  <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" cdata-section-elements="value " />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="string-length(normalize-space(.)) &gt; 0">
+          <xsl:value-of select="." disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text disable-output-escaping="no">Entry ID not found for query: $[query]</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                </xslt-stylesheet>
+              </assignment>
+              <assignment>
+                <output>
+                  <to>status</to>
+                  <value>failure</value>
+                </output>
+              </assignment>
+              <meta>
+                <documentation />
+                <checkpoint>false</checkpoint>
+              </meta>
+              <after-execution>
+                <log>
+                  <level>debug</level>
+                  <parameters>
+                    <input>
+                      <value>==== Entry ID not found===</value>
+                    </input>
+                    <input>
+                      <from>status</from>
+                    </input>
+                    <input>
+                      <from>error message</from>
+                    </input>
+                  </parameters>
+                </log>
+              </after-execution>
+              <location>:switch[1]:sequence[1]:assign[1]</location>
+            </assign>
+          </sequence>
+        </default>
+        <case>
+          <condition>
+            <document>
+              <input>
+                <from>status</from>
+              </input>
+            </document>
+            <xpath-expression>
+              <xpath-replacement-tokens />
+              <xpath><![CDATA[. = 'success']]></xpath>
+            </xpath-expression>
+          </condition>
+          <sequence>
+            <switch>
+              <meta>
+                <documentation />
+                <run-mode-handling>
+                  <run-mode>OCP</run-mode>
+                  <allow-step-into>true</allow-step-into>
+                </run-mode-handling>
+                <checkpoint>false</checkpoint>
+              </meta>
+              <execute-all-applicable-cases>false</execute-all-applicable-cases>
+              <default>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>response body</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>entry id</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="field name">
+                            <input global="false">
+                              <from>field name</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="SPACE" select="' '" />
+  <xsl:variable name="HYPHEN" select="'-'" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="contains('${field name}',  $SPACE)">
+          <xsl:variable name="fieldName" select="translate('${field name}', $SPACE, $HYPHEN)" />
+          <xsl:value-of select="//*[name() = $fieldName]/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="//*[name() = '${field name}']/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>=====response body - non JSON===</value>
+                          </input>
+                          <input>
+                            <from>response body</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>====Found entry ID ===</value>
+                          </input>
+                          <input>
+                            <from>entry id</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[1]:assign[1]</location>
+                  </assign>
+                </sequence>
+              </default>
+              <case>
+                <condition>
+                  <document>
+                    <input>
+                      <from>response body</from>
+                    </input>
+                  </document>
+                  <xpath-expression>
+                    <xpath-replacement-tokens />
+                    <xpath><![CDATA[boolean(//non-xml-data-response) and starts-with(//non-xml-data-response/text(), '{') ]]></xpath>
+                  </xpath-expression>
+                </condition>
+                <sequence>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>response body</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>json data</to>
+                        </output>
+                      </result>
+                      <xpath-expression>
+                        <xpath-replacement-tokens />
+                        <xpath><![CDATA[//non-xml-data-response/text()]]></xpath>
+                      </xpath-expression>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>====Extarcted JSON data===</value>
+                          </input>
+                          <input>
+                            <from>json data</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[1]</location>
+                  </assign>
+                  <call-process>
+                    <process-name>:AutoPilot-OA-Common_Utilities:XML_Utilities:Convert JSON to XML</process-name>
+                    <parameters>
+                      <input>
+                        <from>json data</from>
+                        <to>JSON</to>
+                      </input>
+                      <output>
+                        <from>XML</from>
+                        <to>xml data</to>
+                      </output>
+                    </parameters>
+                    <meta>
+                      <documentation />
+                      <run-mode-handling>
+                        <run-mode>OCP</run-mode>
+                        <allow-step-into>false</allow-step-into>
+                      </run-mode-handling>
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:call-process[1]</location>
+                  </call-process>
+                  <assign>
+                    <assignment>
+                      <document>
+                        <input>
+                          <from>xml data</from>
+                        </input>
+                      </document>
+                      <result>
+                        <output>
+                          <to>entry id</to>
+                        </output>
+                      </result>
+                      <xslt-stylesheet>
+                        <stylesheet-replacement-tokens>
+                          <replacement-token name="field name">
+                            <input global="false">
+                              <from>field name</from>
+                            </input>
+                          </replacement-token>
+                        </stylesheet-replacement-tokens>
+                        <stylesheet><![CDATA[<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+  <xsl:output indent="no" />
+  <xsl:variable name="SPACE" select="' '" />
+  <xsl:variable name="HYPHEN" select="'-'" />
+  <xsl:template match="/">
+    <value>
+      <xsl:choose>
+        <xsl:when test="contains('${field name}' ,  $SPACE)">
+          <xsl:variable name="fieldName" select="translate('${field name}',  $SPACE, $HYPHEN)" />
+          <xsl:value-of select="//*[name() = $fieldName]/text()" disable-output-escaping="no" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="//*[name() = '${field name}']/text()" disable-output-escaping="no" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </value>
+  </xsl:template>
+</xsl:stylesheet>]]></stylesheet>
+                      </xslt-stylesheet>
+                    </assignment>
+                    <meta>
+                      <documentation />
+                      <checkpoint>false</checkpoint>
+                    </meta>
+                    <before-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>====JSON Converted to XML with Entry ID====</value>
+                          </input>
+                          <input>
+                            <from>xml data</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </before-execution>
+                    <after-execution>
+                      <log>
+                        <level>debug</level>
+                        <parameters>
+                          <input>
+                            <value>====Extract Entry ID===</value>
+                          </input>
+                          <input>
+                            <from>entry id</from>
+                          </input>
+                        </parameters>
+                      </log>
+                    </after-execution>
+                    <location>:switch[1]:sequence[2]:switch[1]:sequence[2]:assign[2]</location>
+                  </assign>
+                </sequence>
+              </case>
+              <location>:switch[1]:sequence[2]:switch[1]</location>
+            </switch>
+          </sequence>
+        </case>
+        <location>:switch[1]</location>
+      </switch>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+        <consumer>OCP</consumer>
+        <consumer>SOAP</consumer>
+      </expose-to>
+      <documentation>
+        <description>Find items in  Remedy using REST API.</description>
+        <version></version>
+      </documentation>
+      <logging-options>
+        <is-enabled>false</is-enabled>
+        <log-file-name></log-file-name>
+      </logging-options>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>true</record-metrics>
+      <process-id>8572c8ca-8da7-4b7e-94bd-e13bdf80a7c1</process-id>
+      <author>Ranganath Samudrala</author>
+      <category>Remedy REST API</category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>aoadmin</last-modified-by>
+      <last-modified>1574879838842</last-modified>
+    </meta>
+  </process-def>
+</process>

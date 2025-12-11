@@ -1,0 +1,184 @@
+<process draft="false" dev-studio-version="7.6.02.00">
+  <process-def name=":AO-AD-Dell_Advanced_Infrastructure_Manager:v3.4:VMRack:Start VMRack">
+    <parameters>
+      <input global="false" required="false">
+        <description>The name of the adapter to use to handle the request. 
+Default adapter name: DellAIMActor.</description>
+        <from>adapter name</from>
+        <to>adapter name</to>
+      </input>
+      <input global="false" required="true">
+        <description>Starts a VM Rack
+
+Sample items Xml: 
+
+&lt;items&gt;
+	&lt;item&gt;
+		&lt;targets&gt;
+			&lt;target&gt;
+				&lt;host&gt;localhost&lt;/host&gt;
+				&lt;user-name&gt;admin&lt;/user-name&gt;
+				&lt;password encryption-type="Base64"&gt;YWRtaW4=&lt;/password&gt;	
+				&lt;protocol&gt;https&lt;/protocol&gt;
+				&lt;port&gt;443&lt;/port&gt;
+				&lt;use-ssl-certificate&gt;true&lt;/use-ssl-certificate&gt;
+				&lt;allow-unsigned-certificate&gt;true&lt;/allow-unsigned-certificate&gt;
+				&lt;install-certificate&gt;true&lt;/install-certificate&gt;
+				&lt;passphrase&gt;changeit&lt;/passphrase&gt;
+			&lt;/target&gt;
+		&lt;/targets&gt;
+		&lt;target&gt;config1&lt;/target&gt;
+		&lt;vmrack-id&gt;VM_Rack_1&lt;/vmrack-id&gt;
+	&lt;/item&gt;
+&lt;/items&gt;
+
+
+Elements' Description:
+
+targets[Conditional]:
+	This tag is required when dynamic target configuration needs to be provided in the request. If no target configuration was provided while enabling and configuring an adapter then it is required to provide this tag. Multiple target configurations can be provided inside this tag.
+	
+target[Conditional]:
+	There are two ways in which this tag can be specified.
+	
+	First Option:
+		This tag when provided under "targets" tag will contain a dynamic target configuration information.
+	
+	Second Option:
+		When this tag is provided directly under "item" tag then it specifies the target configuration of Dell AIM Controller on which the request will be executed.
+
+		Valid values: The value specified for &lt;target&gt; XML element must be same as the value that has been specified for the name attribute of &lt;config&gt; element in Grid Manager adapter configuration.
+	
+		Default value: 
+		If this element is not provided or left empty, the request will be executed on the first defined Grid Manager adapter configuration.
+		
+	Note: If "target" tag is provided at both the places then dynamic targets configuration will take precedence.
+
+host[Conditional]:
+	Host name or IP address of Dell AIM Controller. This tag is required while providing dynamic targets.
+
+user-name[Conditional]:
+	Username required to authenticate Dell AIM Controller. This tag is required while providing dynamic targets.
+
+password[Conditional]:
+	The password associated with the &lt;user-name&gt; provided. Encrypted password can be provided by providing an
+"encryption-type" attribute. This tag is required while providing dynamic targets. Valid values for encryption-type are: Plain, Base64
+
+protocol[Optional]:
+	Protocol to connect Dell AIM Controller. This tag is valid here only while providing dynamic targets. Valid values - http, https. Default value - http
+
+port[Optional]:
+	Port associated with protocol provided. This tag is valid here only while providing dynamic targets. Default values - 80 for "http" protocol and 443 for "https" protocol.
+	
+use-ssl-certificate[Optional]: 
+	Determines whether to establish a secure connection. This tag is valid here only while providing dynamic targets. Valid values: true, false. Default value: false
+
+allow-unsigned-certificate[Optional]: 
+	Specifies whether to allow unsigned certificates from trusted zones. This tag is valid here only while providing dynamic targets. Valid values: true, false. Default value: false
+
+install-certificate[Optional]: 
+	Determines whether to install certificates. This tag is valid here only while providing dynamic targets. Valid values: true, false. Default value: false
+
+passphrase[Optional]: 
+	Specifies the Java Standard Trust Keystore passphrase. This tag is valid here only while providing dynamic targets. Default value: changeit
+
+vmrack-id[Required]
+	ID of the VMRack to be started.</description>
+        <from>items</from>
+        <to>items</to>
+      </input>
+      <output global="false" required="false">
+        <description>Returned adapter response is captured in this context parameter.</description>
+        <to>adapter response</to>
+        <from>adapter response</from>
+      </output>
+    </parameters>
+    <access />
+    <sequence>
+      <assign>
+        <assignment>
+          <output>
+            <to>operation name</to>
+            <value>start-vmrack</value>
+          </output>
+        </assignment>
+        <meta>
+          <documentation />
+          <checkpoint>false</checkpoint>
+        </meta>
+        <location>:assign[1]</location>
+      </assign>
+      <call-process>
+        <process-name>:AO-AD-Dell_Advanced_Infrastructure_Manager:Utilities:Execute Request</process-name>
+        <parameters>
+          <input>
+            <from>adapter name</from>
+            <to>adapter name</to>
+          </input>
+          <input>
+            <from>items</from>
+            <to>items</to>
+          </input>
+          <input>
+            <from>operation name</from>
+            <to>operation name</to>
+          </input>
+          <output>
+            <from>adapter response</from>
+            <to>adapter response</to>
+          </output>
+        </parameters>
+        <meta>
+          <documentation />
+          <run-mode-handling>
+            <run-mode>OCP</run-mode>
+            <allow-step-into>false</allow-step-into>
+          </run-mode-handling>
+          <checkpoint>false</checkpoint>
+        </meta>
+        <after-execution>
+          <console-output>
+            <type>INFO</type>
+            <summary>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </summary>
+            <detail>
+              <concat>
+                <input>
+                  <value></value>
+                </input>
+              </concat>
+            </detail>
+          </console-output>
+        </after-execution>
+        <location>:call-process[1]</location>
+      </call-process>
+    </sequence>
+    <meta>
+      <expose-to>
+        <consumer>RULE</consumer>
+        <consumer>SCHEDULE</consumer>
+      </expose-to>
+      <documentation>
+        <description>Starts a VMRack</description>
+        <version></version>
+      </documentation>
+      <peer-location>
+        <location>any</location>
+      </peer-location>
+      <record-metrics>false</record-metrics>
+      <process-id>8db5fe2a-61df-47be-9a6a-f820927efb38</process-id>
+      <author>admin</author>
+      <category></category>
+      <status></status>
+      <keywords></keywords>
+      <systems></systems>
+      <last-modified-by>admin</last-modified-by>
+      <last-modified>1304674873865</last-modified>
+    </meta>
+  </process-def>
+</process>
